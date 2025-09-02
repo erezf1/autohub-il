@@ -2,7 +2,7 @@ import { MessageCircle, Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
-const AppHeader = () => {
+const MobileHeader = () => {
   const navigate = useNavigate();
 
   return (
@@ -53,4 +53,4 @@ const AppHeader = () => {
   );
 };
 
-export default AppHeader;
+export default MobileHeader;

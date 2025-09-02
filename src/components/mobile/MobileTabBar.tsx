@@ -35,7 +35,7 @@ const tabs = [
   }
 ];
 
-const AppTabBar = () => {
+const MobileTabBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -81,4 +81,4 @@ const AppTabBar = () => {
   );
 };
 
-export default AppTabBar;
+export default MobileTabBar;

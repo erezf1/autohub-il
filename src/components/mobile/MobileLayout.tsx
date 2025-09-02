@@ -1,23 +1,23 @@
 import { ReactNode } from "react";
-import AppHeader from "./AppHeader";
-import AppTabBar from "./AppTabBar";
+import MobileHeader from "./MobileHeader";
+import MobileTabBar from "./MobileTabBar";
 
-interface AppLayoutProps {
+interface MobileLayoutProps {
   children: ReactNode;
 }
 
-const AppLayout = ({ children }: AppLayoutProps) => {
+const MobileLayout = ({ children }: MobileLayoutProps) => {
   return (
     <div className="min-h-screen bg-background" dir="rtl">
-      <AppHeader />
+      <MobileHeader />
       <main className="pb-16 pt-4 min-h-[calc(100vh-8rem)]">
         <div className="container max-w-md mx-auto px-4">
           {children}
         </div>
       </main>
-      <AppTabBar />
+      <MobileTabBar />
     </div>
   );
 };
 
-export default AppLayout;
+export default MobileLayout;
