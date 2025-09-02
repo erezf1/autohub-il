@@ -7,31 +7,31 @@ const tabs = [
     id: "search",
     label: "חפש במאגר",
     icon: Search,
-    path: "/search"
+    path: "/mobile/search"
   },
   {
     id: "iso",
     label: "רכבים דרושים",
     icon: FileText,
-    path: "/car-search-requests"
+    path: "/mobile/car-search-requests"
   },
   {
     id: "add",
     label: "הוסף",
     icon: Plus,
-    path: "/add"
+    path: "/mobile/add"
   },
   {
     id: "auctions",
     label: "מכירות פומביות",
     icon: Gavel,
-    path: "/auctions"
+    path: "/mobile/auctions"
   },
   {
     id: "profile",
     label: "הפרופיל שלי",
     icon: User,
-    path: "/profile"
+    path: "/mobile/profile"
   }
 ];
 
@@ -40,10 +40,10 @@ const MobileTabBar = () => {
   const navigate = useNavigate();
 
   const getAddButtonAction = () => {
-    if (location.pathname === "/auctions") {
-      return "/add-auction";
+    if (location.pathname === "/mobile/auctions") {
+      return "/mobile/add-auction";
     }
-    return "/add-car";
+    return "/mobile/add-car";
   };
 
   return (
@@ -53,8 +53,8 @@ const MobileTabBar = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = location.pathname === tab.path || 
-              (tab.path === "/search" && location.pathname === "/") ||
-              (tab.path === "/car-search-requests" && location.pathname === "/car-search-requests");
+              (tab.path === "/mobile/search" && (location.pathname === "/mobile" || location.pathname === "/mobile/")) ||
+              (tab.path === "/mobile/car-search-requests" && location.pathname === "/mobile/car-search-requests");
             
             return (
               <button

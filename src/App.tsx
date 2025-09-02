@@ -4,6 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// Landing Page
+import LandingPage from "./pages/LandingPage";
+
 // Mobile Layout and Pages
 import MobileLayout from "./components/mobile/MobileLayout";
 import DashboardScreen from "./pages/mobile/DashboardScreen";
@@ -36,8 +39,31 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Landing Page */}
+          <Route path="/" element={<LandingPage />} />
+
+          {/* Admin Routes - Must come before mobile catch-all */}
+          <Route path="/admin/*" element={
+            <AdminDesktopLayout>
+              <Routes>
+                <Route path="/" element={<AdminDashboard />} />
+                <Route path="/users" element={<AdminUsersList />} />
+                <Route path="/vehicles" element={<AdminVehiclesList />} />
+                <Route path="/vehicles/:id" element={<AdminVehicleDetail />} />
+                <Route path="/vehicle-requests" element={<AdminVehicleRequestsList />} />
+                <Route path="/vehicle-requests/:id" element={<div className="p-6 hebrew-text">פרטי בקשת רכב - בפיתוח</div>} />
+                <Route path="/auctions" element={<AdminAuctionsList />} />
+                <Route path="/auctions/:id" element={<div className="p-6 hebrew-text">פרטי מכירה פומבית - בפיתוח</div>} />
+                <Route path="/support" element={<AdminSupportTickets />} />
+                <Route path="/support/:id" element={<div className="p-6 hebrew-text">טיפול בפנייה - בפיתוח</div>} />
+                <Route path="/reports" element={<AdminReports />} />
+                <Route path="/settings" element={<AdminSettings />} />
+              </Routes>
+            </AdminDesktopLayout>
+          } />
+
           {/* Mobile Routes */}
-          <Route path="/*" element={
+          <Route path="/mobile/*" element={
             <MobileLayout>
               <Routes>
                 <Route path="/" element={<DashboardScreen />} />
@@ -59,26 +85,6 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </MobileLayout>
-          } />
-
-          {/* Admin Routes - Completely Separate */}
-          <Route path="/admin/*" element={
-            <AdminDesktopLayout>
-              <Routes>
-                <Route path="/" element={<AdminDashboard />} />
-                <Route path="/users" element={<AdminUsersList />} />
-                <Route path="/vehicles" element={<AdminVehiclesList />} />
-                <Route path="/vehicles/:id" element={<AdminVehicleDetail />} />
-                <Route path="/vehicle-requests" element={<AdminVehicleRequestsList />} />
-                <Route path="/vehicle-requests/:id" element={<div className="p-6 hebrew-text">פרטי בקשת רכב - בפיתוח</div>} />
-                <Route path="/auctions" element={<AdminAuctionsList />} />
-                <Route path="/auctions/:id" element={<div className="p-6 hebrew-text">פרטי מכירה פומבית - בפיתוח</div>} />
-                <Route path="/support" element={<AdminSupportTickets />} />
-                <Route path="/support/:id" element={<div className="p-6 hebrew-text">טיפול בפנייה - בפיתוח</div>} />
-                <Route path="/reports" element={<AdminReports />} />
-                <Route path="/settings" element={<AdminSettings />} />
-              </Routes>
-            </AdminDesktopLayout>
           } />
         </Routes>
       </BrowserRouter>
