@@ -19,6 +19,7 @@ import {
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import AdminDesktopLayout from "@/components/admin/AdminDesktopLayout";
 
 // Mock data for reports
 const availableReports = [
@@ -100,18 +101,19 @@ const AdminReports = () => {
   };
 
   return (
-    <div className="space-y-6 min-h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground hebrew-text">דוחות</h1>
-          <p className="text-muted-foreground hebrew-text">
-            יצירה וייצוא של דוחות מערכת
-          </p>
+    <AdminDesktopLayout>
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground hebrew-text">דוחות</h1>
+            <p className="text-lg text-muted-foreground hebrew-text mt-2">
+              יצירה וייצוא של דוחות מערכת
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Report Generation Section */}
+        {/* Report Generation Section */}
       <Card>
         <CardHeader>
           <CardTitle className="hebrew-text">יצירת דוח חדש</CardTitle>
@@ -312,10 +314,10 @@ const AdminReports = () => {
                 </Button>
               </div>
             </div>
-          </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </AdminDesktopLayout>
   );
 };
 

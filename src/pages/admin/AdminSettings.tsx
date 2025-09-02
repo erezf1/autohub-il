@@ -25,6 +25,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import AdminDesktopLayout from "@/components/admin/AdminDesktopLayout";
 
 // Mock data for system settings
 const vehicleCategories = [
@@ -56,30 +57,31 @@ const AdminSettings = () => {
   const [editingCategory, setEditingCategory] = useState<any>(null);
 
   return (
-    <div className="space-y-6 min-h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground hebrew-text">הגדרות מערכת</h1>
-          <p className="text-muted-foreground hebrew-text">
-            ניהול פרמטרים גלובליים של המערכת
-          </p>
+    <AdminDesktopLayout>
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground hebrew-text">הגדרות מערכת</h1>
+            <p className="text-lg text-muted-foreground hebrew-text mt-2">
+              ניהול פרמטרים גלובליים של המערכת
+            </p>
+          </div>
+          <Button size="lg" className="hebrew-text">
+            <Save className="h-4 w-4 ml-2" />
+            שמור שינויים
+          </Button>
         </div>
-        <Button className="hebrew-text">
-          <Save className="h-4 w-4 ml-2" />
-          שמור שינויים
-        </Button>
-      </div>
 
-      <Tabs defaultValue="categories" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="categories" className="hebrew-text">קטגוריות רכב</TabsTrigger>
-          <TabsTrigger value="reports" className="hebrew-text">סיבות דיווח</TabsTrigger>
-          <TabsTrigger value="system" className="hebrew-text">הגדרות מערכת</TabsTrigger>
-          <TabsTrigger value="users" className="hebrew-text">הגדרות משתמשים</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="categories" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="categories" className="hebrew-text">קטגוריות רכב</TabsTrigger>
+            <TabsTrigger value="reports" className="hebrew-text">סיבות דיווח</TabsTrigger>
+            <TabsTrigger value="system" className="hebrew-text">הגדרות מערכת</TabsTrigger>
+            <TabsTrigger value="users" className="hebrew-text">הגדרות משתמשים</TabsTrigger>
+          </TabsList>
 
-        {/* Vehicle Categories Tab */}
+          {/* Vehicle Categories Tab */}
         <TabsContent value="categories">
           <Card>
             <CardHeader>
@@ -371,8 +373,9 @@ const AdminSettings = () => {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
+    </AdminDesktopLayout>
   );
 };
 

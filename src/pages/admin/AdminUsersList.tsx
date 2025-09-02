@@ -1,10 +1,15 @@
 import { useState } from "react";
-import { Plus, Search, Filter, Eye, Edit, Trash2, CheckCircle, Clock, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Filter, MoreHorizontal, UserCheck, UserX, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -13,15 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import AdminDesktopLayout from "@/components/admin/AdminDesktopLayout";
 
 // Mock data
-const mockUsers = [
+const usersData = [
   {
     id: 1,
     name: "דוד כהן",
@@ -91,178 +91,144 @@ const mockUsers = [
 
 const AdminUsersList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [selectedFilter, setSelectedFilter] = useState("all");
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return <Badge variant="default" className="hebrew-text">פעיל</Badge>;
-      case "pending":
-        return <Badge variant="secondary" className="hebrew-text">ממתין לאישור</Badge>;
-      case "suspended":
-        return <Badge variant="destructive" className="hebrew-text">מושעה</Badge>;
-      default:
-        return <Badge variant="outline" className="hebrew-text">{status}</Badge>;
-    }
-  };
-
-  const getPlanBadge = (plan: string) => {
-    switch (plan) {
-      case "premium":
-        return <Badge variant="default" className="hebrew-text">פרמיום</Badge>;
-      case "basic":
-        return <Badge variant="outline" className="hebrew-text">בסיסי</Badge>;
-      default:
-        return <Badge variant="outline" className="hebrew-text">{plan}</Badge>;
-    }
-  };
-
-  const filteredUsers = mockUsers.filter(user => {
-    const matchesSearch = user.name.includes(searchTerm) || 
-                         user.business.includes(searchTerm) || 
-                         user.email.includes(searchTerm);
-    
-    if (activeTab === "all") return matchesSearch;
-    if (activeTab === "pending") return matchesSearch && user.status === "pending";
-    if (activeTab === "new") return matchesSearch && new Date(user.joinDate) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    
-    return matchesSearch;
+  const filteredUsers = usersData.filter(user => {
+    const matchesSearch = user.name.includes(searchTerm) || user.business.includes(searchTerm);
+    const matchesFilter = selectedFilter === "all" || user.status === selectedFilter;
+    return matchesSearch && matchesFilter;
   });
 
   return (
-    <div className="space-y-6 min-h-full">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground hebrew-text">ניהול משתמשים</h1>
-          <p className="text-muted-foreground hebrew-text mt-1">ניהול סוחרי רכב במערכת</p>
-        </div>
-        <Button className="hebrew-text">
-          <Plus className="h-4 w-4 ml-2" />
-          הוסף משתמש חדש
-        </Button>
-      </div>
-
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center space-x-4 space-x-reverse">
-            <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="חפש לפי שם, עסק או אימייל..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 hebrew-text"
-              />
-            </div>
-            <Button variant="outline" size="icon">
-              <Filter className="h-4 w-4" />
-            </Button>
+    <AdminDesktopLayout>
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground hebrew-text">ניהול משתמשים</h1>
+            <p className="text-lg text-muted-foreground hebrew-text mt-2">
+              ניהול סוחרים ומשתמשי המערכת
+            </p>
           </div>
-        </CardContent>
-      </Card>
+          <Button size="lg" className="hebrew-text">
+            הוסף משתמש חדש
+          </Button>
+        </div>
 
-      {/* Tabs and Table */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="all" className="hebrew-text">כל המשתמשים</TabsTrigger>
-          <TabsTrigger value="pending" className="hebrew-text">ממתינים לאישור</TabsTrigger>
-          <TabsTrigger value="new" className="hebrew-text">חדשים</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value={activeTab} className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">
-                {activeTab === "all" && `כל המשתמשים (${filteredUsers.length})`}
-                {activeTab === "pending" && `ממתינים לאישור (${filteredUsers.length})`}
-                {activeTab === "new" && `משתמשים חדשים (${filteredUsers.length})`}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="hebrew-text">משתמש</TableHead>
-                      <TableHead className="hebrew-text">סטטוס</TableHead>
-                      <TableHead className="hebrew-text">תוכנית</TableHead>
-                      <TableHead className="hebrew-text">פעילות</TableHead>
-                      <TableHead className="hebrew-text">התחברות אחרונה</TableHead>
-                      <TableHead className="hebrew-text">פעולות</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium hebrew-text">{user.name}</div>
-                            <div className="text-sm text-muted-foreground hebrew-text">{user.business}</div>
-                            <div className="text-xs text-muted-foreground">{user.email}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {getStatusBadge(user.status)}
-                        </TableCell>
-                        <TableCell>
-                          {getPlanBadge(user.plan)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div className="hebrew-text">{user.vehiclesCount} רכבים</div>
-                            <div className="hebrew-text">{user.auctionsCount} מכירות</div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="hebrew-text">
-                          {user.lastActive}
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                פעולות
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem className="hebrew-text">
-                                <Eye className="h-4 w-4 ml-2" />
-                                צפה בפרטים
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="hebrew-text">
-                                <Edit className="h-4 w-4 ml-2" />
-                                ערוך
-                              </DropdownMenuItem>
-                              {user.status === "pending" && (
-                                <DropdownMenuItem className="hebrew-text">
-                                  <CheckCircle className="h-4 w-4 ml-2" />
-                                  אשר
-                                </DropdownMenuItem>
-                              )}
-                              {user.status === "active" && (
-                                <DropdownMenuItem className="hebrew-text">
-                                  <Clock className="h-4 w-4 ml-2" />
-                                  השעה
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem className="text-destructive hebrew-text">
-                                <Trash2 className="h-4 w-4 ml-2" />
-                                מחק
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+        {/* Search and Filters */}
+        <Card>
+          <CardContent className="p-8">
+            <div className="flex gap-6">
+              <div className="relative flex-1">
+                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                <Input
+                  placeholder="חיפוש לפי שם או חברה..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-12 h-12 text-base hebrew-text"
+                />
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="lg" className="hebrew-text">
+                    <Filter className="ml-2 h-5 w-5" />
+                    {selectedFilter === "all" ? "כל הסטטוסים" : 
+                     selectedFilter === "active" ? "פעיל" :
+                     selectedFilter === "pending" ? "ממתין" : "חסום"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setSelectedFilter("all")} className="hebrew-text">
+                    כל הסטטוסים
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSelectedFilter("active")} className="hebrew-text">
+                    פעיל
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSelectedFilter("pending")} className="hebrew-text">
+                    ממתין לאישור
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSelectedFilter("suspended")} className="hebrew-text">
+                    מושעה
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Users Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl hebrew-text">רשימת משתמשים ({filteredUsers.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-right hebrew-text text-base">שם</TableHead>
+                  <TableHead className="text-right hebrew-text text-base">חברה</TableHead>
+                  <TableHead className="text-right hebrew-text text-base">אימייל</TableHead>
+                  <TableHead className="text-right hebrew-text text-base">תאריך הצטרפות</TableHead>
+                  <TableHead className="text-right hebrew-text text-base">סטטוס</TableHead>
+                  <TableHead className="text-right hebrew-text text-base">פעולות</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.id} className="h-16">
+                    <TableCell className="font-medium hebrew-text text-base">{user.name}</TableCell>
+                    <TableCell className="hebrew-text text-base">{user.business}</TableCell>
+                    <TableCell className="text-base">{user.email}</TableCell>
+                    <TableCell className="hebrew-text text-base">{user.joinDate}</TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant={
+                          user.status === "active" ? "default" :
+                          user.status === "pending" ? "secondary" :
+                          "destructive"
+                        }
+                        className="hebrew-text text-sm"
+                      >
+                        {user.status === "active" ? "פעיל" :
+                         user.status === "pending" ? "ממתין" :
+                         user.status === "suspended" ? "מושעה" : user.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem className="hebrew-text">
+                            <Eye className="ml-2 h-4 w-4" />
+                            צפה בפרטים
+                          </DropdownMenuItem>
+                          {user.status === "pending" && (
+                            <DropdownMenuItem className="hebrew-text">
+                              <UserCheck className="ml-2 h-4 w-4" />
+                              אשר משתמש
+                            </DropdownMenuItem>
+                          )}
+                          {user.status === "active" && (
+                            <DropdownMenuItem className="hebrew-text text-destructive">
+                              <UserX className="ml-2 h-4 w-4" />
+                              השעה משתמש
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+    </AdminDesktopLayout>
   );
 };
 
