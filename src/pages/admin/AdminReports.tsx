@@ -19,8 +19,6 @@ import {
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import AdminDesktopLayout from "@/components/admin/AdminDesktopLayout";
-
 // Mock data for reports
 const availableReports = [
   {
@@ -101,8 +99,7 @@ const AdminReports = () => {
   };
 
   return (
-    <AdminDesktopLayout>
-      <div className="space-y-8">
+    <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -318,7 +315,6 @@ const AdminReports = () => {
         </CardContent>
       </Card>
       </div>
-    </AdminDesktopLayout>
   );
 };
 

@@ -25,8 +25,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import AdminDesktopLayout from "@/components/admin/AdminDesktopLayout";
-
 // Mock data for system settings
 const vehicleCategories = [
   { id: 1, name: "רכבי נוסעים", subcategories: ["סדאן", "האצ'בק", "קופה", "קבריולט"], active: true },
@@ -57,8 +55,7 @@ const AdminSettings = () => {
   const [editingCategory, setEditingCategory] = useState<any>(null);
 
   return (
-    <AdminDesktopLayout>
-      <div className="space-y-8">
+    <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -375,7 +372,6 @@ const AdminSettings = () => {
         </TabsContent>
         </Tabs>
       </div>
-    </AdminDesktopLayout>
   );
 };
 

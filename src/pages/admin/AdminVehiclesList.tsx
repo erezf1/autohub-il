@@ -20,8 +20,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { MoreHorizontal } from "lucide-react";
-import AdminDesktopLayout from "@/components/admin/AdminDesktopLayout";
-
 // Mock data for vehicles
 const mockVehicles = [
   {
@@ -98,8 +96,7 @@ const AdminVehiclesList = () => {
   );
 
   return (
-    <AdminDesktopLayout>
-      <div className="space-y-8">
+    <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -208,7 +205,6 @@ const AdminVehiclesList = () => {
           </CardContent>
         </Card>
       </div>
-    </AdminDesktopLayout>
   );
 };
 

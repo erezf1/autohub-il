@@ -18,8 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import AdminDesktopLayout from "@/components/admin/AdminDesktopLayout";
-
 // Mock data
 const usersData = [
   {
@@ -100,8 +98,7 @@ const AdminUsersList = () => {
   });
 
   return (
-    <AdminDesktopLayout>
-      <div className="space-y-8">
+    <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -228,7 +225,6 @@ const AdminUsersList = () => {
           </CardContent>
         </Card>
       </div>
-    </AdminDesktopLayout>
   );
 };
 
