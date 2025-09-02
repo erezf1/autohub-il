@@ -1,8 +1,14 @@
 import { useState } from "react";
-import { FileBarChart, Download, Calendar, TrendingUp, Users, Car, Gavel, DollarSign } from "lucide-react";
+import { FileBarChart, Download, CalendarIcon, TrendingUp, Users, Car, Gavel, DollarSign } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -11,7 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DateRange } from "react-day-picker";
-import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 // Mock data for reports
 const availableReports = [
@@ -128,12 +135,43 @@ const AdminReports = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium hebrew-text">טווח תאריכים</label>
-              <Calendar
-                mode="range"
-                selected={dateRange}
-                onSelect={setDateRange}
-              />
+              <label className="text-sm font-medium hebrew-text">טווח תאريخים</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal hebrew-text",
+                      !dateRange && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="ml-2 h-4 w-4" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "dd/MM/yyyy")} -{" "}
+                          {format(dateRange.to, "dd/MM/yyyy")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "dd/MM/yyyy")
+                      )
+                    ) : (
+                      <span>בחר טווח תאריخים</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">
@@ -269,7 +307,7 @@ const AdminReports = () => {
               <div className="flex items-center gap-2">
                 <Badge className="bg-yellow-500 hover:bg-yellow-600 hebrew-text">בתהליך</Badge>
                 <Button variant="outline" size="sm" disabled className="hebrew-text">
-                  <Calendar className="h-4 w-4 ml-2" />
+                  <CalendarIcon className="h-4 w-4 ml-2" />
                   ממתין
                 </Button>
               </div>
