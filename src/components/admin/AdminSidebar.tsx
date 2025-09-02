@@ -43,7 +43,7 @@ const AdminSidebar = ({ collapsed, onToggle }: AdminSidebarProps) => {
 
   return (
     <div className={cn(
-      "h-full bg-card border-l flex flex-col transition-all duration-300",
+      "h-screen bg-card border-r flex flex-col transition-all duration-300 sticky top-0 z-50",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Logo and Toggle */}
@@ -67,7 +67,7 @@ const AdminSidebar = ({ collapsed, onToggle }: AdminSidebarProps) => {
           onClick={onToggle}
           className="p-2"
         >
-          {collapsed ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
       </div>
 

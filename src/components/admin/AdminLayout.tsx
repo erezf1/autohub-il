@@ -18,11 +18,17 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen flex w-full bg-background">
+    <div className="min-h-screen flex w-full bg-background" dir="rtl">
+      {/* Sidebar */}
+      <AdminSidebar 
+        collapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Top Header */}
-        <header className="h-16 border-b bg-card px-6 flex items-center justify-between">
+        {/* Top Header - Fixed */}
+        <header className="h-16 border-b bg-card px-6 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center gap-4">
             {/* Notifications */}
             <DropdownMenu>
@@ -75,24 +81,20 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-6">
-          {children}
+        {/* Page Content - Scrollable */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-6 max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
 
-        {/* Footer */}
-        <footer className="h-12 border-t bg-card px-6 flex items-center justify-center">
+        {/* Footer - Fixed */}
+        <footer className="h-12 border-t bg-card px-6 flex items-center justify-center sticky bottom-0 z-40">
           <p className="text-sm text-muted-foreground hebrew-text">
             © 2024 אוטו-האב. כל הזכויות שמורות.
           </p>
         </footer>
       </div>
-
-      {/* Sidebar */}
-      <AdminSidebar 
-        collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
     </div>
   );
 };

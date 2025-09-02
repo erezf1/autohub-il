@@ -130,7 +130,7 @@ const AdminUsersList = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-full">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>

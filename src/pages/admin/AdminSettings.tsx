@@ -56,7 +56,7 @@ const AdminSettings = () => {
   const [editingCategory, setEditingCategory] = useState<any>(null);
 
   return (
-    <div className="space-y-6" dir="rtl">
+    <div className="space-y-6 min-h-full">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
