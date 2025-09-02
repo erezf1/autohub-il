@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { MoreHorizontal } from "lucide-react";
+import AdminDesktopLayout from "@/components/admin/AdminDesktopLayout";
 
 // Mock data for vehicles
 const mockVehicles = [

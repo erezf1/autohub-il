@@ -314,6 +314,7 @@ const AdminReports = () => {
                 </Button>
               </div>
             </div>
+          </div>
         </CardContent>
       </Card>
       </div>
