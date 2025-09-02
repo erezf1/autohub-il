@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Car, MessageCircle, FileText, TrendingUp, Users, Clock } from "lucide-react";
+import { Car, MessageCircle, FileText, TrendingUp, Users, Clock, Gavel } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,12 @@ import { useNavigate } from "react-router-dom";
 const dashboardStats = {
   activeCars: 8,
   totalChats: 23,
-  activeRequests: 4,
-  thisWeekSales: 2
+  newMessages: 5,
+  myBids: 3,
+  newAuctions: 7,
+  mySearches: 4,
+  newOffers: 2,
+  myCarOffers: 6
 };
 
 const recentActivity = [
@@ -19,6 +23,7 @@ const recentActivity = [
     type: "chat",
     title: "הודעה חדשה",
     description: "סוחר #234 שלח הודעה על הטויוטה קמרי",
+    subtitle: "זה עתה הגיע",
     time: "לפני 10 דקות",
     isNew: true
   },
@@ -26,15 +31,17 @@ const recentActivity = [
     id: 2,
     type: "request",
     title: "התאמה חדשה",
-    description: "נמצאה התאמה לבקשת החיפוש שלך - BMW X3",
+    description: "נמצאה התאמה לבקשת החיפוש שלך",
+    subtitle: "BMW X3 2020",
     time: "לפני שעה",
     isNew: true
   },
   {
     id: 3,
-    type: "sale",
-    title: "מכירה הושלמה",
-    description: "הונדה סיוויק 2019 נמכרה בהצלחה",
+    type: "auction",
+    title: "הצעה חדשה",
+    description: "הצעה חדשה התקבלה למכירה הפומבית",
+    subtitle: "פורשה 911 - 750,000 ₪",
     time: "אתמול",
     isNew: false
   }
@@ -57,34 +64,44 @@ const DashboardScreen = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-4">
-        <Card className="card-interactive" onClick={() => navigate("/profile")}>
+        <Card className="card-interactive" onClick={() => navigate("/chats")}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground hebrew-text">
-              רכבים פעילים
+              צ'אטים
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <Car className="h-5 w-5 text-primary" />
-              <span className="text-2xl font-bold text-foreground">
-                {dashboardStats.activeCars}
-              </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <MessageCircle className="h-5 w-5 text-primary" />
+                <span className="text-2xl font-bold text-foreground">
+                  {dashboardStats.totalChats}
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground hebrew-text">
+                {dashboardStats.newMessages} חדשות
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="card-interactive" onClick={() => navigate("/chats")}>
+        <Card className="card-interactive" onClick={() => navigate("/auctions")}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground hebrew-text">
-              צ'אטים פעילים
+              מכירות פומביות
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <MessageCircle className="h-5 w-5 text-primary" />
-              <span className="text-2xl font-bold text-foreground">
-                {dashboardStats.totalChats}
-              </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Gavel className="h-5 w-5 text-primary" />
+                <span className="text-2xl font-bold text-foreground">
+                  {dashboardStats.myBids}
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground hebrew-text">
+                {dashboardStats.newAuctions} חדשות
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -92,31 +109,41 @@ const DashboardScreen = () => {
         <Card className="card-interactive" onClick={() => navigate("/car-search-requests")}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground hebrew-text">
-              בקשות חיפוש
+              חיפושי רכבים
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <FileText className="h-5 w-5 text-primary" />
-              <span className="text-2xl font-bold text-foreground">
-                {dashboardStats.activeRequests}
-              </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <FileText className="h-5 w-5 text-primary" />
+                <span className="text-2xl font-bold text-foreground">
+                  {dashboardStats.mySearches}
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground hebrew-text">
+                {dashboardStats.newOffers} הצעות חדשות
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="card-interactive">
+        <Card className="card-interactive" onClick={() => navigate("/profile")}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground hebrew-text">
-              מכירות השבוע
+              הרכבים שלי
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <TrendingUp className="h-5 w-5 text-success" />
-              <span className="text-2xl font-bold text-foreground">
-                {dashboardStats.thisWeekSales}
-              </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Car className="h-5 w-5 text-primary" />
+                <span className="text-2xl font-bold text-foreground">
+                  {dashboardStats.activeCars}
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground hebrew-text">
+                {dashboardStats.myCarOffers} הצעות חדשות
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -133,7 +160,7 @@ const DashboardScreen = () => {
               <div className="flex-shrink-0 mt-1">
                 {activity.type === "chat" && <MessageCircle className="h-4 w-4 text-primary" />}
                 {activity.type === "request" && <FileText className="h-4 w-4 text-primary" />}
-                {activity.type === "sale" && <TrendingUp className="h-4 w-4 text-success" />}
+                {activity.type === "auction" && <Gavel className="h-4 w-4 text-primary" />}
               </div>
               
               <div className="flex-1 min-w-0">
@@ -150,6 +177,9 @@ const DashboardScreen = () => {
                 <p className="text-sm text-muted-foreground hebrew-text">
                   {activity.description}
                 </p>
+                <p className="text-sm font-medium text-foreground hebrew-text">
+                  {activity.subtitle}
+                </p>
                 <div className="flex items-center mt-2">
                   <Clock className="h-3 w-3 text-muted-foreground ml-1" />
                   <span className="text-xs text-muted-foreground">
@@ -162,22 +192,6 @@ const DashboardScreen = () => {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-4">
-        <Button 
-          onClick={() => navigate("/add")}
-          className="h-12 hebrew-text"
-        >
-          הוסף רכב חדש
-        </Button>
-        <Button 
-          variant="outline"
-          onClick={() => navigate("/car-search-requests")}
-          className="h-12 hebrew-text"
-        >
-          צור בקשת חיפוש
-        </Button>
-      </div>
     </div>
   );
 };

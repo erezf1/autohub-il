@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils";
 const tabs = [
   {
     id: "search",
-    label: "חיפוש",
+    label: "חפש במאגר",
     icon: Search,
     path: "/search"
   },
   {
     id: "iso",
-    label: "חיפוש רכבים",
+    label: "רכבים דרושים",
     icon: FileText,
     path: "/car-search-requests"
   },
@@ -39,6 +39,13 @@ const AppTabBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const getAddButtonAction = () => {
+    if (location.pathname === "/auctions") {
+      return "/add-auction";
+    }
+    return "/add-car";
+  };
+
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
       <div className="container max-w-md mx-auto">
@@ -52,7 +59,7 @@ const AppTabBar = () => {
             return (
               <button
                 key={tab.id}
-                onClick={() => navigate(tab.path)}
+                onClick={() => tab.id === "add" ? navigate(getAddButtonAction()) : navigate(tab.path)}
                 className={cn(
                   "flex flex-col items-center justify-center space-y-1 transition-colors hebrew-text",
                   isActive 

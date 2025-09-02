@@ -34,7 +34,8 @@ const App = () => (
             <Route path="/car-search-requests" element={<ISORequestsScreen />} />
             
             {/* Placeholder routes for navigation */}
-            <Route path="/add" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">הוספת רכב חדש</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
+            <Route path="/add-car" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">הוספת רכב חדש</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
+            <Route path="/add-auction" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">הוספת מכירה פומבית</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
             <Route path="/chat/:id" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">צ'אט</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
             <Route path="/vehicle/:id" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">פרטי רכב</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
             <Route path="/auction/:id" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">מכירה פומבית</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
