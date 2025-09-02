@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Plus, Clock, CheckCircle } from "lucide-react";
+import { FileText, Plus, Clock, CheckCircle, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ const ISORequestsScreen = () => {
       
       <Tabs defaultValue="mine" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="mine" className="hebrew-text">הבקשות שלי</TabsTrigger>
+          <TabsTrigger value="mine" className="hebrew-text">החיפושים שלי</TabsTrigger>
           <TabsTrigger value="all" className="hebrew-text">כל החיפושים</TabsTrigger>
         </TabsList>
         
@@ -59,26 +59,42 @@ const ISORequestsScreen = () => {
           <div className="space-y-3">
             {searchRequests.map((request) => (
               <Card key={request.id} className="card-interactive cursor-pointer">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg hebrew-text">{request.title}</CardTitle>
-                    <Badge 
-                      variant={request.status === "פתוח" ? "default" : "secondary"}
-                      className="hebrew-text"
-                    >
-                      {request.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <CheckCircle className="h-4 w-4 ml-1" />
-                      <span className="hebrew-text">{request.offersCount} הצעות</span>
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-4 space-x-reverse">
+                    {/* Request Icon */}
+                    <div className="relative w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Search className="h-10 w-10 text-muted-foreground" />
+                      {request.status === "פתוח" && (
+                        <Badge variant="default" className="absolute -top-1 -right-1 text-xs">
+                          פעיל
+                        </Badge>
+                      )}
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4 ml-1" />
-                      <span className="hebrew-text">{request.dateCreated}</span>
+
+                    {/* Request Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold text-foreground hebrew-text">
+                          {request.title}
+                        </h3>
+                        <Badge 
+                          variant={request.status === "פתוח" ? "default" : "secondary"}
+                          className="hebrew-text"
+                        >
+                          {request.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-sm text-muted-foreground">
+                          <CheckCircle className="h-4 w-4 ml-1" />
+                          <span className="hebrew-text">{request.offersCount} הצעות</span>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                          <Clock className="h-4 w-4 ml-1" />
+                          <span className="hebrew-text">{request.dateCreated}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -98,26 +114,42 @@ const ISORequestsScreen = () => {
           <div className="space-y-3">
             {searchRequests.map((request) => (
               <Card key={request.id} className="card-interactive cursor-pointer">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg hebrew-text">{request.title}</CardTitle>
-                    <Badge 
-                      variant={request.status === "פתוח" ? "default" : "secondary"}
-                      className="hebrew-text"
-                    >
-                      {request.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <CheckCircle className="h-4 w-4 ml-1" />
-                      <span className="hebrew-text">{request.offersCount} הצעות</span>
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-4 space-x-reverse">
+                    {/* Request Icon */}
+                    <div className="relative w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Search className="h-10 w-10 text-muted-foreground" />
+                      {request.status === "פתוח" && (
+                        <Badge variant="default" className="absolute -top-1 -right-1 text-xs">
+                          פעיל
+                        </Badge>
+                      )}
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4 ml-1" />
-                      <span className="hebrew-text">{request.dateCreated}</span>
+
+                    {/* Request Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold text-foreground hebrew-text">
+                          {request.title}
+                        </h3>
+                        <Badge 
+                          variant={request.status === "פתוח" ? "default" : "secondary"}
+                          className="hebrew-text"
+                        >
+                          {request.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-sm text-muted-foreground">
+                          <CheckCircle className="h-4 w-4 ml-1" />
+                          <span className="hebrew-text">{request.offersCount} הצעות</span>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                          <Clock className="h-4 w-4 ml-1" />
+                          <span className="hebrew-text">{request.dateCreated}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
