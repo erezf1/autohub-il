@@ -1,234 +1,200 @@
 import { useState } from "react";
-import { Car, MessageCircle, FileText, MoreHorizontal, Edit3 } from "lucide-react";
+import { User, Building, Phone, Mail, MapPin, Edit3, Save } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
-// Mock data for user's cars
-const myCars = [
-  {
-    id: 1,
-    title: "טויוטה קמרי 2020",
-    status: "פעיל",
-    chatCount: 3,
-    image: "/placeholder.svg",
-    price: "185,000 ₪"
-  },
-  {
-    id: 2,
-    title: "הונדה סיוויק 2019",
-    status: "נמכר",
-    chatCount: 0,
-    image: "/placeholder.svg",
-    price: "145,000 ₪"
-  },
-  {
-    id: 3,
-    title: "ניסן אלטימה 2021",
-    status: "פעיל",
-    chatCount: 7,
-    image: "/placeholder.svg",
-    price: "195,000 ₪"
-  }
-];
-
-// Mock data for user's ISO requests
-const myISORequests = [
-  {
-    id: 1,
-    title: "טויוטה קורולה 2020",
-    status: "פתוח",
-    offersCount: 3,
-    description: "אוטומט, בנזין, עד 100,000 ק״מ"
-  },
-  {
-    id: 2,
-    title: "רכב שטח יוקרתי",
-    status: "פתוח",
-    offersCount: 8,
-    description: "BMW X5 או מקביל, 2019-2023"
-  },
-  {
-    id: 3,
-    title: "מרצדס C-Class",
-    status: "סגור",
-    offersCount: 12,
-    description: "2018-2021, אוטומט"
-  }
-];
+// User profile data
+const initialUserData = {
+  businessName: "אוטו-דיל בע״מ",
+  contactName: "משה כהן",
+  phone: "054-1234567",
+  email: "moshe@auto-deal.co.il",
+  address: "רחוב הנשיא 123, תל אביב",
+  licenseNumber: "123456789",
+  description: "מתמחים במכירת רכבי יוקרה ורכבי ספורט. יותר מ-15 שנות ניסיון בתחום."
+};
 
 const MyProfileScreen = () => {
-  const [activeTab, setActiveTab] = useState("cars");
-  const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [userData, setUserData] = useState(initialUserData);
 
-  const handleCarClick = (carId: number) => {
-    navigate(`/edit-car/${carId}`);
+  const handleSave = () => {
+    // Here you would typically save to a backend
+    setIsEditing(false);
+    // Show success toast
   };
 
-  const handleCarChats = (carId: number) => {
-    navigate(`/chats?carId=${carId}`);
-  };
-
-  const handleISOClick = (isoId: number) => {
-    navigate(`/iso-request/${isoId}`);
+  const handleCancel = () => {
+    setUserData(initialUserData);
+    setIsEditing(false);
   };
 
   return (
-    <div className="space-y-4">
-      {/* Screen Title */}
-      <h1 className="text-2xl font-bold text-foreground hebrew-text">הפרופיל שלי</h1>
-      
-      {/* Profile Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
-        <TabsList className="grid w-full grid-cols-2 hebrew-text">
-          <TabsTrigger value="cars">הרכבים שלי</TabsTrigger>
-          <TabsTrigger value="iso">הבקשות שלי</TabsTrigger>
-        </TabsList>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground hebrew-text">הפרופיל שלי</h1>
+        {!isEditing ? (
+          <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
+            <Edit3 className="h-4 w-4 ml-1" />
+            ערוך פרופיל
+          </Button>
+        ) : (
+          <div className="flex space-x-2 space-x-reverse">
+            <Button onClick={handleSave} size="sm">
+              <Save className="h-4 w-4 ml-1" />
+              שמור
+            </Button>
+            <Button onClick={handleCancel} variant="outline" size="sm">
+              בטל
+            </Button>
+          </div>
+        )}
+      </div>
 
-        {/* My Cars Tab */}
-        <TabsContent value="cars" className="space-y-3 mt-4">
-          {myCars.map((car) => (
-            <Card key={car.id} className="card-interactive">
-              <CardContent className="p-4">
-                <div className="flex items-start space-x-3 space-x-reverse">
-                  {/* Car Thumbnail */}
-                  <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Car className="h-8 w-8 text-muted-foreground" />
-                  </div>
+      {/* Profile Information */}
+      <Card>
+        <CardContent className="p-6 space-y-6">
+          {/* Business Name */}
+          <div className="space-y-2">
+            <Label htmlFor="businessName" className="text-sm font-medium hebrew-text">
+              שם העסק
+            </Label>
+            {isEditing ? (
+              <Input
+                id="businessName"
+                value={userData.businessName}
+                onChange={(e) => setUserData({...userData, businessName: e.target.value})}
+                className="hebrew-text"
+              />
+            ) : (
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Building className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground hebrew-text">{userData.businessName}</span>
+              </div>
+            )}
+          </div>
 
-                  {/* Car Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-foreground hebrew-text">
-                          {car.title}
-                        </h3>
-                        <p className="text-sm text-primary font-medium hebrew-text">
-                          {car.price}
-                        </p>
-                      </div>
-                      
-                      {/* Status Badge */}
-                      <Badge 
-                        variant={car.status === "פעיל" ? "default" : "secondary"}
-                        className="hebrew-text"
-                      >
-                        {car.status}
-                      </Badge>
-                    </div>
+          {/* Contact Name */}
+          <div className="space-y-2">
+            <Label htmlFor="contactName" className="text-sm font-medium hebrew-text">
+              איש קשר
+            </Label>
+            {isEditing ? (
+              <Input
+                id="contactName"
+                value={userData.contactName}
+                onChange={(e) => setUserData({...userData, contactName: e.target.value})}
+                className="hebrew-text"
+              />
+            ) : (
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground hebrew-text">{userData.contactName}</span>
+              </div>
+            )}
+          </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3 space-x-reverse">
-                        {/* Chat Badge */}
-                        {car.chatCount > 0 && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleCarChats(car.id)}
-                            className="h-8 px-2"
-                          >
-                            <MessageCircle className="h-4 w-4 ml-1" />
-                            <span className="hebrew-text">{car.chatCount}</span>
-                          </Button>
-                        )}
+          {/* Phone */}
+          <div className="space-y-2">
+            <Label htmlFor="phone" className="text-sm font-medium hebrew-text">
+              טלפון
+            </Label>
+            {isEditing ? (
+              <Input
+                id="phone"
+                value={userData.phone}
+                onChange={(e) => setUserData({...userData, phone: e.target.value})}
+                className="hebrew-text"
+              />
+            ) : (
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground hebrew-text">{userData.phone}</span>
+              </div>
+            )}
+          </div>
 
-                        {/* Edit Button */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCarClick(car.id)}
-                          className="h-8 px-2"
-                        >
-                          <Edit3 className="h-4 w-4 ml-1" />
-                          <span className="hebrew-text text-xs">ערוך</span>
-                        </Button>
-                      </div>
+          {/* Email */}
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium hebrew-text">
+              אימייל
+            </Label>
+            {isEditing ? (
+              <Input
+                id="email"
+                type="email"
+                value={userData.email}
+                onChange={(e) => setUserData({...userData, email: e.target.value})}
+                className="hebrew-text"
+              />
+            ) : (
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground hebrew-text">{userData.email}</span>
+              </div>
+            )}
+          </div>
 
-                      {/* More Options */}
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {/* Address */}
+          <div className="space-y-2">
+            <Label htmlFor="address" className="text-sm font-medium hebrew-text">
+              כתובת
+            </Label>
+            {isEditing ? (
+              <Input
+                id="address"
+                value={userData.address}
+                onChange={(e) => setUserData({...userData, address: e.target.value})}
+                className="hebrew-text"
+              />
+            ) : (
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground hebrew-text">{userData.address}</span>
+              </div>
+            )}
+          </div>
 
-          {myCars.length === 0 && (
-            <div className="text-center py-12">
-              <Car className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground hebrew-text mb-2">
-                אין רכבים למכירה
-              </h3>
-              <p className="text-muted-foreground hebrew-text mb-4">
-                התחל למכור את הרכב הראשון שלך
-              </p>
-              <Button onClick={() => navigate("/add")}>
-                הוסף רכב למכירה
-              </Button>
-            </div>
-          )}
-        </TabsContent>
+          {/* License Number */}
+          <div className="space-y-2">
+            <Label htmlFor="licenseNumber" className="text-sm font-medium hebrew-text">
+              מספר רישיון עסק
+            </Label>
+            {isEditing ? (
+              <Input
+                id="licenseNumber"
+                value={userData.licenseNumber}
+                onChange={(e) => setUserData({...userData, licenseNumber: e.target.value})}
+                className="hebrew-text"
+              />
+            ) : (
+              <span className="text-foreground hebrew-text">{userData.licenseNumber}</span>
+            )}
+          </div>
 
-        {/* My ISO Requests Tab */}
-        <TabsContent value="iso" className="space-y-3 mt-4">
-          {myISORequests.map((request) => (
-            <Card 
-              key={request.id} 
-              className="card-interactive cursor-pointer"
-              onClick={() => handleISOClick(request.id)}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground hebrew-text mb-1">
-                      {request.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground hebrew-text">
-                      {request.description}
-                    </p>
-                  </div>
-                  
-                  {/* Status Badge */}
-                  <Badge 
-                    variant={request.status === "פתוח" ? "default" : "secondary"}
-                    className="hebrew-text"
-                  >
-                    {request.status}
-                  </Badge>
-                </div>
-
-                {/* Offers Count */}
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground hebrew-text">
-                    {request.offersCount} הצעות
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-
-          {myISORequests.length === 0 && (
-            <div className="text-center py-12">
-              <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground hebrew-text mb-2">
-                אין בקשות חיפוש פעילות
-              </h3>
-              <p className="text-muted-foreground hebrew-text mb-4">
-                צור בקשת חיפוש ראשונה למציאת הרכב המושלם
-              </p>
-              <Button onClick={() => navigate("/iso-requests")}>
-                צור בקשה חדשה
-              </Button>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-medium hebrew-text">
+              תיאור העסק
+            </Label>
+            {isEditing ? (
+              <Textarea
+                id="description"
+                value={userData.description}
+                onChange={(e) => setUserData({...userData, description: e.target.value})}
+                className="hebrew-text"
+                rows={3}
+              />
+            ) : (
+              <p className="text-muted-foreground hebrew-text">{userData.description}</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

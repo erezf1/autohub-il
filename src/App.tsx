@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/Layout/AppLayout";
 
 // Import all screens
+import DashboardScreen from "./pages/DashboardScreen";
 import CarSearchScreen from "./pages/CarSearchScreen";
 import ChatListScreen from "./pages/ChatListScreen";
 import NotificationListScreen from "./pages/NotificationListScreen";
@@ -24,13 +25,13 @@ const App = () => (
       <BrowserRouter>
         <AppLayout>
           <Routes>
-            <Route path="/" element={<CarSearchScreen />} />
+            <Route path="/" element={<DashboardScreen />} />
             <Route path="/search" element={<CarSearchScreen />} />
             <Route path="/chats" element={<ChatListScreen />} />
             <Route path="/notifications" element={<NotificationListScreen />} />
             <Route path="/auctions" element={<AuctionListScreen />} />
             <Route path="/profile" element={<MyProfileScreen />} />
-            <Route path="/iso-requests" element={<ISORequestsScreen />} />
+            <Route path="/car-search-requests" element={<ISORequestsScreen />} />
             
             {/* Placeholder routes for navigation */}
             <Route path="/add" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">הוספת רכב חדש</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />

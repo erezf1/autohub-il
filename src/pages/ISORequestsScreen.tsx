@@ -71,7 +71,7 @@ const ISORequestsScreen = () => {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground hebrew-text">בקשות ISO</h1>
+        <h1 className="text-2xl font-bold text-foreground hebrew-text">חיפוש רכבים</h1>
         <Button onClick={handleCreateISO} size="sm">
           <Plus className="h-4 w-4 ml-1" />
           בקשה חדשה

@@ -11,9 +11,9 @@ const tabs = [
   },
   {
     id: "iso",
-    label: "בקשות ISO",
+    label: "חיפוש רכבים",
     icon: FileText,
-    path: "/iso-requests"
+    path: "/car-search-requests"
   },
   {
     id: "add",
@@ -46,7 +46,8 @@ const AppTabBar = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = location.pathname === tab.path || 
-              (tab.path === "/search" && location.pathname === "/");
+              (tab.path === "/search" && location.pathname === "/") ||
+              (tab.path === "/car-search-requests" && location.pathname === "/car-search-requests");
             
             return (
               <button
