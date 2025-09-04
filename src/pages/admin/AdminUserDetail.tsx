@@ -102,7 +102,7 @@ const AdminUserDetail = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
+              <div className="text-right">
                 <p className="text-sm font-medium text-muted-foreground hebrew-text">סטטוס</p>
                 <div className="mt-2">
                   {getStatusBadge(mockUserData.status)}
@@ -116,7 +116,7 @@ const AdminUserDetail = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
+              <div className="text-right">
                 <p className="text-sm font-medium text-muted-foreground hebrew-text">תוכנית</p>
                 <div className="mt-2">
                   {getPlanBadge(mockUserData.plan)}
@@ -130,7 +130,7 @@ const AdminUserDetail = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
+              <div className="text-right">
                 <p className="text-sm font-medium text-muted-foreground hebrew-text">רכבים פעילים</p>
                 <p className="text-2xl font-bold">{mockUserData.vehiclesCount}</p>
               </div>
@@ -142,7 +142,7 @@ const AdminUserDetail = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
+              <div className="text-right">
                 <p className="text-sm font-medium text-muted-foreground hebrew-text">סה"כ מכירות</p>
                 <p className="text-2xl font-bold">₪{mockUserData.totalSales.toLocaleString()}</p>
               </div>
@@ -169,46 +169,46 @@ const AdminUserDetail = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-row-reverse">
                     <Mail className="h-5 w-5 text-muted-foreground" />
-                    <div>
+                    <div className="text-right">
                       <p className="text-sm text-muted-foreground hebrew-text">דוא"ל</p>
                       <p className="font-medium">{mockUserData.email}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-row-reverse">
                     <Phone className="h-5 w-5 text-muted-foreground" />
-                    <div>
+                    <div className="text-right">
                       <p className="text-sm text-muted-foreground hebrew-text">טלפון</p>
                       <p className="font-medium">{mockUserData.phone}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-row-reverse">
                     <MapPin className="h-5 w-5 text-muted-foreground" />
-                    <div>
+                    <div className="text-right">
                       <p className="text-sm text-muted-foreground hebrew-text">כתובת</p>
                       <p className="font-medium hebrew-text">{mockUserData.address}</p>
                     </div>
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-row-reverse">
                     <Calendar className="h-5 w-5 text-muted-foreground" />
-                    <div>
+                    <div className="text-right">
                       <p className="text-sm text-muted-foreground hebrew-text">תאריך הצטרפות</p>
                       <p className="font-medium">{new Date(mockUserData.joinDate).toLocaleDateString('he-IL')}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-row-reverse">
                     <Activity className="h-5 w-5 text-muted-foreground" />
-                    <div>
+                    <div className="text-right">
                       <p className="text-sm text-muted-foreground hebrew-text">פעילות אחרונה</p>
                       <p className="font-medium">{mockUserData.lastActive}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-row-reverse">
                     <CheckCircle className="h-5 w-5 text-muted-foreground" />
-                    <div>
+                    <div className="text-right">
                       <p className="text-sm text-muted-foreground hebrew-text">דירוג</p>
                       <p className="font-medium">{mockUserData.rating}/5</p>
                     </div>
@@ -247,9 +247,11 @@ const AdminUserDetail = () => {
                       </TableCell>
                       <TableCell>{new Date(vehicle.date).toLocaleDateString('he-IL')}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm" className="hebrew-text">
-                          צפה
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            צפה
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -287,9 +289,11 @@ const AdminUserDetail = () => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm" className="hebrew-text">
-                          צפה
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            צפה
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -327,9 +331,11 @@ const AdminUserDetail = () => {
                       </TableCell>
                       <TableCell>{new Date(request.date).toLocaleDateString('he-IL')}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm" className="hebrew-text">
-                          צפה
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            צפה
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

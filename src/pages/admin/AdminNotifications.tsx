@@ -262,25 +262,6 @@ const AdminNotifications = () => {
         </div>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="חיפוש עדכונים..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="hebrew-text"
-              />
-            </div>
-            <Button variant="outline" className="hebrew-text">
-              <Filter className="h-4 w-4 ml-2" />
-              מסננים מתקדמים
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Notifications Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -347,7 +328,7 @@ const AdminNotifications = () => {
                             <p className={`font-medium hebrew-text ${!notification.isRead ? 'text-foreground' : 'text-muted-foreground'}`}>
                               {notification.title}
                             </p>
-                            <p className="text-sm text-muted-foreground hebrew-text mt-1">
+                            <p className={`text-sm text-muted-foreground hebrew-text mt-1 ${!notification.isRead ? 'font-semibold' : ''}`}>
                               {notification.description}
                             </p>
                           </div>

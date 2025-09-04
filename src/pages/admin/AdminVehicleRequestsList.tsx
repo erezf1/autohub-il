@@ -215,35 +215,20 @@ const AdminVehicleRequestsList = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">פתח תפריט</span>
-                              <div className="h-4 w-4 flex flex-col justify-center space-y-1">
-                                <div className="w-1 h-1 bg-current rounded-full"></div>
-                                <div className="w-1 h-1 bg-current rounded-full"></div>
-                                <div className="w-1 h-1 bg-current rounded-full"></div>
-                              </div>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem 
-                              className="hebrew-text"
-                              onClick={() => navigate(`/admin/vehicle-requests/${request.id}`)}
-                            >
-                              <Eye className="ml-2 h-4 w-4" />
-                              צפה בפרטים
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="hebrew-text">
-                              <Edit className="ml-2 h-4 w-4" />
-                              ערוך בקשה
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive hebrew-text">
-                              <Trash2 className="ml-2 h-4 w-4" />
-                              מחק בקשה
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/vehicle-requests/${request.id}`)}>
+                            <Eye className="h-4 w-4 ml-1" />
+                            צפה
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            <Edit className="h-4 w-4 ml-1" />
+                            ערוך
+                          </Button>
+                          <Button variant="ghost" size="sm" className="text-destructive hebrew-text">
+                            <Trash2 className="h-4 w-4 ml-1" />
+                            מחק
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

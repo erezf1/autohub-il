@@ -173,30 +173,20 @@ const AdminVehiclesList = () => {
                     <TableCell className="hebrew-text text-base">{vehicle.views}</TableCell>
                     <TableCell className="hebrew-text text-base">{vehicle.dateAdded}</TableCell>
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem 
-                            className="hebrew-text"
-                            onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
-                          >
-                            <Eye className="ml-2 h-4 w-4" />
-                            צפה
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="hebrew-text">
-                            <Edit className="ml-2 h-4 w-4" />
-                            ערוך
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive hebrew-text">
-                            <Trash2 className="ml-2 h-4 w-4" />
-                            מחק
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}>
+                          <Eye className="h-4 w-4 ml-1" />
+                          צפה
+                        </Button>
+                        <Button variant="ghost" size="sm" className="hebrew-text">
+                          <Edit className="h-4 w-4 ml-1" />
+                          ערוך
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-destructive hebrew-text">
+                          <Trash2 className="h-4 w-4 ml-1" />
+                          מחק
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

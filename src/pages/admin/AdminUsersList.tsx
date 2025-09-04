@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -88,6 +89,7 @@ const usersData = [
 ];
 
 const AdminUsersList = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
 
@@ -192,31 +194,24 @@ const AdminUsersList = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/users/${user.id}`)}>
+                          <Eye className="h-4 w-4 ml-1" />
+                          צפה
+                        </Button>
+                        {user.status === "pending" && (
+                          <Button variant="ghost" size="sm" className="hebrew-text text-success">
+                            <UserCheck className="h-4 w-4 ml-1" />
+                            אשר
                           </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="hebrew-text">
-                            <Eye className="ml-2 h-4 w-4" />
-                            צפה בפרטים
-                          </DropdownMenuItem>
-                          {user.status === "pending" && (
-                            <DropdownMenuItem className="hebrew-text">
-                              <UserCheck className="ml-2 h-4 w-4" />
-                              אשר משתמש
-                            </DropdownMenuItem>
-                          )}
-                          {user.status === "active" && (
-                            <DropdownMenuItem className="hebrew-text text-destructive">
-                              <UserX className="ml-2 h-4 w-4" />
-                              השעה משתמש
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        )}
+                        {user.status === "active" && (
+                          <Button variant="ghost" size="sm" className="hebrew-text text-destructive">
+                            <UserX className="h-4 w-4 ml-1" />
+                            השעה
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -255,35 +255,20 @@ const AdminSupportTickets = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">פתח תפריט</span>
-                              <div className="h-4 w-4 flex flex-col justify-center space-y-1">
-                                <div className="w-1 h-1 bg-current rounded-full"></div>
-                                <div className="w-1 h-1 bg-current rounded-full"></div>
-                                <div className="w-1 h-1 bg-current rounded-full"></div>
-                              </div>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem 
-                              className="hebrew-text"
-                              onClick={() => navigate(`/admin/support/${ticket.id}`)}
-                            >
-                              <Eye className="ml-2 h-4 w-4" />
-                              צפה בפנייה
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="hebrew-text">
-                              <MessageSquare className="ml-2 h-4 w-4" />
-                              השב למשתמש
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="hebrew-text">
-                              <User className="ml-2 h-4 w-4" />
-                              שייך לנציג
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/support/${ticket.id}`)}>
+                            <Eye className="h-4 w-4 ml-1" />
+                            צפה
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            <MessageSquare className="h-4 w-4 ml-1" />
+                            השב
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            <User className="h-4 w-4 ml-1" />
+                            שייך
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

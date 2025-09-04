@@ -241,50 +241,154 @@ const AdminSupportTicketDetail = () => {
         </Card>
       </div>
 
-      {/* Main Content - Two Panel Layout */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Left Panel - Ticket Details and Chat */}
-        <div className="xl:col-span-2 space-y-6">
-          {/* Ticket Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">פרטי הפנייה</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium hebrew-text mb-2">תיאור הבעיה</h4>
-                  <p className="text-muted-foreground hebrew-text leading-relaxed">
-                    {mockTicketData.description}
-                  </p>
-                </div>
-                
-                {mockTicketData.relatedDeal && (
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <h4 className="font-medium hebrew-text mb-2">עסקה קשורה</h4>
-                    <div className="space-y-2">
-                      <p className="text-sm"><span className="font-medium">רכב:</span> <span className="hebrew-text">{mockTicketData.relatedDeal.vehicleTitle}</span></p>
-                      <p className="text-sm"><span className="font-medium">ערך עסקה:</span> ₪{mockTicketData.relatedDeal.dealValue.toLocaleString()}</p>
-                      <p className="text-sm"><span className="font-medium">מזהה עסקה:</span> {mockTicketData.relatedDeal.dealId}</p>
+      {/* Main Content - Tabs Layout */}
+      <Tabs defaultValue="main" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="main" className="hebrew-text">פרטי הפנייה</TabsTrigger>
+          <TabsTrigger value="chat-reporter" className="hebrew-text">צ'אט עם מדווח</TabsTrigger>
+          <TabsTrigger value="chat-other" className="hebrew-text">צ'אט עם הצד השני</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="main" className="space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Left Panel - Main Content */}
+            <div className="xl:col-span-2 space-y-6">
+              {/* Original Request */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="hebrew-text">הבקשה המקורית</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium hebrew-text mb-2">תיאור הבעיה</h4>
+                      <p className="text-muted-foreground hebrew-text leading-relaxed">
+                        {mockTicketData.description}
+                      </p>
+                    </div>
+                    
+                    {mockTicketData.relatedDeal && (
+                      <div className="bg-muted/50 p-4 rounded-lg">
+                        <h4 className="font-medium hebrew-text mb-2">עסקה קשורה</h4>
+                        <div className="space-y-2">
+                          <p className="text-sm"><span className="font-medium">רכב:</span> <span className="hebrew-text">{mockTicketData.relatedDeal.vehicleTitle}</span></p>
+                          <p className="text-sm"><span className="font-medium">ערך עסקה:</span> ₪{mockTicketData.relatedDeal.dealValue.toLocaleString()}</p>
+                          <p className="text-sm"><span className="font-medium">מזהה עסקה:</span> {mockTicketData.relatedDeal.dealId}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Support Action Summary */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="hebrew-text">סיכום פעולות התמיכה</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <Textarea
+                      placeholder="תאר את הפעולות שננקטו, ההחלטות שהתקבלו והפתרון שניתן..."
+                      className="min-h-32 hebrew-text"
+                    />
+                    <div className="flex justify-end">
+                      <Button className="hebrew-text">
+                        <FileText className="h-4 w-4 ml-2" />
+                        שמור סיכום
+                      </Button>
                     </div>
                   </div>
-                )}
+                </CardContent>
+              </Card>
 
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground hebrew-text">תאריך פתיחה:</span>
-                    <p className="font-medium">{mockTicketData.createdDate}</p>
+              {/* Original Conversation */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="hebrew-text">השיחה המקורית</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 max-h-64 overflow-y-auto text-sm">
+                    {mockOriginalConversation.map((msg, index) => (
+                      <div key={index} className="border-b pb-2">
+                        <div className="flex justify-between items-start">
+                          <span className="font-medium hebrew-text">{msg.sender}:</span>
+                          <span className="text-xs text-muted-foreground">{msg.time}</span>
+                        </div>
+                        <p className="text-muted-foreground hebrew-text mt-1">{msg.message}</p>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <span className="text-muted-foreground hebrew-text">עדכון אחרון:</span>
-                    <p className="font-medium">{mockTicketData.lastUpdate}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* Chat with Reporter */}
+            {/* Right Panel - User Details */}
+            <div className="space-y-6">
+              {/* Reporter Details */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="hebrew-text">פרטי המדווח</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                        <User className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium hebrew-text">{mockTicketData.reporter.name}</p>
+                        <p className="text-sm text-muted-foreground hebrew-text">{mockTicketData.reporter.business}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <p><span className="text-muted-foreground">דוא"ל:</span> {mockTicketData.reporter.email}</p>
+                      <p><span className="text-muted-foreground">טלפון:</span> {mockTicketData.reporter.phone}</p>
+                    </div>
+                    <Button variant="outline" className="w-full hebrew-text">
+                      <User className="h-4 w-4 ml-2" />
+                      צפה בפרופיל המלא
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Reported User Details */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="hebrew-text">המשתמש המדווח</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
+                        <User className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium hebrew-text">{mockTicketData.reportedUser.name}</p>
+                        <p className="text-sm text-muted-foreground hebrew-text">{mockTicketData.reportedUser.business}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <p><span className="text-muted-foreground">דוא"ל:</span> {mockTicketData.reportedUser.email}</p>
+                      <p><span className="text-muted-foreground">טלפון:</span> {mockTicketData.reportedUser.phone}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" className="flex-1 hebrew-text text-xs">
+                        צפה בפרופיל
+                      </Button>
+                      <Button variant="destructive" className="flex-1 hebrew-text text-xs">
+                        השהה משתמש
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="chat-reporter" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="hebrew-text">תקשורת עם המדווח</CardTitle>
@@ -292,7 +396,7 @@ const AdminSupportTicketDetail = () => {
             <CardContent>
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {mockMessages.map((message) => (
-                  <div key={message.id} className={`flex ${message.senderType === 'admin' ? 'justify-end' : 'justify-start'}`}>
+                  <div key={message.id} className={`flex ${message.senderType === 'admin' ? 'justify-start' : 'justify-end'}`}>
                     <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                       message.senderType === 'admin' 
                         ? 'bg-primary text-primary-foreground' 
@@ -306,7 +410,7 @@ const AdminSupportTicketDetail = () => {
                       {message.attachments.length > 0 && (
                         <div className="mt-2">
                           {message.attachments.map((attachment, index) => (
-                            <Badge key={index} variant="outline" className="text-xs mr-1">
+                            <Badge key={index} variant="outline" className="text-xs ml-1">
                               {attachment}
                             </Badge>
                           ))}
@@ -332,95 +436,52 @@ const AdminSupportTicketDetail = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </TabsContent>
 
-        {/* Right Panel - User Details and Original Conversation */}
-        <div className="space-y-6">
-          {/* Reporter Details */}
+        <TabsContent value="chat-other" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text">פרטי המדווח</CardTitle>
+              <CardTitle className="hebrew-text">תקשורת עם הצד השני</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                    <User className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-medium hebrew-text">{mockTicketData.reporter.name}</p>
-                    <p className="text-sm text-muted-foreground hebrew-text">{mockTicketData.reporter.business}</p>
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {/* Mock conversation with the other party */}
+                <div className="flex justify-end">
+                  <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-muted">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-medium hebrew-text">דני כהן</span>
+                      <span className="text-xs opacity-70">2024-01-10 16:00</span>
+                    </div>
+                    <p className="text-sm hebrew-text">שלום, קיבלתי הודעה על דיווח. אני רוצה להסביר את המצב...</p>
                   </div>
                 </div>
-                <div className="space-y-2 text-sm">
-                  <p><span className="text-muted-foreground">דוא"ל:</span> {mockTicketData.reporter.email}</p>
-                  <p><span className="text-muted-foreground">טלפון:</span> {mockTicketData.reporter.phone}</p>
+                <div className="flex justify-start">
+                  <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-primary text-primary-foreground">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-medium hebrew-text">יעל אדמיני</span>
+                      <span className="text-xs opacity-70">2024-01-10 16:15</span>
+                    </div>
+                    <p className="text-sm hebrew-text">שלום דני, אני מקשיבה. אנא הסבר מה קרה מנקודת המבט שלך.</p>
+                  </div>
                 </div>
-                <Button variant="outline" className="w-full hebrew-text">
-                  <User className="h-4 w-4 ml-2" />
-                  צפה בפרופיל המלא
+              </div>
+              
+              {/* Message Input */}
+              <div className="mt-4 flex gap-2">
+                <Textarea
+                  placeholder="הקלד הודעה לצד השני..."
+                  className="flex-1 hebrew-text"
+                  rows={2}
+                />
+                <Button className="hebrew-text">
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+      </Tabs>
 
-          {/* Reported User Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">המשתמש המדווח</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
-                    <User className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-medium hebrew-text">{mockTicketData.reportedUser.name}</p>
-                    <p className="text-sm text-muted-foreground hebrew-text">{mockTicketData.reportedUser.business}</p>
-                  </div>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <p><span className="text-muted-foreground">דוא"ל:</span> {mockTicketData.reportedUser.email}</p>
-                  <p><span className="text-muted-foreground">טלפון:</span> {mockTicketData.reportedUser.phone}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1 hebrew-text text-xs">
-                    צפה בפרופיל
-                  </Button>
-                  <Button variant="destructive" className="flex-1 hebrew-text text-xs">
-                    השהה משתמש
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Original Conversation Preview */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">השיחה המקורית</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 max-h-64 overflow-y-auto text-sm">
-                {mockOriginalConversation.map((msg, index) => (
-                  <div key={index} className="border-b pb-2">
-                    <div className="flex justify-between items-start">
-                      <span className="font-medium hebrew-text">{msg.sender}:</span>
-                      <span className="text-xs text-muted-foreground">{msg.time}</span>
-                    </div>
-                    <p className="text-muted-foreground hebrew-text mt-1">{msg.message}</p>
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" className="w-full mt-4 hebrew-text">
-                <FileText className="h-4 w-4 ml-2" />
-                צפה בשיחה המלאה
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
     </div>
   );
 };
