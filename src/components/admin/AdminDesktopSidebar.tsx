@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
+  Bell,
   Users,
   Car,
   Search,
@@ -20,6 +21,12 @@ const adminNavItems = [
     url: "/admin", 
     icon: LayoutDashboard,
     description: "מבט כללי על המערכת"
+  },
+  { 
+    title: "עדכונים", 
+    url: "/admin/notifications", 
+    icon: Bell,
+    description: "התראות ועדכונים"
   },
   { 
     title: "ניהול משתמשים", 

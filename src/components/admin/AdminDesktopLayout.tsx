@@ -23,9 +23,9 @@ const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
           {/* Logo Section */}
           <div className="flex items-center gap-3">
             <img 
-              src="/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png" 
-              alt="Auto Hub Admin" 
-              className="w-8 h-8"
+              src="/lovable-uploads/6daec4a1-44e1-4924-8b14-0ae85967e9a4.png" 
+              alt="AutoHub Admin" 
+              className="h-8 w-auto"
             />
             <div className="hebrew-text">
               <h1 className="font-bold text-lg text-primary">אוטו-האב</h1>

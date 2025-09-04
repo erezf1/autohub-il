@@ -29,6 +29,11 @@ import AdminAuctionsList from "./pages/admin/AdminAuctionsList";
 import AdminSupportTickets from "./pages/admin/AdminSupportTickets";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminUserDetail from "./pages/admin/AdminUserDetail";
+import AdminVehicleRequestDetail from "./pages/admin/AdminVehicleRequestDetail";
+import AdminAuctionDetail from "./pages/admin/AdminAuctionDetail";
+import AdminSupportTicketDetail from "./pages/admin/AdminSupportTicketDetail";
+import AdminNotifications from "./pages/admin/AdminNotifications";
 
 const queryClient = new QueryClient();
 
@@ -47,15 +52,17 @@ const App = () => (
             <AdminDesktopLayout>
               <Routes>
                 <Route path="/" element={<AdminDashboard />} />
+                <Route path="/notifications" element={<AdminNotifications />} />
                 <Route path="/users" element={<AdminUsersList />} />
+                <Route path="/users/:id" element={<AdminUserDetail />} />
                 <Route path="/vehicles" element={<AdminVehiclesList />} />
                 <Route path="/vehicles/:id" element={<AdminVehicleDetail />} />
                 <Route path="/vehicle-requests" element={<AdminVehicleRequestsList />} />
-                <Route path="/vehicle-requests/:id" element={<div className="p-6 hebrew-text">פרטי בקשת רכב - בפיתוח</div>} />
+                <Route path="/vehicle-requests/:id" element={<AdminVehicleRequestDetail />} />
                 <Route path="/auctions" element={<AdminAuctionsList />} />
-                <Route path="/auctions/:id" element={<div className="p-6 hebrew-text">פרטי מכירה פומבית - בפיתוח</div>} />
+                <Route path="/auctions/:id" element={<AdminAuctionDetail />} />
                 <Route path="/support" element={<AdminSupportTickets />} />
-                <Route path="/support/:id" element={<div className="p-6 hebrew-text">טיפול בפנייה - בפיתוח</div>} />
+                <Route path="/support/:id" element={<AdminSupportTicketDetail />} />
                 <Route path="/reports" element={<AdminReports />} />
                 <Route path="/settings" element={<AdminSettings />} />
               </Routes>
