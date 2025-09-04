@@ -243,10 +243,10 @@ const AdminSupportTicketDetail = () => {
 
       {/* Main Content - Tabs Layout */}
       <Tabs defaultValue="main" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="main" className="hebrew-text">פרטי הפנייה</TabsTrigger>
-          <TabsTrigger value="chat-reporter" className="hebrew-text">צ'אט עם מדווח</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3" dir="rtl">
           <TabsTrigger value="chat-other" className="hebrew-text">צ'אט עם הצד השני</TabsTrigger>
+          <TabsTrigger value="chat-reporter" className="hebrew-text">צ'אט עם מדווח</TabsTrigger>
+          <TabsTrigger value="main" className="hebrew-text">פרטי הפנייה</TabsTrigger>
         </TabsList>
 
         <TabsContent value="main" className="space-y-6">
@@ -256,10 +256,10 @@ const AdminSupportTicketDetail = () => {
               {/* Original Request */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="hebrew-text">הבקשה המקורית</CardTitle>
+                  <CardTitle className="hebrew-text text-right">הבקשה המקורית</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-right">
                     <div>
                       <h4 className="font-medium hebrew-text mb-2">תיאור הבעיה</h4>
                       <p className="text-muted-foreground hebrew-text leading-relaxed">
@@ -271,9 +271,9 @@ const AdminSupportTicketDetail = () => {
                       <div className="bg-muted/50 p-4 rounded-lg">
                         <h4 className="font-medium hebrew-text mb-2">עסקה קשורה</h4>
                         <div className="space-y-2">
-                          <p className="text-sm"><span className="font-medium">רכב:</span> <span className="hebrew-text">{mockTicketData.relatedDeal.vehicleTitle}</span></p>
-                          <p className="text-sm"><span className="font-medium">ערך עסקה:</span> ₪{mockTicketData.relatedDeal.dealValue.toLocaleString()}</p>
-                          <p className="text-sm"><span className="font-medium">מזהה עסקה:</span> {mockTicketData.relatedDeal.dealId}</p>
+                          <p className="text-sm"><span className="hebrew-text">{mockTicketData.relatedDeal.vehicleTitle}</span> :<span className="font-medium">רכב</span></p>
+                          <p className="text-sm">₪{mockTicketData.relatedDeal.dealValue.toLocaleString()} :<span className="font-medium">ערך עסקה</span></p>
+                          <p className="text-sm">{mockTicketData.relatedDeal.dealId} :<span className="font-medium">מזהה עסקה</span></p>
                         </div>
                       </div>
                     )}

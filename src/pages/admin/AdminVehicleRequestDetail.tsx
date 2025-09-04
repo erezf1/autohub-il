@@ -207,19 +207,19 @@ const AdminVehicleRequestDetail = () => {
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="details" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="details" className="hebrew-text">פרטי הבקשה</TabsTrigger>
-          <TabsTrigger value="requester" className="hebrew-text">פרטי מבקש</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3" dir="rtl">
           <TabsTrigger value="offers" className="hebrew-text">הצעות ({mockOffers.length})</TabsTrigger>
+          <TabsTrigger value="requester" className="hebrew-text">פרטי מבקש</TabsTrigger>
+          <TabsTrigger value="details" className="hebrew-text">פרטי הבקשה</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details">
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text">פרטי הבקשה המלאים</CardTitle>
+              <CardTitle className="hebrew-text text-right">פרטי הבקשה המלאים</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-right" dir="rtl">
                 <div className="space-y-6">
                   <div>
                     <h3 className="font-semibold text-lg hebrew-text mb-3">תיאור הבקשה</h3>
@@ -232,20 +232,20 @@ const AdminVehicleRequestDetail = () => {
                     <h3 className="font-semibold text-lg hebrew-text mb-3">דרישות טכניות</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">טווח שנים:</span>
                         <span className="font-medium">{mockRequestData.yearRange}</span>
+                        <span className="text-muted-foreground hebrew-text">:טווח שנים</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">מקסימום ק"מ:</span>
                         <span className="font-medium">{mockRequestData.maxKilometers.toLocaleString()}</span>
+                        <span className="text-muted-foreground hebrew-text">:מקסימום ק"מ</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">תיבת הילוכים:</span>
                         <span className="font-medium hebrew-text">{mockRequestData.transmissionType}</span>
+                        <span className="text-muted-foreground hebrew-text">:תיבת הילוכים</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">סוג דלק:</span>
                         <span className="font-medium hebrew-text">{mockRequestData.fuelType}</span>
+                        <span className="text-muted-foreground hebrew-text">:סוג דלק</span>
                       </div>
                     </div>
                   </div>
@@ -256,23 +256,23 @@ const AdminVehicleRequestDetail = () => {
                     <h3 className="font-semibold text-lg hebrew-text mb-3">תקציב ומיקום</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">תקציב מינימלי:</span>
                         <span className="font-medium">₪{mockRequestData.budget.min.toLocaleString()}</span>
+                        <span className="text-muted-foreground hebrew-text">:תקציב מינימלי</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">תקציב מקסימלי:</span>
                         <span className="font-medium">₪{mockRequestData.budget.max.toLocaleString()}</span>
+                        <span className="text-muted-foreground hebrew-text">:תקציב מקסימלי</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">אזור:</span>
                         <span className="font-medium hebrew-text">{mockRequestData.location}</span>
+                        <span className="text-muted-foreground hebrew-text">:אזור</span>
                       </div>
                     </div>
                   </div>
 
                   <div>
                     <h3 className="font-semibold text-lg hebrew-text mb-3">צבעים מועדפים</h3>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-2 flex-wrap justify-end">
                       {mockRequestData.preferredColors.map((color, index) => (
                         <Badge key={index} variant="outline" className="hebrew-text">{color}</Badge>
                       ))}
@@ -283,16 +283,16 @@ const AdminVehicleRequestDetail = () => {
                     <h3 className="font-semibold text-lg hebrew-text mb-3">מידע נוסף</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">תאריך פרסום:</span>
                         <span className="font-medium">{new Date(mockRequestData.createdDate).toLocaleDateString('he-IL')}</span>
+                        <span className="text-muted-foreground hebrew-text">:תאריך פרסום</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">עדכון אחרון:</span>
                         <span className="font-medium">{new Date(mockRequestData.lastUpdated).toLocaleDateString('he-IL')}</span>
+                        <span className="text-muted-foreground hebrew-text">:עדכון אחרון</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground hebrew-text">זמן תגובה:</span>
                         <span className="font-medium hebrew-text">{mockRequestData.responseTime}</span>
+                        <span className="text-muted-foreground hebrew-text">:זמן תגובה</span>
                       </div>
                     </div>
                   </div>

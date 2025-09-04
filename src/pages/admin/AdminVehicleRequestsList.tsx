@@ -165,18 +165,56 @@ const AdminVehicleRequestsList = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right hebrew-text">בקשה</TableHead>
-                    <TableHead className="text-right hebrew-text">מבקש</TableHead>
-                    <TableHead className="text-right hebrew-text">תקציב</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">הצעות</TableHead>
+                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
                     <TableHead className="text-right hebrew-text">פעילות אחרונה</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
+                    <TableHead className="text-right hebrew-text">הצעות</TableHead>
+                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
+                    <TableHead className="text-right hebrew-text">תקציב</TableHead>
+                    <TableHead className="text-right hebrew-text">מבקש</TableHead>
+                    <TableHead className="text-right hebrew-text">בקשה</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredRequests.map((request) => (
                     <TableRow key={request.id}>
+                      <TableCell>
+                        <div className="flex justify-start gap-2">
+                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/vehicle-requests/${request.id}`)}>
+                            <Eye className="h-4 w-4 ml-1" />
+                            צפה
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            <Edit className="h-4 w-4 ml-1" />
+                            ערוך
+                          </Button>
+                          <Button variant="ghost" size="sm" className="text-destructive hebrew-text">
+                            <Trash2 className="h-4 w-4 ml-1" />
+                            מחק
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 justify-end">
+                          <span className="text-sm hebrew-text">{request.lastActivity}</span>
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 justify-end">
+                          <span className="hebrew-text">{request.offersCount}</span>
+                          <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </TableCell>
+                      <TableCell>{getStatusBadge(request.status)}</TableCell>
+                      <TableCell className="font-medium hebrew-text text-right">{request.budget}</TableCell>
+                      <TableCell>
+                        <div className="text-right">
+                          <div className="font-medium hebrew-text">{request.requester}</div>
+                          <div className="text-sm text-muted-foreground hebrew-text">
+                            {request.requesterBusiness}
+                          </div>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-3 space-x-reverse">
                           <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
@@ -190,44 +228,6 @@ const AdminVehicleRequestsList = () => {
                               {request.location} • {request.views} צפיות
                             </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium hebrew-text">{request.requester}</div>
-                          <div className="text-sm text-muted-foreground hebrew-text">
-                            {request.requesterBusiness}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium hebrew-text">{request.budget}</TableCell>
-                      <TableCell>{getStatusBadge(request.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                          <span className="hebrew-text">{request.offersCount}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm hebrew-text">{request.lastActivity}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/vehicle-requests/${request.id}`)}>
-                            <Eye className="h-4 w-4 ml-1" />
-                            צפה
-                          </Button>
-                          <Button variant="ghost" size="sm" className="hebrew-text">
-                            <Edit className="h-4 w-4 ml-1" />
-                            ערוך
-                          </Button>
-                          <Button variant="ghost" size="sm" className="text-destructive hebrew-text">
-                            <Trash2 className="h-4 w-4 ml-1" />
-                            מחק
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>

@@ -212,22 +212,22 @@ const AdminAuctionDetail = () => {
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="vehicle" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="vehicle" className="hebrew-text">פרטי רכב</TabsTrigger>
-          <TabsTrigger value="seller" className="hebrew-text">פרטי מוכר</TabsTrigger>
-          <TabsTrigger value="bids" className="hebrew-text">הצעות ({mockBids.length})</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4" dir="rtl">
           <TabsTrigger value="activity" className="hebrew-text">פעילות</TabsTrigger>
+          <TabsTrigger value="bids" className="hebrew-text">הצעות ({mockBids.length})</TabsTrigger>
+          <TabsTrigger value="seller" className="hebrew-text">פרטי מוכר</TabsTrigger>
+          <TabsTrigger value="vehicle" className="hebrew-text">פרטי רכב</TabsTrigger>
         </TabsList>
 
         <TabsContent value="vehicle">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle className="hebrew-text">מפרט טכני</CardTitle>
+                <CardTitle className="hebrew-text text-right">מפרט טכני</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 text-right">
                     <div>
                       <p className="text-sm text-muted-foreground hebrew-text">יצרן</p>
                       <p className="font-medium hebrew-text">{mockAuctionData.vehicle.make}</p>

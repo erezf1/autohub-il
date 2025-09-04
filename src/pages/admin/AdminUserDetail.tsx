@@ -154,11 +154,11 @@ const AdminUserDetail = () => {
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="details" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="details" className="hebrew-text">פרטי משתמש</TabsTrigger>
-          <TabsTrigger value="vehicles" className="hebrew-text">רכבים</TabsTrigger>
-          <TabsTrigger value="auctions" className="hebrew-text">מכירות פומביות</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4" dir="rtl">
           <TabsTrigger value="requests" className="hebrew-text">רכבים דרושים</TabsTrigger>
+          <TabsTrigger value="auctions" className="hebrew-text">מכירות פומביות</TabsTrigger>
+          <TabsTrigger value="vehicles" className="hebrew-text">רכבים</TabsTrigger>
+          <TabsTrigger value="details" className="hebrew-text">פרטי משתמש</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details">

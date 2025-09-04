@@ -181,18 +181,58 @@ const AdminAuctionsList = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right hebrew-text">מכירה</TableHead>
-                    <TableHead className="text-right hebrew-text">מוכר</TableHead>
-                    <TableHead className="text-right hebrew-text">הצעה נוכחית</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">זמן נותר</TableHead>
+                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
                     <TableHead className="text-right hebrew-text">הצעות</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
+                    <TableHead className="text-right hebrew-text">זמן נותר</TableHead>
+                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
+                    <TableHead className="text-right hebrew-text">הצעה נוכחית</TableHead>
+                    <TableHead className="text-right hebrew-text">מוכר</TableHead>
+                    <TableHead className="text-right hebrew-text">מכירה</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredAuctions.map((auction) => (
                     <TableRow key={auction.id}>
+                      <TableCell>
+                        <div className="flex justify-start gap-2">
+                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/auctions/${auction.id}`)}>
+                            <Eye className="h-4 w-4 ml-1" />
+                            צפה
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            <Edit className="h-4 w-4 ml-1" />
+                            ערוך
+                          </Button>
+                          <Button variant="ghost" size="sm" className="text-destructive hebrew-text">
+                            <Trash2 className="h-4 w-4 ml-1" />
+                            בטל
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 justify-end">
+                          <span className="hebrew-text">{auction.bidCount}</span>
+                          <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 justify-end">
+                          <span className={`text-sm hebrew-text ${getTimeRemainingColor(auction.timeRemaining)}`}>
+                            {auction.timeRemaining}
+                          </span>
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </TableCell>
+                      <TableCell>{getStatusBadge(auction.status)}</TableCell>
+                      <TableCell>
+                        <div className="text-right">
+                          <div className="font-medium hebrew-text">{auction.currentBid}</div>
+                          <div className="text-sm text-muted-foreground hebrew-text">
+                            התחלה: {auction.startingPrice}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hebrew-text text-right">{auction.seller}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-3 space-x-reverse">
                           <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
@@ -206,46 +246,6 @@ const AdminAuctionsList = () => {
                               {auction.views} צפיות • נוצר {auction.dateCreated}
                             </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hebrew-text">{auction.seller}</TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium hebrew-text">{auction.currentBid}</div>
-                          <div className="text-sm text-muted-foreground hebrew-text">
-                            התחלה: {auction.startingPrice}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(auction.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className={`text-sm hebrew-text ${getTimeRemainingColor(auction.timeRemaining)}`}>
-                            {auction.timeRemaining}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                          <span className="hebrew-text">{auction.bidCount}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/auctions/${auction.id}`)}>
-                            <Eye className="h-4 w-4 ml-1" />
-                            צפה
-                          </Button>
-                          <Button variant="ghost" size="sm" className="hebrew-text">
-                            <Edit className="h-4 w-4 ml-1" />
-                            ערוך
-                          </Button>
-                          <Button variant="ghost" size="sm" className="text-destructive hebrew-text">
-                            <Trash2 className="h-4 w-4 ml-1" />
-                            בטל
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>

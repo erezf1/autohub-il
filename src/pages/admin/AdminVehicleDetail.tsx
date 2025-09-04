@@ -89,38 +89,38 @@ const AdminVehicleDetail = () => {
       {/* Vehicle Summary */}
       <Card>
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" dir="rtl">
+            <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center">
+              <Car className="h-16 w-16 text-muted-foreground" />
+            </div>
+            
             <div className="md:col-span-2 space-y-4">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="text-right">
                   <h2 className="text-2xl font-bold hebrew-text">{mockVehicleData.price}</h2>
                   <p className="text-muted-foreground hebrew-text">{mockVehicleData.specs.mileage}</p>
                 </div>
                 {getStatusBadge(mockVehicleData.status)}
               </div>
               
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
+              <div className="grid grid-cols-2 gap-4 text-sm text-right">
+                <div className="flex items-center gap-2 justify-end">
                   <span className="hebrew-text">{mockVehicleData.seller}</span>
+                  <User className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                <div className="flex items-center gap-2 justify-end">
                   <span className="hebrew-text">{mockVehicleData.location}</span>
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                <div className="flex items-center gap-2 justify-end">
                   <span className="hebrew-text">נוסף: {mockVehicleData.dateAdded}</span>
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Eye className="h-4 w-4 text-muted-foreground" />
+                <div className="flex items-center gap-2 justify-end">
                   <span className="hebrew-text">{mockVehicleData.views} צפיות</span>
+                  <Eye className="h-4 w-4 text-muted-foreground" />
                 </div>
               </div>
-            </div>
-            
-            <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center">
-              <Car className="h-16 w-16 text-muted-foreground" />
             </div>
           </div>
         </CardContent>
@@ -128,20 +128,20 @@ const AdminVehicleDetail = () => {
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="details" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="details" className="hebrew-text">פרטי רכב</TabsTrigger>
-          <TabsTrigger value="seller" className="hebrew-text">פרטי מוכר</TabsTrigger>
-          <TabsTrigger value="activity" className="hebrew-text">פעילות</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4" dir="rtl">
           <TabsTrigger value="images" className="hebrew-text">תמונות</TabsTrigger>
+          <TabsTrigger value="activity" className="hebrew-text">פעילות</TabsTrigger>
+          <TabsTrigger value="seller" className="hebrew-text">פרטי מוכר</TabsTrigger>
+          <TabsTrigger value="details" className="hebrew-text">פרטי רכב</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text">מפרט טכני</CardTitle>
+              <CardTitle className="hebrew-text text-right">מפרט טכני</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 text-right">
                 <div>
                   <h4 className="font-medium hebrew-text">מנוע</h4>
                   <p className="text-muted-foreground">{mockVehicleData.specs.engine}</p>
@@ -164,19 +164,19 @@ const AdminVehicleDetail = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text">תיאור</CardTitle>
+              <CardTitle className="hebrew-text text-right">תיאור</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground hebrew-text">{mockVehicleData.description}</p>
+              <p className="text-muted-foreground hebrew-text text-right">{mockVehicleData.description}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text">אבזור</CardTitle>
+              <CardTitle className="hebrew-text text-right">אבזור</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 justify-end">
                 {mockVehicleData.features.map((feature, index) => (
                   <Badge key={index} variant="outline" className="hebrew-text">
                     {feature}

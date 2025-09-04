@@ -199,19 +199,58 @@ const AdminSupportTickets = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right hebrew-text">פנייה</TableHead>
-                    <TableHead className="text-right hebrew-text">מדווח</TableHead>
-                    <TableHead className="text-right hebrew-text">קטגוריה</TableHead>
-                    <TableHead className="text-right hebrew-text">עדיפות</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">משוייך לנציג</TableHead>
+                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
                     <TableHead className="text-right hebrew-text">פעילות אחרונה</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
+                    <TableHead className="text-right hebrew-text">משוייך לנציג</TableHead>
+                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
+                    <TableHead className="text-right hebrew-text">עדיפות</TableHead>
+                    <TableHead className="text-right hebrew-text">קטגוריה</TableHead>
+                    <TableHead className="text-right hebrew-text">מדווח</TableHead>
+                    <TableHead className="text-right hebrew-text">פנייה</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredTickets.map((ticket) => (
                     <TableRow key={ticket.id}>
+                      <TableCell>
+                        <div className="flex justify-start gap-2">
+                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/support/${ticket.id}`)}>
+                            <Eye className="h-4 w-4 ml-1" />
+                            צפה
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            <MessageSquare className="h-4 w-4 ml-1" />
+                            השב
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hebrew-text">
+                            <User className="h-4 w-4 ml-1" />
+                            שייך
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 justify-end">
+                          <span className="text-sm hebrew-text">{ticket.lastActivity}</span>
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 justify-end">
+                          <span className="text-sm hebrew-text">{ticket.assignedTo}</span>
+                          <User className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </TableCell>
+                      <TableCell>{getStatusBadge(ticket.status)}</TableCell>
+                      <TableCell>{getPriorityBadge(ticket.priority)}</TableCell>
+                      <TableCell className="hebrew-text text-right">{ticket.category}</TableCell>
+                      <TableCell>
+                        <div className="text-right">
+                          <div className="font-medium hebrew-text">{ticket.reporter}</div>
+                          <div className="text-sm text-muted-foreground hebrew-text">
+                            {ticket.reporterBusiness}
+                          </div>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-3 space-x-reverse">
                           <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
@@ -229,45 +268,6 @@ const AdminSupportTickets = () => {
                               #{ticket.id} • נוצר {ticket.dateCreated}
                             </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium hebrew-text">{ticket.reporter}</div>
-                          <div className="text-sm text-muted-foreground hebrew-text">
-                            {ticket.reporterBusiness}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hebrew-text">{ticket.category}</TableCell>
-                      <TableCell>{getPriorityBadge(ticket.priority)}</TableCell>
-                      <TableCell>{getStatusBadge(ticket.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm hebrew-text">{ticket.assignedTo}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm hebrew-text">{ticket.lastActivity}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/support/${ticket.id}`)}>
-                            <Eye className="h-4 w-4 ml-1" />
-                            צפה
-                          </Button>
-                          <Button variant="ghost" size="sm" className="hebrew-text">
-                            <MessageSquare className="h-4 w-4 ml-1" />
-                            השב
-                          </Button>
-                          <Button variant="ghost" size="sm" className="hebrew-text">
-                            <User className="h-4 w-4 ml-1" />
-                            שייך
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>

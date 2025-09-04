@@ -133,35 +133,15 @@ const AdminSettings = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right hebrew-text">קטגוריה</TableHead>
-                    <TableHead className="text-right hebrew-text">תת-קטגוריות</TableHead>
+                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
                     <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
+                    <TableHead className="text-right hebrew-text">תת-קטגוריות</TableHead>
+                    <TableHead className="text-right hebrew-text">קטגוריה</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {vehicleCategories.map((category) => (
                     <TableRow key={category.id}>
-                      <TableCell className="font-medium hebrew-text">
-                        {category.name}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {category.subcategories.map((sub, index) => (
-                            <Badge key={index} variant="outline" className="text-xs hebrew-text">
-                              {sub}
-                            </Badge>
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant={category.active ? "default" : "secondary"}
-                          className="hebrew-text"
-                        >
-                          {category.active ? "פעיל" : "לא פעיל"}
-                        </Badge>
-                      </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Button variant="outline" size="sm" className="hebrew-text">
@@ -173,6 +153,26 @@ const AdminSettings = () => {
                             מחק
                           </Button>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={category.active ? "default" : "secondary"}
+                          className="hebrew-text"
+                        >
+                          {category.active ? "פעיל" : "לא פעיל"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1 justify-end">
+                          {category.subcategories.map((sub, index) => (
+                            <Badge key={index} variant="outline" className="text-xs hebrew-text">
+                              {sub}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium hebrew-text text-right">
+                        {category.name}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -198,31 +198,15 @@ const AdminSettings = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right hebrew-text">סיבת דיווח</TableHead>
-                    <TableHead className="text-right hebrew-text">קטגוריה</TableHead>
+                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
                     <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
+                    <TableHead className="text-right hebrew-text">קטגוריה</TableHead>
+                    <TableHead className="text-right hebrew-text">סיבת דיווח</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {reportReasons.map((reason) => (
                     <TableRow key={reason.id}>
-                      <TableCell className="font-medium hebrew-text">
-                        {reason.reason}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="hebrew-text">
-                          {reason.category}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant={reason.active ? "default" : "secondary"}
-                          className="hebrew-text"
-                        >
-                          {reason.active ? "פעיל" : "לא פעיל"}
-                        </Badge>
-                      </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Button variant="outline" size="sm" className="hebrew-text">
@@ -234,6 +218,22 @@ const AdminSettings = () => {
                             מחק
                           </Button>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={reason.active ? "default" : "secondary"}
+                          className="hebrew-text"
+                        >
+                          {reason.active ? "פעיל" : "לא פעיל"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="hebrew-text">
+                          {reason.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium hebrew-text text-right">
+                        {reason.reason}
                       </TableCell>
                     </TableRow>
                   ))}
