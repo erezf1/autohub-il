@@ -73,7 +73,7 @@ const CarSearchScreen = () => {
   });
 
   const handleVehicleClick = (vehicleId: number) => {
-    navigate(`/vehicle/${vehicleId}`);
+    navigate(`/mobile/vehicle/${vehicleId}`);
   };
 
   return (

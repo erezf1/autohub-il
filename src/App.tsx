@@ -12,8 +12,13 @@ import MobileLayout from "./components/mobile/MobileLayout";
 import DashboardScreen from "./pages/mobile/DashboardScreen";
 import CarSearchScreen from "./pages/mobile/CarSearchScreen";
 import ChatListScreen from "./pages/mobile/ChatListScreen";
+import ChatDetailScreen from "./pages/mobile/ChatDetailScreen";
 import NotificationListScreen from "./pages/mobile/NotificationListScreen";
 import AuctionListScreen from "./pages/mobile/AuctionListScreen";
+import AuctionDetailScreen from "./pages/mobile/AuctionDetailScreen";
+import VehicleDetailScreen from "./pages/mobile/VehicleDetailScreen";
+import AddVehicleScreen from "./pages/mobile/AddVehicleScreen";
+import AddAuctionScreen from "./pages/mobile/AddAuctionScreen";
 import MyProfileScreen from "./pages/mobile/MyProfileScreen";
 import ISORequestsScreen from "./pages/mobile/ISORequestsScreen";
 import NotFound from "./pages/mobile/NotFound";
@@ -76,17 +81,18 @@ const App = () => (
                 <Route path="/" element={<DashboardScreen />} />
                 <Route path="/search" element={<CarSearchScreen />} />
                 <Route path="/chats" element={<ChatListScreen />} />
+                <Route path="/chat/:id" element={<ChatDetailScreen />} />
                 <Route path="/notifications" element={<NotificationListScreen />} />
                 <Route path="/auctions" element={<AuctionListScreen />} />
+                <Route path="/auction/:id" element={<AuctionDetailScreen />} />
+                <Route path="/vehicle/:id" element={<VehicleDetailScreen />} />
+                <Route path="/add-vehicle" element={<AddVehicleScreen />} />
+                <Route path="/add-auction" element={<AddAuctionScreen />} />
                 <Route path="/profile" element={<MyProfileScreen />} />
                 <Route path="/car-search-requests" element={<ISORequestsScreen />} />
                 
-                {/* Mobile placeholder routes */}
-                <Route path="/add-car" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">הוספת רכב חדש</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
-                <Route path="/add-auction" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">הוספת מכירה פומבית</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
-                <Route path="/chat/:id" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">צ'אט</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
-                <Route path="/vehicle/:id" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">פרטי רכב</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
-                <Route path="/auction/:id" element={<div className="text-center py-12 hebrew-text"><h2 className="text-xl font-bold">מכירה פומבית</h2><p className="text-muted-foreground mt-2">בקרוב...</p></div>} />
+                {/* Legacy route aliases for backward compatibility */}
+                <Route path="/add-car" element={<AddVehicleScreen />} />
                 
                 {/* Catch-all route for mobile */}
                 <Route path="*" element={<NotFound />} />
