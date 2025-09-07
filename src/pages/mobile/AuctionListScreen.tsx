@@ -58,7 +58,7 @@ const AuctionListScreen = () => {
   const navigate = useNavigate();
 
   const handleAuctionClick = (auctionId: number) => {
-    navigate(`/auction/${auctionId}`);
+    navigate(`/mobile/auction/${auctionId}`);
   };
 
   const getTimeRemainingColor = (timeRemaining: string) => {

@@ -48,7 +48,7 @@ const ChatListScreen = () => {
   const navigate = useNavigate();
 
   const handleChatClick = (chatId: number) => {
-    navigate(`/chat/${chatId}`);
+    navigate(`/mobile/chat/${chatId}`);
   };
 
   return (

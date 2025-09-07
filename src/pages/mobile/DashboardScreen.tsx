@@ -64,7 +64,7 @@ const DashboardScreen = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-4">
-        <Card className="card-interactive" onClick={() => navigate("/chats")}>
+        <Card className="card-interactive" onClick={() => navigate("/mobile/chats")}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground hebrew-text">
               צ'אטים
@@ -85,7 +85,7 @@ const DashboardScreen = () => {
           </CardContent>
         </Card>
 
-        <Card className="card-interactive" onClick={() => navigate("/auctions")}>
+        <Card className="card-interactive" onClick={() => navigate("/mobile/auctions")}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground hebrew-text">
               מכירות פומביות
@@ -106,7 +106,7 @@ const DashboardScreen = () => {
           </CardContent>
         </Card>
 
-        <Card className="card-interactive" onClick={() => navigate("/car-search-requests")}>
+        <Card className="card-interactive" onClick={() => navigate("/mobile/car-search-requests")}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground hebrew-text">
               חיפושי רכבים
@@ -127,7 +127,7 @@ const DashboardScreen = () => {
           </CardContent>
         </Card>
 
-        <Card className="card-interactive" onClick={() => navigate("/profile")}>
+        <Card className="card-interactive" onClick={() => navigate("/mobile/profile")}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground hebrew-text">
               הרכבים שלי
