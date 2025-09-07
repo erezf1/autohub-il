@@ -1,130 +1,226 @@
-Mobile Screens Specification - Auto-Hub
-Overview
-This document specifies all mobile screens for the Auto-Hub application. The mobile app is designed for dealers and car traders with a full RTL (Hebrew) interface and is intended to be the primary tool for their daily business operations.
-Screen Navigation Flow
-code
-Code
+# Mobile Screens Specification - Auto-Hub
+
+## Overview
+This document specifies all mobile screens for the Auto-Hub application. The mobile app is designed for dealers and car traders with RTL (Hebrew) interface support.
+
+## Screen Navigation Flow
+```
 MobileLayout (RTL)
 ├── MobileHeader (Logo, Notifications, Chat)
 ├── Main Content Area
 └── MobileTabBar (Bottom Navigation)
-1. Dashboard Screen (/dashboard)
-File: src/pages/mobile/DashboardScreen.tsx
-Purpose
-The main landing screen after login, providing a quick overview of important activities and serving as a launchpad for common tasks.
-Components & Data
-Greeting: "בוקר טוב, [שם הסוחר]".
-Updates Widget: A card with two clickable rows:
-"הודעות צ'אט חדשות" (New Chat Messages) with a count of unread messages.
-"התראות חדשות" (New Notifications) with a count of new notifications.
-My Activity Widget: A card with two clickable rows:
-"מודעות פעילות" (Active Listings) with the count of the user's active vehicle listings.
-"רכבים דרושים" (Vehicles Wanted) with the count of the user's open requests.
-Auctions Widget:
-A clickable row: "מכירות פעילות" (Active Auctions) showing the total count of active auctions on the platform.
-A preview list of "המכירות שלי" (My Auctions) showing the user's own active auctions with end date and highest bid.
-User Actions
-Tap any row in the widgets to navigate to the corresponding screen (e.g., Chat List, Notifications List, My Vehicles, etc.).
-2. Vehicle Search Screen (/search)
-File: src/pages/mobile/CarSearchScreen.tsx
-Purpose
-Allows dealers to search, filter, and discover all available vehicles listed by other users on the platform.
-Components & Data
-Search Bar: An input field with placeholder text "חפש לפי יצרן, דגם...".
-Filter Button: An icon button to open an advanced filtering modal.
-Quick Filter Chips: A horizontal, scrollable list of chips for common categories (e.g., "רכבי יוקרה", "רכבי שטח").
-Results List: A vertically scrollable list of vehicle cards, each displaying:
-Vehicle Image
-Title (Make, Model, Year)
-Key Details (Mileage, Transmission)
-Price
-User Actions
-Enter text to perform a keyword search.
-Tap the filter icon to open advanced filter options.
-Tap a quick filter chip to apply a predefined filter.
-Tap any vehicle card to navigate to the Vehicle Details Screen (8.1).
-3. Vehicles Wanted Screen (/requests)
-File: src/pages/mobile/VehiclesWantedScreen.tsx
-Purpose
-To view all open vehicle requests from the community and to manage one's own requests.
-Layout & Components
-Tab Navigation: Two tabs:
-"כל הבקשות" (All Requests): (Default View) A list of all "Vehicles Wanted" requests from other dealers.
-"הבקשות שלי" (My Requests): A list of requests created by the current user.
-Request List Items: Each item in the list displays:
-Request Title (e.g., "טויוטה קורולה 2020").
-Requesting User's Business Name.
-Creation Date.
-Floating Action Button (+): A circular button to create a new request.
-User Actions
-Toggle between the "All" and "My" tabs.
-Tap the floating (+) button to navigate to the Add/Edit Vehicle Wanted Screen (8.4).
-4. Auctions Screen (/auctions)
-File: src/pages/mobile/AuctionsScreen.tsx
-Purpose
-To discover and participate in active auctions and to manage one's own auctions.
-Layout & Components
-Tab Navigation: Two tabs:
-"מכירות פעילות" (Active Auctions): (Default View) A list of all active auctions on the platform.
-"המכירות שלי" (My Auctions): A list of auctions created by the current user.
-Auction Cards: Each card displays:
-Vehicle Image
-Vehicle Title
-Current Highest Bid amount.
-A live countdown timer showing the time remaining.
-User Actions
-Toggle between the "Active" and "My" tabs.
-Tap any auction card to navigate to the Auction Detail Screen (8.5 for bidding, 8.6 for managing).
-5. My Vehicles Screen (/my-vehicles)
-File: src/pages/mobile/MyVehiclesScreen.tsx
-Purpose
-To manage the user's own inventory of vehicle listings.
-Layout & Components
-Screen Title: "הרכבים שלי".
-My Cars List: A scrollable list of the user's listings. Each item shows:
-Vehicle Thumbnail
-Vehicle Title
-Status (e.g., "פעיל", "נמכר")
-A Chat Badge with the count of unread messages for that vehicle.
-Floating Action Button (+): A plus icon.
-User Actions
-Tap a list item to navigate to the Add/Edit Vehicle Screen (8.2).
-Tap the chat badge to open a filtered Chat List Screen (6.0).
-Tap the floating (+) button to navigate to the Add/Edit Vehicle Screen (8.2).
-6. Chat List Screen (/chats)
-File: src/pages/mobile/ChatListScreen.tsx
-Purpose
-To display and manage all of the user's conversations.
-Layout & Components
-Screen Title: "צ'אטים".
-Chat List: A scrollable list of conversations. Each item shows:
-Chat Subject (e.g., "המכירה שלך: #342").
-Other Party's Name (anonymous or revealed).
-Last message preview.
-Timestamp.
-Unread message badge.
-User Actions
-Tap a conversation to navigate to the Chat Conversation Screen (8.7).
-7. My Profile & Settings Screen (/profile)
-File: src/pages/mobile/MyProfileScreen.tsx
-Purpose
-Allows the user to view their account status and edit their personal and business information.
-Layout & Components
-Screen Title: "הפרופיל והגדרות".
-Account Info Section: Displays non-editable data like Status ("פעיל") and current Plan.
-Editable Info Section: Displays fields for Full Name, Business Name, Location, etc.
-Edit Icon: An icon to toggle editing mode for the fields above.
-Action Links: Links for "Support," "Terms of Use," and "Log Out."
-User Actions
-Tap the Edit Icon to enable editing of profile fields.
-Save or cancel changes after editing.
-Tap "Log Out" to sign out of the application.
-8. Secondary & Action Screens
-8.1. Vehicle Details Screen (/vehicles/:id): Displays all information for a vehicle listed by another dealer. Contains "Start Chat" and "View Dealer Profile" buttons.
-8.2. Add/Edit Vehicle Screen (/my-vehicles/edit/:id or /my-vehicles/add): A full-page form for creating or modifying a vehicle listing.
-8.3. Dealer Profile Screen (/dealers/:id): A public view of another dealer's profile, showing their Business Name, Rating, and Tenure. Contains a "Report User" button.
-8.4. Add/Edit Vehicle Wanted Screen (/requests/edit/:id or /requests/add): A form for creating or modifying a "Vehicle Wanted" request.
-8.5. Auction Screen (Bidder View) (/auctions/:id): A detailed view of an auction where the user can place bids.
-8.6. My Auction Management Screen (/my-auctions/:id): A detailed view of the user's own auction, showing all bids and management options.
-8.7. Chat Conversation Screen (/chats/:id): The screen for a single conversation, with message history, input bar, and the reveal-details workflow.
-8.8. Notifications Screen (/notifications): A dedicated screen showing a full, filterable list of all user notifications.
+```
+
+## 1. Dashboard Screen (`/mobile`)
+**File**: `src/pages/mobile/DashboardScreen.tsx`
+
+### Purpose
+Main hub for dealers to access key features and view summary statistics.
+
+### Layout Requirements
+- **RTL Support**: All text and layout elements flow right-to-left
+- **Header**: Company logo, notifications badge, chat badge
+- **Content**: Dashboard cards with statistics and quick actions
+- **Bottom Tab**: Active on "דף הבית" (Home) tab
+
+### Components Needed
+- Summary cards (total vehicles, active auctions, pending requests)
+- Quick action buttons (add vehicle, search cars, view auctions)
+- Recent activity feed
+- Statistics charts (optional)
+
+### Data Requirements
+- User statistics (vehicles count, auction participation)
+- Recent notifications preview
+- Quick access to frequently used features
+
+## 2. Car Search Screen (`/mobile/search`)
+**File**: `src/pages/mobile/CarSearchScreen.tsx`
+
+### Purpose
+Allow dealers to search and filter available vehicles in the system.
+
+### Layout Requirements
+- **Search Bar**: With RTL placeholder text "חיפוש רכב"
+- **Filter Chips**: Horizontal scrollable quick filters
+- **Results List**: Vehicle cards with images and details
+- **Empty State**: When no results found
+
+### Components Needed
+- Search input with filter icon
+- Filter badges (manufacturer, year, price range)
+- Vehicle result cards with:
+  - Vehicle image
+  - Title and details
+  - Price display
+  - Auction indicator (if applicable)
+
+### Interactions
+- Text search functionality
+- Filter selection/deselection
+- Navigate to vehicle detail on card click
+- Pull to refresh results
+
+## 3. Auction List Screen (`/mobile/auctions`)
+**File**: `src/pages/mobile/AuctionListScreen.tsx`
+
+### Purpose
+Display active and upcoming auctions for dealer participation.
+
+### Layout Requirements
+- **Filter Tabs**: Active, Upcoming, Completed auctions
+- **Auction Cards**: With countdown timers and bid information
+- **Pull to Refresh**: Update auction status
+
+### Components Needed
+- Tab navigation for auction status
+- Auction cards with:
+  - Vehicle image and details
+  - Current bid amount
+  - Countdown timer
+  - Bid button (for active auctions)
+- Empty states for each tab
+
+### Data Requirements
+- Auction status and timing
+- Current bid amounts
+- User's bid history
+- Countdown functionality
+
+## 4. ISO Requests Screen (`/mobile/iso-requests`)
+**File**: `src/pages/mobile/ISORequestsScreen.tsx`
+
+### Purpose
+Manage In Search Of (ISO) requests for specific vehicles.
+
+### Layout Requirements
+- **Request List**: User's active and completed ISO requests
+- **Add Button**: Create new ISO request
+- **Status Indicators**: Visual status of each request
+
+### Components Needed
+- ISO request cards with:
+  - Requested vehicle specifications
+  - Status badge
+  - Creation date
+  - Response count (if any)
+- Floating action button to add new ISO
+- Status filter options
+
+## 5. Chat List Screen (`/mobile/chats`)
+**File**: `src/pages/mobile/ChatListScreen.tsx`
+
+### Purpose
+Display all chat conversations between dealers and other parties.
+
+### Layout Requirements
+- **Chat List**: Conversations sorted by recent activity
+- **Unread Indicators**: Badge for unread message count
+- **Avatar Display**: Other party's profile picture
+
+### Components Needed
+- Chat conversation cards with:
+  - Contact avatar and name
+  - Chat subject/topic
+  - Last message preview
+  - Timestamp (RTL formatted)
+  - Unread count badge
+
+### Interactions
+- Navigate to chat detail on conversation click
+- Pull to refresh for new messages
+- Long press for conversation options (archive, delete)
+
+## 6. Notifications Screen (`/mobile/notifications`)
+**File**: `src/pages/mobile/NotificationListScreen.tsx`
+
+### Purpose
+Display all system notifications grouped by date.
+
+### Layout Requirements
+- **Date Groups**: "היום", "אתמול", "השבוע" sections
+- **Notification Cards**: With icons and descriptions
+- **Read/Unread States**: Visual distinction
+
+### Components Needed
+- Date section headers
+- Notification cards with:
+  - Type-specific icons (with appropriate colors)
+  - Title and description
+  - Timestamp
+  - Unread indicator dot
+
+### Notification Types
+- Auction updates (bid changes, auction end)
+- ISO request responses
+- System announcements
+- Chat messages
+
+## 7. Profile Screen (`/mobile/profile`)
+**File**: `src/pages/mobile/MyProfileScreen.tsx`
+
+### Purpose
+User profile management and account settings.
+
+### Layout Requirements
+- **Profile Header**: User avatar, name, and basic info
+- **Settings Sections**: Grouped configuration options
+- **Action Buttons**: Logout, support contact
+
+### Components Needed
+- Profile information display
+- Settings menu items
+- Language/theme preferences
+- Notification settings toggle
+- Support and help links
+
+## 8. Not Found Screen (`/mobile/*`)
+**File**: `src/pages/mobile/NotFound.tsx`
+
+### Purpose
+Handle invalid mobile routes with user-friendly message.
+
+### Layout Requirements
+- **Error Message**: RTL Hebrew text
+- **Navigation Options**: Return to home or main sections
+- **Consistent Styling**: Match app theme
+
+## Common Mobile Layout Components
+
+### MobileHeader
+- **Logo**: Auto-Hub branding
+- **Title**: Current page title in Hebrew
+- **Actions**: Notification and chat icons with badges
+
+### MobileTabBar
+- **Navigation Tabs**: 
+  - דף הבית (Home/Dashboard)
+  - חיפוש (Search)
+  - מכירות פומביות (Auctions) 
+  - בקשות ISO (ISO Requests)
+  - הודעות (Notifications)
+- **Active State**: Visual indication of current screen
+- **Badge Support**: Unread counts on relevant tabs
+
+## RTL (Hebrew) Design Guidelines
+
+### Text Direction
+- All text flows right-to-left
+- Icons positioned on the left side of text
+- Navigation flows from right to left
+- Numbers and English text maintain LTR within RTL context
+
+### Layout Considerations
+- Margins and padding mirror standard LTR layouts
+- Button placement favors right side for primary actions
+- Form fields align to the right
+- Lists and cards maintain RTL text flow
+
+### Accessibility
+- Screen reader support for RTL content
+- Proper aria labels in Hebrew
+- Color contrast compliance
+- Touch targets meet minimum size requirements
+
+---
+*This specification should be referenced for all mobile screen development and updates.*
