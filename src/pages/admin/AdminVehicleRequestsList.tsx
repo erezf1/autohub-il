@@ -165,7 +165,7 @@ const AdminVehicleRequestsList = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
+                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
                     <TableHead className="text-right hebrew-text">פעילות אחרונה</TableHead>
                     <TableHead className="text-right hebrew-text">הצעות</TableHead>
                     <TableHead className="text-right hebrew-text">סטטוס</TableHead>
@@ -178,7 +178,7 @@ const AdminVehicleRequestsList = () => {
                   {filteredRequests.map((request) => (
                     <TableRow key={request.id}>
                       <TableCell>
-                        <div className="flex justify-start gap-2">
+                        <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/vehicle-requests/${request.id}`)}>
                             <Eye className="h-4 w-4 ml-1" />
                             צפה

@@ -267,10 +267,10 @@ const AdminAuctionDetail = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="hebrew-text">תיאור ואבזור</CardTitle>
+                <CardTitle className="hebrew-text text-right">תיאור ואבזור</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-4 text-right">
                   <div>
                     <h4 className="font-medium hebrew-text mb-2">תיאור</h4>
                     <p className="text-sm text-muted-foreground hebrew-text leading-relaxed">
@@ -279,7 +279,7 @@ const AdminAuctionDetail = () => {
                   </div>
                   <div>
                     <h4 className="font-medium hebrew-text mb-2">אבזור נוסף</h4>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 justify-end">
                       {mockAuctionData.features.map((feature, index) => (
                         <Badge key={index} variant="outline" className="hebrew-text">{feature}</Badge>
                       ))}

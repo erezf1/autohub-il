@@ -181,7 +181,7 @@ const AdminAuctionsList = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
+                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
                     <TableHead className="text-right hebrew-text">הצעות</TableHead>
                     <TableHead className="text-right hebrew-text">זמן נותר</TableHead>
                     <TableHead className="text-right hebrew-text">סטטוס</TableHead>
@@ -194,7 +194,7 @@ const AdminAuctionsList = () => {
                   {filteredAuctions.map((auction) => (
                     <TableRow key={auction.id}>
                       <TableCell>
-                        <div className="flex justify-start gap-2">
+                        <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/auctions/${auction.id}`)}>
                             <Eye className="h-4 w-4 ml-1" />
                             צפה

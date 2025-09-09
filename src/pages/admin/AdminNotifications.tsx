@@ -286,12 +286,12 @@ const AdminNotifications = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right hebrew-text w-12"></TableHead>
                     <TableHead className="text-right hebrew-text">סוג</TableHead>
                     <TableHead className="text-right hebrew-text">תיאור</TableHead>
                     <TableHead className="text-right hebrew-text">עדיפות</TableHead>
                     <TableHead className="text-right hebrew-text">זמן</TableHead>
                     <TableHead className="text-right hebrew-text">סטטוס</TableHead>
+                    <TableHead className="text-right hebrew-text w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -311,13 +311,6 @@ const AdminNotifications = () => {
                         className={`cursor-pointer hover:bg-muted/50 ${!notification.isRead ? 'bg-blue-50/50' : ''}`}
                         onClick={() => handleNotificationClick(notification)}
                       >
-                        <TableCell>
-                          <div className="flex justify-center">
-                            {!notification.isRead && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {getTypeIcon(notification.type, notification.icon)}
@@ -354,6 +347,13 @@ const AdminNotifications = () => {
                               חדש
                             </Badge>
                           )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-center">
+                            {!notification.isRead && (
+                              <div className="w-2 h-2 bg-primary rounded-full"></div>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))

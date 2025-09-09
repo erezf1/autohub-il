@@ -251,8 +251,8 @@ const AdminSupportTicketDetail = () => {
 
         <TabsContent value="main" className="space-y-6">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Left Panel - Main Content */}
-            <div className="xl:col-span-2 space-y-6">
+            {/* Main Content - Right Panel for RTL */}
+            <div className="xl:col-span-2 xl:order-2 space-y-6">
               {/* Original Request */}
               <Card>
                 <CardHeader>
@@ -271,9 +271,9 @@ const AdminSupportTicketDetail = () => {
                       <div className="bg-muted/50 p-4 rounded-lg">
                         <h4 className="font-medium hebrew-text mb-2">עסקה קשורה</h4>
                         <div className="space-y-2">
-                          <p className="text-sm"><span className="hebrew-text">{mockTicketData.relatedDeal.vehicleTitle}</span> :<span className="font-medium">רכב</span></p>
-                          <p className="text-sm">₪{mockTicketData.relatedDeal.dealValue.toLocaleString()} :<span className="font-medium">ערך עסקה</span></p>
-                          <p className="text-sm">{mockTicketData.relatedDeal.dealId} :<span className="font-medium">מזהה עסקה</span></p>
+                          <p className="text-sm"><span className="text-muted-foreground hebrew-text">רכב:</span> <span className="font-medium hebrew-text">{mockTicketData.relatedDeal.vehicleTitle}</span></p>
+                          <p className="text-sm"><span className="text-muted-foreground hebrew-text">ערך עסקה:</span> <span className="font-medium">₪{mockTicketData.relatedDeal.dealValue.toLocaleString()}</span></p>
+                          <p className="text-sm"><span className="text-muted-foreground hebrew-text">מזהה עסקה:</span> <span className="font-medium">{mockTicketData.relatedDeal.dealId}</span></p>
                         </div>
                       </div>
                     )}
@@ -284,20 +284,21 @@ const AdminSupportTicketDetail = () => {
               {/* Support Action Summary */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="hebrew-text">סיכום פעולות התמיכה</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <Button className="hebrew-text">
+                      <FileText className="h-4 w-4 ml-2" />
+                      שמור סיכום
+                    </Button>
+                    <CardTitle className="hebrew-text">סיכום פעולות התמיכה</CardTitle>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <Textarea
                       placeholder="תאר את הפעולות שננקטו, ההחלטות שהתקבלו והפתרון שניתן..."
-                      className="min-h-32 hebrew-text"
+                      className="min-h-32 hebrew-text text-right"
+                      dir="rtl"
                     />
-                    <div className="flex justify-end">
-                      <Button className="hebrew-text">
-                        <FileText className="h-4 w-4 ml-2" />
-                        שמור סיכום
-                      </Button>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -305,17 +306,17 @@ const AdminSupportTicketDetail = () => {
               {/* Original Conversation */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="hebrew-text">השיחה המקורית</CardTitle>
+                  <CardTitle className="hebrew-text text-right">השיחה המקורית</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 max-h-64 overflow-y-auto text-sm">
                     {mockOriginalConversation.map((msg, index) => (
                       <div key={index} className="border-b pb-2">
                         <div className="flex justify-between items-start">
-                          <span className="font-medium hebrew-text">{msg.sender}:</span>
                           <span className="text-xs text-muted-foreground">{msg.time}</span>
+                          <span className="font-medium hebrew-text">{msg.sender}:</span>
                         </div>
-                        <p className="text-muted-foreground hebrew-text mt-1">{msg.message}</p>
+                        <p className="text-muted-foreground hebrew-text mt-1 text-right">{msg.message}</p>
                       </div>
                     ))}
                   </div>
@@ -323,25 +324,25 @@ const AdminSupportTicketDetail = () => {
               </Card>
             </div>
 
-            {/* Right Panel - User Details */}
-            <div className="space-y-6">
+            {/* User Details - Left Panel for RTL */}
+            <div className="xl:order-1 space-y-6">
               {/* Reporter Details */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="hebrew-text">פרטי המדווח</CardTitle>
+                  <CardTitle className="hebrew-text text-right">פרטי המדווח</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-row-reverse">
                       <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
                         <User className="h-6 w-6 text-white" />
                       </div>
-                      <div>
+                      <div className="text-right">
                         <p className="font-medium hebrew-text">{mockTicketData.reporter.name}</p>
                         <p className="text-sm text-muted-foreground hebrew-text">{mockTicketData.reporter.business}</p>
                       </div>
                     </div>
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-2 text-sm text-right">
                       <p><span className="text-muted-foreground">דוא"ל:</span> {mockTicketData.reporter.email}</p>
                       <p><span className="text-muted-foreground">טלפון:</span> {mockTicketData.reporter.phone}</p>
                     </div>
@@ -356,29 +357,29 @@ const AdminSupportTicketDetail = () => {
               {/* Reported User Details */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="hebrew-text">המשתמש המדווח</CardTitle>
+                  <CardTitle className="hebrew-text text-right">המשתמש המדווח</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-row-reverse">
                       <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
                         <User className="h-6 w-6 text-white" />
                       </div>
-                      <div>
+                      <div className="text-right">
                         <p className="font-medium hebrew-text">{mockTicketData.reportedUser.name}</p>
                         <p className="text-sm text-muted-foreground hebrew-text">{mockTicketData.reportedUser.business}</p>
                       </div>
                     </div>
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-2 text-sm text-right">
                       <p><span className="text-muted-foreground">דוא"ל:</span> {mockTicketData.reportedUser.email}</p>
                       <p><span className="text-muted-foreground">טלפון:</span> {mockTicketData.reportedUser.phone}</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" className="flex-1 hebrew-text text-xs">
-                        צפה בפרופיל
-                      </Button>
                       <Button variant="destructive" className="flex-1 hebrew-text text-xs">
                         השהה משתמש
+                      </Button>
+                      <Button variant="outline" className="flex-1 hebrew-text text-xs">
+                        צפה בפרופיל
                       </Button>
                     </div>
                   </div>
