@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate } from "react-router-dom";
 
 // Mock data for search requests
 const searchRequests = [
@@ -38,6 +39,12 @@ const searchRequests = [
 ];
 
 const ISORequestsScreen = () => {
+  const navigate = useNavigate();
+
+  const handleRequestClick = (requestId: number) => {
+    navigate(`/mobile/car-search-request/${requestId}`);
+  };
+
   return (
     <div className="space-y-4">
       {/* Screen Title */}
@@ -58,28 +65,24 @@ const ISORequestsScreen = () => {
         <TabsContent value="mine" className="space-y-4">
           <div className="space-y-3">
             {searchRequests.map((request) => (
-              <Card key={request.id} className="card-interactive cursor-pointer">
+              <Card 
+                key={request.id} 
+                className="card-interactive cursor-pointer"
+                onClick={() => handleRequestClick(request.id)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-4 space-x-reverse">
-                    {/* Request Icon */}
-                    <div className="relative w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Search className="h-10 w-10 text-muted-foreground" />
-                      {request.status === "פתוח" && (
-                        <Badge variant="default" className="absolute -top-1 -right-1 text-xs">
-                          פעיל
-                        </Badge>
-                      )}
-                    </div>
-
                     {/* Request Details */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-foreground hebrew-text">
-                          {request.title}
-                        </h3>
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h3 className="font-semibold text-foreground hebrew-text">
+                            {request.title}
+                          </h3>
+                        </div>
                         <Badge 
                           variant={request.status === "פתוח" ? "default" : "secondary"}
-                          className="hebrew-text"
+                          className="hebrew-text mr-2"
                         >
                           {request.status}
                         </Badge>
@@ -95,6 +98,11 @@ const ISORequestsScreen = () => {
                           <span className="hebrew-text">{request.dateCreated}</span>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Request Icon - moved to right */}
+                    <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Search className="h-10 w-10 text-muted-foreground" />
                     </div>
                   </div>
                 </CardContent>
@@ -113,28 +121,24 @@ const ISORequestsScreen = () => {
         <TabsContent value="all" className="space-y-4">
           <div className="space-y-3">
             {searchRequests.map((request) => (
-              <Card key={request.id} className="card-interactive cursor-pointer">
+              <Card 
+                key={request.id} 
+                className="card-interactive cursor-pointer"
+                onClick={() => handleRequestClick(request.id)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-4 space-x-reverse">
-                    {/* Request Icon */}
-                    <div className="relative w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Search className="h-10 w-10 text-muted-foreground" />
-                      {request.status === "פתוח" && (
-                        <Badge variant="default" className="absolute -top-1 -right-1 text-xs">
-                          פעיל
-                        </Badge>
-                      )}
-                    </div>
-
                     {/* Request Details */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-foreground hebrew-text">
-                          {request.title}
-                        </h3>
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h3 className="font-semibold text-foreground hebrew-text">
+                            {request.title}
+                          </h3>
+                        </div>
                         <Badge 
                           variant={request.status === "פתוח" ? "default" : "secondary"}
-                          className="hebrew-text"
+                          className="hebrew-text mr-2"
                         >
                           {request.status}
                         </Badge>
@@ -150,6 +154,11 @@ const ISORequestsScreen = () => {
                           <span className="hebrew-text">{request.dateCreated}</span>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Request Icon - moved to right */}
+                    <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Search className="h-10 w-10 text-muted-foreground" />
                     </div>
                   </div>
                 </CardContent>

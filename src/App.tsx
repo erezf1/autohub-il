@@ -21,6 +21,10 @@ import AddVehicleScreen from "./pages/mobile/AddVehicleScreen";
 import AddAuctionScreen from "./pages/mobile/AddAuctionScreen";
 import MyProfileScreen from "./pages/mobile/MyProfileScreen";
 import ISORequestsScreen from "./pages/mobile/ISORequestsScreen";
+import ISORequestDetailScreen from "./pages/mobile/ISORequestDetailScreen";
+import ChatRequestScreen from "./pages/mobile/ChatRequestScreen";
+import CreateBidSelectCarScreen from "./pages/mobile/CreateBidSelectCarScreen";
+import CreateBidDetailsScreen from "./pages/mobile/CreateBidDetailsScreen";
 import NotFound from "./pages/mobile/NotFound";
 
 // Admin Layout and Pages
@@ -90,6 +94,10 @@ const App = () => (
                 <Route path="/add-auction" element={<AddAuctionScreen />} />
                 <Route path="/profile" element={<MyProfileScreen />} />
                 <Route path="/car-search-requests" element={<ISORequestsScreen />} />
+                <Route path="/car-search-request/:id" element={<ISORequestDetailScreen />} />
+                <Route path="/chat-request/:id" element={<ChatRequestScreen />} />
+                <Route path="/create-bid" element={<CreateBidSelectCarScreen />} />
+                <Route path="/create-bid/:vehicleId" element={<CreateBidDetailsScreen />} />
                 
                 {/* Legacy route aliases for backward compatibility */}
                 <Route path="/add-car" element={<AddVehicleScreen />} />

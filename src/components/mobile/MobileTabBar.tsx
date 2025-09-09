@@ -40,10 +40,8 @@ const MobileTabBar = () => {
   const navigate = useNavigate();
 
   const getAddButtonAction = () => {
-    if (location.pathname === "/mobile/auctions") {
-      return "/mobile/add-auction";
-    }
-    return "/mobile/add-car";
+    // Always add car to repository
+    return "/mobile/add-vehicle";
   };
 
   return (

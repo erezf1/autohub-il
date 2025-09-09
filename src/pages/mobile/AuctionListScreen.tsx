@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Clock, Gavel, TrendingUp } from "lucide-react";
+import { Clock, Gavel, TrendingUp, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 
@@ -73,8 +74,14 @@ const AuctionListScreen = () => {
 
   return (
     <div className="space-y-4">
-      {/* Screen Title */}
-      <h1 className="text-2xl font-bold text-foreground hebrew-text">מכירות פומביות</h1>
+      {/* Screen Title with Create Bid Button */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground hebrew-text">מכירות פומביות</h1>
+        <Button size="sm" className="hebrew-text" onClick={() => navigate("/mobile/create-bid")}>
+          <Plus className="h-4 w-4 ml-2" />
+          הצעה חדשה
+        </Button>
+      </div>
       
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
@@ -92,7 +99,32 @@ const AuctionListScreen = () => {
               >
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-4 space-x-reverse">
-                    {/* Vehicle Image */}
+                    {/* Auction Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <TrendingUp className="h-3 w-3 ml-1" />
+                          <span>{auction.bidCount} הצעות</span>
+                        </div>
+                        <h3 className="font-semibold text-foreground hebrew-text">
+                          {auction.title}
+                        </h3>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 text-muted-foreground ml-1" />
+                          <span className={`text-sm hebrew-text ${getTimeRemainingColor(auction.timeRemaining)}`}>
+                            {auction.timeRemaining}
+                          </span>
+                        </div>
+                        <p className="text-lg font-bold text-primary hebrew-text">
+                          {auction.currentBid}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Vehicle Image - moved to right */}
                     <div className="relative w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                       <Gavel className="h-10 w-10 text-muted-foreground" />
                       {auction.isHot && (
@@ -100,30 +132,6 @@ const AuctionListScreen = () => {
                           חם
                         </Badge>
                       )}
-                    </div>
-
-                    {/* Auction Details */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-foreground hebrew-text">
-                          {auction.title}
-                        </h3>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <TrendingUp className="h-3 w-3 ml-1" />
-                          <span>{auction.bidCount} הצעות</span>
-                        </div>
-                      </div>
-                      
-                      <p className="text-lg font-bold text-primary hebrew-text mb-2">
-                        {auction.currentBid}
-                      </p>
-                      
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 text-muted-foreground ml-1" />
-                        <span className={`text-sm hebrew-text ${getTimeRemainingColor(auction.timeRemaining)}`}>
-                          {auction.timeRemaining}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -149,7 +157,32 @@ const AuctionListScreen = () => {
               >
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-4 space-x-reverse">
-                    {/* Vehicle Image */}
+                    {/* Auction Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <TrendingUp className="h-3 w-3 ml-1" />
+                          <span>{auction.bidCount} הצעות</span>
+                        </div>
+                        <h3 className="font-semibold text-foreground hebrew-text">
+                          {auction.title}
+                        </h3>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 text-muted-foreground ml-1" />
+                          <span className={`text-sm hebrew-text ${getTimeRemainingColor(auction.timeRemaining)}`}>
+                            {auction.timeRemaining}
+                          </span>
+                        </div>
+                        <p className="text-lg font-bold text-primary hebrew-text">
+                          {auction.currentBid}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Vehicle Image - moved to right */}
                     <div className="relative w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                       <Gavel className="h-10 w-10 text-muted-foreground" />
                       {auction.isHot && (
@@ -157,30 +190,6 @@ const AuctionListScreen = () => {
                           חם
                         </Badge>
                       )}
-                    </div>
-
-                    {/* Auction Details */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-foreground hebrew-text">
-                          {auction.title}
-                        </h3>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <TrendingUp className="h-3 w-3 ml-1" />
-                          <span>{auction.bidCount} הצעות</span>
-                        </div>
-                      </div>
-                      
-                      <p className="text-lg font-bold text-primary hebrew-text mb-2">
-                        {auction.currentBid}
-                      </p>
-                      
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 text-muted-foreground ml-1" />
-                        <span className={`text-sm hebrew-text ${getTimeRemainingColor(auction.timeRemaining)}`}>
-                          {auction.timeRemaining}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </CardContent>
