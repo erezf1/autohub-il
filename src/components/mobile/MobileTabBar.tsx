@@ -5,27 +5,27 @@ import { cn } from "@/lib/utils";
 const tabs = [
   {
     id: "search",
-    label: "חפש במאגר",
+    label: "חיפוש רכבים",
     icon: Search,
     path: "/mobile/search"
   },
   {
-    id: "iso",
-    label: "רכבים דרושים",
+    id: "required-cars",
+    label: "רכבים מבוקשים",
     icon: FileText,
-    path: "/mobile/car-search-requests"
+    path: "/mobile/required-cars"
   },
   {
-    id: "add",
-    label: "הוסף",
+    id: "hot-cars",
+    label: "רכבים חמים",
     icon: Plus,
-    path: "/mobile/add"
+    path: "/mobile/hot-cars"
   },
   {
-    id: "auctions",
-    label: "מכירות פומביות",
+    id: "bids",
+    label: "הצעות מחיר",
     icon: Gavel,
-    path: "/mobile/auctions"
+    path: "/mobile/bids"
   },
   {
     id: "profile",
@@ -57,7 +57,7 @@ const MobileTabBar = () => {
             return (
               <button
                 key={tab.id}
-                onClick={() => tab.id === "add" ? navigate(getAddButtonAction()) : navigate(tab.path)}
+                onClick={() => navigate(tab.path)}
                 className={cn(
                   "flex flex-col items-center justify-center space-y-1 transition-colors hebrew-text",
                   isActive 
