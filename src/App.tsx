@@ -25,10 +25,14 @@ import ISORequestDetailScreen from "./pages/mobile/ISORequestDetailScreen";
 import ChatRequestScreen from "./pages/mobile/ChatRequestScreen";
 import CreateBidSelectCarScreen from "./pages/mobile/CreateBidSelectCarScreen";
 import CreateBidDetailsScreen from "./pages/mobile/CreateBidDetailsScreen";
-import { LoginScreen } from "./pages/mobile/LoginScreen";
 import { RequiredCarsScreen } from "./pages/mobile/RequiredCarsScreen";
 import { HotCarsScreen } from "./pages/mobile/HotCarsScreen"; 
 import { BidsScreen } from "./pages/mobile/BidsScreen";
+import { LoginScreen } from "./pages/mobile/LoginScreen";
+import { OTPVerificationScreen } from "./pages/mobile/OTPVerificationScreen";
+import { OnboardingProfileScreen } from "./pages/mobile/OnboardingProfileScreen";
+import { OnboardingLicenseScreen } from "./pages/mobile/OnboardingLicenseScreen";
+import { PendingApprovalScreen } from "./pages/mobile/PendingApprovalScreen";
 import NotFound from "./pages/mobile/NotFound";
 
 // Admin Layout and Pages
@@ -98,10 +102,17 @@ const App = () => (
                 <Route path="/add-auction" element={<AddAuctionScreen />} />
                 <Route path="/profile" element={<MyProfileScreen />} />
                 <Route path="/car-search-requests" element={<ISORequestsScreen />} />
-                <Route path="/car-search-request/:id" element={<ISORequestDetailScreen />} />
+                <Route path="/login" element={<LoginScreen />} />
+                <Route path="/verify-otp" element={<OTPVerificationScreen />} />
+                <Route path="/onboarding/profile" element={<OnboardingProfileScreen />} />
+                <Route path="/onboarding/license" element={<OnboardingLicenseScreen />} />
+                <Route path="/required-cars" element={<RequiredCarsScreen />} />
+                <Route path="/hot-cars" element={<HotCarsScreen />} />
+                <Route path="/bids" element={<BidsScreen />} />
+                <Route path="/iso-requests/:id" element={<ISORequestDetailScreen />} />
                 <Route path="/chat-request/:id" element={<ChatRequestScreen />} />
-                <Route path="/create-bid" element={<CreateBidSelectCarScreen />} />
-                <Route path="/create-bid/:vehicleId" element={<CreateBidDetailsScreen />} />
+                <Route path="/create-bid-select-car" element={<CreateBidSelectCarScreen />} />
+                <Route path="/pending-approval" element={<PendingApprovalScreen />} />
                 
                 {/* Legacy route aliases for backward compatibility */}
                 <Route path="/add-car" element={<AddVehicleScreen />} />
