@@ -220,4 +220,4 @@ export const RequiredCarsScreen: React.FC = () => {
       </Tabs>
     </div>
   );
-};```
+};
