@@ -68,11 +68,8 @@ export const HotCarsScreen: React.FC = () => {
             <div className="bg-gradient-to-l from-orange-500 to-red-500 rounded-lg p-4 text-white">
               <div className="flex items-center gap-2 mb-2">
                 <Flame className="w-5 h-5" />
-                <h2 className="text-lg font-semibold">רכבים בעדיפות מקסימלית</h2>
+                <h2 className="text-lg font-semibold">הרכבים הכי שווים </h2>
               </div>
-              <p className="text-sm opacity-90">
-                רכבים עם בוסט מוצגים בראش התוצאות למשך 3 ימים
-              </p>
             </div>
 
 
