@@ -75,21 +75,6 @@ export const HotCarsScreen: React.FC = () => {
               </p>
             </div>
 
-            {/* Filter Options */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              <Button variant="default" size="sm" className="whitespace-nowrap">
-                כל הרכבים החמים
-              </Button>
-              <Button variant="outline" size="sm" className="whitespace-nowrap">
-                הרכבים שלי
-              </Button>
-              <Button variant="outline" size="sm" className="whitespace-nowrap">
-                נותרו יותר מיום
-              </Button>
-              <Button variant="outline" size="sm" className="whitespace-nowrap">
-                נגמרים היום
-              </Button>
-            </div>
 
             {/* Boosted Vehicles List */}
             <div className="space-y-4">

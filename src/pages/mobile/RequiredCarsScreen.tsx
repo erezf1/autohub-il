@@ -73,29 +73,12 @@ export const RequiredCarsScreen: React.FC = () => {
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
-            {/* Create New ISO Request Button */}
-            <Button 
-              onClick={() => navigate('/mobile/create-iso-request')}
-              className="w-full gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              צור בקשה חדשה
-            </Button>
-
-            {/* Filter Options */}
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-              <Button variant="default" size="sm" className="px-4 whitespace-nowrap">
-                הכל
-              </Button>
-              <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
-                פעיל
-              </Button>
-              <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
-                התאמות
-              </Button>
-              <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
-                הושלם
-              </Button>
+            {/* Header */}
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <h2 className="text-lg font-semibold text-blue-800 mb-2">רכבים מבוקשים</h2>
+              <p className="text-sm text-blue-600">
+                גלה את הרכבים הנחוצים ביותר בשוק ופרסם הצעה עבורם
+              </p>
             </div>
 
             {/* ISO Requests List */}
@@ -156,6 +139,22 @@ export const RequiredCarsScreen: React.FC = () => {
               <Plus className="w-4 h-4" />
               צור בקשה חדשה
             </Button>
+
+            {/* Filter Options */}
+            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+              <Button variant="default" size="sm" className="px-4 whitespace-nowrap">
+                הכל
+              </Button>
+              <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
+                פעיל
+              </Button>
+              <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
+                התאמות
+              </Button>
+              <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
+                הושלם
+              </Button>
+            </div>
 
             {/* My ISO Requests List - filtered to show only user's requests */}
             <div className="space-y-3">

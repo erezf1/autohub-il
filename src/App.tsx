@@ -93,7 +93,8 @@ const App = () => (
           <Route path="/mobile/*" element={
             <MobileLayout>
               <Routes>
-                <Route path="/" element={<DashboardScreen />} />
+                <Route path="/" element={<WelcomeScreen />} />
+                <Route path="/dashboard" element={<DashboardScreen />} />
                 <Route path="/search" element={<CarSearchScreen />} />
                 <Route path="/chats" element={<ChatListScreen />} />
                 <Route path="/chat/:id" element={<ChatDetailScreen />} />

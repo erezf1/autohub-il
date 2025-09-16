@@ -52,10 +52,9 @@ const searchResults = [
 
 const quickFilters = [
   "רכבי יוקרה",
-  "מכירה פומבית",
-  "רכבי שטח",
-  "היברידי",
-  "חדש מהסוכנות"
+  "אופנועים",
+  "מתחת ל-50,000",
+  "היברידי"
 ];
 
 const CarSearchScreen = () => {
@@ -78,8 +77,13 @@ const CarSearchScreen = () => {
 
   return (
     <div className="space-y-4">
-      {/* Screen Title */}
-      <h1 className="text-2xl font-bold text-foreground hebrew-text">חיפוש רכב</h1>
+      {/* Header with Manage Cars Button */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground hebrew-text">חיפוש רכב</h1>
+        <Button variant="outline" onClick={() => navigate('/mobile/my-cars')}>
+          ניהול הרכבים שלי
+        </Button>
+      </div>
       
       {/* Search Bar with Filter Button */}
       <div className="flex items-center space-x-2 space-x-reverse">
