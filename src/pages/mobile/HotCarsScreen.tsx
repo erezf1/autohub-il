@@ -107,8 +107,8 @@ export const HotCarsScreen: React.FC = () => {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
+                      <div className="flex items-start justify-between mb-2 flex-row-reverse">
+                        <div className="text-right">
                           <h3 className="font-semibold text-lg">
                             {vehicle.make} {vehicle.model}
                           </h3>
@@ -192,8 +192,8 @@ export const HotCarsScreen: React.FC = () => {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
+                      <div className="flex items-start justify-between mb-2 flex-row-reverse">
+                        <div className="text-right">
                           <h3 className="font-semibold">
                             {vehicle.make} {vehicle.model}
                           </h3>
