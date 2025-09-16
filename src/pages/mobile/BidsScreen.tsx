@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MobileLayout from '@/components/mobile/MobileLayout';
+// import MobileLayout from '@/components/mobile/MobileLayout'; // <--- This line is removed
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -75,7 +75,7 @@ const mockActiveAuctions = [
     year: 2021,
     image: "/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png",
     currentBid: "₪125,000",
-    status: "active", 
+    status: "active",
     timeRemaining: "1 יום ו-15 שעות",
     bidCount: 9,
     canBid: true
@@ -105,7 +105,10 @@ export const BidsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("active-auctions");
 
   return (
-    <MobileLayout>
+    // The MobileLayout component is replaced with a div
+    // You might want to add some padding or margin classes here
+    // e.g., <div className="p-4"> to mimic a layout's spacing
+    <div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="active-auctions">כל המכרזים</TabsTrigger>
@@ -119,15 +122,15 @@ export const BidsScreen: React.FC = () => {
               <h3 className="font-medium mb-3 text-blue-800 text-right">ההצעות שלי</h3>
               <div className="space-y-3">
                 {mockMyBids.map((bid) => (
-                  <Card 
-                    key={bid.id} 
+                  <Card
+                    key={bid.id}
                     className="p-4 cursor-pointer hover:shadow-md transition-shadow border-blue-200"
                     onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
                   >
                     <div className="flex gap-4 flex-row-reverse">
                       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                        <img 
-                          src={bid.image} 
+                        <img
+                          src={bid.image}
                           alt={`${bid.make} ${bid.model}`}
                           className="w-full h-full object-cover"
                         />
@@ -168,21 +171,21 @@ export const BidsScreen: React.FC = () => {
                 ))}
               </div>
             </div>
-            
+
             {/* All Other Auctions */}
             <div>
               <h3 className="font-medium mb-3 text-right">כל המכרזים</h3>
               <div className="space-y-3">
                 {mockActiveAuctions.map((auction) => (
-                  <Card 
-                    key={auction.id} 
+                  <Card
+                    key={auction.id}
                     className="p-4 cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                   >
                     <div className="flex gap-4 flex-row-reverse">
                       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                        <img 
-                          src={auction.image} 
+                        <img
+                          src={auction.image}
                           alt={`${auction.make} ${auction.model}`}
                           className="w-full h-full object-cover"
                         />
@@ -210,8 +213,8 @@ export const BidsScreen: React.FC = () => {
                         </div>
 
                         {auction.canBid && (
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             className="w-full gap-2"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -232,26 +235,26 @@ export const BidsScreen: React.FC = () => {
 
           <TabsContent value="my-auctions" className="space-y-4">
             {/* Create New Auction Button */}
-            <Button 
+            <Button
               onClick={() => navigate('/mobile/add-auction')}
               className="w-full gap-2"
             >
               <Plus className="w-4 h-4" />
               צור מכרז חדש
             </Button>
-            
+
             {/* My Auctions List */}
             <div className="space-y-3">
               {mockMyAuctions.map((auction) => (
-                <Card 
-                  key={auction.id} 
+                <Card
+                  key={auction.id}
                   className="p-4 cursor-pointer hover:shadow-md transition-shadow border-green-200"
                   onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                 >
                   <div className="flex gap-4 flex-row-reverse">
                     <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                      <img 
-                        src={auction.image} 
+                      <img
+                        src={auction.image}
                         alt={`${auction.make} ${auction.model}`}
                         className="w-full h-full object-cover"
                       />
@@ -307,6 +310,6 @@ export const BidsScreen: React.FC = () => {
             )}
           </TabsContent>
       </Tabs>
-    </MobileLayout>
+    </div>
   );
 };
