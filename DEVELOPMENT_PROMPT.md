@@ -44,7 +44,7 @@ Before making ANY changes to the Auto-Hub project, you MUST:
 
 #### Component RTL Considerations
 - Tables: Headers align right, action columns on the left side
-- Cards: Content flows RTL, actions on left
+- Cards: Content flows RTL, pictues on the right, actions on left
 - Navigation: Tabs, breadcrumbs, menus flow right-to-left
 - Buttons: Primary actions typically on left side
 - Forms: Labels on right, validation messages in Hebrew
