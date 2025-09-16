@@ -6,7 +6,7 @@ This application consists of two completely separate systems:
 - **Route Prefix**: `/` (root routes)
 - **Layout**: `MobileLayout` with `MobileHeader` and `MobileTabBar`
 - **Design**: Mobile-first responsive design with RTL support
-- **Pages**: Dashboard, Car Search, Chats, Notifications, Auctions, Profile, ISO Requests
+- **Pages**: Dashboard, Car Search, Chats, Notifications, Auctions, Profile, Car Requests
 - **Navigation**: Bottom tab bar navigation
 
 ## 2. Admin Desktop Application (`/src/components/admin/`, `/src/pages/admin/`)
