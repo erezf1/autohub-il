@@ -9,10 +9,10 @@ export const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col" dir="rtl">
-      {/* Header */}
-      <div className="bg-white shadow-sm px-4 py-8">
-        <div className="text-center">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir="rtl">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
           <img 
             src="/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png" 
             alt="AutoHub Logo" 
@@ -21,11 +21,7 @@ export const WelcomeScreen: React.FC = () => {
           <h1 className="text-3xl font-bold text-blue-600 mb-2">Auto-Hub</h1>
           <p className="text-muted-foreground text-lg">פלטפורמת B2B לסוחרי רכב מורשים</p>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-6 space-y-6">
+        <Card className="w-full p-6 space-y-6">
           <div className="text-center space-y-4">
             <h2 className="text-2xl font-semibold">ברוכים הבאים</h2>
             <p className="text-muted-foreground">
@@ -99,13 +95,6 @@ export const WelcomeScreen: React.FC = () => {
             </Button>
           </div>
         </Card>
-      </div>
-
-      {/* Footer */}
-      <div className="bg-gray-50 px-4 py-4 text-center">
-        <p className="text-xs text-muted-foreground">
-          © 2024 Auto-Hub. כל הזכויות שמורות.
-        </p>
       </div>
     </div>
   );

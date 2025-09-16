@@ -21,7 +21,7 @@ export const LoginScreen: React.FC = () => {
     // Simulate API call for login
     setTimeout(() => {
       setIsLoading(false);
-      navigate('/mobile'); // Navigate to dashboard after successful login
+      navigate('/mobile/dashboard'); // Navigate to dashboard after successful login
     }, 1500);
   };
 
@@ -36,10 +36,10 @@ export const LoginScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col" dir="rtl">
-      {/* Header */}
-      <div className="bg-white shadow-sm px-4 py-6">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir="rtl">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
           <Button
             variant="ghost"
             size="sm"
@@ -55,11 +55,7 @@ export const LoginScreen: React.FC = () => {
           </div>
           <div className="w-16"></div>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-6 space-y-6">
+        <Card className="w-full p-6 space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold">התחברות למערכת</h2>
             <p className="text-muted-foreground text-sm">
@@ -142,13 +138,6 @@ export const LoginScreen: React.FC = () => {
             </Button>
           </div>
         </Card>
-      </div>
-
-      {/* Footer */}
-      <div className="bg-gray-50 px-4 py-4 text-center">
-        <p className="text-xs text-muted-foreground">
-          © 2024 Auto-Hub. כל הזכויות שמורות.
-        </p>
       </div>
     </div>
   );

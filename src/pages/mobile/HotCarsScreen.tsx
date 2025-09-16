@@ -98,7 +98,7 @@ export const HotCarsScreen: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-4 p-4 pt-14">
+                  <div className="flex gap-4 p-4 pt-14 flex-row-reverse">
                     <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                       <img 
                         src={vehicle.image} 
@@ -106,7 +106,6 @@ export const HotCarsScreen: React.FC = () => {
                         className="w-full h-full object-cover"
                       />
                     </div>
-
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-2">
                         <div>
@@ -183,7 +182,7 @@ export const HotCarsScreen: React.FC = () => {
                   key={`my-${vehicle.id}`} 
                   className="p-4 border-blue-200"
                 >
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 flex-row-reverse">
                     <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                       <img 
                         src={vehicle.image} 

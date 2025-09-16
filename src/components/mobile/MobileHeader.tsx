@@ -11,7 +11,7 @@ const MobileHeader = () => {
         {/* Logo and Title */}
         <div className="flex items-center">
           <button 
-            onClick={() => navigate("/mobile")}
+            onClick={() => navigate("/mobile/dashboard")}
             className="flex items-center space-x-3 space-x-reverse hover:opacity-80 transition-opacity"
           >
             <img 

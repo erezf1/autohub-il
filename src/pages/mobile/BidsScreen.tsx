@@ -127,7 +127,7 @@ export const BidsScreen: React.FC = () => {
 
             {/* My Bids Section First */}
             <div>
-              <h3 className="font-medium mb-3 text-blue-800">ההצעות שלי</h3>
+              <h3 className="font-medium mb-3 text-blue-800 text-right">ההצעות שלי</h3>
               <div className="space-y-3">
                 {mockMyBids.map((bid) => (
                   <Card 
@@ -135,7 +135,7 @@ export const BidsScreen: React.FC = () => {
                     className="p-4 cursor-pointer hover:shadow-md transition-shadow border-blue-200"
                     onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
                   >
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 flex-row-reverse">
                       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                         <img 
                           src={bid.image} 
@@ -182,7 +182,7 @@ export const BidsScreen: React.FC = () => {
             
             {/* All Other Auctions */}
             <div>
-              <h3 className="font-medium mb-3">כל המכרזים</h3>
+              <h3 className="font-medium mb-3 text-right">כל המכרזים</h3>
               <div className="space-y-3">
                 {mockActiveAuctions.map((auction) => (
                   <Card 
@@ -190,7 +190,7 @@ export const BidsScreen: React.FC = () => {
                     className="p-4 cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                   >
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 flex-row-reverse">
                       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                         <img 
                           src={auction.image} 
@@ -259,7 +259,7 @@ export const BidsScreen: React.FC = () => {
                   className="p-4 cursor-pointer hover:shadow-md transition-shadow border-green-200"
                   onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                 >
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 flex-row-reverse">
                     <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                       <img 
                         src={auction.image} 
