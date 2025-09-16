@@ -1,4 +1,4 @@
-import { Search, FileText, Plus, Gavel, User } from "lucide-react";
+import { Search, FileText, Flame, Gavel, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -18,12 +18,12 @@ const tabs = [
   {
     id: "hot-cars",
     label: "רכבים חמים",
-    icon: Plus,
+    icon: Flame,
     path: "/mobile/hot-cars"
   },
   {
     id: "bids",
-    label: "הצעות מחיר",
+    label: "מכרזים",
     icon: Gavel,
     path: "/mobile/bids"
   },
@@ -39,11 +39,6 @@ const MobileTabBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const getAddButtonAction = () => {
-    // Always add car to repository
-    return "/mobile/add-vehicle";
-  };
-
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
       <div className="container max-w-md mx-auto">
@@ -51,8 +46,7 @@ const MobileTabBar = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = location.pathname === tab.path || 
-              (tab.path === "/mobile/search" && (location.pathname === "/mobile" || location.pathname === "/mobile/")) ||
-              (tab.path === "/mobile/car-search-requests" && location.pathname === "/mobile/car-search-requests");
+              (tab.path === "/mobile/search" && (location.pathname === "/mobile" || location.pathname === "/mobile/"));
             
             return (
               <button
@@ -65,10 +59,7 @@ const MobileTabBar = () => {
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Icon className={cn(
-                  "h-5 w-5",
-                  tab.id === "add" && "h-6 w-6"
-                )} />
+                <Icon className="h-5 w-5" />
                 <span className="text-xs font-medium">{tab.label}</span>
               </button>
             );

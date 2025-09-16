@@ -4,24 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Phone, ArrowLeft, ArrowRight, Loader2, Lock } from 'lucide-react';
+import { Phone, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export const LoginScreen: React.FC = () => {
+export const RegisterScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    if (!phoneNumber.trim() || !password.trim()) return;
+  const handleSendOTP = async () => {
+    if (!phoneNumber.trim()) return;
     
     setIsLoading(true);
     
-    // Simulate API call for login
+    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      navigate('/mobile'); // Navigate to dashboard after successful login
+      navigate('/mobile/verify-otp', { state: { phoneNumber, isRegister: true } });
     }, 1500);
   };
 
@@ -51,7 +50,7 @@ export const LoginScreen: React.FC = () => {
           </Button>
           <div className="text-center">
             <h1 className="text-2xl font-bold text-blue-600 mb-2">Auto-Hub</h1>
-            <p className="text-muted-foreground">התחברות</p>
+            <p className="text-muted-foreground">הרשמה חדשה</p>
           </div>
           <div className="w-16"></div>
         </div>
@@ -61,9 +60,9 @@ export const LoginScreen: React.FC = () => {
       <div className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-6 space-y-6">
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold">התחברות למערכת</h2>
+            <h2 className="text-xl font-semibold">הרשמה למערכת</h2>
             <p className="text-muted-foreground text-sm">
-              היכנסו עם מספר הטלפון והסיסמה שלכם
+              הזינו מספר טלפון לקבלת קוד אימות
             </p>
           </div>
 
@@ -82,27 +81,14 @@ export const LoginScreen: React.FC = () => {
                   maxLength={12}
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">סיסמה</Label>
-              <div className="relative">
-                <Lock className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="הזן סיסמה בת 6 ספרות"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10 text-right"
-                  maxLength={6}
-                />
-              </div>
+              <p className="text-xs text-muted-foreground">
+                אנא הזינו מספר טלפון ישראלי תקין
+              </p>
             </div>
 
             <Button 
-              onClick={handleLogin}
-              disabled={!phoneNumber.trim() || !password.trim() || isLoading}
+              onClick={handleSendOTP}
+              disabled={!phoneNumber.trim() || isLoading}
               className="w-full gap-2"
             >
               {isLoading ? (
@@ -110,30 +96,33 @@ export const LoginScreen: React.FC = () => {
               ) : (
                 <ArrowLeft className="w-4 h-4" />
               )}
-              {isLoading ? 'מתחבר...' : 'התחבר'}
+              {isLoading ? 'שולח קוד...' : 'שלח קוד אימות'}
             </Button>
-
-            <div className="text-center">
-              <Button variant="ghost" size="sm" className="text-xs">
-                שכחתי סיסמה
-              </Button>
-            </div>
           </div>
 
           <Separator />
 
           <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              אין לכם עדיין חשבון?
+              כבר יש לכם חשבון?
             </p>
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => navigate('/mobile/register')}
+              onClick={() => navigate('/mobile/login')}
               className="gap-2"
             >
-              הרשמה חדשה
+              התחברות לחשבון קיים
             </Button>
+          </div>
+
+          <div className="text-center space-y-2">
+            <p className="text-xs text-muted-foreground">
+              בהמשך ההרשמה תתבקשו להעלות תו סוחר בתוקף
+            </p>
+            <p className="text-xs text-muted-foreground">
+              ללא תו סוחר לא ניתן להשתמש במערכת
+            </p>
           </div>
 
           <div className="text-center">

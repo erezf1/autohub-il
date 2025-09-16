@@ -28,7 +28,10 @@ import CreateBidDetailsScreen from "./pages/mobile/CreateBidDetailsScreen";
 import { RequiredCarsScreen } from "./pages/mobile/RequiredCarsScreen";
 import { HotCarsScreen } from "./pages/mobile/HotCarsScreen"; 
 import { BidsScreen } from "./pages/mobile/BidsScreen";
+import { WelcomeScreen } from "./pages/mobile/WelcomeScreen";
+import { RegisterScreen } from "./pages/mobile/RegisterScreen";
 import { LoginScreen } from "./pages/mobile/LoginScreen";
+import { SetPasswordScreen } from "./pages/mobile/SetPasswordScreen";
 import { OTPVerificationScreen } from "./pages/mobile/OTPVerificationScreen";
 import { OnboardingProfileScreen } from "./pages/mobile/OnboardingProfileScreen";
 import { OnboardingLicenseScreen } from "./pages/mobile/OnboardingLicenseScreen";
@@ -102,7 +105,10 @@ const App = () => (
                 <Route path="/add-auction" element={<AddAuctionScreen />} />
                 <Route path="/profile" element={<MyProfileScreen />} />
                 <Route path="/car-search-requests" element={<ISORequestsScreen />} />
+                <Route path="/welcome" element={<WelcomeScreen />} />
+                <Route path="/register" element={<RegisterScreen />} />
                 <Route path="/login" element={<LoginScreen />} />
+                <Route path="/set-password" element={<SetPasswordScreen />} />
                 <Route path="/verify-otp" element={<OTPVerificationScreen />} />
                 <Route path="/onboarding/profile" element={<OnboardingProfileScreen />} />
                 <Route path="/onboarding/license" element={<OnboardingLicenseScreen />} />

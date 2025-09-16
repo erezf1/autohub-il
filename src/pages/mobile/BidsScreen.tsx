@@ -102,137 +102,27 @@ const getBidStatusText = (status: string) => {
 
 export const BidsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("my-bids");
+  const [activeTab, setActiveTab] = useState("active-auctions");
 
   return (
     <MobileLayout>
       <div className="flex-1 p-4" dir="rtl">
-        <h1 className="text-xl font-bold mb-4">הצעות מחיר</h1>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="my-bids">ההצעות שלי</TabsTrigger>
-            <TabsTrigger value="my-auctions">המכירות שלי</TabsTrigger>
-            <TabsTrigger value="active-auctions">מכירות פעילות</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="active-auctions">כל המכרזים</TabsTrigger>
+            <TabsTrigger value="my-auctions">המכרזים שלי</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="my-bids" className="space-y-4">
+          <TabsContent value="active-auctions" className="space-y-4">
             {/* Create New Bid Button */}
             <Button 
               onClick={() => navigate('/mobile/create-bid-select-car')}
               className="w-full gap-2"
             >
               <Plus className="w-4 h-4" />
-              צור הצעה חדשה
+              הגש הצעה חדשה
             </Button>
-
-            {/* My Bids List */}
-            <div className="space-y-3">
-              {mockMyBids.map((bid) => (
-                <Card 
-                  key={bid.id} 
-                  className="p-4 cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
-                >
-                  <div className="flex gap-4">
-                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                      <img 
-                        src={bid.image} 
-                        alt={`${bid.make} ${bid.model}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-semibold">{bid.make} {bid.model}</h3>
-                          <p className="text-sm text-muted-foreground">{bid.year}</p>
-                        </div>
-                        <Badge className={`text-white ${getBidStatusColor(bid.status)}`}>
-                          {getBidStatusText(bid.status)}
-                        </Badge>
-                      </div>
-
-                      <div className="space-y-1 mb-2">
-                        <div className="flex justify-between text-sm">
-                          <span>ההצעה שלי:</span>
-                          <span className="font-medium">{bid.myBid}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>הצעה גבוהה:</span>
-                          <span className="font-medium text-green-600">{bid.currentHighest}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>{bid.timeRemaining}</span>
-                        </div>
-                        <span>{bid.bidCount} הצעות</span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="my-auctions" className="space-y-4">
-            {/* My Auctions List */}
-            <div className="space-y-3">
-              {mockMyAuctions.map((auction) => (
-                <Card 
-                  key={auction.id} 
-                  className="p-4 cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
-                >
-                  <div className="flex gap-4">
-                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                      <img 
-                        src={auction.image} 
-                        alt={`${auction.make} ${auction.model}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-semibold">{auction.make} {auction.model}</h3>
-                          <p className="text-sm text-muted-foreground">{auction.year}</p>
-                        </div>
-                        <Badge className="bg-blue-500 text-white">
-                          פעיל
-                        </Badge>
-                      </div>
-
-                      <div className="space-y-1 mb-2">
-                        <div className="flex justify-between text-sm">
-                          <span>מחיר פתיחה:</span>
-                          <span className="font-medium">{auction.startingPrice}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>הצעה נוכחית:</span>
-                          <span className="font-medium text-green-600">{auction.currentBid}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>{auction.timeRemaining}</span>
-                        </div>
-                        <span>{auction.bidCount} הצעות</span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="active-auctions" className="space-y-4">
+            
             {/* Active Auctions List */}
             <div className="space-y-3">
               {mockActiveAuctions.map((auction) => (
@@ -289,6 +179,138 @@ export const BidsScreen: React.FC = () => {
                 </Card>
               ))}
             </div>
+
+            {/* My Bids Section */}
+            <div className="mt-8">
+              <h3 className="font-medium mb-3">ההצעות שלי</h3>
+              <div className="space-y-3">
+                {mockMyBids.map((bid) => (
+                  <Card 
+                    key={bid.id} 
+                    className="p-4 cursor-pointer hover:shadow-md transition-shadow border-blue-200"
+                    onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
+                  >
+                    <div className="flex gap-4">
+                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                        <img 
+                          src={bid.image} 
+                          alt={`${bid.make} ${bid.model}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h3 className="font-semibold">{bid.make} {bid.model}</h3>
+                            <p className="text-sm text-muted-foreground">{bid.year}</p>
+                          </div>
+                          <Badge className={`text-white ${getBidStatusColor(bid.status)}`}>
+                            {getBidStatusText(bid.status)}
+                          </Badge>
+                        </div>
+
+                        <div className="space-y-1 mb-2">
+                          <div className="flex justify-between text-sm">
+                            <span>ההצעה שלי:</span>
+                            <span className="font-medium">{bid.myBid}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>הצעה גבוהה:</span>
+                            <span className="font-medium text-green-600">{bid.currentHighest}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{bid.timeRemaining}</span>
+                          </div>
+                          <span>{bid.bidCount} הצעות</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="my-auctions" className="space-y-4">
+            {/* Create New Auction Button */}
+            <Button 
+              onClick={() => navigate('/mobile/add-auction')}
+              className="w-full gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              צור מכרז חדש
+            </Button>
+            
+            {/* My Auctions List */}
+            <div className="space-y-3">
+              {mockMyAuctions.map((auction) => (
+                <Card 
+                  key={auction.id} 
+                  className="p-4 cursor-pointer hover:shadow-md transition-shadow border-green-200"
+                  onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
+                >
+                  <div className="flex gap-4">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                      <img 
+                        src={auction.image} 
+                        alt={`${auction.make} ${auction.model}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-semibold">{auction.make} {auction.model}</h3>
+                          <p className="text-sm text-muted-foreground">{auction.year}</p>
+                        </div>
+                        <Badge className="bg-green-500 text-white">
+                          פעיל
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-1 mb-2">
+                        <div className="flex justify-between text-sm">
+                          <span>מחיר פתיחה:</span>
+                          <span className="font-medium">{auction.startingPrice}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>הצעה נוכחית:</span>
+                          <span className="font-medium text-green-600">{auction.currentBid}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          <span>{auction.timeRemaining}</span>
+                        </div>
+                        <span>{auction.bidCount} הצעות</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            {/* Empty State for My Auctions */}
+            {mockMyAuctions.length === 0 && (
+              <div className="text-center py-12">
+                <Gavel className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-medium mb-2">אין לך מכרזים פעילים</h3>
+                <p className="text-muted-foreground mb-4">
+                  צור מכרז חדש לרכב שלך
+                </p>
+                <Button onClick={() => navigate('/mobile/add-auction')}>
+                  צור מכרז ראשון
+                </Button>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

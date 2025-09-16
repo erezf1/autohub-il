@@ -32,12 +32,14 @@ export const OTPVerificationScreen: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      // Simulate new user flow vs returning user
-      const isNewUser = Math.random() > 0.5;
-      if (isNewUser) {
-        navigate('/mobile/onboarding/profile');
+      
+      const isRegister = location.state?.isRegister;
+      if (isRegister) {
+        // For registration - ask for password first
+        navigate('/mobile/set-password', { state: { phoneNumber, otp: otpValue } });
       } else {
-        navigate('/mobile/search');
+        // For login - directly go to dashboard (password was already verified)
+        navigate('/mobile');
       }
     }, 1500);
   };
