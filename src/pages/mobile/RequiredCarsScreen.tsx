@@ -65,12 +65,11 @@ export const RequiredCarsScreen: React.FC = () => {
 
   return (
     <MobileLayout>
-      <div className="flex-1 p-4" dir="rtl">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="all">כל הבקשות</TabsTrigger>
-            <TabsTrigger value="mine">הבקשות שלי</TabsTrigger>
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="all">כל הבקשות</TabsTrigger>
+          <TabsTrigger value="mine">הבקשות שלי</TabsTrigger>
+        </TabsList>
 
           <TabsContent value="all" className="space-y-4">
 
@@ -211,8 +210,7 @@ export const RequiredCarsScreen: React.FC = () => {
               </div>
             )}
           </TabsContent>
-        </Tabs>
-      </div>
+      </Tabs>
     </MobileLayout>
   );
 };

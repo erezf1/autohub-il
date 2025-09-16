@@ -134,9 +134,9 @@ const CarSearchScreen = () => {
                 <div className="relative w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                   <Car className="h-10 w-10 text-muted-foreground" />
                   {vehicle.isAuction && (
-                    <Badge variant="destructive" className="absolute -top-1 -left-1 text-xs">
-                      מכירה פומבית
-                    </Badge>
+                     <Badge variant="destructive" className="absolute -top-1 -right-1 text-xs">
+                       מכירה פומבית
+                     </Badge>
                   )}
                 </div>
 

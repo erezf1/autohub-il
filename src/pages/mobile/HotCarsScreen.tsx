@@ -56,12 +56,11 @@ export const HotCarsScreen: React.FC = () => {
 
   return (
     <MobileLayout>
-      <div className="flex-1 p-4" dir="rtl">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="hot-cars">רכבים חמים</TabsTrigger>
-            <TabsTrigger value="my-boosts">הבוסטים שלי</TabsTrigger>
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="hot-cars">רכבים חמים</TabsTrigger>
+          <TabsTrigger value="my-boosts">הבוסטים שלי</TabsTrigger>
+        </TabsList>
 
           <TabsContent value="hot-cars" className="space-y-4">
             {/* Header Info */}
@@ -246,8 +245,7 @@ export const HotCarsScreen: React.FC = () => {
               </div>
             </Card>
           </TabsContent>
-        </Tabs>
-      </div>
+      </Tabs>
     </MobileLayout>
   );
 };

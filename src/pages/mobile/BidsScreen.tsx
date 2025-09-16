@@ -106,12 +106,11 @@ export const BidsScreen: React.FC = () => {
 
   return (
     <MobileLayout>
-      <div className="flex-1 p-4" dir="rtl">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="active-auctions">כל המכרזים</TabsTrigger>
-            <TabsTrigger value="my-auctions">המכרזים שלי</TabsTrigger>
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="active-auctions">כל המכרזים</TabsTrigger>
+          <TabsTrigger value="my-auctions">המכרזים שלי</TabsTrigger>
+        </TabsList>
 
           <TabsContent value="active-auctions" className="space-y-4">
 
@@ -307,8 +306,7 @@ export const BidsScreen: React.FC = () => {
               </div>
             )}
           </TabsContent>
-        </Tabs>
-      </div>
+      </Tabs>
     </MobileLayout>
   );
 };

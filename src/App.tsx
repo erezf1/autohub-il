@@ -94,6 +94,11 @@ const App = () => (
           <Route path="/mobile/welcome" element={<WelcomeScreen />} />
           <Route path="/mobile/register" element={<RegisterScreen />} />
           <Route path="/mobile/login" element={<LoginScreen />} />
+          <Route path="/mobile/verify-otp" element={<OTPVerificationScreen />} />
+          <Route path="/mobile/set-password" element={<SetPasswordScreen />} />
+          <Route path="/mobile/onboarding-license" element={<OnboardingLicenseScreen />} />
+          <Route path="/mobile/onboarding-profile" element={<OnboardingProfileScreen />} />
+          <Route path="/mobile/pending-approval" element={<PendingApprovalScreen />} />
 
           {/* Mobile Routes */}
           <Route path="/mobile/*" element={
@@ -112,17 +117,12 @@ const App = () => (
                 <Route path="/add-auction" element={<AddAuctionScreen />} />
                 <Route path="/profile" element={<MyProfileScreen />} />
                 <Route path="/car-search-requests" element={<ISORequestsScreen />} />
-                <Route path="/set-password" element={<SetPasswordScreen />} />
-                <Route path="/verify-otp" element={<OTPVerificationScreen />} />
-                <Route path="/onboarding/profile" element={<OnboardingProfileScreen />} />
-                <Route path="/onboarding/license" element={<OnboardingLicenseScreen />} />
                 <Route path="/required-cars" element={<RequiredCarsScreen />} />
                 <Route path="/hot-cars" element={<HotCarsScreen />} />
                 <Route path="/bids" element={<BidsScreen />} />
                 <Route path="/iso-requests/:id" element={<ISORequestDetailScreen />} />
                 <Route path="/chat-request/:id" element={<ChatRequestScreen />} />
                 <Route path="/create-bid-select-car" element={<CreateBidSelectCarScreen />} />
-                <Route path="/pending-approval" element={<PendingApprovalScreen />} />
                 
                 {/* Legacy route aliases for backward compatibility */}
                 <Route path="/add-car" element={<AddVehicleScreen />} />
