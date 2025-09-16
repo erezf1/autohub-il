@@ -5,14 +5,14 @@ Before making ANY changes to the Auto-Hub project, you MUST:
 
 ### 1. Review All Requirement Files
 **MANDATORY**: Always check these files first:
-- `PROJECT_SPEC.md` - Overall project requirements and business rules
+- `docs/PROJECT_PRD.md` - Overall project requirements and business rules
 - `docs/MOBILE_SCREENS_SPEC.md` - Mobile screen specifications and RTL requirements  
 - `docs/ADMIN_SCREENS_SPEC.md` - Admin desktop screen specifications
 - `README_ARCHITECTURE.md` - System architecture and separation principles
 
 ### 2. Update Documentation When Requirements Change
 **REQUIRED**: When implementing new features or changes:
-- Update `PROJECT_SPEC.md` if business rules or entities change
+- Update `docs/PROJECT_PRD.md` if business rules or entities change
 - Update relevant screen specification files if UI/UX changes
 - Maintain consistency across all documentation
 - Add new entities, screens, or business rules to appropriate files
