@@ -89,11 +89,17 @@ const App = () => (
             </AdminDesktopLayout>
           } />
 
+          {/* Auth routes without layout */}
+          <Route path="/mobile" element={<WelcomeScreen />} />
+          <Route path="/mobile/welcome" element={<WelcomeScreen />} />
+          <Route path="/mobile/register" element={<RegisterScreen />} />
+          <Route path="/mobile/login" element={<LoginScreen />} />
+
           {/* Mobile Routes */}
           <Route path="/mobile/*" element={
             <MobileLayout>
               <Routes>
-                <Route path="/" element={<WelcomeScreen />} />
+                <Route path="/" element={<DashboardScreen />} />
                 <Route path="/dashboard" element={<DashboardScreen />} />
                 <Route path="/search" element={<CarSearchScreen />} />
                 <Route path="/chats" element={<ChatListScreen />} />
@@ -106,9 +112,6 @@ const App = () => (
                 <Route path="/add-auction" element={<AddAuctionScreen />} />
                 <Route path="/profile" element={<MyProfileScreen />} />
                 <Route path="/car-search-requests" element={<ISORequestsScreen />} />
-                <Route path="/welcome" element={<WelcomeScreen />} />
-                <Route path="/register" element={<RegisterScreen />} />
-                <Route path="/login" element={<LoginScreen />} />
                 <Route path="/set-password" element={<SetPasswordScreen />} />
                 <Route path="/verify-otp" element={<OTPVerificationScreen />} />
                 <Route path="/onboarding/profile" element={<OnboardingProfileScreen />} />

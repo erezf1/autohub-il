@@ -114,16 +114,6 @@ export const BidsScreen: React.FC = () => {
           </TabsList>
 
           <TabsContent value="active-auctions" className="space-y-4">
-            {/* Header Info */}
-            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-              <div className="flex items-center gap-2 mb-2">
-                <Gavel className="w-5 h-5 text-green-600" />
-                <h2 className="text-lg font-semibold text-green-800">מכרזים פעילים</h2>
-              </div>
-              <p className="text-sm text-green-600">
-                השתתף במכרזים והגש הצעות מחיר עבור הרכבים המבוקשים
-              </p>
-            </div>
 
             {/* My Bids Section First */}
             <div>
@@ -146,7 +136,7 @@ export const BidsScreen: React.FC = () => {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-2">
-                          <div>
+                          <div className="text-right">
                             <h3 className="font-semibold">{bid.make} {bid.model}</h3>
                             <p className="text-sm text-muted-foreground">{bid.year}</p>
                           </div>
@@ -201,7 +191,7 @@ export const BidsScreen: React.FC = () => {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-2">
-                          <div>
+                          <div className="text-right">
                             <h3 className="font-semibold">{auction.make} {auction.model}</h3>
                             <p className="text-sm text-muted-foreground">{auction.year}</p>
                           </div>
@@ -270,7 +260,7 @@ export const BidsScreen: React.FC = () => {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start mb-2">
-                        <div>
+                        <div className="text-right">
                           <h3 className="font-semibold">{auction.make} {auction.model}</h3>
                           <p className="text-sm text-muted-foreground">{auction.year}</p>
                         </div>

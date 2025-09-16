@@ -73,13 +73,6 @@ export const RequiredCarsScreen: React.FC = () => {
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
-            {/* Header */}
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-              <h2 className="text-lg font-semibold text-blue-800 mb-2">רכבים מבוקשים</h2>
-              <p className="text-sm text-blue-600">
-                גלה את הרכבים הנחוצים ביותר בשוק ופרסם הצעה עבורם
-              </p>
-            </div>
 
             {/* ISO Requests List */}
             <div className="space-y-3">
