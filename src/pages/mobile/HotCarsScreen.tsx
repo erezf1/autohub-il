@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MobileLayout from '@/components/mobile/MobileLayout';
+// import MobileLayout from '@/components/mobile/MobileLayout'; // <--- This line is removed
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -55,7 +55,8 @@ export const HotCarsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("hot-cars");
 
   return (
-    <MobileLayout>
+    // The MobileLayout component has been replaced with a div
+    <div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="hot-cars">רכבים חמים</TabsTrigger>
@@ -78,8 +79,8 @@ export const HotCarsScreen: React.FC = () => {
             {/* Boosted Vehicles List */}
             <div className="space-y-4">
               {mockBoostedVehicles.map((vehicle) => (
-                <Card 
-                  key={vehicle.id} 
+                <Card
+                  key={vehicle.id}
                   className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border-orange-200 relative"
                   onClick={() => navigate(`/mobile/vehicle/${vehicle.id}`)}
                 >
@@ -99,8 +100,8 @@ export const HotCarsScreen: React.FC = () => {
 
                   <div className="flex gap-4 p-4 pt-14 flex-row-reverse">
                     <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                      <img 
-                        src={vehicle.image} 
+                      <img
+                        src={vehicle.image}
                         alt={`${vehicle.make} ${vehicle.model}`}
                         className="w-full h-full object-cover"
                       />
@@ -155,7 +156,7 @@ export const HotCarsScreen: React.FC = () => {
                   5/10
                 </Badge>
               </div>
-              
+
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                   <span>בוסטים שהשתמשת:</span>
@@ -175,16 +176,16 @@ export const HotCarsScreen: React.FC = () => {
             {/* My Vehicles Available for Boost */}
             <div className="space-y-3">
               <h3 className="font-medium">הרכבים שלי - זמינים לבוסט</h3>
-              
+
               {mockBoostedVehicles.filter(v => !v.isOwn).map((vehicle) => (
-                <Card 
-                  key={`my-${vehicle.id}`} 
+                <Card
+                  key={`my-${vehicle.id}`}
                   className="p-4 border-blue-200"
                 >
                   <div className="flex gap-4 flex-row-reverse">
                     <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                      <img 
-                        src={vehicle.image} 
+                      <img
+                        src={vehicle.image}
                         alt={`${vehicle.make} ${vehicle.model}`}
                         className="w-full h-full object-cover"
                       />
@@ -211,8 +212,8 @@ export const HotCarsScreen: React.FC = () => {
                         <span className="text-sm text-muted-foreground">
                           {vehicle.location}
                         </span>
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           className="gap-2"
                           onClick={() => {
                             // Handle boost activation
@@ -235,7 +236,7 @@ export const HotCarsScreen: React.FC = () => {
                 <p className="text-sm text-muted-foreground mb-3">
                   הוסף רכב חדש למאגר והפעל עליו בוסט
                 </p>
-                <Button 
+                <Button
                   onClick={() => navigate('/mobile/add-vehicle')}
                   className="w-full gap-2"
                 >
@@ -246,6 +247,6 @@ export const HotCarsScreen: React.FC = () => {
             </Card>
           </TabsContent>
       </Tabs>
-    </MobileLayout>
+    </div>
   );
 };
