@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MobileLayout from '@/components/mobile/MobileLayout';
+// import MobileLayout from '@/components/mobile/MobileLayout'; // <--- This line is removed
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ const mockISORequests = [
   {
     id: 2,
     vehicleType: "מרצדס C-Class",
-    year: "2019-2021", 
+    year: "2019-2021",
     priceRange: "₪150,000 - ₪200,000",
     status: "matches",
     matchCount: 1,
@@ -33,7 +33,7 @@ const mockISORequests = [
     id: 3,
     vehicleType: "BMW X3",
     year: "2018-2020",
-    priceRange: "₪120,000 - ₪180,000", 
+    priceRange: "₪120,000 - ₪180,000",
     status: "completed",
     matchCount: 0,
     createdDate: "לפני חודש",
@@ -64,7 +64,8 @@ export const RequiredCarsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("all");
 
   return (
-    <MobileLayout>
+    // The MobileLayout component has been replaced with a div
+    <div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="all">כל הבקשות</TabsTrigger>
@@ -76,17 +77,19 @@ export const RequiredCarsScreen: React.FC = () => {
             {/* ISO Requests List */}
             <div className="space-y-3">
               {mockISORequests.map((request) => (
-                <Card 
-                  key={request.id} 
-                  className="p-4 cursor-pointer hover:shadow-md transition-shadow"
+                <Card
+                  key={request.id}
+                  // Added text-right for RTL alignment
+                  className="p-4 cursor-pointer hover:shadow-md transition-shadow text-right"
                   onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
                 >
-                  <div className="flex justify-between items-start mb-3">
+                  {/* Added flex-row-reverse to move badge to the left */}
+                  <div className="flex justify-between items-start mb-3 flex-row-reverse">
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg mb-1">{request.vehicleType}</h3>
                       <p className="text-sm text-muted-foreground">{request.year}</p>
                     </div>
-                    <Badge 
+                    <Badge
                       className={`text-white ${getStatusColor(request.status)}`}
                     >
                       {getStatusText(request.status)}
@@ -94,22 +97,23 @@ export const RequiredCarsScreen: React.FC = () => {
                   </div>
 
                   <div className="space-y-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">טווח מחיר:</span>
+                    <div className="flex items-center gap-2 justify-end">
                       <span className="text-sm font-medium">{request.priceRange}</span>
+                      <span className="text-sm text-muted-foreground">:טווח מחיר</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">דרישות:</span>
+                    <div className="flex items-center gap-2 justify-end">
                       <span className="text-sm">{request.requirements}</span>
+                      <span className="text-sm text-muted-foreground">:דרישות</span>
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center text-sm text-muted-foreground">
+                  {/* Added flex-row-reverse to move match count to the left */}
+                  <div className="flex justify-between items-center text-sm text-muted-foreground flex-row-reverse">
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       <span>{request.createdDate}</span>
                     </div>
-                    
+
                     {request.matchCount > 0 && (
                       <div className="flex items-center gap-1">
                         <Search className="w-3 h-3" />
@@ -124,7 +128,7 @@ export const RequiredCarsScreen: React.FC = () => {
 
           <TabsContent value="mine" className="space-y-4">
             {/* My Requests Management */}
-            <Button 
+            <Button
               onClick={() => navigate('/mobile/create-iso-request')}
               className="w-full gap-2"
             >
@@ -151,17 +155,19 @@ export const RequiredCarsScreen: React.FC = () => {
             {/* My ISO Requests List - filtered to show only user's requests */}
             <div className="space-y-3">
               {mockISORequests.filter(req => req.id <= 2).map((request) => (
-                <Card 
-                  key={request.id} 
-                  className="p-4 cursor-pointer hover:shadow-md transition-shadow border-blue-200"
+                <Card
+                  key={request.id}
+                  // Added text-right for RTL alignment
+                  className="p-4 cursor-pointer hover:shadow-md transition-shadow border-blue-200 text-right"
                   onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
                 >
-                  <div className="flex justify-between items-start mb-3">
+                  {/* Added flex-row-reverse to move badge to the left */}
+                  <div className="flex justify-between items-start mb-3 flex-row-reverse">
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg mb-1">{request.vehicleType}</h3>
                       <p className="text-sm text-muted-foreground">{request.year}</p>
                     </div>
-                    <Badge 
+                    <Badge
                       className={`text-white ${getStatusColor(request.status)}`}
                     >
                       {getStatusText(request.status)}
@@ -169,22 +175,23 @@ export const RequiredCarsScreen: React.FC = () => {
                   </div>
 
                   <div className="space-y-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">טווח מחיר:</span>
+                    <div className="flex items-center gap-2 justify-end">
                       <span className="text-sm font-medium">{request.priceRange}</span>
+                      <span className="text-sm text-muted-foreground">:טווח מחיר</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">דרישות:</span>
+                    <div className="flex items-center gap-2 justify-end">
                       <span className="text-sm">{request.requirements}</span>
+                      <span className="text-sm text-muted-foreground">:דרישות</span>
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center text-sm text-muted-foreground">
+                  {/* Added flex-row-reverse to move match count to the left */}
+                  <div className="flex justify-between items-center text-sm text-muted-foreground flex-row-reverse">
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       <span>{request.createdDate}</span>
                     </div>
-                    
+
                     {request.matchCount > 0 && (
                       <div className="flex items-center gap-1">
                         <Search className="w-3 h-3" />
@@ -211,6 +218,6 @@ export const RequiredCarsScreen: React.FC = () => {
             )}
           </TabsContent>
       </Tabs>
-    </MobileLayout>
+    </div>
   );
-};
+};```
