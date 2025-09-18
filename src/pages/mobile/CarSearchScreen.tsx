@@ -129,24 +129,10 @@ const CarSearchScreen = () => {
             className="card-interactive cursor-pointer"
             onClick={() => handleVehicleClick(vehicle.id)}
           >
-            <CardContent className="p-4">
-              <div className="flex items-start space-x-4 space-x-reverse">
-                {/* Vehicle Image */}
-                <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
-                  <img
-                    src={vehicle.image}
-                    alt={vehicle.title}
-                    className="w-full h-full object-cover"
-                  />
-                  {vehicle.isAuction && (
-                     <Badge variant="destructive" className="absolute -top-1 -left-1 text-xs">
-                       מכירה פומבית
-                     </Badge>
-                  )}
-                </div>
-
+            <CardContent className="p-0">
+              <div className="flex">
                 {/* Vehicle Details */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 p-4">
                   <h3 className="font-semibold text-foreground hebrew-text mb-1">
                     {vehicle.title}
                   </h3>
@@ -157,7 +143,22 @@ const CarSearchScreen = () => {
                     {vehicle.price}
                   </p>
                 </div>
+
+                {/* Vehicle Image */}
+                <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden">
+                  <img
+                    src={vehicle.image}
+                    alt={vehicle.title}
+                    className="w-full h-full object-cover"
+                  />
+                  {vehicle.isAuction && (
+                     <Badge variant="destructive" className="absolute top-1 left-1 text-xs">
+                       מכירה פומבית
+                     </Badge>
+                  )}
+                </div>
               </div>
+
             </CardContent>
           </Card>
         ))}

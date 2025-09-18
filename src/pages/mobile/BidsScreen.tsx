@@ -128,16 +128,8 @@ export const BidsScreen: React.FC = () => {
                     className="p-4 cursor-pointer hover:shadow-md transition-shadow border-blue-200"
                     onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
                   >
-                    <div className="flex gap-4 flex-row-reverse">
-                      <div className="w-20 h-20 overflow-hidden flex-shrink-0">
-                        <img
-                          src={bid.image}
-                          alt={`${bid.make} ${bid.model}`}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
+                    <div className="flex">
+                      <div className="flex-1 p-4">
                         <div className="flex justify-between items-start mb-2">
                           <div className="text-right">
                             <h3 className="font-semibold">{bid.make} {bid.model}</h3>
@@ -167,6 +159,14 @@ export const BidsScreen: React.FC = () => {
                           <span>{bid.bidCount} הצעות</span>
                         </div>
                       </div>
+
+                      <div className="w-24 h-24 overflow-hidden flex-shrink-0">
+                        <img
+                          src={bid.image}
+                          alt={`${bid.make} ${bid.model}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
                   </Card>
                 ))}
@@ -183,16 +183,8 @@ export const BidsScreen: React.FC = () => {
                     className="p-4 cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                   >
-                    <div className="flex gap-4 flex-row-reverse">
-                      <div className="w-20 h-20 overflow-hidden flex-shrink-0">
-                        <img
-                          src={auction.image}
-                          alt={`${auction.make} ${auction.model}`}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
+                    <div className="flex">
+                      <div className="flex-1 p-4">
                         <div className="flex justify-between items-start mb-2">
                           <div className="text-right">
                             <h3 className="font-semibold">{auction.make} {auction.model}</h3>
@@ -227,6 +219,14 @@ export const BidsScreen: React.FC = () => {
                           </Button>
                         )}
                       </div>
+
+                      <div className="w-24 h-24 overflow-hidden flex-shrink-0">
+                        <img
+                          src={auction.image}
+                          alt={`${auction.make} ${auction.model}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
                   </Card>
                 ))}
@@ -252,16 +252,8 @@ export const BidsScreen: React.FC = () => {
                   className="p-4 cursor-pointer hover:shadow-md transition-shadow border-green-200"
                   onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                 >
-                  <div className="flex gap-4 flex-row-reverse">
-                    <div className="w-20 h-20 overflow-hidden flex-shrink-0">
-                      <img
-                        src={auction.image}
-                        alt={`${auction.make} ${auction.model}`}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
+                  <div className="flex">
+                    <div className="flex-1 p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div className="text-right">
                           <h3 className="font-semibold">{auction.make} {auction.model}</h3>
@@ -290,6 +282,14 @@ export const BidsScreen: React.FC = () => {
                         </div>
                         <span>{auction.bidCount} הצעות</span>
                       </div>
+                    </div>
+
+                    <div className="w-24 h-24 overflow-hidden flex-shrink-0">
+                      <img
+                        src={auction.image}
+                        alt={`${auction.make} ${auction.model}`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
                 </Card>

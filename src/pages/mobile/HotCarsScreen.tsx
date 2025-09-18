@@ -96,16 +96,9 @@ export const HotCarsScreen: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-4 p-4 pt-14 flex-row-reverse">
-                    <div className="w-24 h-24 overflow-hidden flex-shrink-0">
-                      <img
-                        src={vehicle.image}
-                        alt={`${vehicle.make} ${vehicle.model}`}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2 flex-row-reverse">
+                  <div className="flex pt-14">
+                    <div className="flex-1 p-4">
+                      <div className="flex items-start justify-between mb-2">
                         <div className="text-right">
                           <h3 className="font-semibold text-lg">
                             {vehicle.make} {vehicle.model}
@@ -135,6 +128,14 @@ export const HotCarsScreen: React.FC = () => {
                       <div className="mt-2 text-xs text-muted-foreground">
                         בוסט על ידי: {vehicle.boostedBy}
                       </div>
+                    </div>
+
+                    <div className="w-24 h-24 overflow-hidden flex-shrink-0">
+                      <img
+                        src={vehicle.image}
+                        alt={`${vehicle.make} ${vehicle.model}`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
                 </Card>
@@ -180,17 +181,9 @@ export const HotCarsScreen: React.FC = () => {
                   key={`my-${vehicle.id}`}
                   className="p-4 border-blue-200"
                 >
-                  <div className="flex gap-4 flex-row-reverse">
-                    <div className="w-20 h-20 overflow-hidden flex-shrink-0">
-                      <img
-                        src={vehicle.image}
-                        alt={`${vehicle.make} ${vehicle.model}`}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2 flex-row-reverse">
+                  <div className="flex">
+                    <div className="flex-1 p-4">
+                      <div className="flex items-start justify-between mb-2">
                         <div className="text-right">
                           <h3 className="font-semibold">
                             {vehicle.make} {vehicle.model}
@@ -221,6 +214,14 @@ export const HotCarsScreen: React.FC = () => {
                           הפעל בוסט
                         </Button>
                       </div>
+                    </div>
+
+                    <div className="w-20 h-20 overflow-hidden flex-shrink-0">
+                      <img
+                        src={vehicle.image}
+                        alt={`${vehicle.make} ${vehicle.model}`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
                 </Card>
