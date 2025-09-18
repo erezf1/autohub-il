@@ -130,9 +130,9 @@ const CarSearchScreen = () => {
             onClick={() => handleVehicleClick(vehicle.id)}
           >
             <CardContent className="p-0">
-              <div className="flex">
+              <div className="flex h-32">
                 {/* Vehicle Details */}
-                <div className="flex-1 p-4">
+                <div className="flex-1 p-4 flex flex-col justify-center">
                   <h3 className="font-semibold text-foreground hebrew-text mb-1">
                     {vehicle.title}
                   </h3>
@@ -145,14 +145,14 @@ const CarSearchScreen = () => {
                 </div>
 
                 {/* Vehicle Image */}
-                <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden">
+                <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
                   <img
                     src={vehicle.image}
                     alt={vehicle.title}
                     className="w-full h-full object-cover"
                   />
                   {vehicle.isAuction && (
-                     <Badge variant="destructive" className="absolute top-1 left-1 text-xs">
+                     <Badge variant="destructive" className="absolute top-2 left-2 text-xs">
                        מכירה פומבית
                      </Badge>
                   )}
