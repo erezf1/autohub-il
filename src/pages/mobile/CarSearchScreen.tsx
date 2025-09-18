@@ -131,6 +131,20 @@ const CarSearchScreen = () => {
           >
             <CardContent className="p-0">
               <div className="flex h-32">
+                {/* Vehicle Image */}
+                <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-r-lg">
+                  <img
+                    src={vehicle.image}
+                    alt={vehicle.title}
+                    className="w-full h-full object-cover"
+                  />
+                  {vehicle.isAuction && (
+                     <Badge variant="destructive" className="absolute top-2 left-2 text-xs">
+                       מכירה פומבית
+                     </Badge>
+                  )}
+                </div>
+
                 {/* Vehicle Details */}
                 <div className="flex-1 p-4 flex flex-col justify-center">
                   <h3 className="font-semibold text-foreground hebrew-text mb-1">
@@ -142,20 +156,6 @@ const CarSearchScreen = () => {
                   <p className="text-lg font-bold text-primary hebrew-text">
                     {vehicle.price}
                   </p>
-                </div>
-
-                {/* Vehicle Image */}
-                <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
-                  <img
-                    src={vehicle.image}
-                    alt={vehicle.title}
-                    className="w-full h-full object-cover"
-                  />
-                  {vehicle.isAuction && (
-                     <Badge variant="destructive" className="absolute top-2 left-2 text-xs">
-                       מכירה פומבית
-                     </Badge>
-                  )}
                 </div>
               </div>
 
