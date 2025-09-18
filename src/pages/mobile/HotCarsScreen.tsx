@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Flame, Clock, TrendingUp, Zap, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import darkCarImage from "@/assets/dark_car.png";
 
 // Mock data for boosted vehicles
 const mockBoostedVehicles = [
@@ -15,7 +16,7 @@ const mockBoostedVehicles = [
     model: "E-Class",
     year: 2020,
     price: "₪180,000",
-    image: "/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png",
+    image: darkCarImage,
     location: "תל אביב",
     boostTimeRemaining: "2 ימים ו-14 שעות",
     boostedBy: "דילר פרמיום",
@@ -28,7 +29,7 @@ const mockBoostedVehicles = [
     model: "X5",
     year: 2021,
     price: "₪220,000",
-    image: "/lovable-uploads/6daec4a1-44e1-4924-8b14-0ae85967e9a4.png",
+    image: darkCarImage,
     location: "חיפה",
     boostTimeRemaining: "1 יום ו-8 שעות",
     boostedBy: "הרכבים שלי",
@@ -41,7 +42,7 @@ const mockBoostedVehicles = [
     model: "A6",
     year: 2019,
     price: "₪155,000",
-    image: "/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png",
+    image: darkCarImage,
     location: "ירושלים",
     boostTimeRemaining: "18 שעות",
     boostedBy: "דילר מקצועי",
@@ -96,11 +97,11 @@ export const HotCarsScreen: React.FC = () => {
                   </div>
 
                   <div className="flex gap-4 p-4 pt-14 flex-row-reverse">
-                    <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-24 h-24 overflow-hidden flex-shrink-0">
                       <img
                         src={vehicle.image}
                         alt={`${vehicle.make} ${vehicle.model}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -180,11 +181,11 @@ export const HotCarsScreen: React.FC = () => {
                   className="p-4 border-blue-200"
                 >
                   <div className="flex gap-4 flex-row-reverse">
-                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-20 h-20 overflow-hidden flex-shrink-0">
                       <img
                         src={vehicle.image}
                         alt={`${vehicle.make} ${vehicle.model}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     </div>
 

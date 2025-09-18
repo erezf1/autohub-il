@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import darkCarImage from "@/assets/dark_car.png";
 
 // Mock vehicle data
 const mockVehicle = {
@@ -37,9 +38,9 @@ const mockVehicle = {
     joinDate: "2020"
   },
   images: [
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg"
+    darkCarImage,
+    darkCarImage,
+    darkCarImage
   ],
   isAuction: false,
   status: "זמין"
@@ -80,8 +81,12 @@ const VehicleDetailScreen = () => {
       {/* Vehicle Images */}
       <Card>
         <CardContent className="p-0">
-          <div className="relative h-48 bg-muted rounded-lg flex items-center justify-center">
-            <Car className="h-16 w-16 text-muted-foreground" />
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src={mockVehicle.images[0]}
+              alt={mockVehicle.title}
+              className="w-full h-full object-cover rounded-lg"
+            />
             <Badge variant="secondary" className="absolute top-2 right-2 hebrew-text">
               {mockVehicle.status}
             </Badge>

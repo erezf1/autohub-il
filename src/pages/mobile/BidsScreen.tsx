@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Gavel, Clock, TrendingUp, Plus, Eye, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import darkCarImage from "@/assets/dark_car.png";
 
 // Mock data for bids and auctions
 const mockMyBids = [
@@ -15,7 +16,7 @@ const mockMyBids = [
     make: "טויוטה",
     model: "קמרי",
     year: 2020,
-    image: "/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png",
+    image: darkCarImage,
     myBid: "₪95,000",
     currentHighest: "₪98,000",
     status: "outbid",
@@ -28,7 +29,7 @@ const mockMyBids = [
     make: "מזדה",
     model: "CX-5",
     year: 2021,
-    image: "/lovable-uploads/6daec4a1-44e1-4924-8b14-0ae85967e9a4.png",
+    image: darkCarImage,
     myBid: "₪135,000",
     currentHighest: "₪135,000",
     status: "winning",
@@ -44,7 +45,7 @@ const mockMyAuctions = [
     make: "היונדאי",
     model: "טוסון",
     year: 2019,
-    image: "/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png",
+    image: darkCarImage,
     startingPrice: "₪85,000",
     currentBid: "₪92,000",
     status: "active",
@@ -60,7 +61,7 @@ const mockActiveAuctions = [
     make: "פולקסווגן",
     model: "טיגואן",
     year: 2020,
-    image: "/lovable-uploads/6daec4a1-44e1-4924-8b14-0ae85967e9a4.png",
+    image: darkCarImage,
     currentBid: "₪145,000",
     status: "active",
     timeRemaining: "4 שעות ו-22 דקות",
@@ -73,7 +74,7 @@ const mockActiveAuctions = [
     make: "ניסאן",
     model: "קשקאי",
     year: 2021,
-    image: "/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png",
+    image: darkCarImage,
     currentBid: "₪125,000",
     status: "active",
     timeRemaining: "1 יום ו-15 שעות",
@@ -128,11 +129,11 @@ export const BidsScreen: React.FC = () => {
                     onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
                   >
                     <div className="flex gap-4 flex-row-reverse">
-                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-20 h-20 overflow-hidden flex-shrink-0">
                         <img
                           src={bid.image}
                           alt={`${bid.make} ${bid.model}`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover rounded-lg"
                         />
                       </div>
 
@@ -183,11 +184,11 @@ export const BidsScreen: React.FC = () => {
                     onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                   >
                     <div className="flex gap-4 flex-row-reverse">
-                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-20 h-20 overflow-hidden flex-shrink-0">
                         <img
                           src={auction.image}
                           alt={`${auction.make} ${auction.model}`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover rounded-lg"
                         />
                       </div>
 
@@ -252,11 +253,11 @@ export const BidsScreen: React.FC = () => {
                   onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                 >
                   <div className="flex gap-4 flex-row-reverse">
-                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-20 h-20 overflow-hidden flex-shrink-0">
                       <img
                         src={auction.image}
                         alt={`${auction.make} ${auction.model}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     </div>
 

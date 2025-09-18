@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import darkCarImage from "@/assets/dark_car.png";
 
 // Mock data for vehicle search results
 const searchResults = [
@@ -13,7 +14,7 @@ const searchResults = [
     title: "אאודי A6 2021",
     details: "120,000 ק״מ • אוטומט • בנזין",
     price: "285,000 ₪",
-    image: "/placeholder.svg",
+    image: darkCarImage,
     isAuction: false
   },
   {
@@ -21,7 +22,7 @@ const searchResults = [
     title: "BMW X3 2020",
     details: "85,000 ק״מ • אוטומט • היברידי",
     price: "320,000 ₪",
-    image: "/placeholder.svg",
+    image: darkCarImage,
     isAuction: true
   },
   {
@@ -29,7 +30,7 @@ const searchResults = [
     title: "מרצדס E-Class 2022",
     details: "45,000 ק״מ • אוטומט • בנזין",
     price: "450,000 ₪",
-    image: "/placeholder.svg",
+    image: darkCarImage,
     isAuction: false
   },
   {
@@ -37,7 +38,7 @@ const searchResults = [
     title: "טויוטה קורולה 2020",
     details: "95,000 ק״מ • אוטומט • היברידי",
     price: "165,000 ₪",
-    image: "/placeholder.svg",
+    image: darkCarImage,
     isAuction: false
   },
   {
@@ -45,7 +46,7 @@ const searchResults = [
     title: "פורשה 911 2019",
     details: "35,000 ק״מ • ידנית • בנזין",
     price: "750,000 ₪",
-    image: "/placeholder.svg",
+    image: darkCarImage,
     isAuction: true
   }
 ];
@@ -131,10 +132,14 @@ const CarSearchScreen = () => {
             <CardContent className="p-4">
               <div className="flex items-start space-x-4 space-x-reverse">
                 {/* Vehicle Image */}
-                <div className="relative w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Car className="h-10 w-10 text-muted-foreground" />
+                <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
+                  <img
+                    src={vehicle.image}
+                    alt={vehicle.title}
+                    className="w-full h-full object-cover"
+                  />
                   {vehicle.isAuction && (
-                     <Badge variant="destructive" className="absolute -top-1 -right-1 text-xs">
+                     <Badge variant="destructive" className="absolute -top-1 -left-1 text-xs">
                        מכירה פומבית
                      </Badge>
                   )}
