@@ -1,41 +1,202 @@
 # Project Specification - Auto-Hub
 
 ## Project Overview
-[Add your detailed project description here]
+Auto-Hub is a B2B digital marketplace platform designed for licensed car dealers in Israel. The system provides a secure, members-only environment where verified dealers can manage inventory, search for vehicles, make offers, participate in auctions, and communicate through an integrated chat system. The platform operates with a Hebrew RTL interface and implements comprehensive user verification and reputation management.
 
 ## User Types & Features
 
 ### Mobile Users (Dealers/Car Traders)
-[Define mobile user capabilities and features]
+Licensed car dealers who use the mobile application to:
+- **Inventory Management**: Add, edit, and manage vehicle listings with detailed specifications
+- **Vehicle Search**: Advanced search with filters (make, model, year, price, location, tags)
+- **ISO Requests**: Create "Vehicles Wanted" requests and receive matching offers
+- **Auction Participation**: Create auctions for their vehicles and bid on others' auctions
+- **Communication**: Internal chat system with contact detail reveal functionality
+- **Boost Features**: Priority placement for listings (3-day cycles)
+- **Profile Management**: Business profile, trade license verification, ratings
 
-### Admin Users 
-[Define admin user capabilities and features]
+### Admin Users (Web Desktop)
+System administrators who manage the platform through a web interface:
+- **User Management**: Approve/reject dealer registrations, manage user status
+- **Content Moderation**: Review listings, handle reported content
+- **Auction Oversight**: Monitor auction activities, resolve disputes
+- **Support Management**: Handle support tickets and user reports
+- **System Analytics**: View platform metrics, user activities, and business insights
+- **Configuration**: Manage system settings, subscription plans, and business rules
 
-### Support Staff
-[Define support staff capabilities and features]
+### Support Staff (Web Desktop)
+Customer support representatives with limited administrative access:
+- **Ticket Management**: Handle user support requests and technical issues
+- **Investigation Tools**: Access user data for support purposes
+- **Moderation Actions**: Handle user reports and content violations
+- **Communication**: Internal messaging with users and escalation to admins
 
 ## Entities & Data Models
 
 ### User Entity
-[Define user properties, relationships, and supported operations]
+**Core Properties**: ID (UUID), phone_number, password_hash, user_role (dealer/admin/support), status (pending/active/suspended/rejected)
+**Profile Properties**: full_name, business_name, location, trade_license, tenure, rating_tier, subscription_type, available_boosts, vehicles_limit
+**Relationships**: 1:Many with vehicles, auctions, ISO requests, chat conversations, notifications
+**Operations**: Registration, profile updates, status changes, subscription management
 
 ### Vehicle Entity
-[Define vehicle properties, relationships, and supported operations]
+**Core Properties**: ID, owner_id, make_id, model_id, year, kilometers, price, transmission, fuel_type, engine_size, color, images
+**Status Properties**: status (available/sold/removed), is_boosted, boosted_until, had_severe_crash
+**Metadata**: description, test_result_file, previous_owners, tags (through junction table)
+**Relationships**: 1:Many with auctions, ISO offers; Many:Many with tags
+**Operations**: CRUD operations, search filtering, boost activation, status updates
 
 ### Auction Entity
-[Define auction properties, relationships, and supported operations]
+**Core Properties**: ID, vehicle_id, creator_id, auction_type (standard/reserve/buy_now), starting_price, reserve_price, current_highest_bid
+**Timing**: auction_start_time, auction_end_time, status (scheduled/active/completed/cancelled)
+**Bidding**: bid_count, highest_bidder_id
+**Relationships**: 1:Many with auction_bids, 1:1 with vehicle_listings
+**Operations**: Create auction, place bids, auto-bid updates, completion handling
 
-### Vehicle Request Entity
-[Define vehicle request properties, relationships, and supported operations]
+### ISO Request Entity (Vehicles Wanted)
+**Core Properties**: ID, requester_id, title, description, status (active/completed/expired)
+**Search Criteria**: make_id, model_id, year_from, year_to, price_from, price_to, max_kilometers
+**Preferences**: transmission_preference, fuel_type_preference, location_id
+**Relationships**: 1:Many with ISO offers
+**Operations**: Create requests, receive offers, automatic matching, status management
+
+### ISO Offer Entity
+**Core Properties**: ID, iso_request_id, vehicle_id, offerer_id, offered_price, message
+**Status**: status (pending/accepted/rejected/expired), expires_at
+**Relationships**: Many:1 with ISO requests, vehicles, and users
+**Operations**: Submit offers, accept/reject offers, expiration handling
+
+### Chat System Entities
+**Conversations**: ID, participant_1_id, participant_2_id, vehicle_id, is_details_revealed, details_revealed_by
+**Messages**: ID, conversation_id, sender_id, message_content, message_type, is_read, read_at
+**Relationships**: Users have many conversations, conversations have many messages
+**Operations**: Create conversations, send messages, reveal contact details, mark as read
+
+### Notification Entities
+**User Notifications**: For mobile dealers (registration_approved, auction_outbid, iso_match, message_received, etc.)
+**Admin Notifications**: For admin users (new_user_registration, user_report, auction_completed, etc.)
+**Properties**: recipient_id, notification_type, title, description, is_read, related_entity_type, related_entity_id
+**Operations**: Create notifications, mark as read, real-time updates
 
 ### Support Ticket Entity
-[Define support ticket properties, relationships, and supported operations]
+**Core Properties**: ID, reporter_id, reported_user_id, ticket_type, subject, description, priority, status
+**Management**: assigned_to, resolution_notes, resolved_at, category
+**Relationships**: 1:Many with support_ticket_messages
+**Operations**: Create tickets, assign to staff, update status, add comments
+
+### Lookup Tables
+**Vehicle Makes**: Hebrew and English names for car manufacturers
+**Vehicle Models**: Per-make vehicle models with Hebrew/English names
+**Vehicle Tags**: Categorized tags (condition, category, feature) with colors
+**Locations**: Israeli cities and regions for location-based features
 
 ## Business Rules & Logic
-[Add specific business rules, validation requirements, workflows]
+
+### Subscription Plans & Limits
+- **Regular Plan**: Up to 10 vehicles, basic features
+- **Silver Plan**: Up to 20 vehicles, 5 boosts per month, 2 auctions per month
+- **Unlimited Plan**: Unlimited vehicles, 10 boosts per month, 5 auctions per month
+
+### Boost System
+- Boost duration: 3 days of priority placement
+- Boost limits based on subscription plan
+- Automatic expiration and notification system
+
+### Auction Rules
+- Auction types: Standard, Reserve (minimum price), Buy-Now (instant purchase)
+- Bidding increments and validation
+- Automatic outbid notifications
+- Auction completion and winner determination
+
+### User Rating System
+- Calculated based on activity volume and response times
+- Rating tiers: Bronze, Silver, Gold, Platinum
+- Background calculation process for performance
+
+### Security & Verification
+- Trade license verification for dealer registration
+- Admin approval required for new accounts
+- Status management (pending, active, suspended, rejected)
+- Audit logging for significant actions
+
+### Communication Rules
+- Anonymous initial chat with contact reveal option
+- One-way contact reveal (first revealer pays/gets benefits)
+- Message read receipts and real-time updates
 
 ## Technical Requirements
-[Add any technical constraints, integrations, performance requirements]
+
+### Authentication System
+- 6-digit password-based authentication (simplified from OTP)
+- Phone number as primary identifier
+- Role-based access control (dealer/admin/support)
+- Session management and security
+
+### Real-time Features
+- Live auction bidding with WebSocket connections
+- Real-time chat messaging
+- Instant notification delivery
+- Live counter updates (unread messages, notifications)
+
+### Database Architecture
+- **Supabase/PostgreSQL**: Primary database with RLS policies
+- **Row Level Security**: User isolation and admin access control
+- **Real-time Subscriptions**: For notifications, chat, and auctions
+- **Performance Indexes**: Optimized for search and filtering operations
+
+### Mobile RTL Support
+- Hebrew right-to-left text flow
+- Proper icon and layout positioning for RTL
+- Arabic numerals within Hebrew context
+- Cultural UI/UX considerations for Israeli market
+
+### File Storage & Management
+- Trade license document uploads
+- Vehicle image storage (multiple images per listing)
+- Test result document uploads
+- Profile pictures and business logos
+
+### Search & Filtering
+- Advanced vehicle search with multiple criteria
+- Full-text search capabilities
+- Tag-based categorization and filtering
+- Location-based search and results
+
+### Performance & Scalability
+- Database indexing for search operations
+- Image optimization and lazy loading
+- Real-time connection management
+- Efficient notification delivery system
+
+## Implementation Architecture
+
+### Mobile System (`/mobile/*`)
+- React components with RTL support
+- MobileLayout with header and tab navigation
+- Real-time subscriptions for notifications and chat
+- Camera integration for vehicle photos
+
+### Admin System (`/admin/*`)
+- Desktop web interface with AdminDesktopLayout
+- Comprehensive management dashboards
+- Data visualization and reporting tools
+- Batch operations for user and content management
+
+### Shared Components
+- UI component library (`/components/ui/*`)
+- Utility functions and hooks
+- Common types and interfaces
+- Shared business logic functions
+
+### API Integration
+- Supabase client configuration
+- Database functions and triggers
+- Real-time subscription management
+- File upload and storage handling
+
+---
+
+*This specification serves as the primary reference for development and feature implementation. All database schema details are documented in `docs/DATABASE_SCHEMA_SPEC.md`.*
 
 ---
 *This specification serves as the primary reference for development and feature implementation.*
