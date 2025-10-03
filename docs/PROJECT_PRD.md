@@ -183,6 +183,7 @@ A background process will periodically calculate and update dealer ratings based
 
 - **Payments & Billing:** All subscription payments will be handled externally. Admins will manually update user subscription statuses in the admin panel.
 - **Website/Landing Page:** This project does not include the development of a marketing website or landing page.
+- **AI/LM Integration:** Language model and AI features are out of scope for the initial MVP. These may be added in future phases.
 
 ---
 *This PRD serves as the comprehensive specification for Auto-Hub development and implementation.*
