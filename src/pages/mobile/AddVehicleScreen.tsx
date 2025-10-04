@@ -9,16 +9,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { useVehicles, useVehicleMakes, useVehicleModels } from "@/hooks/mobile/useVehicles";
 
-// Mock data for form options
-const vehicleBrands = [
-  "טויוטה", "מזדה", "יונדאי", "קיה", "נישן", "הונדה", "מיצובישי", 
-  "סובארו", "BMW", "מרצדס", "אאודי", "פולקסווגן", "סקודה", "פורד"
+const fuelTypes = [
+  { value: "gasoline", label: "בנזין" },
+  { value: "diesel", label: "דיזל" },
+  { value: "hybrid", label: "היברידי" },
+  { value: "electric", label: "חשמלי" }
 ];
 
-const fuelTypes = ["בנזין", "דיזל", "היברידי", "חשמלי", "גז"];
-const transmissions = ["ידנית", "אוטומט", "טיפטרוניק"];
+const transmissions = [
+  { value: "manual", label: "ידנית" },
+  { value: "automatic", label: "אוטומט" },
+  { value: "semi_automatic", label: "טיפטרוניק" }
+];
+
 const colors = ["לבן", "שחור", "כסוף", "אפור", "כחול", "אדום", "ירוק", "חום"];
 
 const availableFeatures = [
@@ -45,8 +50,13 @@ interface VehicleForm {
 
 const AddVehicleScreen = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
+  const [selectedMakeId, setSelectedMakeId] = useState<number | undefined>();
+  
+  const { data: makes } = useVehicleMakes();
+  const { data: models } = useVehicleModels(selectedMakeId);
+  const { addVehicle, isAddingVehicle } = useVehicles();
+  
   const [formData, setFormData] = useState<VehicleForm>({
     brand: "",
     model: "",
@@ -80,13 +90,27 @@ const AddVehicleScreen = () => {
   };
 
   const handleSubmit = () => {
-    // In real app, submit to API
-    console.log("Submitting vehicle:", formData);
-    toast({
-      title: "הרכב נוסף בהצלחה!",
-      description: "הרכב שלך פורסם ויופיע ברשימת החיפוש.",
+    if (!selectedMakeId || !formData.model) return;
+
+    const vehicleData = {
+      make_id: selectedMakeId,
+      model_id: parseInt(formData.model),
+      year: parseInt(formData.year),
+      kilometers: parseInt(formData.kilometers),
+      transmission: formData.transmission as 'manual' | 'automatic' | 'semi_automatic',
+      fuel_type: formData.fuelType as 'gasoline' | 'diesel' | 'hybrid' | 'electric',
+      engine_size: formData.engineSize ? parseFloat(formData.engineSize) : undefined,
+      color: formData.color,
+      price: parseFloat(formData.price),
+      description: formData.description,
+      previous_owners: formData.previousOwners ? parseInt(formData.previousOwners) : 1,
+    };
+
+    addVehicle(vehicleData, {
+      onSuccess: () => {
+        navigate("/mobile/dashboard");
+      }
     });
-    navigate("/mobile");
   };
 
   const updateFormData = (field: keyof VehicleForm, value: string | string[]) => {
@@ -157,13 +181,17 @@ const AddVehicleScreen = () => {
           <CardContent className="space-y-4">
             <div>
               <Label className="hebrew-text">יצרן הרכב *</Label>
-              <Select onValueChange={(value) => updateFormData("brand", value)}>
+              <Select onValueChange={(value) => {
+                setSelectedMakeId(parseInt(value));
+                updateFormData("brand", value);
+                updateFormData("model", ""); // Reset model when make changes
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="בחר יצרן" />
                 </SelectTrigger>
                 <SelectContent>
-                  {vehicleBrands.map(brand => (
-                    <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                  {makes?.map(make => (
+                    <SelectItem key={make.id} value={make.id.toString()}>{make.name_hebrew}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -171,12 +199,20 @@ const AddVehicleScreen = () => {
 
             <div>
               <Label className="hebrew-text">דגם *</Label>
-              <Input
-                placeholder="לדוגמה: קמרי, אקורד, גולף"
+              <Select 
                 value={formData.model}
-                onChange={(e) => updateFormData("model", e.target.value)}
-                className="hebrew-text"
-              />
+                onValueChange={(value) => updateFormData("model", value)}
+                disabled={!selectedMakeId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={selectedMakeId ? "בחר דגם" : "בחר תחילה יצרן"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {models?.map(model => (
+                    <SelectItem key={model.id} value={model.id.toString()}>{model.name_hebrew}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -233,7 +269,7 @@ const AddVehicleScreen = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {fuelTypes.map(fuel => (
-                    <SelectItem key={fuel} value={fuel}>{fuel}</SelectItem>
+                    <SelectItem key={fuel.value} value={fuel.value}>{fuel.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -247,7 +283,7 @@ const AddVehicleScreen = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {transmissions.map(trans => (
-                    <SelectItem key={trans} value={trans}>{trans}</SelectItem>
+                    <SelectItem key={trans.value} value={trans.value}>{trans.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -393,10 +429,10 @@ const AddVehicleScreen = () => {
         
         <Button 
           onClick={handleNext}
-          disabled={!canProceed()}
+          disabled={!canProceed() || isAddingVehicle}
           className="hebrew-text"
         >
-          {currentStep < 4 ? "המשך" : "פרסם רכב"}
+          {isAddingVehicle ? "מפרסם..." : (currentStep < 4 ? "המשך" : "פרסם רכב")}
         </Button>
       </div>
     </div>
