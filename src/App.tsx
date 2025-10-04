@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/mobile/ProtectedRoute";
 
 // Landing Page
 import LandingPage from "./pages/LandingPage";
@@ -59,11 +61,12 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
           {/* Landing Page */}
           <Route path="/" element={<LandingPage />} />
 
@@ -100,10 +103,11 @@ const App = () => (
           <Route path="/mobile/onboarding-profile" element={<OnboardingProfileScreen />} />
           <Route path="/mobile/pending-approval" element={<PendingApprovalScreen />} />
 
-          {/* Mobile Routes */}
+          {/* Mobile Protected Routes */}
           <Route path="/mobile/*" element={
-            <MobileLayout>
-              <Routes>
+            <ProtectedRoute>
+              <MobileLayout>
+                <Routes>
                 <Route path="/" element={<DashboardScreen />} />
                 <Route path="/dashboard" element={<DashboardScreen />} />
                 <Route path="/search" element={<CarSearchScreen />} />
@@ -130,11 +134,13 @@ const App = () => (
                 {/* Catch-all route for mobile */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </MobileLayout>
+              </MobileLayout>
+            </ProtectedRoute>
           } />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

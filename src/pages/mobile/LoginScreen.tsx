@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,23 +6,32 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Phone, ArrowLeft, ArrowRight, Loader2, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const LoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { signIn, user } = useAuth();
+
+  useEffect(() => {
+    // Redirect if already logged in
+    if (user) {
+      navigate('/mobile/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleLogin = async () => {
     if (!phoneNumber.trim() || !password.trim()) return;
     
     setIsLoading(true);
+    const { error } = await signIn(phoneNumber, password);
+    setIsLoading(false);
     
-    // Simulate API call for login
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate('/mobile/dashboard'); // Navigate to dashboard after successful login
-    }, 1500);
+    if (!error) {
+      navigate('/mobile/dashboard');
+    }
   };
 
   const formatPhoneNumber = (value: string) => {

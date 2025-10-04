@@ -16,12 +16,11 @@ export const RegisterScreen: React.FC = () => {
     if (!phoneNumber.trim()) return;
     
     setIsLoading(true);
-    
-    // Simulate API call
+    // Navigate to set password directly (phone-based registration)
     setTimeout(() => {
       setIsLoading(false);
-      navigate('/mobile/verify-otp', { state: { phoneNumber, isRegister: true } });
-    }, 1500);
+      navigate('/mobile/onboarding/profile', { state: { phoneNumber, isRegister: true } });
+    }, 500);
   };
 
   const formatPhoneNumber = (value: string) => {
