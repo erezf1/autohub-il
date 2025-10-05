@@ -52,6 +52,8 @@ import AdminSupportTickets from "./pages/admin/AdminSupportTickets";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminUserDetail from "./pages/admin/AdminUserDetail";
+import AdminCreateUser from "./pages/admin/AdminCreateUser";
+import AdminEditUser from "./pages/admin/AdminEditUser";
 import AdminVehicleRequestDetail from "./pages/admin/AdminVehicleRequestDetail";
 import AdminAuctionDetail from "./pages/admin/AdminAuctionDetail";
 import AdminSupportTicketDetail from "./pages/admin/AdminSupportTicketDetail";
@@ -77,7 +79,9 @@ const App = () => (
                 <Route path="/" element={<AdminDashboard />} />
                 <Route path="/notifications" element={<AdminNotifications />} />
                 <Route path="/users" element={<AdminUsersList />} />
+                <Route path="/users/create" element={<AdminCreateUser />} />
                 <Route path="/users/:id" element={<AdminUserDetail />} />
+                <Route path="/users/:id/edit" element={<AdminEditUser />} />
                 <Route path="/vehicles" element={<AdminVehiclesList />} />
                 <Route path="/vehicles/:id" element={<AdminVehicleDetail />} />
                 <Route path="/vehicle-requests" element={<AdminVehicleRequestsList />} />

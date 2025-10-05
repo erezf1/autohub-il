@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { ArrowRight, ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 export const OTPVerificationScreen: React.FC = () => {
   const [otpValue, setOtpValue] = useState('');
@@ -12,6 +13,7 @@ export const OTPVerificationScreen: React.FC = () => {
   const [canResend, setCanResend] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
   
   const phoneNumber = location.state?.phoneNumber || '050-123-4567';
 
@@ -27,6 +29,16 @@ export const OTPVerificationScreen: React.FC = () => {
   const handleVerify = async () => {
     if (otpValue.length !== 6) return;
     
+    // Verify OTP is 5432
+    if (otpValue !== '543210') {
+      toast({
+        title: 'קוד שגוי',
+        description: 'הקוד שהזנת אינו תקין, נסה שוב',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     setIsLoading(true);
     
     // Simulate API call
@@ -35,11 +47,11 @@ export const OTPVerificationScreen: React.FC = () => {
       
       const isRegister = location.state?.isRegister;
       if (isRegister) {
-        // For registration - ask for password first
-        navigate('/mobile/set-password', { state: { phoneNumber, otp: otpValue } });
+        // For registration - go to profile setup
+        navigate('/mobile/onboarding-profile', { state: { phoneNumber, otp: otpValue } });
       } else {
         // For login - directly go to dashboard (password was already verified)
-        navigate('/mobile');
+        navigate('/mobile/dashboard');
       }
     }, 1500);
   };

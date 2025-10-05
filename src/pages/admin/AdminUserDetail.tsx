@@ -1,49 +1,66 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Edit, Mail, Phone, MapPin, Calendar, Activity, CheckCircle, XCircle, Clock, Car, Gavel, Search } from "lucide-react";
+import { ArrowRight, Edit, Phone, MapPin, Calendar, Activity, CheckCircle, XCircle, Clock, Car, Gavel, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-// Mock user data
-const mockUserData = {
-  id: "12345",
-  name: "אברהם כהן",
-  business: "כהן מוטורס",
-  email: "abraham@kohen-motors.co.il",
-  phone: "052-123-4567",
-  address: "רחוב הרצל 15, תל אביב",
-  status: "active",
-  plan: "premium",
-  joinDate: "2023-01-15",
-  lastActive: "2024-01-10 14:30",
-  vehiclesCount: 23,
-  auctionsCount: 7,
-  requestsCount: 4,
-  totalSales: 2850000,
-  rating: 4.8,
-};
-
-const mockVehicles = [
-  { id: "v1", title: "טויוטה קמרי 2022", price: 125000, status: "active", date: "2024-01-08" },
-  { id: "v2", title: "BMW X3 2021", price: 195000, status: "sold", date: "2024-01-05" },
-  { id: "v3", title: "מרצדס C200 2023", price: 215000, status: "active", date: "2024-01-03" },
-];
-
-const mockAuctions = [
-  { id: "a1", title: "אאודי A4 2020", currentBid: 85000, endTime: "2024-01-12 18:00", status: "active" },
-  { id: "a2", title: "פורשה 911 2019", currentBid: 450000, endTime: "2024-01-08 15:00", status: "ended" },
-];
-
-const mockRequests = [
-  { id: "r1", title: "מחפש טויוטה היילקס", budget: "80000-120000", status: "open", date: "2024-01-09" },
-  { id: "r2", title: "צריך מיצובישי לנסר", budget: "45000-65000", status: "closed", date: "2024-01-07" },
-];
+import { useUser } from "@/hooks/admin/useUsers";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminUserDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, isLoading } = useUser(id!);
+
+  // Fetch user's vehicles
+  const { data: vehicles } = useQuery({
+    queryKey: ['admin-user-vehicles', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('vehicle_listings')
+        .select('*')
+        .eq('owner_id', id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Fetch user's auctions
+  const { data: auctions } = useQuery({
+    queryKey: ['admin-user-auctions', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('auctions')
+        .select('*')
+        .eq('creator_id', id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Fetch user's ISO requests
+  const { data: isoRequests } = useQuery({
+    queryKey: ['admin-user-iso-requests', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('iso_requests')
+        .select('*')
+        .eq('requester_id', id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -62,12 +79,28 @@ const AdminUserDetail = () => {
     switch (plan) {
       case 'premium':
         return <Badge className="bg-primary text-primary-foreground">פרימיום</Badge>;
-      case 'basic':
-        return <Badge variant="outline">בסיסי</Badge>;
+      case 'regular':
+        return <Badge variant="outline">רגיל</Badge>;
       default:
         return <Badge variant="secondary">{plan}</Badge>;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-96">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground hebrew-text">משתמש לא נמצא</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -85,15 +118,18 @@ const AdminUserDetail = () => {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold hebrew-text">{mockUserData.name}</h1>
-          <p className="text-lg text-muted-foreground hebrew-text mt-1">{mockUserData.business}</p>
+          <h1 className="text-3xl font-bold hebrew-text">{user.profile?.full_name || 'ללא שם'}</h1>
+          <p className="text-lg text-muted-foreground hebrew-text mt-1">{user.profile?.business_name || 'ללא שם עסק'}</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="hebrew-text">
+          <Button 
+            variant="outline" 
+            className="hebrew-text"
+            onClick={() => navigate(`/admin/users/${id}/edit`)}
+          >
             <Edit className="h-4 w-4 ml-2" />
             עריכת פרטים
           </Button>
-          <Button className="hebrew-text">צפה בפרופיל הציבורי</Button>
         </div>
       </div>
 
@@ -105,7 +141,7 @@ const AdminUserDetail = () => {
               <div className="text-right">
                 <p className="text-sm font-medium text-muted-foreground hebrew-text">סטטוס</p>
                 <div className="mt-2">
-                  {getStatusBadge(mockUserData.status)}
+                  {getStatusBadge(user.status)}
                 </div>
               </div>
               <CheckCircle className="h-8 w-8 text-success" />
@@ -119,7 +155,7 @@ const AdminUserDetail = () => {
               <div className="text-right">
                 <p className="text-sm font-medium text-muted-foreground hebrew-text">תוכנית</p>
                 <div className="mt-2">
-                  {getPlanBadge(mockUserData.plan)}
+                  {getPlanBadge(user.profile?.subscription_type || 'regular')}
                 </div>
               </div>
               <Activity className="h-8 w-8 text-primary" />
@@ -132,7 +168,7 @@ const AdminUserDetail = () => {
             <div className="flex items-center justify-between">
               <div className="text-right">
                 <p className="text-sm font-medium text-muted-foreground hebrew-text">רכבים פעילים</p>
-                <p className="text-2xl font-bold">{mockUserData.vehiclesCount}</p>
+                <p className="text-2xl font-bold">{vehicles?.length || 0}</p>
               </div>
               <Car className="h-8 w-8 text-blue-500" />
             </div>
@@ -143,8 +179,8 @@ const AdminUserDetail = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="text-right">
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">סה"כ מכירות</p>
-                <p className="text-2xl font-bold">₪{mockUserData.totalSales.toLocaleString()}</p>
+                <p className="text-sm font-medium text-muted-foreground hebrew-text">מכירות פומביות</p>
+                <p className="text-2xl font-bold">{auctions?.length || 0}</p>
               </div>
               <Gavel className="h-8 w-8 text-green-500" />
             </div>
@@ -170,24 +206,17 @@ const AdminUserDetail = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 flex-row-reverse">
-                    <Mail className="h-5 w-5 text-muted-foreground" />
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground hebrew-text">דוא"ל</p>
-                      <p className="font-medium">{mockUserData.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 flex-row-reverse">
                     <Phone className="h-5 w-5 text-muted-foreground" />
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground hebrew-text">טלפון</p>
-                      <p className="font-medium">{mockUserData.phone}</p>
+                      <p className="font-medium" dir="ltr">{user.phone_number}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 flex-row-reverse">
                     <MapPin className="h-5 w-5 text-muted-foreground" />
                     <div className="text-right">
-                      <p className="text-sm text-muted-foreground hebrew-text">כתובת</p>
-                      <p className="font-medium hebrew-text">{mockUserData.address}</p>
+                      <p className="text-sm text-muted-foreground hebrew-text">מיקום</p>
+                      <p className="font-medium hebrew-text">{user.profile?.location?.name_hebrew || 'לא צוין'}</p>
                     </div>
                   </div>
                 </div>
@@ -196,21 +225,14 @@ const AdminUserDetail = () => {
                     <Calendar className="h-5 w-5 text-muted-foreground" />
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground hebrew-text">תאריך הצטרפות</p>
-                      <p className="font-medium">{new Date(mockUserData.joinDate).toLocaleDateString('he-IL')}</p>
+                      <p className="font-medium">{new Date(user.created_at).toLocaleDateString('he-IL')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 flex-row-reverse">
                     <Activity className="h-5 w-5 text-muted-foreground" />
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground hebrew-text">פעילות אחרונה</p>
-                      <p className="font-medium">{mockUserData.lastActive}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 flex-row-reverse">
-                    <CheckCircle className="h-5 w-5 text-muted-foreground" />
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground hebrew-text">דירוג</p>
-                      <p className="font-medium">{mockUserData.rating}/5</p>
+                      <p className="font-medium">{new Date(user.updated_at).toLocaleDateString('he-IL')}</p>
                     </div>
                   </div>
                 </div>
@@ -222,41 +244,50 @@ const AdminUserDetail = () => {
         <TabsContent value="vehicles">
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text">רכבים ({mockVehicles.length})</CardTitle>
+              <CardTitle className="hebrew-text">רכבים ({vehicles?.length || 0})</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right hebrew-text">רכב</TableHead>
-                    <TableHead className="text-right hebrew-text">מחיר</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">תאריך הוספה</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockVehicles.map((vehicle) => (
-                    <TableRow key={vehicle.id}>
-                      <TableCell className="font-medium hebrew-text">{vehicle.title}</TableCell>
-                      <TableCell className="hebrew-text">₪{vehicle.price.toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Badge variant={vehicle.status === 'active' ? 'default' : 'secondary'}>
-                          {vehicle.status === 'active' ? 'פעיל' : 'נמכר'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{new Date(vehicle.date).toLocaleDateString('he-IL')}</TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm" className="hebrew-text">
-                            צפה
-                          </Button>
-                        </div>
-                      </TableCell>
+              {vehicles && vehicles.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right hebrew-text">שנה</TableHead>
+                      <TableHead className="text-right hebrew-text">מחיר</TableHead>
+                      <TableHead className="text-right hebrew-text">סטטוס</TableHead>
+                      <TableHead className="text-right hebrew-text">תאריך הוספה</TableHead>
+                      <TableHead className="text-right hebrew-text">פעולות</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {vehicles.map((vehicle: any) => (
+                      <TableRow key={vehicle.id}>
+                        <TableCell className="font-medium hebrew-text">{vehicle.year}</TableCell>
+                        <TableCell className="hebrew-text">₪{vehicle.price?.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <Badge variant={vehicle.status === 'available' ? 'default' : 'secondary'}>
+                            {vehicle.status === 'available' ? 'זמין' : vehicle.status === 'sold' ? 'נמכר' : 'לא זמין'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(vehicle.created_at).toLocaleDateString('he-IL')}</TableCell>
+                        <TableCell>
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="hebrew-text"
+                              onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
+                            >
+                              צפה
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-center text-muted-foreground hebrew-text py-8">אין רכבים</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -264,41 +295,50 @@ const AdminUserDetail = () => {
         <TabsContent value="auctions">
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text">מכירות פומביות ({mockAuctions.length})</CardTitle>
+              <CardTitle className="hebrew-text">מכירות פומביות ({auctions?.length || 0})</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right hebrew-text">רכב</TableHead>
-                    <TableHead className="text-right hebrew-text">הצעה נוכחית</TableHead>
-                    <TableHead className="text-right hebrew-text">סיום</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockAuctions.map((auction) => (
-                    <TableRow key={auction.id}>
-                      <TableCell className="font-medium hebrew-text">{auction.title}</TableCell>
-                      <TableCell className="hebrew-text">₪{auction.currentBid.toLocaleString()}</TableCell>
-                      <TableCell>{auction.endTime}</TableCell>
-                      <TableCell>
-                        <Badge variant={auction.status === 'active' ? 'default' : 'secondary'}>
-                          {auction.status === 'active' ? 'פעילה' : 'הסתיימה'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm" className="hebrew-text">
-                            צפה
-                          </Button>
-                        </div>
-                      </TableCell>
+              {auctions && auctions.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right hebrew-text">מחיר התחלתי</TableHead>
+                      <TableHead className="text-right hebrew-text">הצעה נוכחית</TableHead>
+                      <TableHead className="text-right hebrew-text">סיום</TableHead>
+                      <TableHead className="text-right hebrew-text">סטטוס</TableHead>
+                      <TableHead className="text-right hebrew-text">פעולות</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {auctions.map((auction: any) => (
+                      <TableRow key={auction.id}>
+                        <TableCell className="hebrew-text">₪{auction.starting_price?.toLocaleString()}</TableCell>
+                        <TableCell className="hebrew-text">₪{auction.current_highest_bid?.toLocaleString() || '-'}</TableCell>
+                        <TableCell>{new Date(auction.auction_end_time).toLocaleDateString('he-IL')}</TableCell>
+                        <TableCell>
+                          <Badge variant={auction.status === 'active' ? 'default' : 'secondary'}>
+                            {auction.status === 'active' ? 'פעילה' : auction.status === 'ended' ? 'הסתיימה' : auction.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="hebrew-text"
+                              onClick={() => navigate(`/admin/auctions/${auction.id}`)}
+                            >
+                              צפה
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-center text-muted-foreground hebrew-text py-8">אין מכירות פומביות</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -306,41 +346,52 @@ const AdminUserDetail = () => {
         <TabsContent value="requests">
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text">רכבים דרושים ({mockRequests.length})</CardTitle>
+              <CardTitle className="hebrew-text">רכבים דרושים ({isoRequests?.length || 0})</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right hebrew-text">בקשה</TableHead>
-                    <TableHead className="text-right hebrew-text">תקציב</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">תאריך</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockRequests.map((request) => (
-                    <TableRow key={request.id}>
-                      <TableCell className="font-medium hebrew-text">{request.title}</TableCell>
-                      <TableCell className="hebrew-text">₪{request.budget}</TableCell>
-                      <TableCell>
-                        <Badge variant={request.status === 'open' ? 'default' : 'secondary'}>
-                          {request.status === 'open' ? 'פתוחה' : 'סגורה'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{new Date(request.date).toLocaleDateString('he-IL')}</TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm" className="hebrew-text">
-                            צפה
-                          </Button>
-                        </div>
-                      </TableCell>
+              {isoRequests && isoRequests.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right hebrew-text">בקשה</TableHead>
+                      <TableHead className="text-right hebrew-text">תקציב</TableHead>
+                      <TableHead className="text-right hebrew-text">סטטוס</TableHead>
+                      <TableHead className="text-right hebrew-text">תאריך</TableHead>
+                      <TableHead className="text-right hebrew-text">פעולות</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {isoRequests.map((request: any) => (
+                      <TableRow key={request.id}>
+                        <TableCell className="font-medium hebrew-text">{request.title}</TableCell>
+                        <TableCell className="hebrew-text">
+                          ₪{request.price_from?.toLocaleString()} - ₪{request.price_to?.toLocaleString()}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={request.status === 'active' ? 'default' : 'secondary'}>
+                            {request.status === 'active' ? 'פעילה' : 'סגורה'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(request.created_at).toLocaleDateString('he-IL')}</TableCell>
+                        <TableCell>
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="hebrew-text"
+                              onClick={() => navigate(`/admin/vehicle-requests/${request.id}`)}
+                            >
+                              צפה
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-center text-muted-foreground hebrew-text py-8">אין בקשות</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
