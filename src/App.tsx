@@ -63,6 +63,8 @@ import AdminVehicleRequestDetail from "./pages/admin/AdminVehicleRequestDetail";
 import AdminAuctionDetail from "./pages/admin/AdminAuctionDetail";
 import AdminSupportTicketDetail from "./pages/admin/AdminSupportTicketDetail";
 import AdminNotifications from "./pages/admin/AdminNotifications";
+import AdminAddVehicle from "./pages/admin/AdminAddVehicle";
+import EditVehicleScreen from "./pages/mobile/EditVehicleScreen";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +95,7 @@ const App = () => (
                     <Route path="users/:id" element={<AdminUserDetail />} />
                     <Route path="users/:id/edit" element={<AdminEditUser />} />
                     <Route path="vehicles" element={<AdminVehiclesList />} />
+                    <Route path="vehicles/create" element={<AdminAddVehicle />} />
                     <Route path="vehicles/:id" element={<AdminVehicleDetail />} />
                     <Route path="vehicle-requests" element={<AdminVehicleRequestsList />} />
                     <Route path="vehicle-requests/:id" element={<AdminVehicleRequestDetail />} />
@@ -133,6 +136,7 @@ const App = () => (
                 <Route path="/auctions" element={<AuctionListScreen />} />
                 <Route path="/auction/:id" element={<AuctionDetailScreen />} />
                 <Route path="/vehicle/:id" element={<VehicleDetailScreen />} />
+                <Route path="/vehicle/:id/edit" element={<EditVehicleScreen />} />
                 <Route path="/my-vehicles" element={<MyVehiclesScreen />} />
                 <Route path="/add-vehicle" element={<AddVehicleScreen />} />
                 <Route path="/add-auction" element={<AddAuctionScreen />} />

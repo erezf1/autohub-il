@@ -1,32 +1,20 @@
 import { ReactNode } from "react";
-import { Bell, User, LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import AdminDesktopSidebar from "./AdminDesktopSidebar";
-import { useAdminAuth } from "@/contexts/AdminAuthContext";
-import { toast } from "sonner";
+import AdminUserProfile from "./AdminUserProfile";
 
 interface AdminDesktopLayoutProps {
   children: ReactNode;
 }
 
 const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
-  const navigate = useNavigate();
-  const { signOut } = useAdminAuth();
-
-  const handleLogout = async () => {
-    await signOut();
-    toast.success("התנתקת בהצלחה");
-    navigate("/admin/login");
-  };
-
   return (
     <div className="h-screen w-full bg-background overflow-hidden" dir="rtl">
       {/* Fixed Admin Header */}
@@ -79,32 +67,7 @@ const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
           </DropdownMenu>
 
           {/* Admin Profile */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-3 pr-2">
-                <div className="text-right hebrew-text">
-                  <p className="text-sm font-medium">ישראל ישראלי</p>
-                  <p className="text-xs text-muted-foreground">מנהל מערכת</p>
-                </div>
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary-foreground" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem className="hebrew-text">
-                <User className="ml-2 h-4 w-4" />
-                הפרופיל שלי
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="hebrew-text text-destructive"
-                onClick={handleLogout}
-              >
-                <LogOut className="ml-2 h-4 w-4" />
-                התנתק
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AdminUserProfile />
         </div>
       </header>
 
