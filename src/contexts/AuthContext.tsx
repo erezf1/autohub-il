@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { cleanPhoneNumber, phoneToEmail, isValidIsraeliPhone } from '@/utils/phoneValidation';
 
 interface AuthContextType {
   user: User | null;
@@ -44,8 +45,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (phone: string, password: string, fullName: string, businessName: string) => {
     try {
-      // Use phone as email (format: phone@autohub.local)
-      const email = `${phone.replace(/\D/g, '')}@autohub.local`;
+      // Validate phone format
+      const cleanedPhone = cleanPhoneNumber(phone);
+      if (!isValidIsraeliPhone(cleanedPhone)) {
+        return { error: { message: 'מספר טלפון לא תקין. יש להזין 10 ספרות המתחילות ב-05' } };
+      }
+
+      // Convert phone to email format for Supabase
+      const email = phoneToEmail(cleanedPhone);
       const redirectUrl = `${window.location.origin}/mobile/dashboard`;
 
       const { data, error } = await supabase.auth.signUp({
@@ -54,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            phone_number: phone,
+            phone_number: cleanedPhone,
             full_name: fullName,
             business_name: businessName,
           }
@@ -83,8 +90,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (phone: string, password: string) => {
     try {
-      // Use phone as email (format: phone@autohub.local)
-      const email = `${phone.replace(/\D/g, '')}@autohub.local`;
+      // Validate phone format
+      const cleanedPhone = cleanPhoneNumber(phone);
+      if (!isValidIsraeliPhone(cleanedPhone)) {
+        return { error: { message: 'מספר טלפון לא תקין. יש להזין 10 ספרות המתחילות ב-05' } };
+      }
+
+      // Convert phone to email format for Supabase
+      const email = phoneToEmail(cleanedPhone);
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,

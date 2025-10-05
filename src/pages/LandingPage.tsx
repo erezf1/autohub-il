@@ -96,7 +96,7 @@ const LandingPage = () => {
                 className="w-full mt-6" 
                 size="lg"
                 variant="secondary"
-                onClick={() => navigate('/admin')}
+                onClick={() => navigate('/admin/login')}
               >
                 <Monitor className="w-5 h-5 ml-2" />
                 <span className="hebrew-text">כניסה לפאנל הניהול</span>

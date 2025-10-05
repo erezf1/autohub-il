@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Phone, ArrowLeft, ArrowRight, Loader2, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { formatPhoneDisplay, cleanPhoneNumber } from '@/utils/phoneValidation';
 
 export const LoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -34,14 +35,11 @@ export const LoginScreen: React.FC = () => {
     }
   };
 
-  const formatPhoneNumber = (value: string) => {
-    // Remove all non-digits
-    const digits = value.replace(/\D/g, '');
-    
-    // Format as Israeli phone number
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+  const handlePhoneChange = (value: string) => {
+    const cleaned = cleanPhoneNumber(value);
+    if (cleaned.length <= 10) {
+      setPhoneNumber(formatPhoneDisplay(value));
+    }
   };
 
   return (
@@ -82,11 +80,14 @@ export const LoginScreen: React.FC = () => {
                   type="tel"
                   placeholder="050-123-4567"
                   value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
                   className="pr-10 text-right"
-                  maxLength={12}
+                  dir="ltr"
                 />
               </div>
+              <p className="text-xs text-muted-foreground">
+                הזן מספר טלפון בן 10 ספרות המתחיל ב-05
+              </p>
             </div>
 
             <div className="space-y-2">

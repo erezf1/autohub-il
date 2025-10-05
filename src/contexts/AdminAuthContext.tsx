@@ -1,12 +1,14 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { cleanPhoneNumber, phoneToEmail, isValidIsraeliPhone } from '@/utils/phoneValidation';
 
 interface AdminAuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
   isLoading: boolean;
+  signIn: (phone: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -67,6 +69,28 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  const signIn = async (phone: string, password: string) => {
+    try {
+      // Validate phone format
+      const cleanedPhone = cleanPhoneNumber(phone);
+      if (!isValidIsraeliPhone(cleanedPhone)) {
+        return { error: { message: 'מספר טלפון לא תקין. יש להזין 10 ספרות המתחילות ב-05' } };
+      }
+
+      // Convert phone to email format for Supabase
+      const email = phoneToEmail(cleanedPhone);
+      
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -75,7 +99,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AdminAuthContext.Provider value={{ user, session, isAdmin, isLoading, signOut }}>
+    <AdminAuthContext.Provider value={{ user, session, isAdmin, isLoading, signIn, signOut }}>
       {children}
     </AdminAuthContext.Provider>
   );

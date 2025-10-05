@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCreateUser } from '@/hooks/admin/useUsers';
+import { formatPhoneDisplay, cleanPhoneNumber } from '@/utils/phoneValidation';
 
 const AdminCreateUser = () => {
   const navigate = useNavigate();
@@ -15,15 +16,20 @@ const AdminCreateUser = () => {
     fullName: '',
     businessName: '',
     phoneNumber: '',
-    email: '',
     password: '',
   });
+
+  const handlePhoneChange = (value: string) => {
+    const cleaned = cleanPhoneNumber(value);
+    if (cleaned.length <= 10) {
+      setFormData({ ...formData, phoneNumber: formatPhoneDisplay(value) });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     await createUserMutation.mutateAsync({
-      email: formData.email,
       password: formData.password,
       phoneNumber: formData.phoneNumber,
       fullName: formData.fullName,
@@ -88,24 +94,14 @@ const AdminCreateUser = () => {
                   id="phoneNumber"
                   type="tel"
                   value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
                   required
                   dir="ltr"
-                  placeholder="050-1234567"
+                  placeholder="050-123-4567"
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="hebrew-text">דוא"ל</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  dir="ltr"
-                  placeholder="user@example.com"
-                />
+                <p className="text-xs text-muted-foreground hebrew-text">
+                  הזן מספר טלפון בן 10 ספרות המתחיל ב-05
+                </p>
               </div>
 
               <div className="space-y-2">

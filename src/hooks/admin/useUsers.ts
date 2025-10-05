@@ -179,25 +179,33 @@ export const useCreateUser = () => {
 
   return useMutation({
     mutationFn: async ({ 
-      email, 
       password, 
       phoneNumber,
       fullName, 
       businessName 
     }: { 
-      email: string; 
       password: string;
       phoneNumber: string;
       fullName: string; 
       businessName: string; 
     }) => {
+      // Clean phone and convert to email format
+      const cleanedPhone = phoneNumber.replace(/\D/g, '');
+      
+      // Validate phone format
+      if (!/^05\d{8}$/.test(cleanedPhone)) {
+        throw new Error('מספר טלפון לא תקין. יש להזין 10 ספרות המתחילות ב-05');
+      }
+
+      const email = `${cleanedPhone}@autohub.local`;
+
       // Create auth user
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
         user_metadata: {
-          phone_number: phoneNumber,
+          phone_number: cleanedPhone,
           full_name: fullName,
           business_name: businessName,
         }
