@@ -24,6 +24,7 @@ import VehicleDetailScreen from "./pages/mobile/VehicleDetailScreen";
 import AddVehicleScreen from "./pages/mobile/AddVehicleScreen";
 import AddAuctionScreen from "./pages/mobile/AddAuctionScreen";
 import MyProfileScreen from "./pages/mobile/MyProfileScreen";
+import MyVehiclesScreen from "./pages/mobile/MyVehiclesScreen";
 import ISORequestsScreen from "./pages/mobile/ISORequestsScreen";
 import ISORequestDetailScreen from "./pages/mobile/ISORequestDetailScreen";
 import ChatRequestScreen from "./pages/mobile/ChatRequestScreen";
@@ -132,6 +133,7 @@ const App = () => (
                 <Route path="/auctions" element={<AuctionListScreen />} />
                 <Route path="/auction/:id" element={<AuctionDetailScreen />} />
                 <Route path="/vehicle/:id" element={<VehicleDetailScreen />} />
+                <Route path="/my-vehicles" element={<MyVehiclesScreen />} />
                 <Route path="/add-vehicle" element={<AddVehicleScreen />} />
                 <Route path="/add-auction" element={<AddAuctionScreen />} />
                 <Route path="/profile" element={<MyProfileScreen />} />

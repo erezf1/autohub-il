@@ -39,7 +39,7 @@ const CarSearchScreen = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground hebrew-text">חיפוש רכב</h1>
-        <Button variant="outline" onClick={() => navigate('/mobile/profile')}>
+        <Button variant="outline" onClick={() => navigate('/mobile/my-vehicles')}>
           הרכבים שלי
         </Button>
       </div>
