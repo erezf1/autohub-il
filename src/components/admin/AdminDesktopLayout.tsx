@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Bell, User, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,12 +10,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import AdminDesktopSidebar from "./AdminDesktopSidebar";
+import { useAdminAuth } from "@/contexts/AdminAuthContext";
+import { toast } from "sonner";
 
 interface AdminDesktopLayoutProps {
   children: ReactNode;
 }
 
 const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
+  const navigate = useNavigate();
+  const { signOut } = useAdminAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success("התנתקת בהצלחה");
+    navigate("/admin/login");
+  };
+
   return (
     <div className="h-screen w-full bg-background overflow-hidden" dir="rtl">
       {/* Fixed Admin Header */}
@@ -84,7 +96,10 @@ const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
                 <User className="ml-2 h-4 w-4" />
                 הפרופיל שלי
               </DropdownMenuItem>
-              <DropdownMenuItem className="hebrew-text text-destructive">
+              <DropdownMenuItem 
+                className="hebrew-text text-destructive"
+                onClick={handleLogout}
+              >
                 <LogOut className="ml-2 h-4 w-4" />
                 התנתק
               </DropdownMenuItem>

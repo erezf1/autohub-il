@@ -4,7 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { ProtectedRoute } from "@/components/mobile/ProtectedRoute";
+import ProtectedAdminRoute from "@/components/admin/ProtectedAdminRoute";
 
 // Landing Page
 import LandingPage from "./pages/LandingPage";
@@ -43,6 +45,7 @@ import NotFound from "./pages/mobile/NotFound";
 
 // Admin Layout and Pages
 import AdminDesktopLayout from "./components/admin/AdminDesktopLayout";
+import AdminLoginScreen from "./pages/admin/AdminLoginScreen";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsersList from "./pages/admin/AdminUsersList";
 import AdminVehiclesList from "./pages/admin/AdminVehiclesList";
@@ -65,37 +68,43 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-          {/* Landing Page */}
-          <Route path="/" element={<LandingPage />} />
+      <AdminAuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+            {/* Landing Page */}
+            <Route path="/" element={<LandingPage />} />
 
-          {/* Admin Routes - Must come before mobile catch-all */}
-          <Route path="/admin/*" element={
-            <AdminDesktopLayout>
-              <Routes>
-                <Route path="/" element={<AdminDashboard />} />
-                <Route path="/notifications" element={<AdminNotifications />} />
-                <Route path="/users" element={<AdminUsersList />} />
-                <Route path="/users/create" element={<AdminCreateUser />} />
-                <Route path="/users/:id" element={<AdminUserDetail />} />
-                <Route path="/users/:id/edit" element={<AdminEditUser />} />
-                <Route path="/vehicles" element={<AdminVehiclesList />} />
-                <Route path="/vehicles/:id" element={<AdminVehicleDetail />} />
-                <Route path="/vehicle-requests" element={<AdminVehicleRequestsList />} />
-                <Route path="/vehicle-requests/:id" element={<AdminVehicleRequestDetail />} />
-                <Route path="/auctions" element={<AdminAuctionsList />} />
-                <Route path="/auctions/:id" element={<AdminAuctionDetail />} />
-                <Route path="/support" element={<AdminSupportTickets />} />
-                <Route path="/support/:id" element={<AdminSupportTicketDetail />} />
-                <Route path="/reports" element={<AdminReports />} />
-                <Route path="/settings" element={<AdminSettings />} />
-              </Routes>
-            </AdminDesktopLayout>
-          } />
+            {/* Admin Login - Not Protected */}
+            <Route path="/admin/login" element={<AdminLoginScreen />} />
+
+            {/* Admin Routes - Protected - Must come before mobile catch-all */}
+            <Route path="/admin/*" element={
+              <ProtectedAdminRoute>
+                <AdminDesktopLayout>
+                  <Routes>
+                    <Route path="/" element={<AdminDashboard />} />
+                    <Route path="/notifications" element={<AdminNotifications />} />
+                    <Route path="/users" element={<AdminUsersList />} />
+                    <Route path="/users/create" element={<AdminCreateUser />} />
+                    <Route path="/users/:id" element={<AdminUserDetail />} />
+                    <Route path="/users/:id/edit" element={<AdminEditUser />} />
+                    <Route path="/vehicles" element={<AdminVehiclesList />} />
+                    <Route path="/vehicles/:id" element={<AdminVehicleDetail />} />
+                    <Route path="/vehicle-requests" element={<AdminVehicleRequestsList />} />
+                    <Route path="/vehicle-requests/:id" element={<AdminVehicleRequestDetail />} />
+                    <Route path="/auctions" element={<AdminAuctionsList />} />
+                    <Route path="/auctions/:id" element={<AdminAuctionDetail />} />
+                    <Route path="/support" element={<AdminSupportTickets />} />
+                    <Route path="/support/:id" element={<AdminSupportTicketDetail />} />
+                    <Route path="/reports" element={<AdminReports />} />
+                    <Route path="/settings" element={<AdminSettings />} />
+                  </Routes>
+                </AdminDesktopLayout>
+              </ProtectedAdminRoute>
+            } />
 
           {/* Auth routes without layout */}
           <Route path="/mobile" element={<WelcomeScreen />} />
@@ -143,9 +152,10 @@ const App = () => (
               </MobileLayout>
             </ProtectedRoute>
           } />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+      </AdminAuthProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
