@@ -85,22 +85,22 @@ const App = () => (
               <ProtectedAdminRoute>
                 <AdminDesktopLayout>
                   <Routes>
-                    <Route path="/" element={<AdminDashboard />} />
-                    <Route path="/notifications" element={<AdminNotifications />} />
-                    <Route path="/users" element={<AdminUsersList />} />
-                    <Route path="/users/create" element={<AdminCreateUser />} />
-                    <Route path="/users/:id" element={<AdminUserDetail />} />
-                    <Route path="/users/:id/edit" element={<AdminEditUser />} />
-                    <Route path="/vehicles" element={<AdminVehiclesList />} />
-                    <Route path="/vehicles/:id" element={<AdminVehicleDetail />} />
-                    <Route path="/vehicle-requests" element={<AdminVehicleRequestsList />} />
-                    <Route path="/vehicle-requests/:id" element={<AdminVehicleRequestDetail />} />
-                    <Route path="/auctions" element={<AdminAuctionsList />} />
-                    <Route path="/auctions/:id" element={<AdminAuctionDetail />} />
-                    <Route path="/support" element={<AdminSupportTickets />} />
-                    <Route path="/support/:id" element={<AdminSupportTicketDetail />} />
-                    <Route path="/reports" element={<AdminReports />} />
-                    <Route path="/settings" element={<AdminSettings />} />
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="notifications" element={<AdminNotifications />} />
+                    <Route path="users" element={<AdminUsersList />} />
+                    <Route path="users/create" element={<AdminCreateUser />} />
+                    <Route path="users/:id" element={<AdminUserDetail />} />
+                    <Route path="users/:id/edit" element={<AdminEditUser />} />
+                    <Route path="vehicles" element={<AdminVehiclesList />} />
+                    <Route path="vehicles/:id" element={<AdminVehicleDetail />} />
+                    <Route path="vehicle-requests" element={<AdminVehicleRequestsList />} />
+                    <Route path="vehicle-requests/:id" element={<AdminVehicleRequestDetail />} />
+                    <Route path="auctions" element={<AdminAuctionsList />} />
+                    <Route path="auctions/:id" element={<AdminAuctionDetail />} />
+                    <Route path="support" element={<AdminSupportTickets />} />
+                    <Route path="support/:id" element={<AdminSupportTicketDetail />} />
+                    <Route path="reports" element={<AdminReports />} />
+                    <Route path="settings" element={<AdminSettings />} />
                   </Routes>
                 </AdminDesktopLayout>
               </ProtectedAdminRoute>

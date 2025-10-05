@@ -1,9 +1,12 @@
-import { MessageCircle, Bell } from "lucide-react";
+import { MessageCircle, Bell, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MobileHeader = () => {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-card border-b border-border shadow-sm">
@@ -47,6 +50,20 @@ const MobileHeader = () => {
               7
             </Badge>
           </div>
+
+          {/* Logout Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={async () => {
+              await signOut();
+              navigate("/mobile/welcome");
+            }}
+            className="h-10 w-10"
+            title="התנתק"
+          >
+            <LogOut className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
+          </Button>
         </div>
       </div>
     </header>

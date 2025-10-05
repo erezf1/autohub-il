@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,14 +14,7 @@ export const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn, user } = useAuth();
-
-  useEffect(() => {
-    // Redirect if already logged in (only on initial load, not on back navigation)
-    if (user && !phoneNumber && !password) {
-      navigate('/mobile/dashboard', { replace: true });
-    }
-  }, [user, navigate, phoneNumber, password]);
+  const { signIn, user, signOut } = useAuth();
 
   const handleLogin = async () => {
     if (!phoneNumber.trim() || !password.trim()) return;
@@ -63,6 +56,36 @@ export const LoginScreen: React.FC = () => {
           <div className="w-16"></div>
         </div>
         <Card className="w-full p-6 space-y-6">
+          {user && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-3">
+              <p className="text-sm text-blue-900 dark:text-blue-100 text-center font-medium">
+                אתה כבר מחובר למערכת
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => navigate("/mobile/dashboard")}
+                  variant="default"
+                  size="sm"
+                  className="flex-1"
+                >
+                  מעבר לדשבורד
+                </Button>
+                <Button 
+                  onClick={async () => {
+                    await signOut();
+                    setPhoneNumber("");
+                    setPassword("");
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                >
+                  התנתק
+                </Button>
+              </div>
+            </div>
+          )}
+          
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold">התחברות למערכת</h2>
             <p className="text-muted-foreground text-sm">
