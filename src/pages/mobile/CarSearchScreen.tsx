@@ -122,12 +122,6 @@ const CarSearchScreen = () => {
             );
           })}
 
-          {filteredResults.length === 0 && !isLoading && (
-            <div className="text-center py-8">
-              <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground hebrew-text">לא נמצאו תוצאות</p>
-            </div>
-          )}
         </div>
       )}
     </div>

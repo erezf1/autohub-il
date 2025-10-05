@@ -8,37 +8,42 @@ export const useUsers = (searchTerm?: string, statusFilter?: string) => {
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['admin-users', searchTerm, statusFilter],
     queryFn: async () => {
-      let query = supabase
+      // Fetch users first (without relying on implicit FK-based joins)
+      let usersQuery = supabase
         .from('users')
-        .select(`
-          *,
-          profile:user_profiles(
-            full_name,
-            business_name,
-            subscription_type,
-            location:locations(name_hebrew)
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (statusFilter && statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
+        usersQuery = usersQuery.eq('status', statusFilter);
       }
 
-      const { data, error } = await query;
+      const { data: usersData, error: usersError } = await usersQuery;
+      if (usersError) throw usersError;
+      if (!usersData || usersData.length === 0) return [] as any[];
 
-      if (error) throw error;
+      // Fetch related profiles separately and merge on the client
+      const userIds = usersData.map((u: any) => u.id);
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, full_name, business_name, subscription_type, location_id')
+        .in('id', userIds);
+      if (profilesError) throw profilesError;
 
-      // Filter by search term if provided
-      if (searchTerm && data) {
-        return data.filter(user => 
-          user.profile?.full_name?.includes(searchTerm) ||
-          user.profile?.business_name?.includes(searchTerm) ||
-          user.phone_number?.includes(searchTerm)
+      const profilesById = new Map((profilesData || []).map((p: any) => [p.id, p]));
+      const merged = usersData.map((u: any) => ({ ...u, profile: profilesById.get(u.id) || null }));
+
+      // Filter by search term if provided (against merged data)
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        return merged.filter((u: any) =>
+          (u.profile?.full_name || '').toLowerCase().includes(term) ||
+          (u.profile?.business_name || '').toLowerCase().includes(term) ||
+          (u.phone_number || '').toLowerCase().includes(term)
         );
       }
 
-      return data;
+      return merged;
     },
   });
 
@@ -49,21 +54,37 @@ export const useUser = (userId: string) => {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['admin-user', userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch base user
+      const { data: userData, error: userError } = await supabase
         .from('users')
-        .select(`
-          *,
-          profile:user_profiles(
-            *,
-            location:locations(id, name_hebrew, name_english)
-          ),
-          roles:user_roles(role)
-        `)
+        .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
-      return data;
+      if (userError) throw userError;
+      if (!userData) return null;
+
+      // Fetch profile and roles in parallel (avoid implicit joins)
+      const [profileRes, rolesRes] = await Promise.all([
+        supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle(),
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId),
+      ]);
+
+      if (profileRes.error) throw profileRes.error;
+      if (rolesRes.error) throw rolesRes.error;
+
+      return {
+        ...userData,
+        profile: profileRes.data || null,
+        roles: rolesRes.data || [],
+      } as any;
     },
     enabled: !!userId,
   });
