@@ -47,8 +47,8 @@ export const OTPVerificationScreen: React.FC = () => {
       
       const isRegister = location.state?.isRegister;
       if (isRegister) {
-        // For registration - go to profile setup
-        navigate('/mobile/onboarding-profile', { state: { phoneNumber, otp: otpValue } });
+        // For registration - go to password setup
+        navigate('/mobile/set-password', { state: { phoneNumber, otp: otpValue } });
       } else {
         // For login - directly go to dashboard (password was already verified)
         navigate('/mobile/dashboard');

@@ -36,6 +36,7 @@ import { LoginScreen } from "./pages/mobile/LoginScreen";
 import { SetPasswordScreen } from "./pages/mobile/SetPasswordScreen";
 import { OTPVerificationScreen } from "./pages/mobile/OTPVerificationScreen";
 import { OnboardingProfileScreen } from "./pages/mobile/OnboardingProfileScreen";
+import { ProfileEditScreen } from "./pages/mobile/ProfileEditScreen";
 import { OnboardingLicenseScreen } from "./pages/mobile/OnboardingLicenseScreen";
 import { PendingApprovalScreen } from "./pages/mobile/PendingApprovalScreen";
 import NotFound from "./pages/mobile/NotFound";
@@ -103,6 +104,7 @@ const App = () => (
           <Route path="/mobile/login" element={<LoginScreen />} />
           <Route path="/mobile/verify-otp" element={<OTPVerificationScreen />} />
           <Route path="/mobile/set-password" element={<SetPasswordScreen />} />
+          <Route path="/mobile/profile-edit" element={<ProfileEditScreen />} />
           <Route path="/mobile/onboarding-license" element={<OnboardingLicenseScreen />} />
           <Route path="/mobile/onboarding-profile" element={<OnboardingProfileScreen />} />
           <Route path="/mobile/pending-approval" element={<PendingApprovalScreen />} />
