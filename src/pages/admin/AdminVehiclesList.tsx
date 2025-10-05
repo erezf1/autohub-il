@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Car, Eye, Edit, Trash2, Plus, Search } from "lucide-react";
+import { Car, Eye, Edit, Trash2, Plus, Search, Loader2 } from "lucide-react";
+import { useAdminVehicles } from "@/hooks/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,62 +20,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { MoreHorizontal } from "lucide-react";
-// Mock data for vehicles
-const mockVehicles = [
-  {
-    id: 1,
-    make: "טויוטה",
-    model: "קורולה",
-    year: 2022,
-    seller: "אוטו גל",
-    price: "125,000 ₪",
-    status: "זמין",
-    views: 245,
-    dateAdded: "2024-01-15",
-    location: "תל אביב"
-  },
-  {
-    id: 2,
-    make: "BMW",
-    model: "X5",
-    year: 2021,
-    seller: "מוטורס ישראל",
-    price: "450,000 ₪", 
-    status: "נמכר",
-    views: 189,
-    dateAdded: "2024-01-10",
-    location: "חיפה"
-  },
-  {
-    id: 3,
-    make: "מרצדס",
-    model: "GLC",
-    year: 2023,
-    seller: "דיילי מוטורס",
-    price: "380,000 ₪",
-    status: "זמין",
-    views: 312,
-    dateAdded: "2024-01-20",
-    location: "ירושלים"
-  },
-  {
-    id: 4,
-    make: "אאודי",
-    model: "A4",
-    year: 2020,
-    seller: "אוטו סנטר",
-    price: "195,000 ₪",
-    status: "בהמתנה",
-    views: 156,
-    dateAdded: "2024-01-18",
-    location: "באר שבע"
-  }
-];
 
 const AdminVehiclesList = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const { vehicles, isLoading } = useAdminVehicles();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -89,11 +39,16 @@ const AdminVehiclesList = () => {
     }
   };
 
-  const filteredVehicles = mockVehicles.filter(vehicle =>
-    vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.seller.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredVehicles = (vehicles || []).filter(vehicle => {
+    const makeName = vehicle.make?.name_hebrew || '';
+    const modelName = vehicle.model?.name_hebrew || '';
+    const ownerName = vehicle.owner?.business_name || vehicle.owner?.full_name || '';
+    const search = searchTerm.toLowerCase();
+    
+    return makeName.toLowerCase().includes(search) ||
+           modelName.toLowerCase().includes(search) ||
+           ownerName.toLowerCase().includes(search);
+  });
 
   return (
     <div className="space-y-8">
@@ -105,7 +60,7 @@ const AdminVehiclesList = () => {
               ניהול כל הרכבים במערכת
             </p>
           </div>
-          <Button size="lg" className="hebrew-text">
+          <Button size="lg" className="hebrew-text" onClick={() => navigate('/admin/vehicles/create')}>
             <Plus className="h-4 w-4 ml-2" />
             הוסף רכב חדש
           </Button>
@@ -137,6 +92,15 @@ const AdminVehiclesList = () => {
             <CardTitle className="text-2xl hebrew-text">רשימת רכבים ({filteredVehicles.length})</CardTitle>
           </CardHeader>
           <CardContent>
+            {isLoading ? (
+              <div className="flex justify-center items-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : filteredVehicles.length === 0 ? (
+              <div className="text-center p-12 text-muted-foreground hebrew-text">
+                לא נמצאו רכבים
+              </div>
+            ) : (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -159,19 +123,25 @@ const AdminVehiclesList = () => {
                         </div>
                         <div>
                           <div className="font-medium hebrew-text text-base">
-                            {vehicle.make} {vehicle.model}
+                            {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew}
                           </div>
                           <div className="text-sm text-muted-foreground hebrew-text">
-                            {vehicle.year} • {vehicle.location}
+                            {vehicle.year}
                           </div>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="hebrew-text text-base">{vehicle.seller}</TableCell>
-                    <TableCell className="font-medium hebrew-text text-base">{vehicle.price}</TableCell>
+                    <TableCell className="hebrew-text text-base">
+                      {vehicle.owner?.business_name || vehicle.owner?.full_name || 'לא ידוע'}
+                    </TableCell>
+                    <TableCell className="font-medium hebrew-text text-base">
+                      ₪{vehicle.price?.toLocaleString()}
+                    </TableCell>
                     <TableCell>{getStatusBadge(vehicle.status)}</TableCell>
-                    <TableCell className="hebrew-text text-base">{vehicle.views}</TableCell>
-                    <TableCell className="hebrew-text text-base">{vehicle.dateAdded}</TableCell>
+                    <TableCell className="hebrew-text text-base">-</TableCell>
+                    <TableCell className="hebrew-text text-base">
+                      {new Date(vehicle.created_at).toLocaleDateString('he-IL')}
+                    </TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-2">
                         <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}>
@@ -192,6 +162,7 @@ const AdminVehiclesList = () => {
                 ))}
               </TableBody>
             </Table>
+            )}
           </CardContent>
         </Card>
       </div>

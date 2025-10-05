@@ -16,8 +16,7 @@ const AdminUserProfile = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAdminAuth();
 
-  // Fetch user profile
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ['admin-profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -28,14 +27,17 @@ const AdminUserProfile = () => {
         .eq('id', user.id)
         .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Profile fetch error:', error);
+        return null;
+      }
       return data;
     },
     enabled: !!user?.id,
   });
 
   // Fetch user roles
-  const { data: roles } = useQuery({
+  const { data: roles, isLoading: isLoadingRoles } = useQuery({
     queryKey: ['admin-roles', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -45,10 +47,14 @@ const AdminUserProfile = () => {
         .select('role')
         .eq('user_id', user.id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Roles fetch error:', error);
+        return [];
+      }
       return data;
     },
     enabled: !!user?.id,
+    refetchOnMount: true,
   });
 
   const handleLogout = async () => {
@@ -57,9 +63,24 @@ const AdminUserProfile = () => {
     navigate("/admin/login");
   };
 
-  const displayName = profile?.business_name || profile?.full_name || 'משתמש';
+  // Fallback chain for name display
+  const displayName = profile?.business_name || 
+                      profile?.full_name || 
+                      user?.phone || 
+                      'משתמש';
+  
   const roleLabel = roles?.some(r => r.role === 'admin') ? 'מנהל מערכת' : 
                     roles?.some(r => r.role === 'support') ? 'תמיכה' : 'סוחר';
+
+  // Show loading state
+  if (isLoadingProfile || isLoadingRoles) {
+    return (
+      <div className="flex items-center gap-3 px-2">
+        <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+        <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+      </div>
+    );
+  }
 
   return (
     <DropdownMenu>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Upload, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +34,8 @@ const EditVehicleScreen = () => {
   const queryClient = useQueryClient();
   
   const [selectedMakeId, setSelectedMakeId] = useState<number | undefined>();
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     make_id: "",
     model_id: "",
@@ -71,6 +73,7 @@ const EditVehicleScreen = () => {
   useEffect(() => {
     if (vehicle) {
       setSelectedMakeId(vehicle.make_id);
+      setUploadedImages(vehicle.images || []);
       setFormData({
         make_id: vehicle.make_id?.toString() || "",
         model_id: vehicle.model_id?.toString() || "",
@@ -130,9 +133,64 @@ const EditVehicleScreen = () => {
       price: parseFloat(formData.price),
       description: formData.description,
       previous_owners: formData.previousOwners ? parseInt(formData.previousOwners) : 1,
+      images: uploadedImages.length > 0 ? uploadedImages : null,
     };
 
     updateVehicleMutation.mutate(vehicleData);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    const newImageUrls: string[] = [];
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      for (const file of Array.from(files)) {
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: 'קובץ גדול מדי',
+            description: `${file.name} גדול מ-5MB`,
+            variant: 'destructive',
+          });
+          continue;
+        }
+
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('vehicle-images')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('vehicle-images')
+          .getPublicUrl(fileName);
+
+        newImageUrls.push(publicUrl);
+      }
+
+      setUploadedImages([...uploadedImages, ...newImageUrls]);
+      toast({ title: 'התמונות הועלו בהצלחה' });
+    } catch (error: any) {
+      toast({
+        title: 'שגיאה בהעלאת תמונות',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = (url: string) => {
+    setUploadedImages(uploadedImages.filter(img => img !== url));
   };
 
   if (isLoading) {
@@ -308,6 +366,44 @@ const EditVehicleScreen = () => {
                 className="hebrew-text min-h-[120px]"
               />
             </div>
+
+            <div>
+              <Label className="hebrew-text">תמונות רכב</Label>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="hidden"
+                id="vehicle-images-edit"
+              />
+              <label
+                htmlFor="vehicle-images-edit"
+                className="border-2 border-dashed border-muted rounded-lg p-6 text-center block cursor-pointer"
+              >
+                <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground hebrew-text">
+                  {uploading ? 'מעלה...' : 'לחץ להוספת תמונות'}
+                </p>
+              </label>
+              {uploadedImages.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-4">
+                  {uploadedImages.map((url, index) => (
+                    <div key={index} className="relative">
+                      <img src={url} alt={`תמונה ${index + 1}`} className="w-full h-24 object-cover rounded" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(url)}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -315,7 +411,7 @@ const EditVehicleScreen = () => {
           <Button type="button" variant="outline" onClick={() => navigate('/mobile/my-vehicles')} className="hebrew-text">
             ביטול
           </Button>
-          <Button type="submit" disabled={updateVehicleMutation.isPending} className="flex-1 hebrew-text">
+          <Button type="submit" disabled={updateVehicleMutation.isPending || uploading} className="flex-1 hebrew-text">
             {updateVehicleMutation.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 ml-2 animate-spin" />

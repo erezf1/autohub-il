@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useVehicles, useVehicleMakes, useVehicleModels } from "@/hooks/mobile/useVehicles";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const fuelTypes = [
   { value: "gasoline", label: "בנזין" },
@@ -52,10 +54,13 @@ const AddVehicleScreen = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedMakeId, setSelectedMakeId] = useState<number | undefined>();
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   
   const { data: makes } = useVehicleMakes();
   const { data: models } = useVehicleModels(selectedMakeId);
   const { addVehicle, isAddingVehicle } = useVehicles();
+  const { toast } = useToast();
   
   const [formData, setFormData] = useState<VehicleForm>({
     brand: "",
@@ -89,7 +94,7 @@ const AddVehicleScreen = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedMakeId || !formData.model) return;
 
     const vehicleData = {
@@ -104,6 +109,7 @@ const AddVehicleScreen = () => {
       price: parseFloat(formData.price),
       description: formData.description,
       previous_owners: formData.previousOwners ? parseInt(formData.previousOwners) : 1,
+      images: uploadedImages.length > 0 ? uploadedImages : null,
     };
 
     addVehicle(vehicleData, {
@@ -111,6 +117,60 @@ const AddVehicleScreen = () => {
         navigate("/mobile/dashboard");
       }
     });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    const newImageUrls: string[] = [];
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      for (const file of Array.from(files)) {
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: 'קובץ גדול מדי',
+            description: `${file.name} גדול מ-5MB`,
+            variant: 'destructive',
+          });
+          continue;
+        }
+
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('vehicle-images')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('vehicle-images')
+          .getPublicUrl(fileName);
+
+        newImageUrls.push(publicUrl);
+      }
+
+      setUploadedImages([...uploadedImages, ...newImageUrls]);
+      toast({ title: 'התמונות הועלו בהצלחה' });
+    } catch (error: any) {
+      toast({
+        title: 'שגיאה בהעלאת תמונות',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = (url: string) => {
+    setUploadedImages(uploadedImages.filter(img => img !== url));
   };
 
   const updateFormData = (field: keyof VehicleForm, value: string | string[]) => {
@@ -399,19 +459,43 @@ const AddVehicleScreen = () => {
 
             <div>
               <Label className="hebrew-text">תמונות הרכב</Label>
-              <div className="border-2 border-dashed border-muted rounded-lg p-8 text-center">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="hidden"
+                id="vehicle-images"
+              />
+              <label
+                htmlFor="vehicle-images"
+                className="border-2 border-dashed border-muted rounded-lg p-8 text-center block cursor-pointer"
+              >
                 <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground hebrew-text mb-2">
-                  גרור תמונות לכאן או לחץ לבחירת קבצים
+                  {uploading ? 'מעלה...' : 'גרור תמונות לכאן או לחץ לבחירת קבצים'}
                 </p>
                 <p className="text-sm text-muted-foreground hebrew-text">
                   מקסימום 10 תמונות, עד 5MB כל תמונה
                 </p>
-                <Button variant="outline" className="mt-4">
-                  <Plus className="h-4 w-4 ml-2" />
-                  <span className="hebrew-text">בחר תמונות</span>
-                </Button>
-              </div>
+              </label>
+              {uploadedImages.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-4">
+                  {uploadedImages.map((url, index) => (
+                    <div key={index} className="relative">
+                      <img src={url} alt={`תמונה ${index + 1}`} className="w-full h-24 object-cover rounded" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(url)}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -429,7 +513,7 @@ const AddVehicleScreen = () => {
         
         <Button 
           onClick={handleNext}
-          disabled={!canProceed() || isAddingVehicle}
+          disabled={!canProceed() || isAddingVehicle || uploading}
           className="hebrew-text"
         >
           {isAddingVehicle ? "מפרסם..." : (currentStep < 4 ? "המשך" : "פרסם רכב")}

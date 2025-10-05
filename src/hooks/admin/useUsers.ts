@@ -199,32 +199,19 @@ export const useCreateUser = () => {
 
       const email = `${cleanedPhone}@autohub.local`;
 
-      // Call edge function to create user (requires admin privileges)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-create-user`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Use supabase.functions.invoke instead of fetch
+      const { data: result, error } = await supabase.functions.invoke('admin-create-user', {
+        body: {
           email,
           password,
           phone_number: cleanedPhone,
           full_name: fullName,
           business_name: businessName,
-        }),
+        },
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to create user');
-      }
-
-      const data = await response.json();
-      return data;
+      if (error) throw error;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });

@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Upload, X } from 'lucide-react';
+import { useAdminVehicles } from '@/hooks/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVehicleMakes, useVehicleModels } from '@/hooks/mobile/useVehicles';
@@ -30,10 +31,11 @@ const colors = ["לבן", "שחור", "כסוף", "אפור", "כחול", "אד�
 const AdminAddVehicle = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const [selectedMakeId, setSelectedMakeId] = useState<number | undefined>();
   const [selectedUserId, setSelectedUserId] = useState("");
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     make_id: "",
     model_id: "",
@@ -50,6 +52,7 @@ const AdminAddVehicle = () => {
   
   const { data: makes } = useVehicleMakes();
   const { data: models } = useVehicleModels(selectedMakeId);
+  const { addVehicle, isAddingVehicle } = useAdminVehicles();
 
   // Fetch all users for selection
   const { data: users } = useQuery({
@@ -77,31 +80,47 @@ const AdminAddVehicle = () => {
     },
   });
 
-  // Add vehicle mutation
-  const addVehicleMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const { error } = await supabase
-        .from('vehicle_listings')
-        .insert([data]);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-vehicles'] });
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    const newImageUrls: string[] = [];
+
+    try {
+      for (const file of Array.from(files)) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${selectedUserId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        const { error: uploadError, data } = await supabase.storage
+          .from('vehicle-images')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('vehicle-images')
+          .getPublicUrl(fileName);
+
+        newImageUrls.push(publicUrl);
+      }
+
+      setUploadedImages([...uploadedImages, ...newImageUrls]);
+      toast({ title: 'התמונות הועלו בהצלחה' });
+    } catch (error: any) {
       toast({
-        title: 'הרכב נוסף בהצלחה!',
-        description: 'הרכב נוסף למערכת',
-      });
-      navigate('/admin/vehicles');
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'שגיאה בהוספת רכב',
+        title: 'שגיאה בהעלאת תמונות',
         description: error.message,
         variant: 'destructive',
       });
-    },
-  });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = (url: string) => {
+    setUploadedImages(uploadedImages.filter(img => img !== url));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,9 +148,11 @@ const AdminAddVehicle = () => {
       description: formData.description,
       previous_owners: formData.previousOwners ? parseInt(formData.previousOwners) : 1,
       status: 'available',
+      images: uploadedImages.length > 0 ? uploadedImages : null,
     };
 
-    addVehicleMutation.mutate(vehicleData);
+    addVehicle(vehicleData);
+    navigate('/admin/vehicles');
   };
 
   return (
@@ -322,6 +343,46 @@ const AdminAddVehicle = () => {
                 className="hebrew-text min-h-[120px]"
               />
             </div>
+
+            <div>
+              <Label className="hebrew-text">תמונות רכב</Label>
+              <div className="border-2 border-dashed rounded-lg p-6">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading || !selectedUserId}
+                  className="hidden"
+                  id="vehicle-images"
+                />
+                <label
+                  htmlFor="vehicle-images"
+                  className="flex flex-col items-center cursor-pointer"
+                >
+                  <Upload className="h-12 w-12 text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground hebrew-text">
+                    {uploading ? 'מעלה...' : !selectedUserId ? 'בחר קודם בעל רכב' : 'לחץ להעלאת תמונות'}
+                  </p>
+                </label>
+              </div>
+              {uploadedImages.length > 0 && (
+                <div className="grid grid-cols-4 gap-2 mt-4">
+                  {uploadedImages.map((url, index) => (
+                    <div key={index} className="relative">
+                      <img src={url} alt={`תמונה ${index + 1}`} className="w-full h-24 object-cover rounded" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(url)}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -336,10 +397,10 @@ const AdminAddVehicle = () => {
           </Button>
           <Button 
             type="submit" 
-            disabled={addVehicleMutation.isPending}
+            disabled={isAddingVehicle || uploading}
             className="hebrew-text"
           >
-            {addVehicleMutation.isPending ? (
+            {isAddingVehicle ? (
               <>
                 <Loader2 className="h-4 w-4 ml-2 animate-spin" />
                 מוסיף...
