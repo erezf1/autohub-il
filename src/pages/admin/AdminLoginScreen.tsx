@@ -1,104 +1,111 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { Phone, Lock, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { formatPhoneDisplay, cleanPhoneNumber } from '@/utils/phoneValidation';
 
 export default function AdminLoginScreen() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { signIn } = useAdminAuth();
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const cleaned = cleanPhoneNumber(value);
+    if (cleaned.length <= 10) {
+      setPhone(formatPhoneDisplay(value));
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+    const { error } = await signIn(phone, password);
+
+    if (error) {
+      toast.error('שגיאה בהתחברות', {
+        description: error.message === 'Invalid login credentials' 
+          ? 'מספר טלפון או סיסמה שגויים'
+          : error.message,
       });
-
-      if (authError) throw authError;
-
-      // Check if user has admin or support role
-      const { data: roles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', authData.user.id);
-
-      if (rolesError) throw rolesError;
-
-      const hasAdminAccess = roles?.some(r => r.role === 'admin' || r.role === 'support');
-
-      if (!hasAdminAccess) {
-        await supabase.auth.signOut();
-        toast.error("אין לך הרשאות גישה למערכת הניהול");
-        return;
-      }
-
-      toast.success("התחברת בהצלחה");
-      navigate('/admin');
-    } catch (error: any) {
-      console.error('Login error:', error);
-      toast.error(error.message || "שגיאה בהתחברות");
-    } finally {
       setIsLoading(false);
+      return;
     }
+
+    toast.success('התחברת בהצלחה');
+    navigate('/admin');
+    setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-background p-4">
-      <Card className="w-full max-w-md" dir="rtl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">מערכת ניהול Auto-Hub</CardTitle>
-          <CardDescription>התחבר עם חשבון מנהל</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">דוא"ל</Label>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4" dir="rtl">
+      <Card className="w-full max-w-md p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-blue-600 mb-2">Auto-Hub</h1>
+          <h2 className="text-xl font-semibold text-gray-800">כניסת מנהלים</h2>
+          <p className="text-muted-foreground mt-2">התחבר עם מספר הטלפון שלך</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="phone">מספר טלפון</Label>
+            <div className="relative">
+              <Phone className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                id="phone"
+                type="tel"
+                placeholder="050-123-4567"
+                value={phone}
+                onChange={handlePhoneChange}
+                className="pr-10 text-right"
                 required
-                disabled={isLoading}
+                dir="ltr"
               />
             </div>
+            <p className="text-xs text-muted-foreground">
+              הזן מספר טלפון בן 10 ספרות המתחיל ב-05
+            </p>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">סיסמה</Label>
+          <div className="space-y-2">
+            <Label htmlFor="password">סיסמה</Label>
+            <div className="relative">
+              <Lock className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password"
                 type="password"
+                placeholder="הזן סיסמה"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                className="pr-10 text-right"
                 required
-                disabled={isLoading}
               />
             </div>
+          </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                  מתחבר...
-                </>
-              ) : (
-                "התחבר"
-              )}
-            </Button>
-          </form>
-        </CardContent>
+          <Button 
+            type="submit" 
+            className="w-full" 
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                מתחבר...
+              </>
+            ) : (
+              'התחבר'
+            )}
+          </Button>
+        </form>
       </Card>
     </div>
   );

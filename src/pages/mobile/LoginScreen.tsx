@@ -17,11 +17,11 @@ export const LoginScreen: React.FC = () => {
   const { signIn, user } = useAuth();
 
   useEffect(() => {
-    // Redirect if already logged in
-    if (user) {
-      navigate('/mobile/dashboard');
+    // Redirect if already logged in (only on initial load, not on back navigation)
+    if (user && !phoneNumber && !password) {
+      navigate('/mobile/dashboard', { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, phoneNumber, password]);
 
   const handleLogin = async () => {
     if (!phoneNumber.trim() || !password.trim()) return;
