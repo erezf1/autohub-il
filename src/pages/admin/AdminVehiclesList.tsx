@@ -144,16 +144,36 @@ const AdminVehiclesList = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}>
-                          <Eye className="h-4 w-4 ml-1" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="hebrew-text"
+                          onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
+                        >
+                          <Eye className="h-4 w-4 ml-2" />
                           צפה
                         </Button>
-                        <Button variant="ghost" size="sm" className="hebrew-text">
-                          <Edit className="h-4 w-4 ml-1" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="hebrew-text"
+                          onClick={() => navigate(`/admin/vehicles/${vehicle.id}/edit`)}
+                        >
+                          <Edit className="h-4 w-4 ml-2" />
                           ערוך
                         </Button>
-                        <Button variant="ghost" size="sm" className="text-destructive hebrew-text">
-                          <Trash2 className="h-4 w-4 ml-1" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-destructive hebrew-text"
+                          onClick={() => {
+                            if (confirm('האם אתה בטוח שברצונך למחוק רכב זה?')) {
+                              // TODO: Implement delete functionality
+                              console.log('Delete vehicle:', vehicle.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 ml-2" />
                           מחק
                         </Button>
                       </div>

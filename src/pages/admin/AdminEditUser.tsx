@@ -5,7 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUser, useUpdateUserProfile } from '@/hooks/admin/useUsers';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const AdminEditUser = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,10 +17,26 @@ const AdminEditUser = () => {
   const { user, isLoading } = useUser(id!);
   const updateProfileMutation = useUpdateUserProfile();
   
+  const { data: locations } = useQuery({
+    queryKey: ['locations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('*')
+        .eq('is_active', true)
+        .order('name_hebrew');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const [formData, setFormData] = useState({
     fullName: '',
     businessName: '',
-    phoneNumber: '',
+    locationId: '',
+    tradeLicenseNumber: '',
+    subscriptionType: '',
+    ratingTier: '',
   });
 
   useEffect(() => {
@@ -24,7 +44,10 @@ const AdminEditUser = () => {
       setFormData({
         fullName: user.profile?.full_name || '',
         businessName: user.profile?.business_name || '',
-        phoneNumber: user.phone_number || '',
+        locationId: user.profile?.location_id?.toString() || '',
+        tradeLicenseNumber: user.profile?.trade_license_number || '',
+        subscriptionType: user.profile?.subscription_type || 'regular',
+        ratingTier: user.profile?.rating_tier || 'bronze',
       });
     }
   }, [user]);
@@ -34,10 +57,13 @@ const AdminEditUser = () => {
     
     await updateProfileMutation.mutateAsync({
       userId: id!,
-      phoneNumber: formData.phoneNumber,
       profileData: {
         full_name: formData.fullName,
         business_name: formData.businessName,
+        location_id: formData.locationId ? parseInt(formData.locationId) : null,
+        trade_license_number: formData.tradeLicenseNumber || null,
+        subscription_type: formData.subscriptionType,
+        rating_tier: formData.ratingTier,
       },
     });
     
@@ -104,15 +130,70 @@ const AdminEditUser = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phoneNumber" className="hebrew-text">מספר טלפון</Label>
+                <Label htmlFor="phoneNumber" className="hebrew-text">מספר טלפון (לא ניתן לעריכה)</Label>
                 <Input
                   id="phoneNumber"
                   type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  required
+                  value={user?.phone_number || ''}
+                  disabled
+                  dir="ltr"
+                  className="bg-muted"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="locationId" className="hebrew-text">איזור</Label>
+                <Select value={formData.locationId} onValueChange={(value) => setFormData({ ...formData, locationId: value })}>
+                  <SelectTrigger className="hebrew-text" dir="rtl">
+                    <SelectValue placeholder="בחר איזור" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations?.map((location) => (
+                      <SelectItem key={location.id} value={location.id.toString()} className="hebrew-text">
+                        {location.name_hebrew}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tradeLicenseNumber" className="hebrew-text">מספר רישיון עסק</Label>
+                <Input
+                  id="tradeLicenseNumber"
+                  value={formData.tradeLicenseNumber}
+                  onChange={(e) => setFormData({ ...formData, tradeLicenseNumber: e.target.value })}
                   dir="ltr"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="subscriptionType" className="hebrew-text">סוג מנוי</Label>
+                <Select value={formData.subscriptionType} onValueChange={(value) => setFormData({ ...formData, subscriptionType: value })}>
+                  <SelectTrigger className="hebrew-text" dir="rtl">
+                    <SelectValue placeholder="בחר סוג מנוי" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="regular" className="hebrew-text">רגיל</SelectItem>
+                    <SelectItem value="premium" className="hebrew-text">פרימיום</SelectItem>
+                    <SelectItem value="vip" className="hebrew-text">VIP</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ratingTier" className="hebrew-text">דרגת מוניטין</Label>
+                <Select value={formData.ratingTier} onValueChange={(value) => setFormData({ ...formData, ratingTier: value })}>
+                  <SelectTrigger className="hebrew-text" dir="rtl">
+                    <SelectValue placeholder="בחר דרגה" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bronze" className="hebrew-text">ארד</SelectItem>
+                    <SelectItem value="silver" className="hebrew-text">כסף</SelectItem>
+                    <SelectItem value="gold" className="hebrew-text">זהב</SelectItem>
+                    <SelectItem value="platinum" className="hebrew-text">פלטינום</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

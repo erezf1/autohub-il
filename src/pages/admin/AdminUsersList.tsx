@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, UserCheck, UserX, Eye, Loader2 } from "lucide-react";
+import { Search, Filter, UserCheck, UserX, Eye, Edit, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -138,7 +138,7 @@ const AdminUsersList = () => {
                            user.status === "suspended" ? "מושעה" : user.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                       <TableCell>
                         <div className="flex justify-end gap-2">
                           <Button 
                             variant="ghost" 
@@ -148,6 +148,15 @@ const AdminUsersList = () => {
                           >
                             <Eye className="h-4 w-4 ml-1" />
                             צפה
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="hebrew-text" 
+                            onClick={() => navigate(`/admin/users/${user.id}/edit`)}
+                          >
+                            <Edit className="h-4 w-4 ml-1" />
+                            ערוך
                           </Button>
                           {user.status === "pending" && (
                             <Button 

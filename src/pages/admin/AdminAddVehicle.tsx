@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Loader2, Upload, X } from 'lucide-react';
+import { ArrowRight, Loader2, Upload, X, Plus, Minus } from 'lucide-react';
 import { useAdminVehicles } from '@/hooks/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -36,17 +37,18 @@ const AdminAddVehicle = () => {
   const [selectedUserId, setSelectedUserId] = useState("");
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [formData, setFormData] = useState({
     make_id: "",
     model_id: "",
-    year: "",
+    year: "2020",
     kilometers: "",
     price: "",
     fuelType: "",
     transmission: "",
     engineSize: "",
     color: "",
-    previousOwners: "",
+    previousOwners: "1",
     description: "",
   });
   
@@ -77,6 +79,19 @@ const AdminAddVehicle = () => {
 
       const profilesById = new Map((profilesData || []).map(p => [p.id, p]));
       return usersData.map(u => ({ ...u, profile: profilesById.get(u.id) || null }));
+    },
+  });
+
+  const { data: availableTags } = useQuery({
+    queryKey: ['vehicle-tags'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('vehicle_tags')
+        .select('*')
+        .eq('is_active', true)
+        .order('name_hebrew');
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -150,8 +165,8 @@ const AdminAddVehicle = () => {
       model_id: parseInt(formData.model_id),
       year: parseInt(formData.year),
       kilometers: parseInt(formData.kilometers),
-      transmission: formData.transmission,
-      fuel_type: formData.fuelType,
+      transmission: formData.transmission || null,
+      fuel_type: formData.fuelType || null,
       engine_size: formData.engineSize ? parseFloat(formData.engineSize) : null,
       color: formData.color,
       price: parseFloat(formData.price),
@@ -253,14 +268,33 @@ const AdminAddVehicle = () => {
 
               <div>
                 <Label className="hebrew-text">שנת ייצור *</Label>
-                <Input
-                  type="number"
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                  required
-                  min="1990"
-                  max="2025"
-                />
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setFormData({ ...formData, year: (parseInt(formData.year) - 1).toString() })}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <Input
+                    type="number"
+                    value={formData.year}
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    required
+                    min="1990"
+                    max="2025"
+                    className="text-center"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setFormData({ ...formData, year: (parseInt(formData.year) + 1).toString() })}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               <div>
@@ -288,10 +322,10 @@ const AdminAddVehicle = () => {
               </div>
 
               <div>
-                <Label className="hebrew-text">סוג דלק *</Label>
+                <Label className="hebrew-text">סוג דלק</Label>
                 <Select value={formData.fuelType} onValueChange={(value) => setFormData({ ...formData, fuelType: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="בחר סוג דלק" />
+                    <SelectValue placeholder="בחר סוג דלק (אופציונלי)" />
                   </SelectTrigger>
                   <SelectContent>
                     {fuelTypes.map(fuel => (
@@ -302,10 +336,10 @@ const AdminAddVehicle = () => {
               </div>
 
               <div>
-                <Label className="hebrew-text">תיבת הילוכים *</Label>
+                <Label className="hebrew-text">תיבת הילוכים</Label>
                 <Select value={formData.transmission} onValueChange={(value) => setFormData({ ...formData, transmission: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="בחר תיבת הילוכים" />
+                    <SelectValue placeholder="בחר תיבת הילוכים (אופציונלי)" />
                   </SelectTrigger>
                   <SelectContent>
                     {transmissions.map(trans => (
@@ -321,21 +355,38 @@ const AdminAddVehicle = () => {
                   value={formData.engineSize}
                   onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
                   placeholder="2.5"
-                  type="number"
-                  max="99.9"
-                  step="0.1"
+                  type="text"
                 />
                 <p className="text-xs text-muted-foreground mt-1 hebrew-text">ערך מקסימלי: 99.9 ליטר</p>
               </div>
 
               <div>
                 <Label className="hebrew-text">מספר בעלים קודמים</Label>
-                <Input
-                  type="number"
-                  value={formData.previousOwners}
-                  onChange={(e) => setFormData({ ...formData, previousOwners: e.target.value })}
-                  min="0"
-                />
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setFormData({ ...formData, previousOwners: Math.max(1, parseInt(formData.previousOwners) - 1).toString() })}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <Input
+                    type="number"
+                    value={formData.previousOwners}
+                    onChange={(e) => setFormData({ ...formData, previousOwners: e.target.value })}
+                    min="1"
+                    className="text-center"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setFormData({ ...formData, previousOwners: (parseInt(formData.previousOwners) + 1).toString() })}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               <div>
@@ -396,6 +447,34 @@ const AdminAddVehicle = () => {
                   ))}
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tags Selection */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="hebrew-text text-right">תגיות</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2 justify-end">
+              {availableTags?.map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant={selectedTags.includes(tag.id) ? "default" : "outline"}
+                  className="hebrew-text cursor-pointer"
+                  style={selectedTags.includes(tag.id) ? { backgroundColor: tag.color } : {}}
+                  onClick={() => {
+                    setSelectedTags(prev =>
+                      prev.includes(tag.id)
+                        ? prev.filter(id => id !== tag.id)
+                        : [...prev, tag.id]
+                    );
+                  }}
+                >
+                  {tag.name_hebrew}
+                </Badge>
+              ))}
             </div>
           </CardContent>
         </Card>

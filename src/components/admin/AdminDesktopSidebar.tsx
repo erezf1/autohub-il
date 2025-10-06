@@ -113,10 +113,11 @@ const AdminDesktopSidebar = () => {
             <li key={item.url}>
               <NavLink
                 to={item.url}
+                end
                 className={({ isActive: navIsActive }) => cn(
                   "flex items-center gap-4 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200",
                   "hover:bg-primary/10 hover:text-primary group",
-                  (navIsActive || isActive(item.url)) 
+                  navIsActive
                     ? "bg-primary text-primary-foreground shadow-sm" 
                     : "text-muted-foreground hover:text-foreground"
                 )}
