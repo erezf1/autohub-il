@@ -133,8 +133,7 @@ const EditVehicleScreen = () => {
       }
     }
     if (!formData.kilometers) errors.kilometers = "קילומטרז׳ הוא שדה חובה";
-    if (!formData.fuelType) errors.fuelType = "סוג דלק הוא שדה חובה";
-    if (!formData.transmission) errors.transmission = "תיבת הילוכים היא שדה חובה";
+    // fuelType and transmission are now optional
     if (!formData.price) errors.price = "מחיר הוא שדה חובה";
     
     setFieldErrors(errors);
@@ -158,8 +157,8 @@ const EditVehicleScreen = () => {
       model_id: parseInt(formData.model_id),
       year: parseInt(formData.year),
       kilometers: parseInt(formData.kilometers),
-      transmission: formData.transmission,
-      fuel_type: formData.fuelType,
+      transmission: formData.transmission || null,
+      fuel_type: formData.fuelType || null,
       engine_size: formData.engineSize ? parseFloat(formData.engineSize) : null,
       color: formData.color,
       price: parseFloat(formData.price),
@@ -362,7 +361,7 @@ const EditVehicleScreen = () => {
             </div>
 
             <div>
-              <Label className="hebrew-text">סוג דלק *</Label>
+              <Label className="hebrew-text">סוג דלק (אופציונלי)</Label>
               <Select 
                 value={formData.fuelType} 
                 onValueChange={(value) => {
@@ -387,7 +386,7 @@ const EditVehicleScreen = () => {
             </div>
 
             <div>
-              <Label className="hebrew-text">תיבת הילוכים *</Label>
+              <Label className="hebrew-text">תיבת הילוכים (אופציונלי)</Label>
               <Select 
                 value={formData.transmission} 
                 onValueChange={(value) => {
@@ -414,9 +413,10 @@ const EditVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">נפח מנוע</Label>
               <Input
+                type="text"
                 value={formData.engineSize}
                 onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
-                placeholder="2.5"
+                placeholder="2.5L"
               />
             </div>
 

@@ -1,66 +1,111 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Car, MessageCircle, Phone, Star, MapPin, Calendar, Gauge } from "lucide-react";
+import { ArrowRight, MessageCircle, Phone, Star, MapPin, Calendar, Gauge, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import darkCarImage from "@/assets/dark_car.png";
-
-// Mock vehicle data
-const mockVehicle = {
-  id: "456",
-  title: "טויוטה קמרי 2020",
-  price: "285,000 ₪",
-  year: 2020,
-  kilometers: 120000,
-  transmission: "אוטומט",
-  fuelType: "בנזין",
-  engineSize: "2.5L",
-  color: "לבן פנינה",
-  previousOwners: 1,
-  location: "תל אביב",
-  description: "רכב במצב מעולה, מטופל בסוכנות בלבד. החלפת שמן כל 10,000 ק״מ, צמיגים חדשים. רכב משפחתי שמור מאוד.",
-  features: [
-    "מערכת מולטימדיה מתקדמת",
-    "מצלמת רוורס",
-    "חישני חניה",
-    "בקרת שיוט",
-    "מזגן אוטומטי דו-אזורי",
-    "חלונות חשמליים",
-    "מנעולי ילדים"
-  ],
-  seller: {
-    name: "משה לוי",
-    phone: "050-7654321",
-    rating: 4.8,
-    salesCount: 23,
-    joinDate: "2020"
-  },
-  images: [
-    darkCarImage,
-    darkCarImage,
-    darkCarImage
-  ],
-  isAuction: false,
-  status: "זמין"
-};
+import { useState } from "react";
 
 const VehicleDetailScreen = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Fetch vehicle data
+  const { data: vehicle, isLoading } = useQuery({
+    queryKey: ['vehicle-detail', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('vehicle_listings')
+        .select(`
+          *,
+          make:vehicle_makes(id, name_hebrew, name_english),
+          model:vehicle_models(id, name_hebrew, name_english)
+        `)
+        .eq('id', id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Fetch owner profile separately
+  const { data: ownerProfile } = useQuery({
+    queryKey: ['vehicle-owner', vehicle?.owner_id],
+    queryFn: async () => {
+      if (!vehicle?.owner_id) return null;
+      
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id, full_name, business_name')
+        .eq('id', vehicle.owner_id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!vehicle?.owner_id,
+  });
 
   const handleBackClick = () => {
     navigate("/mobile/search");
   };
 
   const handleContactSeller = () => {
-    navigate(`/mobile/chat/new?vehicle=${id}&seller=${mockVehicle.seller.name}`);
+    if (vehicle?.owner_id) {
+      navigate(`/mobile/chat/new?vehicle=${id}&seller=${ownerProfile?.business_name || ownerProfile?.full_name}`);
+    }
   };
 
   const handleCallSeller = () => {
-    window.location.href = `tel:${mockVehicle.seller.phone}`;
+    // Phone number would need to be fetched separately or included in query
+    // For now, just show toast
   };
+
+  const nextImage = () => {
+    if (vehicle?.images && vehicle.images.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % vehicle.images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (vehicle?.images && vehicle.images.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + vehicle.images.length) % vehicle.images.length);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!vehicle) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground hebrew-text">רכב לא נמצא</p>
+      </div>
+    );
+  }
+
+  const images = vehicle.images || [darkCarImage];
+  const transmissionLabel = vehicle.transmission === 'automatic' ? 'אוטומט' : 
+                           vehicle.transmission === 'manual' ? 'ידנית' : 
+                           vehicle.transmission === 'semi_automatic' ? 'טיפטרוניק' : '-';
+  const fuelLabel = vehicle.fuel_type === 'gasoline' ? 'בנזין' :
+                   vehicle.fuel_type === 'diesel' ? 'דיזל' :
+                   vehicle.fuel_type === 'hybrid' ? 'היברידי' : 
+                   vehicle.fuel_type === 'electric' ? 'חשמלי' : '-';
+  const statusLabel = vehicle.status === 'available' ? 'זמין' : 
+                     vehicle.status === 'sold' ? 'נמכר' : 'לא פעיל';
 
   return (
     <div className="space-y-4">
@@ -78,18 +123,49 @@ const VehicleDetailScreen = () => {
         </h1>
       </div>
 
-      {/* Vehicle Images */}
+      {/* Vehicle Images with Carousel */}
       <Card>
         <CardContent className="p-0">
-          <div className="relative h-48 overflow-hidden">
+          <div className="relative h-64 overflow-hidden rounded-lg">
             <img
-              src={mockVehicle.images[0]}
-              alt={mockVehicle.title}
-              className="w-full h-full object-cover rounded-lg"
+              src={images[currentImageIndex]}
+              alt={`${vehicle.make?.name_hebrew} ${vehicle.model?.name_hebrew}`}
+              className="w-full h-full object-cover"
             />
             <Badge variant="secondary" className="absolute top-2 right-2 hebrew-text">
-              {mockVehicle.status}
+              {statusLabel}
             </Badge>
+            
+            {images.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
+                  onClick={prevImage}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
+                  onClick={nextImage}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                  {images.map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`h-2 w-2 rounded-full ${
+                        idx === currentImageIndex ? 'bg-primary' : 'bg-background/60'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -99,11 +175,11 @@ const VehicleDetailScreen = () => {
         <CardContent className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-2xl font-bold text-foreground hebrew-text">
-              {mockVehicle.title}
+              {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
             </h2>
             <div className="text-left">
               <p className="text-2xl font-bold text-primary hebrew-text">
-                {mockVehicle.price}
+                {parseFloat(vehicle.price.toString()).toLocaleString()} ₪
               </p>
               <p className="text-sm text-muted-foreground hebrew-text">
                 ניתן למשא ומתן
@@ -111,18 +187,14 @@ const VehicleDetailScreen = () => {
             </div>
           </div>
           
-          <div className="flex items-center space-x-4 space-x-reverse text-sm text-muted-foreground">
-            <div className="flex items-center space-x-1 space-x-reverse">
-              <MapPin className="h-4 w-4" />
-              <span className="hebrew-text">{mockVehicle.location}</span>
-            </div>
+          <div className="flex items-center space-x-4 space-x-reverse text-sm text-muted-foreground flex-wrap gap-2">
             <div className="flex items-center space-x-1 space-x-reverse">
               <Calendar className="h-4 w-4" />
-              <span>{mockVehicle.year}</span>
+              <span>{vehicle.year}</span>
             </div>
             <div className="flex items-center space-x-1 space-x-reverse">
               <Gauge className="h-4 w-4" />
-              <span>{mockVehicle.kilometers.toLocaleString()} ק״מ</span>
+              <span>{vehicle.kilometers?.toLocaleString()} ק״מ</span>
             </div>
           </div>
         </CardContent>
@@ -137,59 +209,59 @@ const VehicleDetailScreen = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-muted-foreground hebrew-text">שנת ייצור</p>
-              <p className="font-medium text-foreground">{mockVehicle.year}</p>
+              <p className="font-medium text-foreground">{vehicle.year}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground hebrew-text">קילומטרז׳</p>
-              <p className="font-medium text-foreground">{mockVehicle.kilometers.toLocaleString()} ק״מ</p>
+              <p className="font-medium text-foreground">{vehicle.kilometers?.toLocaleString()} ק״מ</p>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
-              <p className="font-medium text-foreground hebrew-text">{mockVehicle.transmission}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text">סוג דלק</p>
-              <p className="font-medium text-foreground hebrew-text">{mockVehicle.fuelType}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
-              <p className="font-medium text-foreground">{mockVehicle.engineSize}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
-              <p className="font-medium text-foreground hebrew-text">{mockVehicle.color}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Features */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">אביזרים ותוספות</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {mockVehicle.features.map((feature, index) => (
-              <Badge key={index} variant="secondary" className="hebrew-text">
-                {feature}
-              </Badge>
-            ))}
+            {vehicle.transmission && (
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
+                <p className="font-medium text-foreground hebrew-text">{transmissionLabel}</p>
+              </div>
+            )}
+            {vehicle.fuel_type && (
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">סוג דלק</p>
+                <p className="font-medium text-foreground hebrew-text">{fuelLabel}</p>
+              </div>
+            )}
+            {vehicle.engine_size && (
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
+                <p className="font-medium text-foreground">{vehicle.engine_size}</p>
+              </div>
+            )}
+            {vehicle.color && (
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
+                <p className="font-medium text-foreground hebrew-text">{vehicle.color}</p>
+              </div>
+            )}
+            {vehicle.previous_owners && (
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
+                <p className="font-medium text-foreground">{vehicle.previous_owners}</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Description */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">תיאור</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-foreground hebrew-text leading-relaxed">
-            {mockVehicle.description}
-          </p>
-        </CardContent>
-      </Card>
+      {vehicle.description && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="hebrew-text">תיאור</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-foreground hebrew-text leading-relaxed">
+              {vehicle.description}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Seller Information */}
       <Card>
@@ -200,23 +272,13 @@ const VehicleDetailScreen = () => {
           <div className="flex items-center space-x-3 space-x-reverse mb-4">
             <Avatar className="h-12 w-12">
               <AvatarFallback className="bg-primary text-primary-foreground">
-                {mockVehicle.seller.name.charAt(0)}
+                {(ownerProfile?.business_name || ownerProfile?.full_name || 'M').charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <h3 className="font-semibold text-foreground hebrew-text">
-                {mockVehicle.seller.name}
+                {ownerProfile?.business_name || ownerProfile?.full_name || 'סוחר'}
               </h3>
-              <div className="flex items-center space-x-2 space-x-reverse text-sm text-muted-foreground">
-                <div className="flex items-center space-x-1 space-x-reverse">
-                  <Star className="h-4 w-4 fill-current text-warning" />
-                  <span>{mockVehicle.seller.rating}</span>
-                </div>
-                <Separator orientation="vertical" className="h-4" />
-                <span className="hebrew-text">{mockVehicle.seller.salesCount} מכירות</span>
-                <Separator orientation="vertical" className="h-4" />
-                <span className="hebrew-text">חבר מאז {mockVehicle.seller.joinDate}</span>
-              </div>
             </div>
           </div>
           
@@ -227,12 +289,6 @@ const VehicleDetailScreen = () => {
             >
               <MessageCircle className="h-4 w-4 ml-2" />
               <span className="hebrew-text">שלח הודעה</span>
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={handleCallSeller}
-            >
-              <Phone className="h-4 w-4" />
             </Button>
           </div>
         </CardContent>

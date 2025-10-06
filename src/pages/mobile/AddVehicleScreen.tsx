@@ -105,8 +105,7 @@ const AddVehicleScreen = () => {
         break;
       case 2:
         if (!formData.kilometers) errors.kilometers = "קילומטרז׳ הוא שדה חובה";
-        if (!formData.fuelType) errors.fuelType = "סוג דלק הוא שדה חובה";
-        if (!formData.transmission) errors.transmission = "תיבת הילוכים היא שדה חובה";
+        // fuelType and transmission are now optional
         break;
       case 3:
         if (!formData.price) errors.price = "מחיר הוא שדה חובה";
@@ -149,9 +148,9 @@ const AddVehicleScreen = () => {
       model_id: parseInt(formData.model),
       year: parseInt(formData.year),
       kilometers: parseInt(formData.kilometers),
-      transmission: formData.transmission as 'manual' | 'automatic' | 'semi_automatic',
-      fuel_type: formData.fuelType as 'gasoline' | 'diesel' | 'hybrid' | 'electric',
-      engine_size: formData.engineSize ? parseFloat(formData.engineSize) : undefined,
+      transmission: formData.transmission || null,
+      fuel_type: formData.fuelType || null,
+      engine_size: formData.engineSize ? parseFloat(formData.engineSize) : null,
       color: formData.color,
       price: parseFloat(formData.price),
       description: formData.description,
@@ -241,7 +240,7 @@ const AddVehicleScreen = () => {
       case 1:
         return formData.brand && formData.model && formData.year;
       case 2:
-        return formData.kilometers && formData.fuelType && formData.transmission;
+        return formData.kilometers; // fuelType and transmission are now optional
       case 3:
         return formData.price && formData.condition;
       case 4:
@@ -406,7 +405,7 @@ const AddVehicleScreen = () => {
             </div>
 
             <div>
-              <Label className="hebrew-text">סוג דלק *</Label>
+              <Label className="hebrew-text">סוג דלק (אופציונלי)</Label>
               <Select 
                 value={formData.fuelType}
                 onValueChange={(value) => {
@@ -431,7 +430,7 @@ const AddVehicleScreen = () => {
             </div>
 
             <div>
-              <Label className="hebrew-text">תיבת הילוכים *</Label>
+              <Label className="hebrew-text">תיבת הילוכים (אופציונלי)</Label>
               <Select 
                 value={formData.transmission}
                 onValueChange={(value) => {
@@ -458,6 +457,7 @@ const AddVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">נפח מנוע</Label>
               <Input
+                type="text"
                 placeholder="2.5L"
                 value={formData.engineSize}
                 onChange={(e) => updateFormData("engineSize", e.target.value)}

@@ -8,14 +8,15 @@ export interface VehicleInput {
   sub_model?: string;
   year: number;
   kilometers: number;
-  transmission: 'manual' | 'automatic' | 'semi_automatic';
-  fuel_type: 'gasoline' | 'diesel' | 'hybrid' | 'electric';
-  engine_size?: number;
+  transmission?: string | null;
+  fuel_type?: string | null;
+  engine_size?: number | null;
   color?: string;
   price: number;
   description?: string;
   had_severe_crash?: boolean;
   previous_owners?: number;
+  images?: string[] | null;
 }
 
 export const useVehicles = () => {
