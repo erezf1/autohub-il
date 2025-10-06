@@ -56,8 +56,44 @@ serve(async (req) => {
 
     if (vehicleError) {
       console.error('Vehicle insert error:', vehicleError);
+      
+      // Parse field-specific errors
+      let errorMessage = vehicleError.message;
+      let errorField = null;
+      
+      // Detect numeric overflow on engine_size
+      if (vehicleError.code === '22003' && vehicleError.message.includes('numeric field overflow')) {
+        if (vehicleError.message.includes('engine_size')) {
+          errorMessage = 'ערך נפח מנוע חייב להיות קטן מ-100 ליטר';
+          errorField = 'engine_size';
+        } else {
+          errorMessage = 'אחד מהערכים הנומריים גדול מדי';
+        }
+      }
+      
+      // Detect missing required fields
+      if (vehicleError.code === '23502') {
+        const fieldMatch = vehicleError.message.match(/column "(\w+)"/);
+        if (fieldMatch) {
+          errorField = fieldMatch[1];
+          const fieldLabels: Record<string, string> = {
+            'make_id': 'יצרן',
+            'model_id': 'דגם',
+            'year': 'שנת ייצור',
+            'price': 'מחיר',
+            'owner_id': 'בעל רכב'
+          };
+          errorMessage = `השדה ${fieldLabels[errorField] || errorField} הוא חובה`;
+        }
+      }
+      
       return new Response(
-        JSON.stringify({ error: vehicleError.message }),
+        JSON.stringify({ 
+          error: errorMessage,
+          field: errorField,
+          code: vehicleError.code,
+          details: vehicleError.details
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

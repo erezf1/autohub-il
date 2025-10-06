@@ -57,9 +57,27 @@ export const useAdminVehicles = () => {
       });
     },
     onError: (error: any) => {
+      // Parse error response for field-specific messages
+      let errorMessage = 'אירעה שגיאה בהוספת הרכב';
+      let errorTitle = 'שגיאה';
+      
+      if (error?.message) {
+        try {
+          const parsedError = JSON.parse(error.message);
+          if (parsedError.error) {
+            errorMessage = parsedError.error;
+            if (parsedError.field) {
+              errorTitle = `שגיאה בשדה: ${parsedError.field}`;
+            }
+          }
+        } catch {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
-        title: 'שגיאה',
-        description: error.message || 'אירעה שגיאה בהוספת הרכב',
+        title: errorTitle,
+        description: errorMessage,
         variant: 'destructive',
       });
     },

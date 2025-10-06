@@ -134,6 +134,16 @@ const AdminAddVehicle = () => {
       return;
     }
 
+    // Validate engine size
+    if (formData.engineSize && parseFloat(formData.engineSize) >= 100) {
+      toast({
+        title: 'שגיאה',
+        description: 'נפח מנוע חייב להיות קטן מ-100 ליטר',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const vehicleData = {
       owner_id: selectedUserId,
       make_id: parseInt(formData.make_id),
@@ -311,7 +321,11 @@ const AdminAddVehicle = () => {
                   value={formData.engineSize}
                   onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
                   placeholder="2.5"
+                  type="number"
+                  max="99.9"
+                  step="0.1"
                 />
+                <p className="text-xs text-muted-foreground mt-1 hebrew-text">ערך מקסימלי: 99.9 ליטר</p>
               </div>
 
               <div>
