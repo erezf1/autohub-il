@@ -56,6 +56,7 @@ const AddVehicleScreen = () => {
   const [selectedMakeId, setSelectedMakeId] = useState<number | undefined>();
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
   const { data: makes } = useVehicleMakes();
   const { data: models } = useVehicleModels(selectedMakeId);
@@ -72,7 +73,7 @@ const AddVehicleScreen = () => {
     transmission: "",
     engineSize: "",
     color: "",
-    previousOwners: "",
+    previousOwners: "1",
     description: "",
     features: [],
     condition: ""
@@ -86,9 +87,55 @@ const AddVehicleScreen = () => {
     }
   };
 
+  const validateCurrentStep = () => {
+    const errors: Record<string, string> = {};
+    
+    switch (currentStep) {
+      case 1:
+        if (!formData.brand) errors.brand = "יצרן הוא שדה חובה";
+        if (!formData.model) errors.model = "דגם הוא שדה חובה";
+        if (!formData.year) {
+          errors.year = "שנת ייצור היא שדה חובה";
+        } else {
+          const year = parseInt(formData.year);
+          if (year < 1990 || year > 2025) {
+            errors.year = "שנת ייצור חייבת להיות בין 1990 ל-2025";
+          }
+        }
+        break;
+      case 2:
+        if (!formData.kilometers) errors.kilometers = "קילומטרז׳ הוא שדה חובה";
+        if (!formData.fuelType) errors.fuelType = "סוג דלק הוא שדה חובה";
+        if (!formData.transmission) errors.transmission = "תיבת הילוכים היא שדה חובה";
+        break;
+      case 3:
+        if (!formData.price) errors.price = "מחיר הוא שדה חובה";
+        if (!formData.condition) errors.condition = "מצב הרכב הוא שדה חובה";
+        break;
+      case 4:
+        if (!formData.description || formData.description.trim().length < 10) {
+          errors.description = "תיאור חייב להכיל לפחות 10 תווים";
+        }
+        break;
+    }
+    
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleNext = () => {
+    if (!validateCurrentStep()) {
+      toast({
+        title: 'שגיאה בטופס',
+        description: 'אנא תקן את השגיאות לפני המעבר לשלב הבא',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
+      setFieldErrors({}); // Clear errors when moving to next step
     } else {
       handleSubmit();
     }
@@ -241,12 +288,18 @@ const AddVehicleScreen = () => {
           <CardContent className="space-y-4">
             <div>
               <Label className="hebrew-text">יצרן הרכב *</Label>
-              <Select onValueChange={(value) => {
-                setSelectedMakeId(parseInt(value));
-                updateFormData("brand", value);
-                updateFormData("model", ""); // Reset model when make changes
-              }}>
-                <SelectTrigger>
+              <Select 
+                value={formData.brand}
+                onValueChange={(value) => {
+                  setSelectedMakeId(parseInt(value));
+                  updateFormData("brand", value);
+                  updateFormData("model", "");
+                  if (fieldErrors.brand) {
+                    setFieldErrors({ ...fieldErrors, brand: "" });
+                  }
+                }}
+              >
+                <SelectTrigger className={fieldErrors.brand ? "border-destructive" : ""}>
                   <SelectValue placeholder="בחר יצרן" />
                 </SelectTrigger>
                 <SelectContent>
@@ -255,16 +308,24 @@ const AddVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {fieldErrors.brand && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.brand}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">דגם *</Label>
               <Select 
                 value={formData.model}
-                onValueChange={(value) => updateFormData("model", value)}
+                onValueChange={(value) => {
+                  updateFormData("model", value);
+                  if (fieldErrors.model) {
+                    setFieldErrors({ ...fieldErrors, model: "" });
+                  }
+                }}
                 disabled={!selectedMakeId}
               >
-                <SelectTrigger>
+                <SelectTrigger className={fieldErrors.model ? "border-destructive" : ""}>
                   <SelectValue placeholder={selectedMakeId ? "בחר דגם" : "בחר תחילה יצרן"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -273,23 +334,35 @@ const AddVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {fieldErrors.model && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.model}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">שנת ייצור *</Label>
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 placeholder="2020"
                 value={formData.year}
-                onChange={(e) => updateFormData("year", e.target.value)}
-                min="1990"
-                max="2024"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  updateFormData("year", value);
+                  if (fieldErrors.year) {
+                    setFieldErrors({ ...fieldErrors, year: "" });
+                  }
+                }}
+                className={fieldErrors.year ? "border-destructive" : ""}
               />
+              {fieldErrors.year && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.year}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">צבע</Label>
-              <Select onValueChange={(value) => updateFormData("color", value)}>
+              <Select value={formData.color} onValueChange={(value) => updateFormData("color", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="בחר צבע" />
                 </SelectTrigger>
@@ -314,17 +387,36 @@ const AddVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">קילומטרז׳ *</Label>
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 placeholder="120000"
                 value={formData.kilometers}
-                onChange={(e) => updateFormData("kilometers", e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  updateFormData("kilometers", value);
+                  if (fieldErrors.kilometers) {
+                    setFieldErrors({ ...fieldErrors, kilometers: "" });
+                  }
+                }}
+                className={fieldErrors.kilometers ? "border-destructive" : ""}
               />
+              {fieldErrors.kilometers && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.kilometers}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">סוג דלק *</Label>
-              <Select onValueChange={(value) => updateFormData("fuelType", value)}>
-                <SelectTrigger>
+              <Select 
+                value={formData.fuelType}
+                onValueChange={(value) => {
+                  updateFormData("fuelType", value);
+                  if (fieldErrors.fuelType) {
+                    setFieldErrors({ ...fieldErrors, fuelType: "" });
+                  }
+                }}
+              >
+                <SelectTrigger className={fieldErrors.fuelType ? "border-destructive" : ""}>
                   <SelectValue placeholder="בחר סוג דלק" />
                 </SelectTrigger>
                 <SelectContent>
@@ -333,12 +425,23 @@ const AddVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {fieldErrors.fuelType && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.fuelType}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">תיבת הילוכים *</Label>
-              <Select onValueChange={(value) => updateFormData("transmission", value)}>
-                <SelectTrigger>
+              <Select 
+                value={formData.transmission}
+                onValueChange={(value) => {
+                  updateFormData("transmission", value);
+                  if (fieldErrors.transmission) {
+                    setFieldErrors({ ...fieldErrors, transmission: "" });
+                  }
+                }}
+              >
+                <SelectTrigger className={fieldErrors.transmission ? "border-destructive" : ""}>
                   <SelectValue placeholder="בחר תיבת הילוכים" />
                 </SelectTrigger>
                 <SelectContent>
@@ -347,6 +450,9 @@ const AddVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {fieldErrors.transmission && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.transmission}</p>
+              )}
             </div>
 
             <div>
@@ -361,11 +467,14 @@ const AddVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">מספר בעלים קודמים</Label>
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 placeholder="1"
                 value={formData.previousOwners}
-                onChange={(e) => updateFormData("previousOwners", e.target.value)}
-                min="0"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  updateFormData("previousOwners", value || "1");
+                }}
               />
             </div>
           </CardContent>
@@ -382,17 +491,36 @@ const AddVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">מחיר מבוקש (₪) *</Label>
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 placeholder="285000"
                 value={formData.price}
-                onChange={(e) => updateFormData("price", e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  updateFormData("price", value);
+                  if (fieldErrors.price) {
+                    setFieldErrors({ ...fieldErrors, price: "" });
+                  }
+                }}
+                className={fieldErrors.price ? "border-destructive" : ""}
               />
+              {fieldErrors.price && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.price}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">מצב הרכב *</Label>
-              <Select onValueChange={(value) => updateFormData("condition", value)}>
-                <SelectTrigger>
+              <Select 
+                value={formData.condition}
+                onValueChange={(value) => {
+                  updateFormData("condition", value);
+                  if (fieldErrors.condition) {
+                    setFieldErrors({ ...fieldErrors, condition: "" });
+                  }
+                }}
+              >
+                <SelectTrigger className={fieldErrors.condition ? "border-destructive" : ""}>
                   <SelectValue placeholder="בחר מצב הרכב" />
                 </SelectTrigger>
                 <SelectContent>
@@ -403,6 +531,9 @@ const AddVehicleScreen = () => {
                   <SelectItem value="needs-work">דורש עבודה</SelectItem>
                 </SelectContent>
               </Select>
+              {fieldErrors.condition && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.condition}</p>
+              )}
             </div>
 
             <div>
@@ -452,9 +583,17 @@ const AddVehicleScreen = () => {
               <Textarea
                 placeholder="תאר את הרכב, מצבו, היסטוריית הטיפולים וכל מידע רלוונטי..."
                 value={formData.description}
-                onChange={(e) => updateFormData("description", e.target.value)}
-                className="hebrew-text min-h-[120px]"
+                onChange={(e) => {
+                  updateFormData("description", e.target.value);
+                  if (fieldErrors.description) {
+                    setFieldErrors({ ...fieldErrors, description: "" });
+                  }
+                }}
+                className={`hebrew-text min-h-[120px] ${fieldErrors.description ? "border-destructive" : ""}`}
               />
+              {fieldErrors.description && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.description}</p>
+              )}
             </div>
 
             <div>

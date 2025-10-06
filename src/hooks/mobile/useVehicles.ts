@@ -31,8 +31,7 @@ export const useVehicles = () => {
         .select(`
           *,
           make:vehicle_makes(id, name_hebrew, name_english),
-          model:vehicle_models(id, name_hebrew, name_english),
-          owner:user_profiles(full_name, business_name)
+          model:vehicle_models(id, name_hebrew, name_english)
         `)
         .eq('status', 'available')
         .order('created_at', { ascending: false });

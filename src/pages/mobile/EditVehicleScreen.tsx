@@ -36,6 +36,7 @@ const EditVehicleScreen = () => {
   const [selectedMakeId, setSelectedMakeId] = useState<number | undefined>();
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     make_id: "",
     model_id: "",
@@ -46,7 +47,7 @@ const EditVehicleScreen = () => {
     transmission: "",
     engineSize: "",
     color: "",
-    previousOwners: "",
+    previousOwners: "1",
     description: "",
   });
   
@@ -118,8 +119,39 @@ const EditVehicleScreen = () => {
     },
   });
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    
+    if (!formData.make_id) errors.make_id = "יצרן הוא שדה חובה";
+    if (!formData.model_id) errors.model_id = "דגם הוא שדה חובה";
+    if (!formData.year) {
+      errors.year = "שנת ייצור היא שדה חובה";
+    } else {
+      const year = parseInt(formData.year);
+      if (year < 1990 || year > 2025) {
+        errors.year = "שנת ייצור חייבת להיות בין 1990 ל-2025";
+      }
+    }
+    if (!formData.kilometers) errors.kilometers = "קילומטרז׳ הוא שדה חובה";
+    if (!formData.fuelType) errors.fuelType = "סוג דלק הוא שדה חובה";
+    if (!formData.transmission) errors.transmission = "תיבת הילוכים היא שדה חובה";
+    if (!formData.price) errors.price = "מחיר הוא שדה חובה";
+    
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      toast({
+        title: 'שגיאה בטופס',
+        description: 'אנא תקן את השגיאות לפני השמירה',
+        variant: 'destructive',
+      });
+      return;
+    }
     
     const vehicleData = {
       make_id: parseInt(formData.make_id),
@@ -223,9 +255,12 @@ const EditVehicleScreen = () => {
                 onValueChange={(value) => {
                   setSelectedMakeId(parseInt(value));
                   setFormData({ ...formData, make_id: value, model_id: "" });
+                  if (fieldErrors.make_id) {
+                    setFieldErrors({ ...fieldErrors, make_id: "" });
+                  }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger className={fieldErrors.make_id ? "border-destructive" : ""}>
                   <SelectValue placeholder="בחר יצרן" />
                 </SelectTrigger>
                 <SelectContent>
@@ -234,16 +269,24 @@ const EditVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {fieldErrors.make_id && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.make_id}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">דגם *</Label>
               <Select
                 value={formData.model_id}
-                onValueChange={(value) => setFormData({ ...formData, model_id: value })}
+                onValueChange={(value) => {
+                  setFormData({ ...formData, model_id: value });
+                  if (fieldErrors.model_id) {
+                    setFieldErrors({ ...fieldErrors, model_id: "" });
+                  }
+                }}
                 disabled={!selectedMakeId}
               >
-                <SelectTrigger>
+                <SelectTrigger className={fieldErrors.model_id ? "border-destructive" : ""}>
                   <SelectValue placeholder={selectedMakeId ? "בחר דגם" : "בחר תחילה יצרן"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -252,16 +295,29 @@ const EditVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {fieldErrors.model_id && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.model_id}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">שנת ייצור *</Label>
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                required
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  setFormData({ ...formData, year: value });
+                  if (fieldErrors.year) {
+                    setFieldErrors({ ...fieldErrors, year: "" });
+                  }
+                }}
+                className={fieldErrors.year ? "border-destructive" : ""}
               />
+              {fieldErrors.year && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.year}</p>
+              )}
             </div>
 
             <div>
@@ -288,17 +344,35 @@ const EditVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">קילומטרז׳ *</Label>
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={formData.kilometers}
-                onChange={(e) => setFormData({ ...formData, kilometers: e.target.value })}
-                required
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  setFormData({ ...formData, kilometers: value });
+                  if (fieldErrors.kilometers) {
+                    setFieldErrors({ ...fieldErrors, kilometers: "" });
+                  }
+                }}
+                className={fieldErrors.kilometers ? "border-destructive" : ""}
               />
+              {fieldErrors.kilometers && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.kilometers}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">סוג דלק *</Label>
-              <Select value={formData.fuelType} onValueChange={(value) => setFormData({ ...formData, fuelType: value })}>
-                <SelectTrigger>
+              <Select 
+                value={formData.fuelType} 
+                onValueChange={(value) => {
+                  setFormData({ ...formData, fuelType: value });
+                  if (fieldErrors.fuelType) {
+                    setFieldErrors({ ...fieldErrors, fuelType: "" });
+                  }
+                }}
+              >
+                <SelectTrigger className={fieldErrors.fuelType ? "border-destructive" : ""}>
                   <SelectValue placeholder="בחר סוג דלק" />
                 </SelectTrigger>
                 <SelectContent>
@@ -307,12 +381,23 @@ const EditVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {fieldErrors.fuelType && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.fuelType}</p>
+              )}
             </div>
 
             <div>
               <Label className="hebrew-text">תיבת הילוכים *</Label>
-              <Select value={formData.transmission} onValueChange={(value) => setFormData({ ...formData, transmission: value })}>
-                <SelectTrigger>
+              <Select 
+                value={formData.transmission} 
+                onValueChange={(value) => {
+                  setFormData({ ...formData, transmission: value });
+                  if (fieldErrors.transmission) {
+                    setFieldErrors({ ...fieldErrors, transmission: "" });
+                  }
+                }}
+              >
+                <SelectTrigger className={fieldErrors.transmission ? "border-destructive" : ""}>
                   <SelectValue placeholder="בחר תיבת הילוכים" />
                 </SelectTrigger>
                 <SelectContent>
@@ -321,6 +406,9 @@ const EditVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {fieldErrors.transmission && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.transmission}</p>
+              )}
             </div>
 
             <div>
@@ -335,9 +423,13 @@ const EditVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">מספר בעלים קודמים</Label>
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={formData.previousOwners}
-                onChange={(e) => setFormData({ ...formData, previousOwners: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  setFormData({ ...formData, previousOwners: value || "1" });
+                }}
               />
             </div>
           </CardContent>
@@ -351,11 +443,21 @@ const EditVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">מחיר (₪) *</Label>
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                required
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  setFormData({ ...formData, price: value });
+                  if (fieldErrors.price) {
+                    setFieldErrors({ ...fieldErrors, price: "" });
+                  }
+                }}
+                className={fieldErrors.price ? "border-destructive" : ""}
               />
+              {fieldErrors.price && (
+                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.price}</p>
+              )}
             </div>
 
             <div>
