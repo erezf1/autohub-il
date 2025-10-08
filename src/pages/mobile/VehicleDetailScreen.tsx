@@ -25,7 +25,11 @@ const VehicleDetailScreen = () => {
         .select(`
           *,
           make:vehicle_makes(id, name_hebrew, name_english),
-          model:vehicle_models(id, name_hebrew, name_english)
+          model:vehicle_models(id, name_hebrew, name_english),
+          vehicle_listing_tags(
+            tag_id,
+            tag:vehicle_tags(id, name_hebrew, name_english, color, tag_type)
+          )
         `)
         .eq('id', id)
         .single();
@@ -231,7 +235,7 @@ const VehicleDetailScreen = () => {
             {vehicle.engine_size && (
               <div>
                 <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
-                <p className="font-medium text-foreground">{vehicle.engine_size}</p>
+                <p className="font-medium text-foreground hebrew-text">{vehicle.engine_size.toLocaleString()} סמ״ק</p>
               </div>
             )}
             {vehicle.sub_model && (
@@ -269,6 +273,66 @@ const VehicleDetailScreen = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Tags Section */}
+      {vehicle.vehicle_listing_tags && vehicle.vehicle_listing_tags.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="hebrew-text">תגיות</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {vehicle.vehicle_listing_tags.map((vlt: any) => (
+                <Badge
+                  key={vlt.tag.id}
+                  style={{ 
+                    backgroundColor: vlt.tag.color || '#6B7280',
+                    borderColor: vlt.tag.color || '#6B7280'
+                  }}
+                  className="text-white"
+                >
+                  {vlt.tag.name_hebrew}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Vehicle Condition & History */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="hebrew-text">מצב ורקע הרכב</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground hebrew-text">תאונה חמורה</p>
+              <p className="font-medium text-foreground hebrew-text">
+                {vehicle.had_severe_crash ? 'כן' : 'לא'}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
+              <p className="font-medium text-foreground">{vehicle.previous_owners || '-'}</p>
+            </div>
+          </div>
+          
+          {vehicle.test_result_file_url && (
+            <div className="pt-2 border-t">
+              <p className="text-sm text-muted-foreground hebrew-text mb-2">קובץ תוצאות טסט</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full hebrew-text"
+                onClick={() => window.open(vehicle.test_result_file_url, '_blank')}
+              >
+                צפה בקובץ הטסט
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Seller Information */}
       <Card>

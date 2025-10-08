@@ -190,6 +190,54 @@ interface VehicleFilterDrawerProps {
 />
 ```
 
+### VehicleDetailScreen (`src/pages/mobile/VehicleDetailScreen.tsx`)
+**Purpose**: Display comprehensive vehicle information for other users' listings with seller contact
+
+**Features**:
+- **Data Fetching**: Joins `vehicle_makes`, `vehicle_models`, `vehicle_listing_tags` with nested `vehicle_tags`
+- **Image Carousel**: Full-width display with navigation and status badge
+- **Comprehensive Details**: 
+  - Technical specifications (מפרט טכני)
+  - Engine size displayed as "XXX סמ״ק" for cubic centimeters
+  - Description (תיאור) - optional
+  - Color-coded tags (תגיות) - optional
+  - Vehicle condition & history (מצב ורקע הרכב)
+  - Severe crash status (תאונה חמורה)
+  - Previous owners count (בעלים קודמים)
+  - Test result file viewer (קובץ תוצאות טסט)
+- **Seller Contact**: Avatar, name, and message button
+- **RTL Support**: Full Hebrew interface with proper text flow
+
+**Query Pattern**:
+```typescript
+const { data: vehicle } = useQuery({
+  queryKey: ['vehicle-detail', id],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from('vehicle_listings')
+      .select(`
+        *,
+        make:vehicle_makes(id, name_hebrew, name_english),
+        model:vehicle_models(id, name_hebrew, name_english),
+        vehicle_listing_tags(
+          tag_id,
+          tag:vehicle_tags(id, name_hebrew, name_english, color, tag_type)
+        )
+      `)
+      .eq('id', id)
+      .single();
+    return data;
+  }
+});
+```
+
+**Display Pattern**:
+- Cards for each section (specifications, description, tags, condition, seller)
+- Grid layout (2 columns) for technical specifications
+- Color-coded badges for tags using `style` prop with database colors
+- Conditional rendering for optional fields
+- Test result file opens in new tab via `window.open()`
+
 ---
 
 ## Design System Tokens

@@ -341,14 +341,56 @@ Display all system notifications with enhanced categorization per PRD requiremen
 **File**: `src/pages/mobile/VehicleDetailScreen.tsx`
 
 #### Purpose
-Comprehensive vehicle information with enhanced PRD features.
+Display comprehensive vehicle information for other users' listings with seller contact options.
 
-#### Enhanced Features
-- Boost status and boost option
-- Create auction option
-- Enhanced vehicle specifications per PRD data model
-- Anonymous chat initiation
-- Report vehicle/owner functionality
+#### Layout Requirements
+- RTL mobile interface with proper Hebrew text alignment
+- Fixed header with back navigation
+- Image carousel with navigation dots and status badge
+- Scrollable content area with organized card sections
+
+#### Components
+1. **Vehicle Images Carousel:**
+   - Full-width image display with navigation arrows (RTL layout)
+   - Image indicator dots at bottom
+   - Status badge overlay (זמין/נמכר)
+
+2. **Vehicle Title & Price Card:**
+   - Large title: Make Model Year in Hebrew
+   - Prominent price display with "ניתן למשא ומתן" subtitle
+   - Quick stats icons: Year, Kilometers
+
+3. **Technical Specifications Card (מפרט טכני):**
+   - Grid layout (2 columns) displaying:
+     - שנת ייצור, קילומטרז׳
+     - תיבת הילוכים (אוטומט/ידנית/טיפטרוניק)
+     - סוג דלק (בנזין/דיזל/היברידי/חשמלי)
+     - נפח מנוע displayed as "XXX סמ״ק"
+     - סוג, צבע, בעלים קודמים (if provided)
+
+4. **Description Card (תיאור):**
+   - Displayed only if description exists
+   - Full-width text block with RTL text flow
+
+5. **Tags Card (תגיות):**
+   - Displayed only if vehicle has tags
+   - Color-coded badges matching database tag colors
+   - Flex wrap layout showing Hebrew tag names
+
+6. **Vehicle Condition & History Card (מצב ורקע הרכב):**
+   - תאונה חמורה (Severe crash): כן/לא
+   - בעלים קודמים (Previous owners count)
+   - Test result file viewer button (if file exists)
+
+7. **Seller Information Card (פרטי המוכר):**
+   - Avatar with seller initial
+   - Business/full name display
+   - "שלח הודעה" button - navigates to chat
+
+#### Data Fetching
+- Fetch vehicle with joined `vehicle_makes`, `vehicle_models`
+- Fetch `vehicle_listing_tags` with nested `vehicle_tags` for color-coded display
+- Fetch owner profile for seller information display
 
 ## 7. Profile Screen (`/mobile/profile`)
 **File**: `src/pages/mobile/MyProfileScreen.tsx`
