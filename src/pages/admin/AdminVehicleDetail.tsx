@@ -1,85 +1,49 @@
-import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Car, Edit, Eye, MapPin, Calendar, User, Loader2 } from "lucide-react";
+import { ArrowRight, Car, Edit, Calendar, User, Loader2, AlertTriangle, Download, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { formatDistanceToNow } from 'date-fns';
+import { he } from 'date-fns/locale';
+import { useAdminVehicles } from '@/hooks/admin';
 
 const AdminVehicleDetail = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
+  const { useAdminVehicle } = useAdminVehicles();
 
-  const { data: vehicle, isLoading } = useQuery({
-    queryKey: ['admin-vehicle', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('vehicle_listings')
-        .select(`
-          *,
-          make:vehicle_makes(name_hebrew, name_english),
-          model:vehicle_models(name_hebrew, name_english)
-        `)
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: ownerProfile } = useQuery({
-    queryKey: ['vehicle-owner', vehicle?.owner_id],
-    enabled: !!vehicle?.owner_id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('full_name, business_name')
-        .eq('id', vehicle!.owner_id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: vehicleTags } = useQuery({
-    queryKey: ['vehicle-tags', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('vehicle_listing_tags')
-        .select(`
-          tag_id,
-          tag:vehicle_tags(*)
-        `)
-        .eq('vehicle_id', id);
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: vehicle, isLoading } = useAdminVehicle(id);
 
   const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, string> = {
-      'available': 'זמין',
-      'sold': 'נמכר',
-      'pending': 'בהמתנה',
+    const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+      available: { label: "זמין", variant: "default" },
+      sold: { label: "נמכר", variant: "secondary" },
+      pending: { label: "ממתין", variant: "outline" },
+      removed: { label: "הוסר", variant: "destructive" }
     };
-    const hebrewStatus = statusMap[status] || status;
-    
-    switch (status) {
-      case "available":
-        return <Badge variant="default" className="hebrew-text">{hebrewStatus}</Badge>;
-      case "sold":
-        return <Badge variant="secondary" className="hebrew-text">{hebrewStatus}</Badge>;
-      case "pending":
-        return <Badge variant="outline" className="hebrew-text">{hebrewStatus}</Badge>;
-      default:
-        return <Badge variant="secondary" className="hebrew-text">{hebrewStatus}</Badge>;
-    }
+
+    const statusInfo = statusMap[status] || { label: status, variant: "outline" as const };
+    return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
+  };
+
+  const getFuelTypeLabel = (fuelType: string | null) => {
+    const fuelMap: Record<string, string> = {
+      gasoline: "בנזין",
+      diesel: "דיזל",
+      hybrid: "היברידי",
+      electric: "חשמלי"
+    };
+    return fuelMap[fuelType || ''] || fuelType || '-';
+  };
+
+  const getTransmissionLabel = (transmission: string | null) => {
+    const transMap: Record<string, string> = {
+      manual: "ידנית",
+      automatic: "אוטומט",
+      semi_automatic: "טיפטרוניק"
+    };
+    return transMap[transmission || ''] || transmission || '-';
   };
 
   if (isLoading) {
@@ -115,48 +79,58 @@ const AdminVehicleDetail = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setIsEditing(!isEditing)}
-            className="hebrew-text"
-          >
+          <Button onClick={() => navigate(`/admin/vehicles/${id}/edit`)}>
             <Edit className="h-4 w-4 ml-2" />
-            {isEditing ? "בטל עריכה" : "ערוך פרטי רכב"}
-          </Button>
-          <Button className="hebrew-text">
-            <Eye className="h-4 w-4 ml-2" />
-            צפה כמו לקוח
+            ערוך
           </Button>
         </div>
       </div>
 
-      {/* Vehicle Summary */}
+      {/* Summary Card */}
       <Card>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" dir="rtl">
-            <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center">
-              <Car className="h-16 w-16 text-muted-foreground" />
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground hebrew-text">מחיר</p>
+              <p className="text-2xl font-bold hebrew-text">₪{vehicle.price?.toLocaleString()}</p>
             </div>
-            
-            <div className="md:col-span-2 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="text-right">
-                  <h2 className="text-2xl font-bold hebrew-text">₪{vehicle.price.toLocaleString()}</h2>
-                  <p className="text-muted-foreground hebrew-text">{vehicle.kilometers.toLocaleString()} ק״מ</p>
-                </div>
-                {getStatusBadge(vehicle.status)}
+            <div>
+              <p className="text-sm text-muted-foreground hebrew-text">קילומטרז׳</p>
+              <p className="text-lg font-semibold hebrew-text">{vehicle.kilometers?.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground hebrew-text">שנה</p>
+              <p className="text-lg font-semibold hebrew-text">{vehicle.year}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground hebrew-text">סטטוס</p>
+              <div className="flex gap-2 items-center">
+                {getStatusBadge(vehicle.status || 'available')}
+                {vehicle.had_severe_crash && (
+                  <Badge variant="destructive" className="flex gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    תאונה
+                  </Badge>
+                )}
+                {vehicle.is_boosted && vehicle.boosted_until && new Date(vehicle.boosted_until) > new Date() && (
+                  <Badge className="flex gap-1 bg-amber-500">
+                    <Zap className="h-3 w-3" />
+                    מודגש
+                  </Badge>
+                )}
               </div>
-              
-              <div className="grid grid-cols-2 gap-4 text-sm text-right">
-                <div className="flex items-center gap-2 justify-end">
-                  <span className="hebrew-text">{ownerProfile?.business_name || ownerProfile?.full_name}</span>
-                  <User className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div className="flex items-center gap-2 justify-end">
-                  <span className="hebrew-text">נוסף: {new Date(vehicle.created_at).toLocaleDateString('he-IL')}</span>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </div>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground hebrew-text">בעלים</p>
+              <p className="text-lg hebrew-text">{vehicle.owner?.business_name || vehicle.owner?.full_name || '-'}</p>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t">
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4 ml-2" />
+              <span className="hebrew-text">
+                נוסף {formatDistanceToNow(new Date(vehicle.created_at), { addSuffix: true, locale: he })}
+              </span>
             </div>
           </div>
         </CardContent>
@@ -174,68 +148,103 @@ const AdminVehicleDetail = () => {
         <TabsContent value="details" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text text-right">מפרט טכני</CardTitle>
+              <CardTitle className="hebrew-text">מפרט טכני</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4 text-right">
-                {vehicle.engine_size && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground hebrew-text">יצרן</p>
+                  <p className="font-medium hebrew-text">{vehicle.make?.name_hebrew}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground hebrew-text">דגם</p>
+                  <p className="font-medium hebrew-text">{vehicle.model?.name_hebrew}</p>
+                </div>
+                {vehicle.sub_model && (
                   <div>
-                    <h4 className="font-medium hebrew-text">נפח מנוע</h4>
-                    <p className="text-muted-foreground">{vehicle.engine_size}L</p>
-                  </div>
-                )}
-                {vehicle.transmission && (
-                  <div>
-                    <h4 className="font-medium hebrew-text">תיבת הילוכים</h4>
-                    <p className="text-muted-foreground hebrew-text">{vehicle.transmission}</p>
-                  </div>
-                )}
-                {vehicle.fuel_type && (
-                  <div>
-                    <h4 className="font-medium hebrew-text">סוג דלק</h4>
-                    <p className="text-muted-foreground hebrew-text">{vehicle.fuel_type}</p>
-                  </div>
-                )}
-                {vehicle.color && (
-                  <div>
-                    <h4 className="font-medium hebrew-text">צבע</h4>
-                    <p className="text-muted-foreground hebrew-text">{vehicle.color}</p>
+                    <p className="text-sm text-muted-foreground hebrew-text">תת דגם</p>
+                    <p className="font-medium hebrew-text">{vehicle.sub_model}</p>
                   </div>
                 )}
                 <div>
-                  <h4 className="font-medium hebrew-text">בעלים קודמים</h4>
-                  <p className="text-muted-foreground">{vehicle.previous_owners}</p>
+                  <p className="text-sm text-muted-foreground hebrew-text">שנה</p>
+                  <p className="font-medium">{vehicle.year}</p>
                 </div>
+                <div>
+                  <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
+                  <p className="font-medium hebrew-text">{vehicle.color || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground hebrew-text">סוג דלק</p>
+                  <p className="font-medium hebrew-text">{getFuelTypeLabel(vehicle.fuel_type)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
+                  <p className="font-medium hebrew-text">{getTransmissionLabel(vehicle.transmission)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
+                  <p className="font-medium hebrew-text">{vehicle.engine_size ? `${vehicle.engine_size}L` : '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
+                  <p className="font-medium">{vehicle.previous_owners || 1}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground hebrew-text">תאונה חמורה</p>
+                  <p className="font-medium hebrew-text">{vehicle.had_severe_crash ? 'כן' : 'לא'}</p>
+                </div>
+                {vehicle.is_boosted && vehicle.boosted_until && (
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">מודגש עד</p>
+                    <p className="font-medium hebrew-text">
+                      {new Date(vehicle.boosted_until).toLocaleDateString('he-IL')}
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
 
-          {vehicle.description && (
+          {vehicle.test_result_file_url && (
             <Card>
               <CardHeader>
-                <CardTitle className="hebrew-text text-right">תיאור</CardTitle>
+                <CardTitle className="hebrew-text">תוצאות טסט</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground hebrew-text text-right">{vehicle.description}</p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.open(vehicle.test_result_file_url, '_blank')}
+                  className="hebrew-text"
+                >
+                  <Download className="h-4 w-4 ml-2" />
+                  הורד קובץ טסט
+                </Button>
               </CardContent>
             </Card>
           )}
 
-          {vehicleTags && vehicleTags.length > 0 && (
+          {vehicle.description && (
             <Card>
               <CardHeader>
-                <CardTitle className="hebrew-text text-right">תגיות</CardTitle>
+                <CardTitle className="hebrew-text">תיאור</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2 justify-end">
-                  {vehicleTags.map((vt: any) => (
-                    <Badge 
-                      key={vt.tag_id} 
-                      variant="outline" 
-                      className="hebrew-text"
-                      style={{ backgroundColor: vt.tag?.color }}
-                    >
-                      {vt.tag?.name_hebrew}
+                <p className="text-muted-foreground hebrew-text whitespace-pre-wrap">{vehicle.description}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {vehicle.tags && vehicle.tags.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="hebrew-text">תגיות</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {vehicle.tags.map((tag: any) => (
+                    <Badge key={tag.id} variant="secondary" style={{ backgroundColor: tag.color }}>
+                      {tag.name_hebrew}
                     </Badge>
                   ))}
                 </div>
@@ -244,19 +253,19 @@ const AdminVehicleDetail = () => {
           )}
         </TabsContent>
 
-        <TabsContent value="seller" className="space-y-4">
+        <TabsContent value="seller">
           <Card>
             <CardHeader>
-              <CardTitle className="hebrew-text">פרטי מוכר</CardTitle>
+              <CardTitle className="hebrew-text">מידע על המוכר</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-2">
               <div>
-                <h4 className="font-medium hebrew-text">שם מלא</h4>
-                <p className="text-muted-foreground hebrew-text">{ownerProfile?.full_name}</p>
+                <p className="text-sm text-muted-foreground hebrew-text">שם מלא</p>
+                <p className="font-medium hebrew-text">{vehicle.owner?.full_name || '-'}</p>
               </div>
               <div>
-                <h4 className="font-medium hebrew-text">שם עסק</h4>
-                <p className="text-muted-foreground hebrew-text">{ownerProfile?.business_name}</p>
+                <p className="text-sm text-muted-foreground hebrew-text">שם עסק</p>
+                <p className="font-medium hebrew-text">{vehicle.owner?.business_name || '-'}</p>
               </div>
             </CardContent>
           </Card>

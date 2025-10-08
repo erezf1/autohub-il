@@ -51,6 +51,8 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsersList from "./pages/admin/AdminUsersList";
 import AdminVehiclesList from "./pages/admin/AdminVehiclesList";
 import AdminVehicleDetail from "./pages/admin/AdminVehicleDetail";
+import AdminEditVehicle from "./pages/admin/AdminEditVehicle";
+import AdminAddVehicle from "./pages/admin/AdminAddVehicle";
 import AdminVehicleRequestsList from "./pages/admin/AdminVehicleRequestsList";
 import AdminAuctionsList from "./pages/admin/AdminAuctionsList";
 import AdminSupportTickets from "./pages/admin/AdminSupportTickets";
@@ -63,7 +65,6 @@ import AdminVehicleRequestDetail from "./pages/admin/AdminVehicleRequestDetail";
 import AdminAuctionDetail from "./pages/admin/AdminAuctionDetail";
 import AdminSupportTicketDetail from "./pages/admin/AdminSupportTicketDetail";
 import AdminNotifications from "./pages/admin/AdminNotifications";
-import AdminAddVehicle from "./pages/admin/AdminAddVehicle";
 import EditVehicleScreen from "./pages/mobile/EditVehicleScreen";
 
 const queryClient = new QueryClient();
@@ -97,6 +98,7 @@ const App = () => (
                     <Route path="vehicles" element={<AdminVehiclesList />} />
                     <Route path="vehicles/create" element={<AdminAddVehicle />} />
                     <Route path="vehicles/:id" element={<AdminVehicleDetail />} />
+                    <Route path="vehicles/:id/edit" element={<AdminEditVehicle />} />
                     <Route path="vehicle-requests" element={<AdminVehicleRequestsList />} />
                     <Route path="vehicle-requests/:id" element={<AdminVehicleRequestDetail />} />
                     <Route path="auctions" element={<AdminAuctionsList />} />
