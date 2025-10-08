@@ -142,3 +142,19 @@ export const useVehicleModels = (makeId?: number) => {
     enabled: !!makeId,
   });
 };
+
+export const useVehicleTags = () => {
+  return useQuery({
+    queryKey: ['vehicle-tags'],
+    queryFn: async () => {
+      const { data, error } = await dealerClient
+        .from('vehicle_tags')
+        .select('*')
+        .eq('is_active', true)
+        .order('name_hebrew');
+
+      if (error) throw error;
+      return data;
+    },
+  });
+};

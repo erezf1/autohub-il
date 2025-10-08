@@ -1,119 +1,147 @@
 import { useState } from "react";
-import { Search, Filter, Car, Loader2 } from "lucide-react";
+import { Search, Filter, ArrowRight, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/mobile/useVehicles";
+import { VehicleFilterDrawer } from "@/components/mobile/VehicleFilterDrawer";
+import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from "@/utils/mobile/vehicleFilters";
 import darkCarImage from "@/assets/dark_car.png";
-
-const quickFilters = [
-  "רכבי יוקרה",
-  "אופנועים",
-  "מתחת ל-200,000",
-  "היברידי"
-];
 
 const CarSearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [filters, setFilters] = useState<VehicleFilters>({});
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const navigate = useNavigate();
   const { vehicles, isLoading } = useVehicles();
 
-  const filteredResults = vehicles?.filter(vehicle => {
-    const makeModel = `${vehicle.make?.name_hebrew || ''} ${vehicle.model?.name_hebrew || ''}`;
-    const matchesSearch = makeModel.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         vehicle.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const vehiclePrice = parseFloat(vehicle.price.toString());
-    const matchesFilter = !activeFilter || 
-      (activeFilter === "רכבי יוקרה" && vehiclePrice > 400000) ||
-      (activeFilter === "מתחת ל-200,000" && vehiclePrice < 200000) ||
-      (activeFilter === "היברידי" && vehicle.fuel_type === 'hybrid');
-    
-    return matchesSearch && matchesFilter;
-  }) || [];
+  const filteredResults = applyVehicleFilters(
+    vehicles || [],
+    filters,
+    searchQuery
+  );
+
+  const activeFilterCount = getActiveFilterCount(filters);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground hebrew-text">חיפוש רכב</h1>
-        <Button variant="outline" onClick={() => navigate('/mobile/my-vehicles')}>
+    <div className="space-y-4" dir="rtl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => navigate('/mobile/dashboard')}
+          >
+            <ArrowRight className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-bold text-foreground hebrew-text">חיפוש רכבים</h1>
+        </div>
+        <Button 
+          variant="outline"
+          onClick={() => navigate('/mobile/my-vehicles')}
+        >
           הרכבים שלי
         </Button>
       </div>
-      
-      <div className="flex items-center space-x-2 space-x-reverse">
-        <div className="relative flex-1">
+
+      {/* Search and Filter */}
+      <div className="flex gap-2">
+        <div className="flex-1 relative">
           <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="חפש לפי יצרן, דגם..."
+            placeholder="חפש לפי יצרן, דגם או שנה..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-10 hebrew-text"
+            className="pr-10"
           />
         </div>
-        <Button variant="outline" size="icon">
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={() => setFilterDrawerOpen(true)}
+          className="relative"
+        >
           <Filter className="h-4 w-4" />
+          {activeFilterCount > 0 && (
+            <Badge 
+              className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
+              variant="destructive"
+            >
+              {activeFilterCount}
+            </Badge>
+          )}
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {quickFilters.map((filter) => (
-          <Badge
-            key={filter}
-            variant={activeFilter === filter ? "default" : "secondary"}
-            className="cursor-pointer hebrew-text"
-            onClick={() => setActiveFilter(activeFilter === filter ? null : filter)}
+      {/* Active Filters Display */}
+      {activeFilterCount > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm text-muted-foreground hebrew-text">
+            {activeFilterCount} פילטרים פעילים
+          </span>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setFilters({})}
           >
-            {filter}
-          </Badge>
-        ))}
-      </div>
+            נקה הכל
+          </Button>
+        </div>
+      )}
 
+      {/* Results */}
       <p className="text-sm text-muted-foreground hebrew-text">
-        מציג {filteredResults.length} תוצאות
+        נמצאו {filteredResults.length} רכבים
       </p>
 
       {isLoading ? (
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
         <div className="space-y-3">
-          {filteredResults.map((vehicle) => {
-            const transmissionLabel = vehicle.transmission === 'automatic' ? 'אוטומט' : 
-                                     vehicle.transmission === 'manual' ? 'ידנית' : 'טיפטרוניק';
-            const fuelLabel = vehicle.fuel_type === 'gasoline' ? 'בנזין' :
-                             vehicle.fuel_type === 'diesel' ? 'דיזל' :
-                             vehicle.fuel_type === 'hybrid' ? 'היברידי' : 'חשמלי';
-            
+          {filteredResults.map((car) => {
+            const transmissionLabel = car.transmission === 'automatic' ? 'אוטומט' : 
+                                     car.transmission === 'manual' ? 'ידנית' : 'טיפטרוניק';
+            const fuelLabel = car.fuel_type === 'gasoline' ? 'בנזין' :
+                             car.fuel_type === 'diesel' ? 'דיזל' :
+                             car.fuel_type === 'hybrid' ? 'היברידי' : 'חשמלי';
+
             return (
               <Card 
-                key={vehicle.id}
+                key={car.id}
                 className="card-interactive cursor-pointer"
-                onClick={() => navigate(`/mobile/vehicle/${vehicle.id}`)}
+                onClick={() => navigate(`/mobile/vehicle/${car.id}`)}
               >
                 <CardContent className="p-0">
                   <div className="flex h-32">
                     <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-r-lg">
                       <img
-                        src={vehicle.images?.[0] || darkCarImage}
-                        alt={`${vehicle.make?.name_hebrew} ${vehicle.model?.name_hebrew}`}
+                        src={car.images?.[0] || darkCarImage}
+                        alt={`${car.make?.name_hebrew} ${car.model?.name_hebrew}`}
                         className="w-full h-full object-cover"
                       />
+                      {car.is_boosted && (
+                        <Badge className="absolute top-2 left-2 bg-yellow-500">
+                          מבוסט
+                        </Badge>
+                      )}
                     </div>
 
-                    <div className="flex-1 p-4 flex flex-col justify-center">
-                      <h3 className="font-semibold text-foreground hebrew-text mb-1">
-                        {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
-                      </h3>
-                      <p className="text-sm text-muted-foreground hebrew-text mb-2">
-                        {vehicle.kilometers?.toLocaleString()} ק״מ • {transmissionLabel} • {fuelLabel}
-                      </p>
+                    <div className="flex-1 p-4 flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-semibold text-foreground hebrew-text mb-1">
+                          {car.make?.name_hebrew} {car.model?.name_hebrew} {car.year}
+                        </h3>
+                        <p className="text-sm text-muted-foreground hebrew-text">
+                          {car.kilometers?.toLocaleString()} ק״מ • {transmissionLabel} • {fuelLabel}
+                        </p>
+                      </div>
                       <p className="text-lg font-bold text-primary hebrew-text">
-                        {parseFloat(vehicle.price.toString()).toLocaleString()} ₪
+                        {parseFloat(car.price.toString()).toLocaleString()} ₪
                       </p>
                     </div>
                   </div>
@@ -121,9 +149,16 @@ const CarSearchScreen = () => {
               </Card>
             );
           })}
-
         </div>
       )}
+
+      {/* Filter Drawer */}
+      <VehicleFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        currentFilters={filters}
+        onApplyFilters={setFilters}
+      />
     </div>
   );
 };

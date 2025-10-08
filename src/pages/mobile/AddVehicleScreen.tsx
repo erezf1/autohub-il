@@ -83,7 +83,7 @@ const AddVehicleScreen = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     } else {
-      navigate("/mobile");
+      navigate("/mobile/my-vehicles");
     }
   };
 

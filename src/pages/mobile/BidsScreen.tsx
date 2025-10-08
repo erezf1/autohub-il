@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-// import MobileLayout from '@/components/mobile/MobileLayout'; // <--- This line is removed
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Gavel, Clock, TrendingUp, Plus, Eye, Users } from 'lucide-react';
+import { Gavel, Clock, Filter, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
+import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
 import darkCarImage from "@/assets/dark_car.png";
 
 // Mock data for bids and auctions
@@ -104,6 +105,15 @@ const getBidStatusText = (status: string) => {
 export const BidsScreen: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("active-auctions");
+  const [filters, setFilters] = useState<VehicleFilters>({});
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+
+  const filteredActiveAuctions = applyVehicleFilters(
+    mockActiveAuctions,
+    filters
+  );
+
+  const activeFilterCount = getActiveFilterCount(filters);
 
   return (
     // The MobileLayout component is replaced with a div
@@ -117,6 +127,42 @@ export const BidsScreen: React.FC = () => {
         </TabsList>
 
           <TabsContent value="active-auctions" className="space-y-4">
+            {/* Filter Button */}
+            <div className="flex justify-end">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setFilterDrawerOpen(true)}
+                className="relative gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                סנן מכרזים
+                {activeFilterCount > 0 && (
+                  <Badge 
+                    className="h-5 w-5 p-0 flex items-center justify-center text-xs"
+                    variant="destructive"
+                  >
+                    {activeFilterCount}
+                  </Badge>
+                )}
+              </Button>
+            </div>
+
+            {/* Active Filters Display */}
+            {activeFilterCount > 0 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-muted-foreground hebrew-text">
+                  {activeFilterCount} פילטרים פעילים
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setFilters({})}
+                >
+                  נקה הכל
+                </Button>
+              </div>
+            )}
 
             {/* My Bids Section First */}
             <div>
@@ -175,9 +221,9 @@ export const BidsScreen: React.FC = () => {
 
             {/* All Other Auctions */}
             <div>
-              <h3 className="font-medium mb-3 text-right">כל המכרזים</h3>
+              <h3 className="font-medium mb-3 text-right">כל המכרזים ({filteredActiveAuctions.length})</h3>
               <div className="space-y-3">
-                {mockActiveAuctions.map((auction) => (
+                {filteredActiveAuctions.map((auction) => (
                   <Card
                     key={auction.id}
                     className="p-4 cursor-pointer hover:shadow-md transition-shadow"
@@ -311,6 +357,14 @@ export const BidsScreen: React.FC = () => {
             )}
           </TabsContent>
       </Tabs>
+
+      {/* Filter Drawer */}
+      <VehicleFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        currentFilters={filters}
+        onApplyFilters={setFilters}
+      />
     </div>
   );
 };

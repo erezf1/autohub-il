@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-// import MobileLayout from '@/components/mobile/MobileLayout'; // <--- This line is removed
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Flame, Clock, TrendingUp, Zap, Plus } from 'lucide-react';
+import { Flame, Clock, TrendingUp, Zap, Plus, Search, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
+import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
 import darkCarImage from "@/assets/dark_car.png";
 
 // Mock data for boosted vehicles
@@ -54,6 +56,17 @@ const mockBoostedVehicles = [
 export const HotCarsScreen: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("hot-cars");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<VehicleFilters>({});
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+
+  const filteredBoostedVehicles = applyVehicleFilters(
+    mockBoostedVehicles,
+    filters,
+    searchQuery
+  );
+
+  const activeFilterCount = getActiveFilterCount(filters);
 
   return (
     // The MobileLayout component has been replaced with a div
@@ -73,10 +86,59 @@ export const HotCarsScreen: React.FC = () => {
               </div>
             </div>
 
+            {/* Search and Filter */}
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="חפש ברכבים חמים..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pr-10"
+                />
+              </div>
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setFilterDrawerOpen(true)}
+                className="relative"
+              >
+                <Filter className="h-4 w-4" />
+                {activeFilterCount > 0 && (
+                  <Badge 
+                    className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                    variant="destructive"
+                  >
+                    {activeFilterCount}
+                  </Badge>
+                )}
+              </Button>
+            </div>
+
+            {/* Active Filters Display */}
+            {activeFilterCount > 0 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-muted-foreground hebrew-text">
+                  {activeFilterCount} פילטרים פעילים
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setFilters({})}
+                >
+                  נקה הכל
+                </Button>
+              </div>
+            )}
+
 
             {/* Boosted Vehicles List */}
+            <p className="text-sm text-muted-foreground hebrew-text">
+              נמצאו {filteredBoostedVehicles.length} רכבים מבוסטים
+            </p>
+
             <div className="space-y-4">
-              {mockBoostedVehicles.map((vehicle) => (
+              {filteredBoostedVehicles.map((vehicle) => (
                 <Card
                   key={vehicle.id}
                   className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border-orange-200 relative"
@@ -246,6 +308,14 @@ export const HotCarsScreen: React.FC = () => {
             </Card>
           </TabsContent>
       </Tabs>
+
+      {/* Filter Drawer */}
+      <VehicleFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        currentFilters={filters}
+        onApplyFilters={setFilters}
+      />
     </div>
   );
 };
