@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { useToast } from '@/hooks/use-toast';
 
 export const useAdminVehicles = () => {
@@ -10,7 +10,7 @@ export const useAdminVehicles = () => {
     queryKey: ['admin-vehicles'],
     queryFn: async () => {
       // First fetch vehicles with make and model
-      const { data: vehiclesData, error: vehiclesError } = await supabase
+      const { data: vehiclesData, error: vehiclesError } = await adminClient
         .from('vehicle_listings')
         .select(`
           *,
@@ -24,7 +24,7 @@ export const useAdminVehicles = () => {
 
       // Fetch owner profiles separately
       const ownerIds = [...new Set(vehiclesData.map(v => v.owner_id).filter(Boolean))];
-      const { data: profilesData, error: profilesError } = await supabase
+      const { data: profilesData, error: profilesError } = await adminClient
         .from('user_profiles')
         .select('id, full_name, business_name')
         .in('id', ownerIds);
@@ -42,7 +42,7 @@ export const useAdminVehicles = () => {
 
   const addVehicleMutation = useMutation({
     mutationFn: async (vehicleData: any) => {
-      const { data, error } = await supabase.functions.invoke('admin-add-vehicle', {
+      const { data, error } = await adminClient.functions.invoke('admin-add-vehicle', {
         body: vehicleData,
       });
 

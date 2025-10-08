@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { cleanPhoneNumber, phoneToEmail, isValidIsraeliPhone } from '@/utils/phoneValidation';
 
 interface AdminAuthContextType {
@@ -22,7 +22,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const checkAdminRole = async (userId: string) => {
     try {
-      const { data: roles, error } = await supabase
+      const { data: roles, error } = await adminClient
         .from('user_roles')
         .select('role')
         .eq('user_id', userId);
@@ -41,8 +41,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = adminClient.auth.onAuthStateChange(
       async (event, currentSession) => {
+        console.log('Admin auth state changed:', event, currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
@@ -57,7 +58,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
+    adminClient.auth.getSession().then(async ({ data: { session: currentSession } }) => {
+      console.log('Initial admin session:', currentSession?.user?.id);
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
 
@@ -81,7 +83,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       // Convert phone to email format for Supabase
       const email = phoneToEmail(cleanedPhone);
       
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await adminClient.auth.signInWithPassword({
         email,
         password,
       });
@@ -103,7 +105,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await adminClient.auth.signOut();
     setUser(null);
     setSession(null);
     setIsAdmin(false);

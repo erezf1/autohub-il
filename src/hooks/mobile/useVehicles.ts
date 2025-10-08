@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { useToast } from '@/hooks/use-toast';
 
 export interface VehicleInput {
@@ -27,7 +27,7 @@ export const useVehicles = () => {
   const { data: vehicles, isLoading, error } = useQuery({
     queryKey: ['vehicles'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_listings')
         .select(`
           *,
@@ -46,10 +46,10 @@ export const useVehicles = () => {
   const { data: myVehicles } = useQuery({
     queryKey: ['my-vehicles'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await dealerClient.auth.getUser();
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_listings')
         .select(`
           *,
@@ -67,10 +67,10 @@ export const useVehicles = () => {
   // Add new vehicle
   const addVehicleMutation = useMutation({
     mutationFn: async (vehicleData: VehicleInput) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await dealerClient.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_listings')
         .insert([{ ...vehicleData, owner_id: user.id }])
         .select()
@@ -111,7 +111,7 @@ export const useVehicleMakes = () => {
   return useQuery({
     queryKey: ['vehicle-makes'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_makes')
         .select('*')
         .eq('is_active', true)
@@ -129,7 +129,7 @@ export const useVehicleModels = (makeId?: number) => {
     queryFn: async () => {
       if (!makeId) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_models')
         .select('*')
         .eq('make_id', makeId)

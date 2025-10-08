@@ -56,36 +56,6 @@ export const LoginScreen: React.FC = () => {
           <div className="w-16"></div>
         </div>
         <Card className="w-full p-6 space-y-6">
-          {user && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-3">
-              <p className="text-sm text-blue-900 dark:text-blue-100 text-center font-medium">
-                אתה כבר מחובר למערכת
-              </p>
-              <div className="flex gap-2">
-                <Button 
-                  onClick={() => navigate("/mobile/dashboard")}
-                  variant="default"
-                  size="sm"
-                  className="flex-1"
-                >
-                  מעבר לדשבורד
-                </Button>
-                <Button 
-                  onClick={async () => {
-                    await signOut();
-                    setPhoneNumber("");
-                    setPassword("");
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                >
-                  התנתק
-                </Button>
-              </div>
-            </div>
-          )}
-          
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold">התחברות למערכת</h2>
             <p className="text-muted-foreground text-sm">

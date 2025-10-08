@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useProfile = () => {
@@ -10,7 +10,7 @@ export const useProfile = () => {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('user_profiles')
         .select(`
           *,
@@ -30,7 +30,7 @@ export const useProfile = () => {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('users')
         .select('status')
         .eq('id', user.id)

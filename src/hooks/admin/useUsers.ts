@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -9,7 +10,7 @@ export const useUsers = (searchTerm?: string, statusFilter?: string) => {
     queryKey: ['admin-users', searchTerm, statusFilter],
     queryFn: async () => {
       // Fetch users first (without relying on implicit FK-based joins)
-      let usersQuery = supabase
+      let usersQuery = adminClient
         .from('users')
         .select('*')
         .order('created_at', { ascending: false });
@@ -24,7 +25,7 @@ export const useUsers = (searchTerm?: string, statusFilter?: string) => {
 
       // Fetch related profiles separately and merge on the client
       const userIds = usersData.map((u: any) => u.id);
-      const { data: profilesData, error: profilesError } = await supabase
+      const { data: profilesData, error: profilesError } = await adminClient
         .from('user_profiles')
         .select('id, full_name, business_name, subscription_type, location_id')
         .in('id', userIds);
@@ -55,7 +56,7 @@ export const useUser = (userId: string) => {
     queryKey: ['admin-user', userId],
     queryFn: async () => {
       // Fetch base user
-      const { data: userData, error: userError } = await supabase
+      const { data: userData, error: userError } = await adminClient
         .from('users')
         .select('*')
         .eq('id', userId)
@@ -66,12 +67,12 @@ export const useUser = (userId: string) => {
 
       // Fetch profile and roles in parallel (avoid implicit joins)
       const [profileRes, rolesRes] = await Promise.all([
-        supabase
+        adminClient
           .from('user_profiles')
           .select('*')
           .eq('id', userId)
           .maybeSingle(),
-        supabase
+        adminClient
           .from('user_roles')
           .select('role')
           .eq('user_id', userId),
@@ -98,7 +99,7 @@ export const useUpdateUserStatus = () => {
 
   return useMutation({
     mutationFn: async ({ userId, status }: { userId: string; status: string }) => {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('users')
         .update({ status })
         .eq('id', userId);
@@ -139,7 +140,7 @@ export const useUpdateUserProfile = () => {
     }) => {
       // Update phone number if provided
       if (phoneNumber) {
-        const { error: phoneError } = await supabase
+        const { error: phoneError } = await adminClient
           .from('users')
           .update({ phone_number: phoneNumber })
           .eq('id', userId);
@@ -148,7 +149,7 @@ export const useUpdateUserProfile = () => {
       }
 
       // Update profile data
-      const { error: profileError } = await supabase
+      const { error: profileError } = await adminClient
         .from('user_profiles')
         .update(profileData)
         .eq('id', userId);
