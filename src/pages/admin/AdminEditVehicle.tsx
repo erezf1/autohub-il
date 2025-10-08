@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { adminClient } from '@/integrations/supabase/adminClient';
 import { useToast } from '@/hooks/use-toast';
 import { useVehicleMakes, useVehicleModels } from '@/hooks/mobile/useVehicles';
+// Vehicle type constants for dropdown
 import { VEHICLE_TYPES } from '@/constants/vehicleTypes';
 
 const fuelTypes = [
