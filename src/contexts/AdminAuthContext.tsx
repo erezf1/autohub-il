@@ -8,7 +8,7 @@ interface AdminAuthContextType {
   session: Session | null;
   isAdmin: boolean;
   isLoading: boolean;
-  signIn: (phone: string, password: string) => Promise<{ error: any }>;
+  signIn: (phone: string, password: string) => Promise<{ error: any; isAdmin: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -75,20 +75,30 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       // Validate phone format
       const cleanedPhone = cleanPhoneNumber(phone);
       if (!isValidIsraeliPhone(cleanedPhone)) {
-        return { error: { message: 'מספר טלפון לא תקין. יש להזין 10 ספרות המתחילות ב-05' } };
+        return { error: { message: 'מספר טלפון לא תקין. יש להזין 10 ספרות המתחילות ב-05' }, isAdmin: false };
       }
 
       // Convert phone to email format for Supabase
       const email = phoneToEmail(cleanedPhone);
       
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      return { error };
+      if (error) {
+        return { error, isAdmin: false };
+      }
+
+      // Wait for admin role check to complete
+      if (data.user) {
+        const hasAdminAccess = await checkAdminRole(data.user.id);
+        return { error: null, isAdmin: hasAdminAccess };
+      }
+
+      return { error: null, isAdmin: false };
     } catch (error) {
-      return { error };
+      return { error, isAdmin: false };
     }
   };
 

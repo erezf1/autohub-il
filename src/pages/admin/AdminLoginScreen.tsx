@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,14 @@ export default function AdminLoginScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn } = useAdminAuth();
+  const { signIn, user, isAdmin } = useAdminAuth();
+
+  // Navigate to admin dashboard when user is authenticated and confirmed as admin
+  useEffect(() => {
+    if (user && isAdmin && !isLoading) {
+      navigate('/admin', { replace: true });
+    }
+  }, [user, isAdmin, isLoading, navigate]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -28,7 +35,7 @@ export default function AdminLoginScreen() {
     e.preventDefault();
     setIsLoading(true);
 
-    const { error } = await signIn(phone, password);
+    const { error, isAdmin: hasAdminAccess } = await signIn(phone, password);
 
     if (error) {
       toast.error('שגיאה בהתחברות', {
@@ -40,9 +47,16 @@ export default function AdminLoginScreen() {
       return;
     }
 
-    toast.success('התחברת בהצלחה');
-    navigate('/admin');
-    setIsLoading(false);
+    if (!hasAdminAccess) {
+      toast.error('אין הרשאות גישה', {
+        description: 'למשתמש זה אין הרשאות מנהל או תמיכה',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    toast.success('מאמת הרשאות...');
+    // Keep loading state - useEffect will handle navigation when isAdmin is confirmed
   };
 
   return (
