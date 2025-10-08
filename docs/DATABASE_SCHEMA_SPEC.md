@@ -176,7 +176,7 @@ CREATE TABLE public.vehicle_listings (
   kilometers INTEGER CHECK (kilometers >= 0),
   transmission TEXT CHECK (transmission IN ('manual', 'automatic', 'semi_automatic')),
   fuel_type TEXT CHECK (fuel_type IN ('gasoline', 'diesel', 'hybrid', 'electric')),
-  engine_size DECIMAL(3,1), -- Engine size in liters
+  engine_size NUMERIC, -- Engine size in cubic centimeters (cc), no upper limit
   color TEXT,
   price DECIMAL(10,2) NOT NULL CHECK (price > 0),
   description TEXT,

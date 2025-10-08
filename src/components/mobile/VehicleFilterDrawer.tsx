@@ -82,6 +82,8 @@ export const VehicleFilterDrawer = ({
 
   const handleReset = () => {
     setLocalFilters({});
+    onApplyFilters({});
+    onOpenChange(false);
   };
 
   const handleApply = () => {
@@ -91,7 +93,7 @@ export const VehicleFilterDrawer = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh]" dir="rtl">
+      <DrawerContent className="max-h-[90vh] w-full" dir="rtl">
         <DrawerHeader>
           <DrawerTitle className="text-right hebrew-text">סינון רכבים</DrawerTitle>
         </DrawerHeader>

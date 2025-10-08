@@ -79,22 +79,56 @@ Display waiting state during admin approval process.
 
 ## Main Application Screens
 
-### 6. Car Search Screen (`/mobile/search`)
+### 6. Car Search Screen (`/mobile/search` or `/mobile/car-search`)
 **File**: `src/pages/mobile/CarSearchScreen.tsx`
 
 #### Purpose
-Browse and search available vehicles in marketplace.
+Browse and search available vehicles from OTHER dealers in the marketplace. **EXCLUDES user's own vehicles.**
+
+#### Search Behavior
+- **CRITICAL**: Search results automatically exclude the current user's own vehicles
+- Query implementation: `.neq('owner_id', userId)` in `useVehicles()` hook
+- User's own vehicles are accessible only through "My Vehicles" screen (`/mobile/my-vehicles`)
+- Displays only vehicles owned by other dealers
 
 #### Layout Requirements
-- **Search Bar**: RTL placeholder "חיפוש רכב"
-- **Quick Filters**: "עד ₪50,000", "אחרי תאונה", "רכבי יוקרה", "אופנועים"
-- **Results Grid**: Vehicle cards with boost indicators
+- **Header**: Page title with back button and "My Vehicles" link
+- **Search Bar**: Real-time search with RTL placeholder "חפש לפי יצרן, דגם או שנה..."
+- **Filter Button**: Icon button with active filter count badge
+- **Active Filters Display**: Shows applied filter count with "Clear All" button
+- **Results Counter**: Hebrew text showing number of matching vehicles
+- **Vehicle Cards**: Scrollable list with comprehensive vehicle information
 
 #### Components Needed
-- Advanced search with filters
-- Vehicle cards showing boost status
-- Empty state for no results
-- Pull to refresh functionality
+- Search input with icon (right-aligned for RTL)
+- Full-width filter drawer (see VehicleFilterDrawer specifications below)
+- Vehicle result cards displaying:
+  - Vehicle image with boosted badge
+  - Make, model, year (Hebrew)
+  - Kilometers, transmission type, fuel type
+  - Price in ILS (₪)
+  - Click to navigate to vehicle detail
+- Active filter badges with count
+- "Clear All" button that resets all filters
+- Loading states
+
+#### VehicleFilterDrawer Specifications
+- **Component**: `src/components/mobile/VehicleFilterDrawer.tsx`
+- **Width**: Full mobile screen width (`w-full`)
+- **Max Height**: 90vh for scrollable content
+- **RTL Support**: `dir="rtl"` for proper Hebrew layout
+- **Filter Categories**:
+  - Make (יצרן): Dropdown with "הכל" option
+  - Model (דגם): Dependent on make selection
+  - Year Range (שנת ייצור): From/To inputs
+  - Price Range (מחיר): From/To inputs
+  - Tags (תגיות): Interactive badge selection
+- **Clear All Button**: 
+  - Resets all filters to empty state
+  - Immediately applies changes via `onApplyFilters({})`
+  - Auto-closes drawer via `onOpenChange(false)`
+  - Returns user to search screen in one action
+- **Apply Button**: Closes drawer and applies selected filters
 
 ### 7. Required Cars Screen (`/mobile/required-cars`)
 **File**: `src/pages/mobile/RequiredCarsScreen.tsx`
@@ -192,7 +226,9 @@ Manage dealer's personal vehicle inventory separately from marketplace search.
 ### Add/Edit Vehicle Screens
 **Files**: `src/pages/mobile/AddVehicleScreen.tsx`, `src/pages/mobile/EditVehicleScreen.tsx`
 
-#### Vehicle Type Field
+#### Shared Field Specifications
+
+**Vehicle Type Field**
 - **Field Name**: "סוג" (Type)
 - **Input Type**: Dropdown/Select with 7 predefined categories
 - **Options** (from `src/constants/vehicleTypes.ts`):
@@ -203,9 +239,43 @@ Manage dealer's personal vehicle inventory separately from marketplace search.
   - SUV (suv)
   - יוקרתי (luxury)
   - ספורט (sport)
-- **Required**: Yes
+- **Required**: Optional
 - **RTL Support**: Hebrew labels with proper text alignment
 - **Search/Filter**: Vehicle type is filterable in search screens using these categories
+
+**Engine Size Field**
+- **Field Name**: "נפח מנוע" (Engine Size)
+- **Input Type**: Numeric input
+- **Unit**: Cubic centimeters (סמ"ק / cc)
+- **Placeholder**: "1600 סמ״ק"
+- **Validation**: Accepts any positive number (no upper limit)
+- **Database**: Stored as NUMERIC type to support values like 5000cc, 10000cc
+- **Required**: Optional
+
+**Tags Field (Edit Vehicle Screen Only)**
+- **Field Name**: "תגיות" (Tags)
+- **Location**: Separate Card after description field, before images section
+- **Input Type**: Interactive badge selection
+- **Data Source**: `vehicle_tags` table via `useVehicleTags()` hook
+- **Display**: 
+  - Color-coded badges from database (`tag.color` field or default #6B7280)
+  - Selected tags show filled badge with tag color
+  - Unselected tags show outline badge
+  - Flex-wrap layout for multi-row display
+- **Interaction**: Click/tap to toggle selection
+- **State Management**: 
+  - Component state: `selectedTagIds: number[]`
+  - Loads existing tags on mount from `vehicle_listing_tags` table
+  - Updates local state array on toggle
+- **Database Operations**:
+  - On save: Deletes all existing tags for vehicle, then inserts new selection
+  - Uses `vehicle_listing_tags` junction table
+- **RTL Support**: Proper Hebrew text in badges
+
+#### Edit Vehicle Screen Specific Features
+- **Model Dropdown Fix**: Uses `key={`model-${selectedMakeId}`}` to force re-render when make changes
+- **Tags Section**: Full Card component with interactive badge selection
+- **Pre-populated Data**: Loads vehicle data and existing tags on mount via separate useEffect hooks
 
 ### 12. Create ISO Request Screen (`/mobile/create-iso-request`)
 **File**: `src/pages/mobile/CreateISORequestScreen.tsx`

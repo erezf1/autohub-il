@@ -126,7 +126,9 @@ This section details the core entities of the system and defines the viewing and
 | SubModel         | Enum (7 types)  | All                   | Owner, Admin       | Vehicle category: micro, mini, family, executive, suv, luxury, sport. Displayed as dropdown with Hebrew labels. |
 | Year             | Number          | All                   | Owner, Admin       |                                 |
 | Kilometers       | Number          | All                   | Owner, Admin       |                                 |
-| Transmission     | Enum            | All                   | Owner, Admin       |                                 |
+| Transmission     | Enum            | All                   | Owner, Admin       | Manual, Automatic, Tiptronic.   |
+| FuelType         | Enum            | All                   | Owner, Admin       | Gasoline, Diesel, Hybrid, Electric. |
+| EngineSize       | NUMERIC         | All                   | Owner, Admin       | Engine size in cubic centimeters (cc), no upper limit. Database stores as NUMERIC type. |
 | Price            | Number          | All                   | Owner, Admin       |                                 |
 | Description      | Text            | All                   | Owner, Admin       |                                 |
 | Images           | Array of URLs   | All                   | Owner, Admin       |                                 |

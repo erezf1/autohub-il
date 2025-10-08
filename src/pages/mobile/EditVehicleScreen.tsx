@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useVehicleMakes, useVehicleModels } from "@/hooks/mobile/useVehicles";
+import { Badge } from "@/components/ui/badge";
+import { useVehicleMakes, useVehicleModels, useVehicleTags } from "@/hooks/mobile/useVehicles";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { useToast } from '@/hooks/use-toast';
@@ -38,6 +39,7 @@ const EditVehicleScreen = () => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [formData, setFormData] = useState({
     make_id: "",
     model_id: "",
@@ -55,6 +57,7 @@ const EditVehicleScreen = () => {
   
   const { data: makes } = useVehicleMakes();
   const { data: models } = useVehicleModels(selectedMakeId);
+  const { data: availableTags } = useVehicleTags();
 
   // Fetch vehicle data
   const { data: vehicle, isLoading } = useQuery({
@@ -85,7 +88,7 @@ const EditVehicleScreen = () => {
         price: vehicle.price?.toString() || "",
         fuelType: vehicle.fuel_type || "",
         transmission: vehicle.transmission || "",
-        engineSize: vehicle.engine_size?.toString() || "1600",
+        engineSize: vehicle.engine_size?.toString() || "",
         color: vehicle.color || "",
         previousOwners: vehicle.previous_owners?.toString() || "1",
         description: vehicle.description || "",
@@ -93,6 +96,24 @@ const EditVehicleScreen = () => {
       });
     }
   }, [vehicle]);
+
+  // Load vehicle tags
+  useEffect(() => {
+    const loadTags = async () => {
+      if (!id) return;
+      
+      const { data: vehicleTags } = await dealerClient
+        .from('vehicle_listing_tags')
+        .select('tag_id')
+        .eq('vehicle_id', id);
+      
+      if (vehicleTags) {
+        setSelectedTagIds(vehicleTags.map(vt => vt.tag_id));
+      }
+    };
+    
+    loadTags();
+  }, [id]);
 
   // Update vehicle mutation
   const updateVehicleMutation = useMutation({
@@ -142,7 +163,7 @@ const EditVehicleScreen = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -170,7 +191,33 @@ const EditVehicleScreen = () => {
       sub_model: formData.vehicleType || null,
     };
 
-    updateVehicleMutation.mutate(vehicleData);
+    try {
+      // Update vehicle
+      await updateVehicleMutation.mutateAsync(vehicleData);
+      
+      // Update tags
+      await dealerClient
+        .from('vehicle_listing_tags')
+        .delete()
+        .eq('vehicle_id', id);
+      
+      if (selectedTagIds.length > 0) {
+        await dealerClient
+          .from('vehicle_listing_tags')
+          .insert(
+            selectedTagIds.map(tagId => ({
+              vehicle_id: id,
+              tag_id: tagId
+            }))
+          );
+      }
+    } catch (error: any) {
+      toast({
+        title: 'שגיאה בעדכון',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -287,6 +334,7 @@ const EditVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">דגם *</Label>
               <Select
+                key={`model-${selectedMakeId}`}
                 value={formData.model_id}
                 onValueChange={(value) => {
                   setFormData({ ...formData, model_id: value });
@@ -423,12 +471,13 @@ const EditVehicleScreen = () => {
               <Label className="hebrew-text">נפח מנוע (סמ"ק)</Label>
               <Input
                 type="text"
+                inputMode="numeric"
                 value={formData.engineSize}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9]/g, '');
                   setFormData({ ...formData, engineSize: value });
                 }}
-                placeholder="1600"
+                placeholder="1600 סמ״ק"
               />
             </div>
 
@@ -505,9 +554,45 @@ const EditVehicleScreen = () => {
                 className="hebrew-text min-h-[120px]"
               />
             </div>
+          </CardContent>
+        </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle className="hebrew-text">תגיות</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {availableTags?.map(tag => (
+                <Badge
+                  key={tag.id}
+                  variant={selectedTagIds.includes(tag.id) ? "default" : "outline"}
+                  className="cursor-pointer"
+                  style={selectedTagIds.includes(tag.id) ? { 
+                    backgroundColor: tag.color || '#6B7280',
+                    borderColor: tag.color || '#6B7280'
+                  } : {}}
+                  onClick={() => {
+                    setSelectedTagIds(prev => 
+                      prev.includes(tag.id)
+                        ? prev.filter(id => id !== tag.id)
+                        : [...prev, tag.id]
+                    );
+                  }}
+                >
+                  {tag.name_hebrew}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="hebrew-text">תמונות רכב</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div>
-              <Label className="hebrew-text">תמונות רכב</Label>
               <input
                 type="file"
                 multiple

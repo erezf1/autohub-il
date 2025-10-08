@@ -452,7 +452,8 @@ const AddVehicleScreen = () => {
               <Label className="hebrew-text">נפח מנוע (סמ"ק)</Label>
               <Input
                 type="text"
-                placeholder="1600"
+                inputMode="numeric"
+                placeholder="1600 סמ״ק"
                 value={formData.engineSize}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9]/g, '');

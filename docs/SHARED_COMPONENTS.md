@@ -138,6 +138,60 @@ import { adminClient } from '@/integrations/supabase/adminClient';
 
 ---
 
+## Mobile-Specific Components
+
+### VehicleFilterDrawer (`src/components/mobile/VehicleFilterDrawer.tsx`)
+**Purpose**: Full-screen mobile filter drawer for vehicle search with RTL support
+
+**Features**:
+- **Full-Width Design**: Spans entire mobile screen width (`w-full`) for optimal UX
+- **Max Height**: 90vh for scrollable content
+- **Filter Categories**: 
+  - Make (יצרן): Dropdown with "הכל" (all) option
+  - Model (דגם): Dependent on make selection, disabled until make is selected
+  - Year Range (שנת ייצור): From/To numeric inputs
+  - Price Range (מחיר): From/To numeric inputs  
+  - Tags (תגיות): Interactive badge selection with color coding
+- **State Management**: 
+  - Local state synchronized with parent component
+  - Uses "all" value instead of empty string for Select "All" options
+  - Handles make/model dependencies correctly
+- **RTL Support**: Full Hebrew interface with `dir="rtl"`
+- **Clear All Behavior**: 
+  - Resets all filters to empty state (`{}`)
+  - Immediately applies changes via `onApplyFilters({})`
+  - Auto-closes drawer via `onOpenChange(false)`
+  - Returns user to main search screen in one action
+
+**Props Interface**:
+```typescript
+interface VehicleFilterDrawerProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  currentFilters: VehicleFilters;
+  onApplyFilters: (filters: VehicleFilters) => void;
+}
+```
+
+**Implementation Details**:
+- Uses `Drawer` component from shadcn/ui (vaul library)
+- `DrawerContent` styled with `max-h-[90vh] w-full`
+- Select dropdowns use "all" value for "הכל" options (not empty string)
+- Handler functions convert "all" to `undefined` for filter state
+- Footer buttons: "אפס הכל" (Reset All) and "החל פילטרים" (Apply Filters)
+
+**Usage Example**:
+```typescript
+<VehicleFilterDrawer
+  open={filterDrawerOpen}
+  onOpenChange={setFilterDrawerOpen}
+  currentFilters={filters}
+  onApplyFilters={setFilters}
+/>
+```
+
+---
+
 ## Design System Tokens
 
 ### Color System (`src/index.css`)

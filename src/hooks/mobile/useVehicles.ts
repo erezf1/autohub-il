@@ -23,11 +23,14 @@ export const useVehicles = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch all available vehicles
+  // Fetch all available vehicles (excluding own vehicles)
   const { data: vehicles, isLoading, error } = useQuery({
     queryKey: ['vehicles'],
     queryFn: async () => {
-      const { data, error } = await dealerClient
+      const { data: { user } } = await dealerClient.auth.getUser();
+      const userId = user?.id;
+
+      const query = dealerClient
         .from('vehicle_listings')
         .select(`
           *,
@@ -36,6 +39,13 @@ export const useVehicles = () => {
         `)
         .eq('status', 'available')
         .order('created_at', { ascending: false });
+
+      // Exclude own vehicles if user is authenticated
+      if (userId) {
+        query.neq('owner_id', userId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data;
