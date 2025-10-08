@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { adminClient } from '@/integrations/supabase/adminClient';
 import { useToast } from '@/hooks/use-toast';
 import { useVehicleMakes, useVehicleModels } from '@/hooks/mobile/useVehicles';
+import { VEHICLE_TYPES } from '@/constants/vehicleTypes';
 
 const fuelTypes = [
   { value: "gasoline", label: "בנזין" },
@@ -50,6 +51,7 @@ const AdminAddVehicle = () => {
     color: "",
     previousOwners: "1",
     description: "",
+    vehicleType: "",
   });
   
   const { data: makes } = useVehicleMakes();
@@ -174,6 +176,7 @@ const AdminAddVehicle = () => {
       previous_owners: formData.previousOwners ? parseInt(formData.previousOwners) : 1,
       status: 'available',
       images: uploadedImages.length > 0 ? uploadedImages : null,
+      sub_model: formData.vehicleType || null,
     };
 
     addVehicle(vehicleData);
@@ -261,6 +264,23 @@ const AdminAddVehicle = () => {
                   <SelectContent>
                     {models?.map(model => (
                       <SelectItem key={model.id} value={model.id.toString()}>{model.name_hebrew}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="hebrew-text">סוג</Label>
+                <Select
+                  value={formData.vehicleType}
+                  onValueChange={(value) => setFormData({ ...formData, vehicleType: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="בחר סוג רכב" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VEHICLE_TYPES.map(type => (
+                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

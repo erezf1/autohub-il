@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDistanceToNow } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { useAdminVehicles } from '@/hooks/admin';
+import { getVehicleTypeLabel } from '@/constants/vehicleTypes';
 
 const AdminVehicleDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -162,8 +163,8 @@ const AdminVehicleDetail = () => {
                 </div>
                 {vehicle.sub_model && (
                   <div>
-                    <p className="text-sm text-muted-foreground hebrew-text">תת דגם</p>
-                    <p className="font-medium hebrew-text">{vehicle.sub_model}</p>
+                    <p className="text-sm text-muted-foreground hebrew-text">סוג</p>
+                    <p className="font-medium hebrew-text">{getVehicleTypeLabel(vehicle.sub_model)}</p>
                   </div>
                 )}
                 <div>

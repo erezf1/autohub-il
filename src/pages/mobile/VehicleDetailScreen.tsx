@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import darkCarImage from "@/assets/dark_car.png";
 import { useState } from "react";
+import { getVehicleTypeLabel } from "@/constants/vehicleTypes";
 
 const VehicleDetailScreen = () => {
   const { id } = useParams();
@@ -231,6 +232,12 @@ const VehicleDetailScreen = () => {
               <div>
                 <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
                 <p className="font-medium text-foreground">{vehicle.engine_size}</p>
+              </div>
+            )}
+            {vehicle.sub_model && (
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">סוג</p>
+                <p className="font-medium text-foreground hebrew-text">{getVehicleTypeLabel(vehicle.sub_model)}</p>
               </div>
             )}
             {vehicle.color && (

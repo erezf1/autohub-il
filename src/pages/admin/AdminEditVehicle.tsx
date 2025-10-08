@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { adminClient } from '@/integrations/supabase/adminClient';
 import { useToast } from '@/hooks/use-toast';
 import { useVehicleMakes, useVehicleModels } from '@/hooks/mobile/useVehicles';
+import { VEHICLE_TYPES } from '@/constants/vehicleTypes';
 
 const fuelTypes = [
   { value: "gasoline", label: "בנזין" },
@@ -292,12 +293,20 @@ const AdminEditVehicle = () => {
               </div>
 
               <div>
-                <Label className="hebrew-text">תת דגם</Label>
-                <Input
+                <Label className="hebrew-text">סוג</Label>
+                <Select
                   value={formData.sub_model}
-                  onChange={(e) => setFormData({ ...formData, sub_model: e.target.value })}
-                  placeholder="לדוגמה: Sport, Premium"
-                />
+                  onValueChange={(value) => setFormData({ ...formData, sub_model: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="בחר סוג רכב" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VEHICLE_TYPES.map(type => (
+                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

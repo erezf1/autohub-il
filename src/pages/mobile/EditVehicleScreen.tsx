@@ -11,6 +11,7 @@ import { useVehicleMakes, useVehicleModels } from "@/hooks/mobile/useVehicles";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { useToast } from '@/hooks/use-toast';
+import { VEHICLE_TYPES } from '@/constants/vehicleTypes';
 
 const fuelTypes = [
   { value: "gasoline", label: "בנזין" },
@@ -49,6 +50,7 @@ const EditVehicleScreen = () => {
     color: "",
     previousOwners: "1",
     description: "",
+    vehicleType: "",
   });
   
   const { data: makes } = useVehicleMakes();
@@ -87,6 +89,7 @@ const EditVehicleScreen = () => {
         color: vehicle.color || "",
         previousOwners: vehicle.previous_owners?.toString() || "1",
         description: vehicle.description || "",
+        vehicleType: vehicle.sub_model || "",
       });
     }
   }, [vehicle]);
@@ -164,6 +167,7 @@ const EditVehicleScreen = () => {
       description: formData.description,
       previous_owners: formData.previousOwners ? parseInt(formData.previousOwners) : 1,
       images: uploadedImages.length > 0 ? uploadedImages : null,
+      sub_model: formData.vehicleType || null,
     };
 
     updateVehicleMutation.mutate(vehicleData);
@@ -324,6 +328,20 @@ const EditVehicleScreen = () => {
               {fieldErrors.year && (
                 <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.year}</p>
               )}
+            </div>
+
+            <div>
+              <Label className="hebrew-text">סוג</Label>
+              <Select value={formData.vehicleType} onValueChange={(value) => setFormData({ ...formData, vehicleType: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="בחר סוג רכב" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VEHICLE_TYPES.map(type => (
+                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

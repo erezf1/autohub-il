@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useVehicles, useVehicleMakes, useVehicleModels } from "@/hooks/mobile/useVehicles";
 import { dealerClient } from "@/integrations/supabase/dealerClient";
 import { useToast } from "@/hooks/use-toast";
+import { VEHICLE_TYPES } from "@/constants/vehicleTypes";
 
 const fuelTypes = [
   { value: "gasoline", label: "בנזין" },
@@ -48,6 +49,7 @@ interface VehicleForm {
   description: string;
   features: string[];
   condition: string;
+  vehicleType: string;
 }
 
 const AddVehicleScreen = () => {
@@ -76,7 +78,8 @@ const AddVehicleScreen = () => {
     previousOwners: "1",
     description: "",
     features: [],
-    condition: ""
+    condition: "",
+    vehicleType: ""
   });
 
   const handleBackClick = () => {
@@ -155,6 +158,7 @@ const AddVehicleScreen = () => {
       description: formData.description,
       previous_owners: formData.previousOwners ? parseInt(formData.previousOwners) : 1,
       images: uploadedImages.length > 0 ? uploadedImages : null,
+      sub_model: formData.vehicleType || null,
     };
 
     addVehicle(vehicleData, {
@@ -349,6 +353,20 @@ const AddVehicleScreen = () => {
               {fieldErrors.year && (
                 <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.year}</p>
               )}
+            </div>
+
+            <div>
+              <Label className="hebrew-text">סוג</Label>
+              <Select value={formData.vehicleType} onValueChange={(value) => updateFormData("vehicleType", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="בחר סוג רכב" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VEHICLE_TYPES.map(type => (
+                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
