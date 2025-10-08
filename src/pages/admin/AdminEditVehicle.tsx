@@ -278,6 +278,7 @@ const AdminEditVehicle = () => {
               <div>
                 <Label className="hebrew-text">דגם *</Label>
                 <Select
+                  key={`model-${selectedMakeId}`}
                   value={formData.model_id}
                   onValueChange={(value) => setFormData({ ...formData, model_id: value })}
                   disabled={!selectedMakeId}
@@ -525,24 +526,28 @@ const AdminEditVehicle = () => {
             <CardTitle className="hebrew-text text-right">תגיות</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2 justify-end">
-              {availableTags?.map((tag) => (
-                <Badge
-                  key={tag.id}
-                  variant={selectedTags.includes(tag.id) ? "default" : "outline"}
-                  className="cursor-pointer hebrew-text"
-                  onClick={() => {
-                    setSelectedTags(prev =>
-                      prev.includes(tag.id)
-                        ? prev.filter(id => id !== tag.id)
-                        : [...prev, tag.id]
-                    );
-                  }}
-                >
-                  {tag.name_hebrew}
-                </Badge>
-              ))}
-            </div>
+            {!availableTags || availableTags.length === 0 ? (
+              <p className="text-sm text-muted-foreground hebrew-text text-right">אין תגיות זמינות</p>
+            ) : (
+              <div className="flex flex-wrap gap-2 justify-end">
+                {availableTags.map((tag) => (
+                  <Badge
+                    key={tag.id}
+                    variant={selectedTags.includes(tag.id) ? "default" : "outline"}
+                    className="cursor-pointer hebrew-text"
+                    onClick={() => {
+                      setSelectedTags(prev =>
+                        prev.includes(tag.id)
+                          ? prev.filter(id => id !== tag.id)
+                          : [...prev, tag.id]
+                      );
+                    }}
+                  >
+                    {tag.name_hebrew}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

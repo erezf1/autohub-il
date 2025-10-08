@@ -13,39 +13,55 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-    );
-
     // Verify authentication
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(
-        JSON.stringify({ error: 'Missing authorization header' }),
+        JSON.stringify({ error: 'חסר אימות. אנא התחבר מחדש.' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    // Create client for auth validation (with anon key)
+    const authClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
     if (authError || !user) {
+      console.error('Auth error:', authError);
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'אימות נכשל. אנא התחבר מחדש.' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Create service role client for database operations
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
     // Check admin/support role
-    const { data: roles } = await supabaseClient
+    const { data: roles, error: rolesError } = await supabaseClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id);
 
+    if (rolesError) {
+      console.error('Error fetching roles:', rolesError);
+      return new Response(
+        JSON.stringify({ error: 'שגיאה בבדיקת הרשאות המשתמש' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const isAdmin = roles?.some(r => r.role === 'admin' || r.role === 'support');
     if (!isAdmin) {
       return new Response(
-        JSON.stringify({ error: 'Admin access required' }),
+        JSON.stringify({ error: 'נדרשות הרשאות מנהל לביצוע פעולה זו' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -54,7 +70,14 @@ serve(async (req) => {
 
     if (!vehicleId) {
       return new Response(
-        JSON.stringify({ error: 'Vehicle ID is required' }),
+        JSON.stringify({ error: 'מזהה רכב חסר' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!vehicleData) {
+      return new Response(
+        JSON.stringify({ error: 'חסרים נתוני רכב' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -93,7 +116,14 @@ serve(async (req) => {
       
       if (insertError.code === '23502') {
         return new Response(
-          JSON.stringify({ error: 'חסרים שדות חובה', field: 'required' }),
+          JSON.stringify({ error: 'חסרים שדות חובה. אנא מלא את כל השדות הנדרשים.', field: 'required' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (insertError.code === '23503') {
+        return new Response(
+          JSON.stringify({ error: 'ערך לא חוקי באחד מהשדות. אנא בדוק את הנתונים.', field: 'foreign_key' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -110,8 +140,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in admin-update-vehicle function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'שגיאה לא ידועה';
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: `שגיאה בעדכון הרכב: ${errorMessage}` }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
