@@ -258,7 +258,7 @@ const AdminSupportTicketDetail = () => {
                 <CardHeader>
                   <CardTitle className="hebrew-text text-right">הבקשה המקורית</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent dir="rtl">
                   <div className="space-y-4 text-right">
                     <div>
                       <h4 className="font-medium hebrew-text mb-2">תיאור הבעיה</h4>
@@ -308,8 +308,8 @@ const AdminSupportTicketDetail = () => {
                 <CardHeader>
                   <CardTitle className="hebrew-text text-right">השיחה המקורית</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 max-h-64 overflow-y-auto text-sm">
+                <CardContent dir="rtl">
+                  <div className="space-y-2 max-h-64 overflow-y-auto text-sm text-right">
                     {mockOriginalConversation.map((msg, index) => (
                       <div key={index} className="border-b pb-2">
                         <div className="flex justify-between items-start">

@@ -225,7 +225,7 @@ const AdminAuctionDetail = () => {
               <CardHeader>
                 <CardTitle className="hebrew-text text-right">מפרט טכני</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent dir="rtl">
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4 text-right">
                     <div>
@@ -269,7 +269,7 @@ const AdminAuctionDetail = () => {
               <CardHeader>
                 <CardTitle className="hebrew-text text-right">תיאור ואבזור</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent dir="rtl">
                 <div className="space-y-4 text-right">
                   <div>
                     <h4 className="font-medium hebrew-text mb-2">תיאור</h4>
@@ -296,8 +296,8 @@ const AdminAuctionDetail = () => {
             <CardHeader>
               <CardTitle className="hebrew-text">פרטי המוכר</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
+            <CardContent dir="rtl">
+              <div className="space-y-6 text-right">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
                     <User className="h-8 w-8 text-primary-foreground" />

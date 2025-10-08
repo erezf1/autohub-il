@@ -202,8 +202,8 @@ const AdminUserDetail = () => {
             <CardHeader>
               <CardTitle className="hebrew-text">מידע אישי ועסקי</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent dir="rtl">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-right">
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 flex-row-reverse">
                     <Phone className="h-5 w-5 text-muted-foreground" />

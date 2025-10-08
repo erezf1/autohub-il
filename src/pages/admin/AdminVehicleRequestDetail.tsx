@@ -218,7 +218,7 @@ const AdminVehicleRequestDetail = () => {
             <CardHeader>
               <CardTitle className="hebrew-text text-right">פרטי הבקשה המלאים</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent dir="rtl">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-right" dir="rtl">
                 <div className="space-y-6">
                   <div>
@@ -307,8 +307,8 @@ const AdminVehicleRequestDetail = () => {
             <CardHeader>
               <CardTitle className="hebrew-text">פרטי המבקש</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
+            <CardContent dir="rtl">
+              <div className="space-y-6 text-right">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
                     <User className="h-8 w-8 text-primary-foreground" />

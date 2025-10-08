@@ -13,15 +13,21 @@ export default function AdminLoginScreen() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [allowAutoRedirect, setAllowAutoRedirect] = useState(true);
   const navigate = useNavigate();
   const { signIn, user, isAdmin, isLoading: authLoading } = useAdminAuth();
 
-  // Navigate to admin dashboard when user is authenticated and confirmed as admin
+  // Prevent auto-redirect on mount - user intentionally navigated to login
   useEffect(() => {
-    if (user && isAdmin && !authLoading) {
+    setAllowAutoRedirect(false);
+  }, []);
+
+  // Navigate to admin dashboard only after successful login, not on page load
+  useEffect(() => {
+    if (user && isAdmin && !authLoading && allowAutoRedirect) {
       navigate('/admin', { replace: true });
     }
-  }, [user, isAdmin, authLoading, navigate]);
+  }, [user, isAdmin, authLoading, allowAutoRedirect, navigate]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -56,6 +62,7 @@ export default function AdminLoginScreen() {
     }
 
     toast.success('מאמת הרשאות...');
+    setAllowAutoRedirect(true); // Enable auto-redirect after successful login
     setIsLoading(false);
     // useEffect will handle navigation when isAdmin is confirmed
   };

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { adminClient } from "@/integrations/supabase/adminClient";
 import { toast } from "sonner";
 
 const AdminUserProfile = () => {
@@ -21,7 +21,7 @@ const AdminUserProfile = () => {
     queryFn: async () => {
       if (!user?.id) return null;
       
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('user_profiles')
         .select('full_name, business_name')
         .eq('id', user.id)
@@ -29,6 +29,7 @@ const AdminUserProfile = () => {
       
       if (error) {
         console.error('Profile fetch error:', error);
+        toast.error('שגיאה בטעינת פרטי משתמש');
         return null;
       }
       return data;
@@ -42,13 +43,14 @@ const AdminUserProfile = () => {
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id);
       
       if (error) {
         console.error('Roles fetch error:', error);
+        toast.error('שגיאה בטעינת הרשאות');
         return [];
       }
       return data;
@@ -96,9 +98,12 @@ const AdminUserProfile = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem className="hebrew-text">
+        <DropdownMenuItem 
+          className="hebrew-text text-muted-foreground cursor-not-allowed"
+          disabled
+        >
           <User className="ml-2 h-4 w-4" />
-          הפרופיל שלי
+          הפרופיל שלי (בקרוב)
         </DropdownMenuItem>
         <DropdownMenuItem 
           className="hebrew-text text-destructive"

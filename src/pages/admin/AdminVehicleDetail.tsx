@@ -89,8 +89,8 @@ const AdminVehicleDetail = () => {
 
       {/* Summary Card */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <CardContent className="pt-6" dir="rtl">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-right">
             <div>
               <p className="text-sm text-muted-foreground hebrew-text">מחיר</p>
               <p className="text-2xl font-bold hebrew-text">₪{vehicle.price?.toLocaleString()}</p>
@@ -107,12 +107,6 @@ const AdminVehicleDetail = () => {
               <p className="text-sm text-muted-foreground hebrew-text">סטטוס</p>
               <div className="flex gap-2 items-center">
                 {getStatusBadge(vehicle.status || 'available')}
-                {vehicle.had_severe_crash && (
-                  <Badge variant="destructive" className="flex gap-1">
-                    <AlertTriangle className="h-3 w-3" />
-                    תאונה
-                  </Badge>
-                )}
                 {vehicle.is_boosted && vehicle.boosted_until && new Date(vehicle.boosted_until) > new Date() && (
                   <Badge className="flex gap-1 bg-amber-500">
                     <Zap className="h-3 w-3" />
@@ -121,17 +115,19 @@ const AdminVehicleDetail = () => {
                 )}
               </div>
             </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-right mt-4">
+            <div>
+              <p className="text-sm text-muted-foreground hebrew-text">סוג</p>
+              <p className="text-lg font-semibold hebrew-text">{getVehicleTypeLabel(vehicle.sub_model || 'car')}</p>
+            </div>
             <div>
               <p className="text-sm text-muted-foreground hebrew-text">בעלים</p>
               <p className="text-lg hebrew-text">{vehicle.owner?.business_name || vehicle.owner?.full_name || '-'}</p>
             </div>
-          </div>
-          <div className="mt-4 pt-4 border-t">
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 ml-2" />
-              <span className="hebrew-text">
-                נוסף {formatDistanceToNow(new Date(vehicle.created_at), { addSuffix: true, locale: he })}
-              </span>
+            <div>
+              <p className="text-sm text-muted-foreground hebrew-text">תאריך הוספה</p>
+              <p className="text-lg hebrew-text">{formatDistanceToNow(new Date(vehicle.created_at), { addSuffix: true, locale: he })}</p>
             </div>
           </div>
         </CardContent>
@@ -151,8 +147,8 @@ const AdminVehicleDetail = () => {
             <CardHeader>
               <CardTitle className="hebrew-text">מפרט טכני</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <CardContent dir="rtl">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-right">
                 <div>
                   <p className="text-sm text-muted-foreground hebrew-text">יצרן</p>
                   <p className="font-medium hebrew-text">{vehicle.make?.name_hebrew}</p>
@@ -191,10 +187,6 @@ const AdminVehicleDetail = () => {
                   <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
                   <p className="font-medium">{vehicle.previous_owners || 1}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground hebrew-text">תאונה חמורה</p>
-                  <p className="font-medium hebrew-text">{vehicle.had_severe_crash ? 'כן' : 'לא'}</p>
-                </div>
                 {vehicle.is_boosted && vehicle.boosted_until && (
                   <div>
                     <p className="text-sm text-muted-foreground hebrew-text">מודגש עד</p>
@@ -230,8 +222,8 @@ const AdminVehicleDetail = () => {
               <CardHeader>
                 <CardTitle className="hebrew-text">תיאור</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground hebrew-text whitespace-pre-wrap">{vehicle.description}</p>
+              <CardContent dir="rtl">
+                <p className="text-muted-foreground hebrew-text whitespace-pre-wrap text-right">{vehicle.description}</p>
               </CardContent>
             </Card>
           )}
@@ -241,8 +233,8 @@ const AdminVehicleDetail = () => {
               <CardHeader>
                 <CardTitle className="hebrew-text">תגיות</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
+              <CardContent dir="rtl">
+                <div className="flex flex-wrap gap-2 justify-end">
                   {vehicle.tags.map((tag: any) => (
                     <Badge key={tag.id} variant="secondary" style={{ backgroundColor: tag.color }}>
                       {tag.name_hebrew}
@@ -259,12 +251,12 @@ const AdminVehicleDetail = () => {
             <CardHeader>
               <CardTitle className="hebrew-text">מידע על המוכר</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <div>
+            <CardContent className="space-y-2" dir="rtl">
+              <div className="text-right">
                 <p className="text-sm text-muted-foreground hebrew-text">שם מלא</p>
                 <p className="font-medium hebrew-text">{vehicle.owner?.full_name || '-'}</p>
               </div>
-              <div>
+              <div className="text-right">
                 <p className="text-sm text-muted-foreground hebrew-text">שם עסק</p>
                 <p className="font-medium hebrew-text">{vehicle.owner?.business_name || '-'}</p>
               </div>
