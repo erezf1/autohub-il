@@ -42,18 +42,22 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = adminClient.auth.onAuthStateChange(
-      async (event, currentSession) => {
+      (event, currentSession) => {
         console.log('Admin auth state changed:', event, currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
         if (currentSession?.user) {
-          // Wait for admin role check to complete before setting loading to false
-          await checkAdminRole(currentSession.user.id);
+          // Defer admin role check to avoid blocking
+          setIsLoading(true);
+          setTimeout(async () => {
+            await checkAdminRole(currentSession.user.id);
+            setIsLoading(false);
+          }, 0);
         } else {
           setIsAdmin(false);
+          setIsLoading(false);
         }
-        setIsLoading(false);
       }
     );
 
@@ -74,6 +78,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (phone: string, password: string) => {
     try {
+      // Force logout any existing session first
+      await adminClient.auth.signOut();
+      
       // Validate phone format
       const cleanedPhone = cleanPhoneNumber(phone);
       if (!isValidIsraeliPhone(cleanedPhone)) {

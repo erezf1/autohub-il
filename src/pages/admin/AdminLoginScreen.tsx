@@ -14,14 +14,14 @@ export default function AdminLoginScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn, user, isAdmin } = useAdminAuth();
+  const { signIn, user, isAdmin, isLoading: authLoading } = useAdminAuth();
 
   // Navigate to admin dashboard when user is authenticated and confirmed as admin
   useEffect(() => {
-    if (user && isAdmin && !isLoading) {
+    if (user && isAdmin && !authLoading) {
       navigate('/admin', { replace: true });
     }
-  }, [user, isAdmin, isLoading, navigate]);
+  }, [user, isAdmin, authLoading, navigate]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -56,7 +56,8 @@ export default function AdminLoginScreen() {
     }
 
     toast.success('מאמת הרשאות...');
-    // Keep loading state - useEffect will handle navigation when isAdmin is confirmed
+    setIsLoading(false);
+    // useEffect will handle navigation when isAdmin is confirmed
   };
 
   return (
