@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowRight, Loader2, Upload, X } from "lucide-react";
+import { ArrowRight, Loader2, Upload, X, Plus, Minus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useVehicleMakes, useVehicleModels } from "@/hooks/mobile/useVehicles";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { useToast } from '@/hooks/use-toast';
 
 const fuelTypes = [
@@ -45,7 +45,7 @@ const EditVehicleScreen = () => {
     price: "",
     fuelType: "",
     transmission: "",
-    engineSize: "",
+    engineSize: "1600",
     color: "",
     previousOwners: "1",
     description: "",
@@ -58,7 +58,7 @@ const EditVehicleScreen = () => {
   const { data: vehicle, isLoading } = useQuery({
     queryKey: ['vehicle', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_listings')
         .select('*')
         .eq('id', id)
@@ -83,9 +83,9 @@ const EditVehicleScreen = () => {
         price: vehicle.price?.toString() || "",
         fuelType: vehicle.fuel_type || "",
         transmission: vehicle.transmission || "",
-        engineSize: vehicle.engine_size?.toString() || "",
+        engineSize: vehicle.engine_size?.toString() || "1600",
         color: vehicle.color || "",
-        previousOwners: vehicle.previous_owners?.toString() || "",
+        previousOwners: vehicle.previous_owners?.toString() || "1",
         description: vehicle.description || "",
       });
     }
@@ -94,7 +94,7 @@ const EditVehicleScreen = () => {
   // Update vehicle mutation
   const updateVehicleMutation = useMutation({
     mutationFn: async (data: any) => {
-      const { error } = await supabase
+      const { error } = await dealerClient
         .from('vehicle_listings')
         .update(data)
         .eq('id', id);
@@ -133,7 +133,6 @@ const EditVehicleScreen = () => {
       }
     }
     if (!formData.kilometers) errors.kilometers = "קילומטרז׳ הוא שדה חובה";
-    // fuelType and transmission are now optional
     if (!formData.price) errors.price = "מחיר הוא שדה חובה";
     
     setFieldErrors(errors);
@@ -178,8 +177,16 @@ const EditVehicleScreen = () => {
     const newImageUrls: string[] = [];
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const { data: { user } } = await dealerClient.auth.getUser();
+      if (!user) {
+        toast({
+          title: 'שגיאה',
+          description: 'נדרש להיות מחובר להעלות תמונות',
+          variant: 'destructive',
+        });
+        setUploading(false);
+        return;
+      }
 
       for (const file of Array.from(files)) {
         if (file.size > 5 * 1024 * 1024) {
@@ -194,13 +201,13 @@ const EditVehicleScreen = () => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await dealerClient.storage
           .from('vehicle-images')
           .upload(fileName, file);
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = dealerClient.storage
           .from('vehicle-images')
           .getPublicUrl(fileName);
 
@@ -212,7 +219,7 @@ const EditVehicleScreen = () => {
     } catch (error: any) {
       toast({
         title: 'שגיאה בהעלאת תמונות',
-        description: error.message,
+        description: error?.message || 'אירעה שגיאה בהעלאת התמונות',
         variant: 'destructive',
       });
     } finally {
@@ -364,14 +371,9 @@ const EditVehicleScreen = () => {
               <Label className="hebrew-text">סוג דלק (אופציונלי)</Label>
               <Select 
                 value={formData.fuelType} 
-                onValueChange={(value) => {
-                  setFormData({ ...formData, fuelType: value });
-                  if (fieldErrors.fuelType) {
-                    setFieldErrors({ ...fieldErrors, fuelType: "" });
-                  }
-                }}
+                onValueChange={(value) => setFormData({ ...formData, fuelType: value })}
               >
-                <SelectTrigger className={fieldErrors.fuelType ? "border-destructive" : ""}>
+                <SelectTrigger>
                   <SelectValue placeholder="בחר סוג דלק" />
                 </SelectTrigger>
                 <SelectContent>
@@ -380,23 +382,15 @@ const EditVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
-              {fieldErrors.fuelType && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.fuelType}</p>
-              )}
             </div>
 
             <div>
               <Label className="hebrew-text">תיבת הילוכים (אופציונלי)</Label>
               <Select 
                 value={formData.transmission} 
-                onValueChange={(value) => {
-                  setFormData({ ...formData, transmission: value });
-                  if (fieldErrors.transmission) {
-                    setFieldErrors({ ...fieldErrors, transmission: "" });
-                  }
-                }}
+                onValueChange={(value) => setFormData({ ...formData, transmission: value })}
               >
-                <SelectTrigger className={fieldErrors.transmission ? "border-destructive" : ""}>
+                <SelectTrigger>
                   <SelectValue placeholder="בחר תיבת הילוכים" />
                 </SelectTrigger>
                 <SelectContent>
@@ -405,32 +399,57 @@ const EditVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
-              {fieldErrors.transmission && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.transmission}</p>
-              )}
             </div>
 
             <div>
-              <Label className="hebrew-text">נפח מנוע</Label>
+              <Label className="hebrew-text">נפח מנוע (סמ"ק)</Label>
               <Input
                 type="text"
                 value={formData.engineSize}
-                onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
-                placeholder="2.5L"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  setFormData({ ...formData, engineSize: value });
+                }}
+                placeholder="1600"
               />
             </div>
 
             <div>
               <Label className="hebrew-text">מספר בעלים קודמים</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                value={formData.previousOwners}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, '');
-                  setFormData({ ...formData, previousOwners: value || "1" });
-                }}
-              />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const current = parseInt(formData.previousOwners) || 1;
+                    setFormData({ ...formData, previousOwners: Math.max(0, current - 1).toString() });
+                  }}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  value={formData.previousOwners}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    setFormData({ ...formData, previousOwners: value || "1" });
+                  }}
+                  className="text-center"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const current = parseInt(formData.previousOwners) || 1;
+                    setFormData({ ...formData, previousOwners: (current + 1).toString() });
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -478,17 +497,19 @@ const EditVehicleScreen = () => {
                 onChange={handleImageUpload}
                 disabled={uploading}
                 className="hidden"
-                id="vehicle-images-edit"
+                id="vehicle-images"
               />
-              <label
-                htmlFor="vehicle-images-edit"
-                className="border-2 border-dashed border-muted rounded-lg p-6 text-center block cursor-pointer"
-              >
-                <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground hebrew-text">
-                  {uploading ? 'מעלה...' : 'לחץ להוספת תמונות'}
-                </p>
-              </label>
+              <div className="border-2 border-dashed rounded-lg p-6">
+                <label
+                  htmlFor="vehicle-images"
+                  className="flex flex-col items-center cursor-pointer"
+                >
+                  <Upload className="h-12 w-12 text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground hebrew-text">
+                    {uploading ? 'מעלה...' : 'לחץ להעלאת תמונות'}
+                  </p>
+                </label>
+              </div>
               {uploadedImages.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 mt-4">
                   {uploadedImages.map((url, index) => (
@@ -513,15 +534,8 @@ const EditVehicleScreen = () => {
           <Button type="button" variant="outline" onClick={() => navigate('/mobile/my-vehicles')} className="hebrew-text">
             ביטול
           </Button>
-          <Button type="submit" disabled={updateVehicleMutation.isPending || uploading} className="flex-1 hebrew-text">
-            {updateVehicleMutation.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                שומר...
-              </>
-            ) : (
-              'שמור שינויים'
-            )}
+          <Button type="submit" disabled={updateVehicleMutation.isPending} className="hebrew-text">
+            {updateVehicleMutation.isPending ? 'שומר...' : 'שמור שינויים'}
           </Button>
         </div>
       </form>

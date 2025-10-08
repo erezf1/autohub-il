@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Upload, Car, Plus, X } from "lucide-react";
+import { ArrowRight, Upload, Car, Plus, X, ChevronLeft, Minus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useVehicles, useVehicleMakes, useVehicleModels } from "@/hooks/mobile/useVehicles";
-import { supabase } from "@/integrations/supabase/client";
+import { dealerClient } from "@/integrations/supabase/dealerClient";
 import { useToast } from "@/hooks/use-toast";
 
 const fuelTypes = [
@@ -71,7 +71,7 @@ const AddVehicleScreen = () => {
     price: "",
     fuelType: "",
     transmission: "",
-    engineSize: "",
+    engineSize: "1600",
     color: "",
     previousOwners: "1",
     description: "",
@@ -105,7 +105,6 @@ const AddVehicleScreen = () => {
         break;
       case 2:
         if (!formData.kilometers) errors.kilometers = "קילומטרז׳ הוא שדה חובה";
-        // fuelType and transmission are now optional
         break;
       case 3:
         if (!formData.price) errors.price = "מחיר הוא שדה חובה";
@@ -134,7 +133,7 @@ const AddVehicleScreen = () => {
     
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
-      setFieldErrors({}); // Clear errors when moving to next step
+      setFieldErrors({});
     } else {
       handleSubmit();
     }
@@ -173,8 +172,16 @@ const AddVehicleScreen = () => {
     const newImageUrls: string[] = [];
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const { data: { user } } = await dealerClient.auth.getUser();
+      if (!user) {
+        toast({
+          title: 'שגיאה',
+          description: 'נדרש להיות מחובר להעלות תמונות',
+          variant: 'destructive',
+        });
+        setUploading(false);
+        return;
+      }
 
       for (const file of Array.from(files)) {
         if (file.size > 5 * 1024 * 1024) {
@@ -189,13 +196,13 @@ const AddVehicleScreen = () => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await dealerClient.storage
           .from('vehicle-images')
           .upload(fileName, file);
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = dealerClient.storage
           .from('vehicle-images')
           .getPublicUrl(fileName);
 
@@ -207,7 +214,7 @@ const AddVehicleScreen = () => {
     } catch (error: any) {
       toast({
         title: 'שגיאה בהעלאת תמונות',
-        description: error.message,
+        description: error?.message || 'אירעה שגיאה בהעלאת התמונות',
         variant: 'destructive',
       });
     } finally {
@@ -232,21 +239,6 @@ const AddVehicleScreen = () => {
       updateFormData("features", currentFeatures.filter(f => f !== feature));
     } else {
       updateFormData("features", [...currentFeatures, feature]);
-    }
-  };
-
-  const canProceed = () => {
-    switch (currentStep) {
-      case 1:
-        return formData.brand && formData.model && formData.year;
-      case 2:
-        return formData.kilometers; // fuelType and transmission are now optional
-      case 3:
-        return formData.price && formData.condition;
-      case 4:
-        return formData.description;
-      default:
-        return false;
     }
   };
 
@@ -408,14 +400,9 @@ const AddVehicleScreen = () => {
               <Label className="hebrew-text">סוג דלק (אופציונלי)</Label>
               <Select 
                 value={formData.fuelType}
-                onValueChange={(value) => {
-                  updateFormData("fuelType", value);
-                  if (fieldErrors.fuelType) {
-                    setFieldErrors({ ...fieldErrors, fuelType: "" });
-                  }
-                }}
+                onValueChange={(value) => updateFormData("fuelType", value)}
               >
-                <SelectTrigger className={fieldErrors.fuelType ? "border-destructive" : ""}>
+                <SelectTrigger>
                   <SelectValue placeholder="בחר סוג דלק" />
                 </SelectTrigger>
                 <SelectContent>
@@ -424,23 +411,15 @@ const AddVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
-              {fieldErrors.fuelType && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.fuelType}</p>
-              )}
             </div>
 
             <div>
               <Label className="hebrew-text">תיבת הילוכים (אופציונלי)</Label>
               <Select 
                 value={formData.transmission}
-                onValueChange={(value) => {
-                  updateFormData("transmission", value);
-                  if (fieldErrors.transmission) {
-                    setFieldErrors({ ...fieldErrors, transmission: "" });
-                  }
-                }}
+                onValueChange={(value) => updateFormData("transmission", value)}
               >
-                <SelectTrigger className={fieldErrors.transmission ? "border-destructive" : ""}>
+                <SelectTrigger>
                   <SelectValue placeholder="בחר תיבת הילוכים" />
                 </SelectTrigger>
                 <SelectContent>
@@ -449,33 +428,58 @@ const AddVehicleScreen = () => {
                   ))}
                 </SelectContent>
               </Select>
-              {fieldErrors.transmission && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.transmission}</p>
-              )}
             </div>
 
             <div>
-              <Label className="hebrew-text">נפח מנוע</Label>
+              <Label className="hebrew-text">נפח מנוע (סמ"ק)</Label>
               <Input
                 type="text"
-                placeholder="2.5L"
+                placeholder="1600"
                 value={formData.engineSize}
-                onChange={(e) => updateFormData("engineSize", e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  updateFormData("engineSize", value);
+                }}
               />
             </div>
 
             <div>
               <Label className="hebrew-text">מספר בעלים קודמים</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder="1"
-                value={formData.previousOwners}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, '');
-                  updateFormData("previousOwners", value || "1");
-                }}
-              />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const current = parseInt(formData.previousOwners) || 1;
+                    updateFormData("previousOwners", Math.max(0, current - 1).toString());
+                  }}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="1"
+                  value={formData.previousOwners}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    updateFormData("previousOwners", value || "1");
+                  }}
+                  className="text-center"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const current = parseInt(formData.previousOwners) || 1;
+                    updateFormData("previousOwners", (current + 1).toString());
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -493,7 +497,7 @@ const AddVehicleScreen = () => {
               <Input
                 type="text"
                 inputMode="numeric"
-                placeholder="285000"
+                placeholder="50000"
                 value={formData.price}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9]/g, '');
@@ -521,50 +525,17 @@ const AddVehicleScreen = () => {
                 }}
               >
                 <SelectTrigger className={fieldErrors.condition ? "border-destructive" : ""}>
-                  <SelectValue placeholder="בחר מצב הרכב" />
+                  <SelectValue placeholder="בחר מצב" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="excellent">מעולה</SelectItem>
-                  <SelectItem value="very-good">טוב מאוד</SelectItem>
+                  <SelectItem value="excellent">מצוין</SelectItem>
+                  <SelectItem value="very_good">טוב מאוד</SelectItem>
                   <SelectItem value="good">טוב</SelectItem>
                   <SelectItem value="fair">סביר</SelectItem>
-                  <SelectItem value="needs-work">דורש עבודה</SelectItem>
                 </SelectContent>
               </Select>
               {fieldErrors.condition && (
                 <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.condition}</p>
-              )}
-            </div>
-
-            <div>
-              <Label className="hebrew-text">אביזרים ותוספות</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {availableFeatures.map(feature => (
-                  <div key={feature} className="flex items-center space-x-2 space-x-reverse">
-                    <Checkbox
-                      id={feature}
-                      checked={formData.features.includes(feature)}
-                      onCheckedChange={() => toggleFeature(feature)}
-                    />
-                    <Label htmlFor={feature} className="text-sm hebrew-text">
-                      {feature}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-              
-              {formData.features.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {formData.features.map(feature => (
-                    <Badge key={feature} variant="secondary" className="text-xs hebrew-text">
-                      {feature}
-                      <X 
-                        className="h-3 w-3 mr-1 cursor-pointer"
-                        onClick={() => toggleFeature(feature)}
-                      />
-                    </Badge>
-                  ))}
-                </div>
               )}
             </div>
           </CardContent>
@@ -581,7 +552,7 @@ const AddVehicleScreen = () => {
             <div>
               <Label className="hebrew-text">תיאור הרכב *</Label>
               <Textarea
-                placeholder="תאר את הרכב, מצבו, היסטוריית הטיפולים וכל מידע רלוונטי..."
+                placeholder="תאר את הרכב - מצב כללי, תיקונים שבוצעו, אביזרים נוספים וכו'"
                 value={formData.description}
                 onChange={(e) => {
                   updateFormData("description", e.target.value);
@@ -597,28 +568,45 @@ const AddVehicleScreen = () => {
             </div>
 
             <div>
-              <Label className="hebrew-text">תמונות הרכב</Label>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={uploading}
-                className="hidden"
-                id="vehicle-images"
-              />
-              <label
-                htmlFor="vehicle-images"
-                className="border-2 border-dashed border-muted rounded-lg p-8 text-center block cursor-pointer"
-              >
-                <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground hebrew-text mb-2">
-                  {uploading ? 'מעלה...' : 'גרור תמונות לכאן או לחץ לבחירת קבצים'}
-                </p>
-                <p className="text-sm text-muted-foreground hebrew-text">
-                  מקסימום 10 תמונות, עד 5MB כל תמונה
-                </p>
-              </label>
+              <Label className="hebrew-text">תכונות נוספות</Label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {availableFeatures.map(feature => (
+                  <div key={feature} className="flex items-center space-x-2 space-x-reverse">
+                    <Checkbox 
+                      id={feature}
+                      checked={formData.features.includes(feature)}
+                      onCheckedChange={() => toggleFeature(feature)}
+                    />
+                    <Label htmlFor={feature} className="hebrew-text text-sm cursor-pointer">
+                      {feature}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label className="hebrew-text">תמונות רכב</Label>
+              <div className="border-2 border-dashed rounded-lg p-6">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                  className="hidden"
+                  id="vehicle-images"
+                />
+                <label
+                  htmlFor="vehicle-images"
+                  className="flex flex-col items-center cursor-pointer"
+                >
+                  <Upload className="h-12 w-12 text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground hebrew-text">
+                    {uploading ? 'מעלה...' : 'לחץ להעלאת תמונות'}
+                  </p>
+                </label>
+              </div>
               {uploadedImages.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 mt-4">
                   {uploadedImages.map((url, index) => (
@@ -641,21 +629,23 @@ const AddVehicleScreen = () => {
       )}
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between pt-4">
-        <Button 
-          variant="outline" 
-          onClick={handleBackClick}
-          className="hebrew-text"
-        >
-          {currentStep > 1 ? "חזור" : "ביטול"}
-        </Button>
-        
+      <div className="flex justify-between gap-4">
+        {currentStep > 1 && (
+          <Button 
+            variant="outline" 
+            onClick={() => setCurrentStep(prev => prev - 1)}
+            className="hebrew-text"
+          >
+            חזור
+          </Button>
+        )}
         <Button 
           onClick={handleNext}
-          disabled={!canProceed() || isAddingVehicle || uploading}
-          className="hebrew-text"
+          disabled={isAddingVehicle}
+          className="mr-auto hebrew-text"
         >
-          {isAddingVehicle ? "מפרסם..." : (currentStep < 4 ? "המשך" : "פרסם רכב")}
+          {currentStep === 4 ? (isAddingVehicle ? 'מוסיף...' : 'פרסם רכב') : 'המשך'}
+          <ChevronLeft className="mr-2 h-4 w-4" />
         </Button>
       </div>
     </div>
@@ -663,3 +653,4 @@ const AddVehicleScreen = () => {
 };
 
 export default AddVehicleScreen;
+

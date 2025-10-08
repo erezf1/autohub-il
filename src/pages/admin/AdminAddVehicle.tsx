@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { adminClient } from '@/integrations/supabase/adminClient';
 import { useToast } from '@/hooks/use-toast';
 import { useVehicleMakes, useVehicleModels } from '@/hooks/mobile/useVehicles';
 
@@ -46,7 +46,7 @@ const AdminAddVehicle = () => {
     price: "",
     fuelType: "",
     transmission: "",
-    engineSize: "",
+    engineSize: "1600",
     color: "",
     previousOwners: "1",
     description: "",
@@ -60,7 +60,7 @@ const AdminAddVehicle = () => {
   const { data: users } = useQuery({
     queryKey: ['admin-all-users'],
     queryFn: async () => {
-      const { data: usersData, error: usersError } = await supabase
+      const { data: usersData, error: usersError } = await adminClient
         .from('users')
         .select('id')
         .eq('status', 'active')
@@ -70,7 +70,7 @@ const AdminAddVehicle = () => {
       if (!usersData) return [];
 
       const userIds = usersData.map(u => u.id);
-      const { data: profilesData, error: profilesError } = await supabase
+      const { data: profilesData, error: profilesError } = await adminClient
         .from('user_profiles')
         .select('id, full_name, business_name')
         .in('id', userIds);
@@ -85,7 +85,7 @@ const AdminAddVehicle = () => {
   const { data: availableTags } = useQuery({
     queryKey: ['vehicle-tags'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('vehicle_tags')
         .select('*')
         .eq('is_active', true)
@@ -107,13 +107,13 @@ const AdminAddVehicle = () => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${selectedUserId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError, data } = await adminClient.storage
           .from('vehicle-images')
           .upload(fileName, file);
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = adminClient.storage
           .from('vehicle-images')
           .getPublicUrl(fileName);
 
@@ -125,7 +125,7 @@ const AdminAddVehicle = () => {
     } catch (error: any) {
       toast({
         title: 'שגיאה בהעלאת תמונות',
-        description: error.message,
+        description: error?.message || 'אירעה שגיאה בהעלאת התמונות',
         variant: 'destructive',
       });
     } finally {
