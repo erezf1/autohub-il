@@ -36,12 +36,12 @@ export const VehicleFilterDrawer = ({
   }, [currentFilters]);
 
   const handleMakeChange = (value: string) => {
-    const makeId = value ? parseInt(value) : undefined;
+    const makeId = value === "all" ? undefined : parseInt(value);
     setLocalFilters({ ...localFilters, makeId, modelId: undefined });
   };
 
   const handleModelChange = (value: string) => {
-    const modelId = value ? parseInt(value) : undefined;
+    const modelId = value === "all" ? undefined : parseInt(value);
     setLocalFilters({ ...localFilters, modelId });
   };
 
@@ -101,14 +101,14 @@ export const VehicleFilterDrawer = ({
           <div>
             <Label className="hebrew-text">יצרן</Label>
             <Select 
-              value={localFilters.makeId?.toString() || ""} 
+              value={localFilters.makeId?.toString() || "all"} 
               onValueChange={handleMakeChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder="בחר יצרן" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">הכל</SelectItem>
+                <SelectItem value="all">הכל</SelectItem>
                 {makes?.map(make => (
                   <SelectItem key={make.id} value={make.id.toString()}>
                     {make.name_hebrew}
@@ -122,7 +122,7 @@ export const VehicleFilterDrawer = ({
           <div>
             <Label className="hebrew-text">דגם</Label>
             <Select 
-              value={localFilters.modelId?.toString() || ""} 
+              value={localFilters.modelId?.toString() || "all"} 
               onValueChange={handleModelChange}
               disabled={!localFilters.makeId}
             >
@@ -130,7 +130,7 @@ export const VehicleFilterDrawer = ({
                 <SelectValue placeholder={localFilters.makeId ? "בחר דגם" : "בחר תחילה יצרן"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">הכל</SelectItem>
+                <SelectItem value="all">הכל</SelectItem>
                 {models?.map(model => (
                   <SelectItem key={model.id} value={model.id.toString()}>
                     {model.name_hebrew}
