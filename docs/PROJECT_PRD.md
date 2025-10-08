@@ -123,7 +123,7 @@ This section details the core entities of the system and defines the viewing and
 | VehicleType      | Enum            | All                   | Owner, Admin       | Car or Motorcycle.              |
 | Make             | Text            | All                   | Owner, Admin       |                                 |
 | Model            | Text            | All                   | Owner, Admin       |                                 |
-| SubModel         | Text            | All                   | Owner, Admin       |                                 |
+| SubModel         | Enum (7 types)  | All                   | Owner, Admin       | Vehicle category: micro, mini, family, executive, suv, luxury, sport. Displayed as dropdown with Hebrew labels. |
 | Year             | Number          | All                   | Owner, Admin       |                                 |
 | Kilometers       | Number          | All                   | Owner, Admin       |                                 |
 | Transmission     | Enum            | All                   | Owner, Admin       |                                 |
@@ -175,9 +175,13 @@ A background process will periodically calculate and update dealer ratings based
 # 7. Technical Requirements
 
 - **Platforms:** Cross-platform mobile app (iOS/Android) and a web admin panel.
-- **Authentication:** Passwordless login via OTP.
+- **Authentication:** 
+  - Mobile Users: Passwordless login via OTP
+  - Admin Users: Phone number + 6-digit password with separate session storage
+  - Separate auth clients: `supabase` client for mobile, `adminClient` for admin panel
 - **Real-time:** Chat and auctions must use real-time technology (e.g., WebSockets).
 - **Audit Log:** The system must log all significant user and admin actions (user ID, action type, entity, timestamp).
+- **Shared Components:** Predefined constants for vehicle types and other enumerated values stored in `src/constants/` directory
 
 # 8. MVP Limitations & Clarifications
 

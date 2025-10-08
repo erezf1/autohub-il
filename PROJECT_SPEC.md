@@ -40,7 +40,8 @@ Customer support representatives with limited administrative access:
 **Operations**: Registration, profile updates, status changes, subscription management
 
 ### Vehicle Entity
-**Core Properties**: ID, owner_id, make_id, model_id, year, kilometers, price, transmission, fuel_type, engine_size, color, images
+**Core Properties**: ID, owner_id, make_id, model_id, sub_model (vehicle type category), year, kilometers, price, transmission, fuel_type, engine_size, color, images
+**Vehicle Type (sub_model)**: Predefined categories - micro (מיקרו), mini (מיני), family (משפחתי), executive (מנהלים), suv (SUV), luxury (יוקרתי), sport (ספורט)
 **Status Properties**: status (available/sold/removed), is_boosted, boosted_until, had_severe_crash
 **Metadata**: description, test_result_file, previous_owners, tags (through junction table)
 **Relationships**: 1:Many with auctions, ISO offers; Many:Many with tags
@@ -187,6 +188,10 @@ Customer support representatives with limited administrative access:
 - Utility functions and hooks
 - Common types and interfaces
 - Shared business logic functions
+- **Shared Constants** (`/src/constants/*`):
+  - `vehicleTypes.ts`: 7 predefined vehicle categories with Hebrew labels
+  - Used across mobile and admin for consistent vehicle type selection
+  - Helper function `getVehicleTypeLabel()` for display conversion
 
 ### API Integration
 - Supabase client configuration

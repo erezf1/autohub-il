@@ -3,6 +3,18 @@
 ## Overview
 This document specifies all admin desktop screens for the Auto-Hub application. The admin interface is designed for desktop use with RTL (Hebrew) support and comprehensive management capabilities.
 
+## Admin Authentication
+**File**: `src/pages/admin/AdminLoginScreen.tsx`
+
+### Login Flow
+- **Phone Number + Password**: 6-digit password authentication (not OTP)
+- **Admin Client**: Uses separate auth storage (`adminClient` with storageKey: 'admin-auth')
+- **Auto-Redirect Behavior**: 
+  - Authenticated admins are redirected to dashboard automatically
+  - Intentional navigation to `/admin/login` allows manual re-login without auto-redirect
+  - Prevents login loop while enabling fresh authentication
+- **Session Management**: Separate from mobile dealer sessions
+
 ## Screen Navigation Structure
 ```
 AdminDesktopLayout
@@ -139,13 +151,32 @@ Detailed vehicle information and management.
 
 ### Layout Requirements
 - **Vehicle Gallery**: Image carousel
-- **Specifications Table**: Detailed vehicle specs
+- **Specifications Table**: Detailed vehicle specs with RTL support
 - **Owner Information**: Vehicle owner details
 - **Approval Controls**: Approve/reject vehicle listing
 
+### Summary Card Layout
+- **First Row (4 columns)**: Price, Mileage, Year, Status
+- **Second Row (3 columns)**: Type (סוג), Owner, Creation Date
+- **RTL Styling**: All cards use `dir="rtl"` and `text-right` classes
+- **Vehicle Type**: Displayed with Hebrew label from `vehicleTypes.ts` constants
+- **Removed Fields**: "תאונה חמורה" (severe crash) badge and field removed from summary
+
+### Technical Specifications Section
+- **RTL Grid Layout**: `dir="rtl"` on CardContent and grid containers
+- **Fields Displayed**: 
+  - סוג (Type) - from predefined constants
+  - תיבת הילוכים (Transmission)
+  - סוג דלק (Fuel Type)
+  - נפח מנוע (Engine Size)
+  - צבע (Color)
+  - בעלים קודמים (Previous Owners)
+  - קובץ תוצאות בדיקה (Test Results)
+- **Removed**: "תאונה חמורה" field completely removed
+
 ### Components Needed
 - Image gallery with zoom
-- Specifications data table
+- RTL-aware specifications data table
 - Owner contact information
 - Approval/rejection workflow
 - History and comments section
@@ -356,7 +387,12 @@ Admin-specific notifications and system alerts.
 ### AdminDesktopHeader
 - **Company Logo and Name**: Auto-Hub branding
 - **Notifications Dropdown**: System alerts for admin
-- **User Profile Dropdown**: Admin user menu with logout
+- **User Profile Component**: 
+  - Displays logged-in admin's name (business_name or full_name)
+  - Shows admin role (מנהל מערכת/תמיכה/סוחר)
+  - Uses `adminClient` for data fetching (not regular supabase client)
+  - Dropdown menu with "הפרופיל שלי" (disabled - coming soon) and "התנתק" (logout)
+  - Proper error handling with toast notifications
 
 ### AdminDesktopSidebar
 - **Navigation Menu**: Collapsible sidebar with all admin sections
@@ -395,6 +431,27 @@ Admin-specific notifications and system alerts.
 - Charts and graphs support RTL labels
 - Date/time formatting follows Hebrew conventions
 - Number formatting maintains proper directionality
+
+### Card and Detail Pages RTL Implementation
+**Critical for all admin detail pages:**
+- All `Card` and `CardContent` components must include `dir="rtl"`
+- Grid containers must have `className="text-right"` 
+- Hebrew text elements must have `hebrew-text` class for proper font rendering
+- Applied consistently across:
+  - `AdminVehicleDetail.tsx`
+  - `AdminUserDetail.tsx`
+  - `AdminAuctionDetail.tsx`
+  - `AdminVehicleRequestDetail.tsx`
+  - `AdminSupportTicketDetail.tsx`
+
+### Admin Edge Functions Error Handling
+- All edge function errors return Hebrew messages
+- Standard error format: `{ error: 'הודעת שגיאה בעברית' }`
+- Applied to:
+  - `admin-create-user`
+  - `admin-add-vehicle`
+  - `admin-update-vehicle`
+- Consistent error messaging across all admin operations
 
 ---
 *This specification should be referenced for all admin screen development and updates.*

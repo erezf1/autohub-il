@@ -189,6 +189,24 @@ Manage dealer's personal vehicle inventory separately from marketplace search.
 - **Add Vehicle**: Quick access to add new vehicles
 - **Status Indicators**: Available, sold, boosted status
 
+### Add/Edit Vehicle Screens
+**Files**: `src/pages/mobile/AddVehicleScreen.tsx`, `src/pages/mobile/EditVehicleScreen.tsx`
+
+#### Vehicle Type Field
+- **Field Name**: "סוג" (Type)
+- **Input Type**: Dropdown/Select with 7 predefined categories
+- **Options** (from `src/constants/vehicleTypes.ts`):
+  - מיקרו (micro)
+  - מיני (mini)
+  - משפחתי (family)
+  - מנהלים (executive)
+  - SUV (suv)
+  - יוקרתי (luxury)
+  - ספורט (sport)
+- **Required**: Yes
+- **RTL Support**: Hebrew labels with proper text alignment
+- **Search/Filter**: Vehicle type is filterable in search screens using these categories
+
 ### 12. Create ISO Request Screen (`/mobile/create-iso-request`)
 **File**: `src/pages/mobile/CreateISORequestScreen.tsx`
 

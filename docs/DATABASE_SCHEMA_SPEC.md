@@ -171,7 +171,7 @@ CREATE TABLE public.vehicle_listings (
   owner_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   make_id INTEGER REFERENCES public.vehicle_makes(id),
   model_id INTEGER REFERENCES public.vehicle_models(id),
-  sub_model TEXT, -- Specific variant (e.g., "דלוקס", "ספורט")
+  sub_model TEXT, -- Vehicle type category: micro, mini, family, executive, suv, luxury, sport (from predefined constants in src/constants/vehicleTypes.ts)
   year INTEGER NOT NULL CHECK (year >= 1990 AND year <= EXTRACT(YEAR FROM NOW()) + 1),
   kilometers INTEGER CHECK (kilometers >= 0),
   transmission TEXT CHECK (transmission IN ('manual', 'automatic', 'semi_automatic')),
