@@ -17,8 +17,17 @@ const CarSearchScreen = () => {
   const navigate = useNavigate();
   const { vehicles, isLoading } = useVehicles();
 
+  // Sort to show boosted vehicles first
+  const sortedVehicles = [...(vehicles || [])].sort((a, b) => {
+    const aIsBoosted = a.is_boosted && a.boosted_until && new Date(a.boosted_until) > new Date();
+    const bIsBoosted = b.is_boosted && b.boosted_until && new Date(b.boosted_until) > new Date();
+    if (aIsBoosted && !bIsBoosted) return -1;
+    if (!aIsBoosted && bIsBoosted) return 1;
+    return 0;
+  });
+
   const filteredResults = applyVehicleFilters(
-    vehicles || [],
+    sortedVehicles,
     filters,
     searchQuery
   );
@@ -110,6 +119,10 @@ const CarSearchScreen = () => {
                              car.fuel_type === 'diesel' ? 'דיזל' :
                              car.fuel_type === 'hybrid' ? 'היברידי' : 'חשמלי';
 
+            const originalPrice = parseFloat(car.price.toString());
+            const hotSalePrice = car.hot_sale_price ? parseFloat(car.hot_sale_price.toString()) : null;
+            const isHotSale = car.is_boosted && car.boosted_until && new Date(car.boosted_until) > new Date() && hotSalePrice;
+
             return (
               <Card 
                 key={car.id}
@@ -124,9 +137,9 @@ const CarSearchScreen = () => {
                         alt={`${car.make?.name_hebrew} ${car.model?.name_hebrew}`}
                         className="w-full h-full object-cover"
                       />
-                      {car.is_boosted && (
-                        <Badge className="absolute top-2 left-2 bg-yellow-500">
-                          מבוסט
+                      {isHotSale && (
+                        <Badge className="absolute top-2 left-2 bg-orange-500">
+                          🔥 Hot Sale
                         </Badge>
                       )}
                     </div>
@@ -140,9 +153,22 @@ const CarSearchScreen = () => {
                           {car.kilometers?.toLocaleString()} ק״מ • {transmissionLabel} • {fuelLabel}
                         </p>
                       </div>
-                      <p className="text-lg font-bold text-primary hebrew-text">
-                        {parseFloat(car.price.toString()).toLocaleString()} ₪
-                      </p>
+                      <div className="flex items-center gap-2">
+                        {isHotSale && hotSalePrice ? (
+                          <>
+                            <p className="text-lg font-bold text-orange-600 hebrew-text">
+                              {hotSalePrice.toLocaleString()} ₪
+                            </p>
+                            <p className="text-sm text-muted-foreground line-through hebrew-text">
+                              {originalPrice.toLocaleString()} ₪
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-lg font-bold text-primary hebrew-text">
+                            {originalPrice.toLocaleString()} ₪
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>

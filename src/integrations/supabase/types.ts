@@ -818,6 +818,7 @@ export type Database = {
           engine_size: number | null
           fuel_type: string | null
           had_severe_crash: boolean | null
+          hot_sale_price: number | null
           id: string
           images: string[] | null
           is_boosted: boolean | null
@@ -842,6 +843,7 @@ export type Database = {
           engine_size?: number | null
           fuel_type?: string | null
           had_severe_crash?: boolean | null
+          hot_sale_price?: number | null
           id?: string
           images?: string[] | null
           is_boosted?: boolean | null
@@ -866,6 +868,7 @@ export type Database = {
           engine_size?: number | null
           fuel_type?: string | null
           had_severe_crash?: boolean | null
+          hot_sale_price?: number | null
           id?: string
           images?: string[] | null
           is_boosted?: boolean | null
@@ -1003,6 +1006,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_boosts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_admin_notification: {
         Args: {
           p_assigned_to?: string

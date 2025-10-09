@@ -35,6 +35,14 @@ const statsData = [
     new: 15,
     pending: 23,
     link: "/admin/support"
+  },
+  {
+    title: "בוסטים פעילים",
+    icon: TrendingUp,
+    total: 45,
+    new: 7,
+    pending: 0,
+    link: "/admin/vehicles?filter=boosted"
   }
 ];
 

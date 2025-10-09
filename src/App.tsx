@@ -33,6 +33,7 @@ import CreateBidDetailsScreen from "./pages/mobile/CreateBidDetailsScreen";
 import { RequiredCarsScreen } from "./pages/mobile/RequiredCarsScreen";
 import { HotCarsScreen } from "./pages/mobile/HotCarsScreen"; 
 import { BidsScreen } from "./pages/mobile/BidsScreen";
+import BoostManagementScreen from "./pages/mobile/BoostManagementScreen";
 import { WelcomeScreen } from "./pages/mobile/WelcomeScreen";
 import { RegisterScreen } from "./pages/mobile/RegisterScreen";
 import { LoginScreen } from "./pages/mobile/LoginScreen";
@@ -146,6 +147,7 @@ const App = () => (
                 <Route path="/car-search-requests" element={<ISORequestsScreen />} />
                 <Route path="/required-cars" element={<RequiredCarsScreen />} />
                 <Route path="/hot-cars" element={<HotCarsScreen />} />
+                <Route path="/boost-management" element={<BoostManagementScreen />} />
                 <Route path="/bids" element={<BidsScreen />} />
                 <Route path="/iso-requests/:id" element={<ISORequestDetailScreen />} />
                 <Route path="/chat-request/:id" element={<ChatRequestScreen />} />

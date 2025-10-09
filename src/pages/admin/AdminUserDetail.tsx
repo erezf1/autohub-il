@@ -186,6 +186,18 @@ const AdminUserDetail = () => {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="text-right">
+                <p className="text-sm font-medium text-muted-foreground hebrew-text">בוסטים זמינים</p>
+                <p className="text-2xl font-bold">{user.profile?.available_boosts || 0}</p>
+              </div>
+              <Activity className="h-8 w-8 text-orange-500" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Detailed Information Tabs */}

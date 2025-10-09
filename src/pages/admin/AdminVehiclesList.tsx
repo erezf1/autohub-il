@@ -107,6 +107,7 @@ const AdminVehiclesList = () => {
                   <TableHead className="text-right hebrew-text text-base">רכב</TableHead>
                   <TableHead className="text-right hebrew-text text-base">מוכר</TableHead>
                   <TableHead className="text-right hebrew-text text-base">מחיר</TableHead>
+                  <TableHead className="text-right hebrew-text text-base">בוסט</TableHead>
                   <TableHead className="text-right hebrew-text text-base">סטטוס</TableHead>
                   <TableHead className="text-right hebrew-text text-base">צפיות</TableHead>
                   <TableHead className="text-right hebrew-text text-base">תאריך הוספה</TableHead>
@@ -134,8 +135,22 @@ const AdminVehiclesList = () => {
                     <TableCell className="hebrew-text text-base">
                       {vehicle.owner?.business_name || vehicle.owner?.full_name || 'לא ידוע'}
                     </TableCell>
-                    <TableCell className="font-medium hebrew-text text-base">
-                      ₪{vehicle.price?.toLocaleString()}
+                    <TableCell className="hebrew-text text-base">
+                      <div>
+                        <div className="font-medium">₪{vehicle.price?.toLocaleString()}</div>
+                        {vehicle.hot_sale_price && (
+                          <div className="text-sm text-orange-600">
+                            מבצע: ₪{vehicle.hot_sale_price.toString()}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {vehicle.is_boosted && vehicle.boosted_until && new Date(vehicle.boosted_until) > new Date() ? (
+                        <Badge className="bg-orange-500">🔥 פעיל</Badge>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
                     </TableCell>
                     <TableCell>{getStatusBadge(vehicle.status)}</TableCell>
                     <TableCell className="hebrew-text text-base">-</TableCell>
