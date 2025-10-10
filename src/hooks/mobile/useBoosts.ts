@@ -55,21 +55,18 @@ export function useBoosts() {
     },
   });
 
-  // Fetch user profile with boost credits
-  const { data: profile } = useQuery({
-    queryKey: ['user-boost-profile'],
+  // Fetch remaining boosts via RPC function
+  const { data: remainingBoosts, isLoading: isLoadingBoosts } = useQuery({
+    queryKey: ['user-remaining-boosts'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase
-        .from('user_profiles')
-        .select('available_boosts')
-        .eq('id', user.id)
-        .single();
+        .rpc('get_remaining_boosts', { user_id: user.id });
 
       if (error) throw error;
-      return data;
+      return data as number;
     },
   });
 
@@ -96,25 +93,12 @@ export function useBoosts() {
 
       if (updateError) throw updateError;
 
-      // Decrement available boosts directly
-      const currentBoosts = profile?.available_boosts || 0;
-      if (currentBoosts <= 0) {
-        throw new Error('אין בוסטים זמינים');
-      }
-
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .update({ available_boosts: currentBoosts - 1 })
-        .eq('id', user.id);
-      
-      if (profileError) throw profileError;
-
       return { vehicleId, boostedUntil };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['boosted-vehicles'] });
       queryClient.invalidateQueries({ queryKey: ['my-boostable-vehicles'] });
-      queryClient.invalidateQueries({ queryKey: ['user-boost-profile'] });
+      queryClient.invalidateQueries({ queryKey: ['user-remaining-boosts'] });
       queryClient.invalidateQueries({ queryKey: ['my-vehicles'] });
       
       toast({
@@ -174,7 +158,8 @@ export function useBoosts() {
     isLoadingBoosted,
     myVehicles,
     isLoadingMy,
-    availableBoosts: profile?.available_boosts || 0,
+    availableBoosts: remainingBoosts || 0,
+    isLoadingBoosts,
     activateBoost: activateBoost.mutate,
     isActivating: activateBoost.isPending,
     deactivateBoost: deactivateBoost.mutate,

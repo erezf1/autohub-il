@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useBoosts } from "@/hooks/mobile/useBoosts";
+import { useProfile } from "@/hooks/mobile/useProfile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,7 @@ export const BoostManagementScreen = () => {
     deactivateBoost,
     isDeactivating 
   } = useBoosts();
+  const { profile } = useProfile();
 
   const [boostDialogOpen, setBoostDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
@@ -39,6 +41,15 @@ export const BoostManagementScreen = () => {
   };
 
   const handleActivateBoost = () => {
+    if (availableBoosts <= 0) {
+      toast({
+        title: "אין בוסטים זמינים",
+        description: "השתמשת בכל הבוסטים שלך החודש. צור קשר עם המנהל לשדרוג מנוי",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedVehicle) return;
 
     const hotPrice = parseFloat(hotSalePrice);
@@ -104,18 +115,33 @@ export const BoostManagementScreen = () => {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground hebrew-text">בוסטים זמינים</p>
+              <p className="text-sm text-muted-foreground hebrew-text">בוסטים נותרים החודש</p>
               <p className="text-3xl font-bold text-orange-600">{availableBoosts}</p>
             </div>
             <Flame className="h-12 w-12 text-orange-500" />
           </div>
-          <Button 
-            className="w-full mt-4"
-            variant="outline"
-            onClick={() => navigate('/mobile/profile')}
-          >
-            רכוש בוסטים נוספים
-          </Button>
+          <p className="text-sm text-muted-foreground hebrew-text mt-4">
+            הבוסטים מתאפסים בתחילת כל חודש לפי המנוי שלך
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Subscription Info */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground hebrew-text">סוג מנוי:</span>
+              <span className="font-semibold hebrew-text">
+                {profile?.subscription_type === 'silver' ? 'כסף (5 בוסטים/חודש)' : 
+                 profile?.subscription_type === 'unlimited' ? 'בלתי מוגבל (10 בוסטים/חודש)' :
+                 'רגיל (ללא בוסטים)'}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground hebrew-text">
+              לשדרוג מנוי או הוספת בוסטים, צור קשר עם המנהל
+            </p>
+          </div>
         </CardContent>
       </Card>
 

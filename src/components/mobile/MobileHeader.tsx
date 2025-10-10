@@ -1,12 +1,22 @@
-import { MessageCircle, Bell, LogOut } from "lucide-react";
+import { MessageCircle, Bell, User, Globe, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/mobile/useProfile";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const MobileHeader = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { profile } = useProfile();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-card border-b border-border shadow-sm">
@@ -51,19 +61,38 @@ const MobileHeader = () => {
             </Badge>
           </div>
 
-          {/* Logout Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={async () => {
-              await signOut();
-              navigate("/mobile/welcome");
-            }}
-            className="h-10 w-10"
-            title="התנתק"
-          >
-            <LogOut className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
-          </Button>
+          {/* User Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10"
+              >
+                <User className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel className="hebrew-text">
+                {profile?.business_name || 'משתמש'}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem disabled className="hebrew-text">
+                <Globe className="ml-2 h-4 w-4" />
+                <span>שפה (בקרוב)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  await signOut();
+                  navigate("/mobile/welcome");
+                }}
+                className="hebrew-text"
+              >
+                <LogOut className="ml-2 h-4 w-4" />
+                <span>התנתק</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

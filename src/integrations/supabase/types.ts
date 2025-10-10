@@ -1038,6 +1038,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      get_remaining_boosts: {
+        Args: { user_id: string }
+        Returns: number
+      }
       get_user_unread_messages_count: {
         Args: { user_id: string }
         Returns: number
