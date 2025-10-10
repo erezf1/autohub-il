@@ -5,11 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, ArrowRight, Loader2, User, Building, MapPin, FileText } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, ArrowRight, Loader2, User, Building, MapPin, FileText, Crown, Calendar, Award } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
+import { format } from "date-fns";
+import { he } from "date-fns/locale";
 
 export const ProfileEditScreen: React.FC = () => {
   const [fullName, setFullName] = useState('');
@@ -38,6 +41,25 @@ export const ProfileEditScreen: React.FC = () => {
     },
   });
 
+  // Fetch user profile for subscription display
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile-for-edit'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !isOnboarding,
+  });
+
   useEffect(() => {
     // Load existing profile data if not onboarding
     const loadProfile = async () => {
@@ -61,6 +83,33 @@ export const ProfileEditScreen: React.FC = () => {
     
     loadProfile();
   }, [isOnboarding]);
+
+  const getSubscriptionLabel = (type: string) => {
+    switch(type) {
+      case 'silver': return 'כסף';
+      case 'unlimited': return 'בלתי מוגבל';
+      case 'regular': 
+      default: return 'רגיל';
+    }
+  };
+
+  const getRatingTierLabel = (tier: string) => {
+    switch(tier) {
+      case 'gold': return 'זהב';
+      case 'silver': return 'כסף';
+      case 'bronze': 
+      default: return 'ברונזה';
+    }
+  };
+
+  const getRatingTierColor = (tier: string) => {
+    switch(tier) {
+      case 'gold': return 'text-yellow-600';
+      case 'silver': return 'text-gray-600';
+      case 'bronze': 
+      default: return 'text-orange-700';
+    }
+  };
 
   const handleSave = async () => {
     if (!fullName.trim() || !businessName.trim()) {
@@ -117,7 +166,7 @@ export const ProfileEditScreen: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4" dir="rtl">
+    <div className="container max-w-md mx-auto space-y-4" dir="rtl">
       <div className="flex items-center gap-2">
         <Button 
           variant="ghost" 
@@ -131,6 +180,35 @@ export const ProfileEditScreen: React.FC = () => {
           {isOnboarding ? 'השלמת פרטים' : 'עריכת פרטים'}
         </h1>
       </div>
+
+      {/* Subscription Info (Only when not onboarding) */}
+      {!isOnboarding && userProfile && (
+        <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Crown className="h-5 w-5 text-primary" />
+                <span className="font-bold text-foreground hebrew-text">
+                  {getSubscriptionLabel(userProfile?.subscription_type || 'regular')}
+                </span>
+              </div>
+              <Badge variant="outline" className={`${getRatingTierColor(userProfile?.rating_tier || 'bronze')} border-current`}>
+                <Award className="h-3 w-3 ml-1" />
+                {getRatingTierLabel(userProfile?.rating_tier || 'bronze')}
+              </Badge>
+            </div>
+
+            {userProfile?.subscription_valid_until && (
+              <div className="flex items-center space-x-2 space-x-reverse text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground hebrew-text">
+                  תוקף עד: {format(new Date(userProfile.subscription_valid_until), 'dd/MM/yyyy', { locale: he })}
+                </span>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
 
       <Card className="p-6 space-y-6">
           <div className="text-center space-y-2">
