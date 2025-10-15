@@ -61,7 +61,7 @@ const VehicleDetailScreen = () => {
   });
 
   const handleBackClick = () => {
-    navigate("/mobile/search");
+    navigate(-1);
   };
 
   const handleContactSeller = () => {

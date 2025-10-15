@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Car, Shield, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import logo from '@/assets/auto-hub-logo.png';
 
 export const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export const WelcomeScreen: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <img 
-            src="/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png" 
+            src={logo}
             alt="AutoHub Logo" 
             className="h-16 w-auto mx-auto mb-4"
           />

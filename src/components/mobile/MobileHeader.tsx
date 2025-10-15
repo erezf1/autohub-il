@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/mobile/useProfile";
+import logo from "@/assets/auto-hub-logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +29,7 @@ const MobileHeader = () => {
             className="flex items-center space-x-3 space-x-reverse hover:opacity-80 transition-opacity"
           >
             <img 
-              src="/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png" 
+              src={logo}
               alt="AutoHub Logo" 
               className="h-8 w-auto"
             />

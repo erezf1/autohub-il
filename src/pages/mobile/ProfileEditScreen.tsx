@@ -195,7 +195,7 @@ export const ProfileEditScreen: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 p-4" dir="rtl">
+    <div className="container max-w-md mx-auto px-4 space-y-4" dir="rtl">
       <div className="flex items-center gap-2">
         <Button 
           variant="ghost" 
