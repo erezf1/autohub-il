@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useProfile } from "@/hooks/mobile/useProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { dealerClient } from "@/integrations/supabase/dealerClient";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
@@ -23,7 +23,7 @@ const MyProfileScreen = () => {
     queryKey: ['user-data', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data } = await supabase
+      const { data } = await dealerClient
         .from('users')
         .select('phone_number')
         .eq('id', user.id)
@@ -38,7 +38,7 @@ const MyProfileScreen = () => {
     queryKey: ['active-vehicles-count', user?.id],
     queryFn: async () => {
       if (!user?.id) return 0;
-      const { count, error } = await supabase
+      const { count, error } = await dealerClient
         .from('vehicle_listings')
         .select('*', { count: 'exact', head: true })
         .eq('owner_id', user.id)

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
 import darkCarImage from "@/assets/dark_car.png";
 import { useState } from "react";
 import { getVehicleTypeLabel } from "@/constants/vehicleTypes";
@@ -22,7 +22,7 @@ const VehicleDetailScreen = () => {
   const { data: vehicle, isLoading } = useQuery({
     queryKey: ['vehicle-detail', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_listings')
         .select(`
           *,
@@ -34,7 +34,7 @@ const VehicleDetailScreen = () => {
           )
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return data;
@@ -48,11 +48,11 @@ const VehicleDetailScreen = () => {
     queryFn: async () => {
       if (!vehicle?.owner_id) return null;
       
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('user_profiles')
         .select('id, full_name, business_name')
         .eq('id', vehicle.owner_id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return data;

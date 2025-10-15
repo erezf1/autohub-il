@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, ArrowRight, Loader2, User, Building, MapPin, FileText, Crown, Calendar, Award } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
+import { useAuth } from '@/contexts/AuthContext';
+import { formatPhoneDisplay } from '@/utils/phoneValidation';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { format } from "date-fns";
@@ -23,6 +25,7 @@ export const ProfileEditScreen: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const isOnboarding = location.state?.isOnboarding || false;
 
@@ -30,7 +33,7 @@ export const ProfileEditScreen: React.FC = () => {
   const { data: locations } = useQuery({
     queryKey: ['locations'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('locations')
         .select('*')
         .eq('is_active', true)
@@ -45,19 +48,52 @@ export const ProfileEditScreen: React.FC = () => {
   const { data: userProfile } = useQuery({
     queryKey: ['user-profile-for-edit'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      if (!user?.id) return null;
       
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('user_profiles')
         .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !isOnboarding && !!user?.id,
+  });
+
+  // Fetch phone number
+  const { data: userData } = useQuery({
+    queryKey: ['user-data', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await dealerClient
+        .from('users')
+        .select('phone_number')
         .eq('id', user.id)
         .single();
       
       if (error) throw error;
       return data;
     },
-    enabled: !isOnboarding,
+    enabled: !!user?.id,
+  });
+
+  // Fetch active vehicle count
+  const { data: activeVehiclesCount } = useQuery({
+    queryKey: ['active-vehicles-count-edit', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { count, error } = await dealerClient
+        .from('vehicle_listings')
+        .select('*', { count: 'exact', head: true })
+        .eq('owner_id', user.id)
+        .eq('status', 'available');
+      
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!user?.id,
   });
 
   useEffect(() => {
@@ -109,14 +145,12 @@ export const ProfileEditScreen: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
       if (!user) {
         throw new Error('User not found');
       }
 
       // Update user profile
-      const { error } = await supabase
+      const { error } = await dealerClient
         .from('user_profiles')
         .update({
           full_name: fullName,
@@ -161,7 +195,7 @@ export const ProfileEditScreen: React.FC = () => {
   }
 
   return (
-    <div className="container max-w-md mx-auto space-y-4" dir="rtl">
+    <div className="space-y-4 p-4" dir="rtl">
       <div className="flex items-center gap-2">
         <Button 
           variant="ghost" 
@@ -201,6 +235,13 @@ export const ProfileEditScreen: React.FC = () => {
                 </span>
               </div>
             )}
+
+            <div className="flex items-center justify-between pt-2 border-t">
+              <span className="text-sm text-muted-foreground hebrew-text">רכבים פעילים</span>
+              <span className="text-sm font-medium text-foreground">
+                {activeVehiclesCount || 0}/{userProfile?.vehicles_limit || 0}
+              </span>
+            </div>
           </div>
         </Card>
       )}
@@ -218,6 +259,23 @@ export const ProfileEditScreen: React.FC = () => {
           </div>
 
           <div className="space-y-4">
+            {/* Phone Number (Read-Only) */}
+            {userData?.phone_number && (
+              <div className="space-y-2">
+                <Label htmlFor="phone">טלפון</Label>
+                <div className="relative">
+                  <Input 
+                    id="phone" 
+                    type="text" 
+                    value={formatPhoneDisplay(userData.phone_number)}
+                    disabled
+                    className="pr-10 text-right bg-muted" 
+                    dir="rtl"
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="fullName">שם מלא</Label>
               <div className="relative">
