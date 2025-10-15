@@ -22,25 +22,17 @@ const MobileHeader = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-card border-b border-border shadow-sm">
       <div className="container max-w-md mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo and Title */}
+        {/* Logo */}
         <div className="flex items-center">
           <button 
             onClick={() => navigate("/mobile/dashboard")}
-            className="flex items-center space-x-3 space-x-reverse hover:opacity-80 transition-opacity"
+            className="hover:opacity-80 transition-opacity"
           >
             <img 
               src={logo}
               alt="AutoHub Logo" 
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
-            <div className="text-right">
-              <div className="text-lg font-bold text-primary hebrew-text">
-                אוטו-האב
-              </div>
-              <div className="text-xs text-muted-foreground hebrew-text">
-                הבית לסוחרי הרכב
-              </div>
-            </div>
           </button>
         </div>
 
