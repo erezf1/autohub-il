@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
+import { formatPhoneDisplay } from '@/utils/phoneValidation';
 
 const MyProfileScreen = () => {
   const navigate = useNavigate();
@@ -28,6 +29,23 @@ const MyProfileScreen = () => {
         .eq('id', user.id)
         .single();
       return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch active vehicle count
+  const { data: activeVehiclesCount } = useQuery({
+    queryKey: ['active-vehicles-count', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { count, error } = await supabase
+        .from('vehicle_listings')
+        .select('*', { count: 'exact', head: true })
+        .eq('owner_id', user.id)
+        .eq('status', 'available');
+      
+      if (error) throw error;
+      return count || 0;
     },
     enabled: !!user?.id,
   });
@@ -130,8 +148,10 @@ const MyProfileScreen = () => {
               <div className="flex items-center justify-center">
                 <Car className="h-5 w-5 text-green-500" />
               </div>
-              <div className="text-2xl font-bold text-foreground">{profile?.vehicles_limit || 0}</div>
-              <div className="text-xs text-muted-foreground hebrew-text">רכבים</div>
+              <div className="text-2xl font-bold text-foreground">
+                {activeVehiclesCount || 0}/{profile?.vehicles_limit || 0}
+              </div>
+              <div className="text-xs text-muted-foreground hebrew-text">רכבים פעילים</div>
             </div>
           </div>
         </CardContent>
@@ -169,7 +189,9 @@ const MyProfileScreen = () => {
             </Label>
             <div className="flex items-center space-x-2 space-x-reverse">
               <Phone className="h-4 w-4 text-muted-foreground" />
-              <span className="text-foreground hebrew-text">{userData?.phone_number || 'לא הוגדר'}</span>
+              <span className="text-foreground hebrew-text">
+                {userData?.phone_number ? formatPhoneDisplay(userData.phone_number) : 'לא הוגדר'}
+              </span>
             </div>
           </div>
 

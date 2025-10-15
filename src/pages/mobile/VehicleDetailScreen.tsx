@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, MessageCircle, Phone, Star, MapPin, Calendar, Gauge, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowRight, MessageCircle, Phone, Star, MapPin, Calendar, Gauge, ChevronLeft, ChevronRight, Loader2, Edit, Flame } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,10 +10,12 @@ import { supabase } from '@/integrations/supabase/client';
 import darkCarImage from "@/assets/dark_car.png";
 import { useState } from "react";
 import { getVehicleTypeLabel } from "@/constants/vehicleTypes";
+import { useAuth } from "@/contexts/AuthContext";
 
 const VehicleDetailScreen = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Fetch vehicle data
@@ -102,6 +104,7 @@ const VehicleDetailScreen = () => {
   }
 
   const images = vehicle.images || [darkCarImage];
+  const isOwnVehicle = vehicle?.owner_id === user?.id;
   const transmissionLabel = vehicle.transmission === 'automatic' ? 'אוטומט' : 
                            vehicle.transmission === 'manual' ? 'ידנית' : 
                            vehicle.transmission === 'semi_automatic' ? 'טיפטרוניק' : '-';
@@ -334,36 +337,60 @@ const VehicleDetailScreen = () => {
         </CardContent>
       </Card>
 
-      {/* Seller Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">פרטי המוכר</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-3 space-x-reverse mb-4">
-            <Avatar className="h-12 w-12">
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                {(ownerProfile?.business_name || ownerProfile?.full_name || 'M').charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <h3 className="font-semibold text-foreground hebrew-text">
-                {ownerProfile?.business_name || ownerProfile?.full_name || 'סוחר'}
-              </h3>
+      {/* Conditional Actions Based on Ownership */}
+      {isOwnVehicle ? (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex gap-2">
+              <Button 
+                className="flex-1"
+                onClick={() => navigate(`/mobile/vehicle/${id}/edit`)}
+              >
+                <Edit className="h-4 w-4 ml-2" />
+                ערוך רכב
+              </Button>
+              <Button 
+                variant="outline"
+                className="flex-1"
+                onClick={() => navigate('/mobile/boost-management')}
+              >
+                <Flame className="h-4 w-4 ml-2" />
+                בוסט
+              </Button>
             </div>
-          </div>
-          
-          <div className="flex space-x-2 space-x-reverse">
-            <Button 
-              className="flex-1"
-              onClick={handleContactSeller}
-            >
-              <MessageCircle className="h-4 w-4 ml-2" />
-              <span className="hebrew-text">שלח הודעה</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="hebrew-text">פרטי המוכר</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-3 space-x-reverse mb-4">
+              <Avatar className="h-12 w-12">
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {(ownerProfile?.business_name || ownerProfile?.full_name || 'M').charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground hebrew-text">
+                  {ownerProfile?.business_name || ownerProfile?.full_name || 'סוחר'}
+                </h3>
+              </div>
+            </div>
+            
+            <div className="flex space-x-2 space-x-reverse">
+              <Button 
+                className="flex-1"
+                onClick={handleContactSeller}
+              >
+                <MessageCircle className="h-4 w-4 ml-2" />
+                <span className="hebrew-text">שלח הודעה</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

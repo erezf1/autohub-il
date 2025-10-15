@@ -113,7 +113,7 @@ const DashboardScreen = () => {
           </CardContent>
         </Card>
 
-        <Card className="card-interactive" onClick={() => navigate("/mobile/search")}>
+        <Card className="card-interactive" onClick={() => navigate("/mobile/my-vehicles")}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground hebrew-text">
               הרכבים שלי

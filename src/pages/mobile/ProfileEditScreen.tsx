@@ -61,28 +61,13 @@ export const ProfileEditScreen: React.FC = () => {
   });
 
   useEffect(() => {
-    // Load existing profile data if not onboarding
-    const loadProfile = async () => {
-      if (!isOnboarding) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-          
-          if (profile) {
-            setFullName(profile.full_name || '');
-            setBusinessName(profile.business_name || '');
-            setLocationId(profile.location_id?.toString() || '');
-          }
-        }
-      }
-    };
-    
-    loadProfile();
-  }, [isOnboarding]);
+    // Load existing profile data if not onboarding and profile is loaded
+    if (!isOnboarding && userProfile) {
+      setFullName(userProfile.full_name || '');
+      setBusinessName(userProfile.business_name || '');
+      setLocationId(userProfile.location_id?.toString() || '');
+    }
+  }, [isOnboarding, userProfile]);
 
   const getSubscriptionLabel = (type: string) => {
     switch(type) {
@@ -164,6 +149,16 @@ export const ProfileEditScreen: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  const isLoadingProfile = !isOnboarding && !userProfile;
+
+  if (isLoadingProfile) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-md mx-auto space-y-4" dir="rtl">
