@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Clock, CheckCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PageHeader } from '@/components/common';
 
 // Mock data for ISO requests
 const mockISORequests = [
@@ -66,6 +67,8 @@ export const RequiredCarsScreen: React.FC = () => {
   return (
     // The MobileLayout component has been replaced with a div
     <div>
+      <PageHeader title="חיפוש רכבים" />
+      
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="all">כל הבקשות</TabsTrigger>

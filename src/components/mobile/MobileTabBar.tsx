@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils";
 const tabs = [
   {
     id: "search",
-    label: "חיפוש רכבים",
+    label: "מאגר הרכבים",
     icon: Search,
     path: "/mobile/search"
   },
   {
     id: "required-cars",
-    label: "רכבים מבוקשים",
+    label: "חיפוש רכבים",
     icon: FileText,
     path: "/mobile/required-cars"
   },

@@ -41,7 +41,7 @@ const CarSearchScreen = () => {
   return (
     <PageContainer>
       <PageHeader
-        title="חיפוש רכבים"
+        title="מאגר הרכבים"
         onBack={() => navigate('/mobile/dashboard')}
         rightAction={
           <Button 
