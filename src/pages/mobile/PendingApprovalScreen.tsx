@@ -13,10 +13,12 @@ export const PendingApprovalScreen: React.FC = () => {
   const { user } = useAuth();
 
   // Fetch complete profile data
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, error: profileError } = useQuery({
     queryKey: ['pending-profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
+      
+      console.log('Fetching profile for user:', user.id);
       
       const { data, error } = await dealerClient
         .from('user_profiles')
@@ -27,10 +29,17 @@ export const PendingApprovalScreen: React.FC = () => {
         .eq('id', user.id)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        throw error;
+      }
+      
+      console.log('Fetched profile data:', data);
       return data;
     },
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const handleLogout = () => {
@@ -85,7 +94,13 @@ export const PendingApprovalScreen: React.FC = () => {
                 <div className="h-3 bg-gray-200 rounded" />
               </div>
             </div>
-          ) : profile && (
+          ) : profileError ? (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-sm text-red-600">
+                שגיאה בטעינת הפרטים. אנא נסה לרענן את העמוד.
+              </p>
+            </div>
+          ) : profile ? (
             <div className="bg-gray-50 border rounded-lg p-4 space-y-3">
               <h4 className="font-medium text-gray-800 flex items-center gap-2">
                 <User className="w-4 h-4" />
@@ -129,14 +144,37 @@ export const PendingApprovalScreen: React.FC = () => {
                   variant="outline" 
                   size="sm" 
                   className="w-full gap-2"
-                  asChild
+                  onClick={async () => {
+                    try {
+                      // Get signed URL for private bucket
+                      const filePath = profile.trade_license_file_url.split('/').pop();
+                      const { data, error } = await dealerClient.storage
+                        .from('dealer-documents')
+                        .createSignedUrl(profile.trade_license_file_url.replace(/.*dealer-documents\//, ''), 60);
+                      
+                      if (error) {
+                        console.error('Error creating signed URL:', error);
+                        // Try opening the direct URL as fallback
+                        window.open(profile.trade_license_file_url, '_blank');
+                      } else if (data) {
+                        window.open(data.signedUrl, '_blank');
+                      }
+                    } catch (err) {
+                      console.error('Error opening document:', err);
+                      window.open(profile.trade_license_file_url, '_blank');
+                    }
+                  }}
                 >
-                  <a href={profile.trade_license_file_url} target="_blank" rel="noopener noreferrer">
-                    <FileText className="w-4 h-4" />
-                    צפה בתו סוחר שהועלה
-                  </a>
+                  <FileText className="w-4 h-4" />
+                  צפה בתו סוחר שהועלה
                 </Button>
               )}
+            </div>
+          ) : (
+            <div className="bg-gray-50 border rounded-lg p-4">
+              <p className="text-sm text-muted-foreground text-center">
+                לא נמצאו פרטים. אנא נסה לרענן את העמוד.
+              </p>
             </div>
           )}
 
