@@ -65,8 +65,8 @@ export const useUser = (userId: string) => {
       if (userError) throw userError;
       if (!userData) return null;
 
-      // Fetch profile and roles in parallel (avoid implicit joins)
-      const [profileRes, rolesRes] = await Promise.all([
+      // Fetch profile with location and roles in parallel
+      const [profileRes, rolesRes, locationRes] = await Promise.all([
         adminClient
           .from('user_profiles')
           .select('*')
@@ -76,6 +76,23 @@ export const useUser = (userId: string) => {
           .from('user_roles')
           .select('role')
           .eq('user_id', userId),
+        // Fetch location separately if profile exists
+        (async () => {
+          const profileData = await adminClient
+            .from('user_profiles')
+            .select('location_id')
+            .eq('id', userId)
+            .maybeSingle();
+          
+          if (profileData.data?.location_id) {
+            return adminClient
+              .from('locations')
+              .select('*')
+              .eq('id', profileData.data.location_id)
+              .maybeSingle();
+          }
+          return { data: null, error: null };
+        })(),
       ]);
 
       if (profileRes.error) throw profileRes.error;
@@ -83,7 +100,10 @@ export const useUser = (userId: string) => {
 
       return {
         ...userData,
-        profile: profileRes.data || null,
+        profile: profileRes.data ? {
+          ...profileRes.data,
+          location: locationRes.data || null,
+        } : null,
         roles: rolesRes.data || [],
       } as any;
     },
@@ -132,11 +152,15 @@ export const useUpdateUserProfile = () => {
     mutationFn: async ({ 
       userId, 
       phoneNumber,
-      profileData 
+      profileData,
+      tradeLicenseFile,
+      profilePictureFile
     }: { 
       userId: string; 
       phoneNumber?: string;
       profileData: any;
+      tradeLicenseFile?: File;
+      profilePictureFile?: File;
     }) => {
       // Update phone number if provided
       if (phoneNumber) {
@@ -146,6 +170,42 @@ export const useUpdateUserProfile = () => {
           .eq('id', userId);
         
         if (phoneError) throw phoneError;
+      }
+
+      // Upload trade license if provided
+      if (tradeLicenseFile) {
+        const fileExt = tradeLicenseFile.name.split('.').pop();
+        const filePath = `${userId}/trade_license_${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await adminClient.storage
+          .from('dealer-documents')
+          .upload(filePath, tradeLicenseFile);
+        
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = adminClient.storage
+          .from('dealer-documents')
+          .getPublicUrl(filePath);
+        
+        profileData.trade_license_file_url = publicUrl;
+      }
+
+      // Upload profile picture if provided
+      if (profilePictureFile) {
+        const fileExt = profilePictureFile.name.split('.').pop();
+        const filePath = `${userId}/profile_${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await adminClient.storage
+          .from('profile-pictures')
+          .upload(filePath, profilePictureFile);
+        
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = adminClient.storage
+          .from('profile-pictures')
+          .getPublicUrl(filePath);
+        
+        profileData.profile_picture_url = publicUrl;
       }
 
       // Update profile data

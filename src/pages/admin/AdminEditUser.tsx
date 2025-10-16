@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, FileText, Upload } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,10 +34,13 @@ const AdminEditUser = () => {
     fullName: '',
     businessName: '',
     locationId: '',
-    tradeLicenseNumber: '',
+    businessDescription: '',
     subscriptionType: '',
     ratingTier: '',
   });
+
+  const [tradeLicenseFile, setTradeLicenseFile] = useState<File | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -45,7 +48,7 @@ const AdminEditUser = () => {
         fullName: user.profile?.full_name || '',
         businessName: user.profile?.business_name || '',
         locationId: user.profile?.location_id?.toString() || '',
-        tradeLicenseNumber: user.profile?.trade_license_number || '',
+        businessDescription: user.profile?.business_description || '',
         subscriptionType: user.profile?.subscription_type || 'regular',
         ratingTier: user.profile?.rating_tier || 'bronze',
       });
@@ -61,10 +64,12 @@ const AdminEditUser = () => {
         full_name: formData.fullName,
         business_name: formData.businessName,
         location_id: formData.locationId ? parseInt(formData.locationId) : null,
-        trade_license_number: formData.tradeLicenseNumber || null,
+        business_description: formData.businessDescription || null,
         subscription_type: formData.subscriptionType,
         rating_tier: formData.ratingTier,
       },
+      tradeLicenseFile: tradeLicenseFile || undefined,
+      profilePictureFile: profilePictureFile || undefined,
     });
     
     navigate(`/admin/users/${id}`);
@@ -158,16 +163,6 @@ const AdminEditUser = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tradeLicenseNumber" className="hebrew-text">מספר רישיון עסק</Label>
-                <Input
-                  id="tradeLicenseNumber"
-                  value={formData.tradeLicenseNumber}
-                  onChange={(e) => setFormData({ ...formData, tradeLicenseNumber: e.target.value })}
-                  dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="subscriptionType" className="hebrew-text">סוג מנוי</Label>
                 <Select value={formData.subscriptionType} onValueChange={(value) => setFormData({ ...formData, subscriptionType: value })}>
                   <SelectTrigger className="hebrew-text" dir="rtl">
@@ -194,6 +189,89 @@ const AdminEditUser = () => {
                     <SelectItem value="platinum" className="hebrew-text">פלטינום</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="businessDescription" className="hebrew-text">תיאור העסק</Label>
+              <Textarea
+                id="businessDescription"
+                value={formData.businessDescription}
+                onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
+                className="hebrew-text min-h-[100px]"
+                dir="rtl"
+                placeholder="תאר את העסק שלך..."
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="hebrew-text">תו סוחר</Label>
+                {user?.profile?.trade_license_file_url && (
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-md mb-2">
+                    <FileText className="h-4 w-4" />
+                    <span className="text-sm hebrew-text flex-1">מסמך קיים</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.open(user.profile.trade_license_file_url, '_blank')}
+                      className="hebrew-text"
+                    >
+                      צפה
+                    </Button>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => setTradeLicenseFile(e.target.files?.[0] || null)}
+                    className="flex-1"
+                  />
+                  {tradeLicenseFile && (
+                    <span className="text-sm text-muted-foreground">{tradeLicenseFile.name}</span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground hebrew-text">
+                  {user?.profile?.trade_license_file_url ? 'העלה קובץ חדש להחלפת המסמך הקיים' : 'העלה תו סוחר (PDF, JPG, PNG)'}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="hebrew-text">תמונת פרופיל</Label>
+                {user?.profile?.profile_picture_url && (
+                  <div className="flex items-center gap-2 mb-2">
+                    <img 
+                      src={user.profile.profile_picture_url} 
+                      alt="Profile" 
+                      className="h-16 w-16 rounded-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.open(user.profile.profile_picture_url, '_blank')}
+                      className="hebrew-text"
+                    >
+                      צפה בגודל מלא
+                    </Button>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setProfilePictureFile(e.target.files?.[0] || null)}
+                    className="flex-1"
+                  />
+                  {profilePictureFile && (
+                    <span className="text-sm text-muted-foreground">{profilePictureFile.name}</span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground hebrew-text">
+                  {user?.profile?.profile_picture_url ? 'העלה תמונה חדשה להחלפת התמונה הקיימת' : 'העלה תמונת פרופיל'}
+                </p>
               </div>
             </div>
 

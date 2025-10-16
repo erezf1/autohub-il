@@ -134,67 +134,67 @@ const AdminUserDetail = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-3 lg:grid-cols-5 gap-4">
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="text-right">
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">סטטוס</p>
-                <div className="mt-2">
+                <p className="text-xs font-medium text-muted-foreground hebrew-text">סטטוס</p>
+                <div className="mt-1">
                   {getStatusBadge(user.status)}
                 </div>
               </div>
-              <CheckCircle className="h-8 w-8 text-success" />
+              <CheckCircle className="h-6 w-6 text-success" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="text-right">
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">תוכנית</p>
-                <div className="mt-2">
+                <p className="text-xs font-medium text-muted-foreground hebrew-text">תוכנית</p>
+                <div className="mt-1">
                   {getPlanBadge(user.profile?.subscription_type || 'regular')}
                 </div>
               </div>
-              <Activity className="h-8 w-8 text-primary" />
+              <Activity className="h-6 w-6 text-primary" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="text-right">
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">רכבים פעילים</p>
-                <p className="text-2xl font-bold">{vehicles?.length || 0}</p>
+                <p className="text-xs font-medium text-muted-foreground hebrew-text">רכבים פעילים</p>
+                <p className="text-xl font-bold">{vehicles?.length || 0}</p>
               </div>
-              <Car className="h-8 w-8 text-blue-500" />
+              <Car className="h-6 w-6 text-blue-500" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="text-right">
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">מכירות פומביות</p>
-                <p className="text-2xl font-bold">{auctions?.length || 0}</p>
+                <p className="text-xs font-medium text-muted-foreground hebrew-text">מכירות פומביות</p>
+                <p className="text-xl font-bold">{auctions?.length || 0}</p>
               </div>
-              <Gavel className="h-8 w-8 text-green-500" />
+              <Gavel className="h-6 w-6 text-green-500" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="text-right">
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">בוסטים זמינים</p>
-                <p className="text-2xl font-bold">{user.profile?.available_boosts || 0}</p>
+                <p className="text-xs font-medium text-muted-foreground hebrew-text">בוסטים זמינים</p>
+                <p className="text-xl font-bold">{user.profile?.available_boosts || 0}</p>
               </div>
-              <Activity className="h-8 w-8 text-orange-500" />
+              <Activity className="h-6 w-6 text-orange-500" />
             </div>
           </CardContent>
         </Card>
@@ -202,9 +202,7 @@ const AdminUserDetail = () => {
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="details" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4" dir="rtl">
-          <TabsTrigger value="requests" className="hebrew-text">רכבים דרושים</TabsTrigger>
-          <TabsTrigger value="auctions" className="hebrew-text">מכירות פומביות</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2" dir="rtl">
           <TabsTrigger value="vehicles" className="hebrew-text">רכבים</TabsTrigger>
           <TabsTrigger value="details" className="hebrew-text">פרטי משתמש</TabsTrigger>
         </TabsList>
@@ -217,6 +215,14 @@ const AdminUserDetail = () => {
             <CardContent dir="rtl">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-right">
                 <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">שם מלא</p>
+                    <p className="font-medium hebrew-text">{user.profile?.full_name || 'לא צוין'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">שם עסק</p>
+                    <p className="font-medium hebrew-text">{user.profile?.business_name || 'לא צוין'}</p>
+                  </div>
                   <div className="flex items-center gap-3 flex-row-reverse">
                     <Phone className="h-5 w-5 text-muted-foreground" />
                     <div className="text-right">
@@ -231,8 +237,45 @@ const AdminUserDetail = () => {
                       <p className="font-medium hebrew-text">{user.profile?.location?.name_hebrew || 'לא צוין'}</p>
                     </div>
                   </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">תיאור העסק</p>
+                    <p className="font-medium hebrew-text">{user.profile?.business_description || 'לא צוין'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">דרגת מוניטין</p>
+                    <p className="font-medium hebrew-text">
+                      {user.profile?.rating_tier === 'bronze' ? 'ארד' : 
+                       user.profile?.rating_tier === 'silver' ? 'כסף' :
+                       user.profile?.rating_tier === 'gold' ? 'זהב' :
+                       user.profile?.rating_tier === 'platinum' ? 'פלטינום' : 'לא צוין'}
+                    </p>
+                  </div>
                 </div>
                 <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">סוג מנוי</p>
+                    <p className="font-medium hebrew-text">
+                      {user.profile?.subscription_type === 'regular' ? 'רגיל' :
+                       user.profile?.subscription_type === 'premium' ? 'פרימיום' :
+                       user.profile?.subscription_type === 'vip' ? 'VIP' : 'לא צוין'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">מנוי בתוקף עד</p>
+                    <p className="font-medium hebrew-text">
+                      {user.profile?.subscription_valid_until 
+                        ? new Date(user.profile.subscription_valid_until).toLocaleDateString('he-IL')
+                        : 'לא צוין'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">ותק (חודשים)</p>
+                    <p className="font-medium">{user.profile?.tenure || 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">זמן תגובה ממוצע (דקות)</p>
+                    <p className="font-medium">{user.profile?.avg_response_time || 'לא זמין'}</p>
+                  </div>
                   <div className="flex items-center gap-3 flex-row-reverse">
                     <Calendar className="h-5 w-5 text-muted-foreground" />
                     <div className="text-right">
@@ -247,6 +290,19 @@ const AdminUserDetail = () => {
                       <p className="font-medium">{new Date(user.updated_at).toLocaleDateString('he-IL')}</p>
                     </div>
                   </div>
+                  {user.profile?.trade_license_file_url && (
+                    <div>
+                      <p className="text-sm text-muted-foreground hebrew-text mb-2">תו סוחר</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(user.profile.trade_license_file_url, '_blank')}
+                        className="hebrew-text"
+                      >
+                        צפה במסמך
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -304,109 +360,6 @@ const AdminUserDetail = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="auctions">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">מכירות פומביות ({auctions?.length || 0})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {auctions && auctions.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-right hebrew-text">מחיר התחלתי</TableHead>
-                      <TableHead className="text-right hebrew-text">הצעה נוכחית</TableHead>
-                      <TableHead className="text-right hebrew-text">סיום</TableHead>
-                      <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                      <TableHead className="text-right hebrew-text">פעולות</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {auctions.map((auction: any) => (
-                      <TableRow key={auction.id}>
-                        <TableCell className="hebrew-text">₪{auction.starting_price?.toLocaleString()}</TableCell>
-                        <TableCell className="hebrew-text">₪{auction.current_highest_bid?.toLocaleString() || '-'}</TableCell>
-                        <TableCell>{new Date(auction.auction_end_time).toLocaleDateString('he-IL')}</TableCell>
-                        <TableCell>
-                          <Badge variant={auction.status === 'active' ? 'default' : 'secondary'}>
-                            {auction.status === 'active' ? 'פעילה' : auction.status === 'ended' ? 'הסתיימה' : auction.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="hebrew-text"
-                              onClick={() => navigate(`/admin/auctions/${auction.id}`)}
-                            >
-                              צפה
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <p className="text-center text-muted-foreground hebrew-text py-8">אין מכירות פומביות</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="requests">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">רכבים דרושים ({isoRequests?.length || 0})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isoRequests && isoRequests.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-right hebrew-text">בקשה</TableHead>
-                      <TableHead className="text-right hebrew-text">תקציב</TableHead>
-                      <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                      <TableHead className="text-right hebrew-text">תאריך</TableHead>
-                      <TableHead className="text-right hebrew-text">פעולות</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {isoRequests.map((request: any) => (
-                      <TableRow key={request.id}>
-                        <TableCell className="font-medium hebrew-text">{request.title}</TableCell>
-                        <TableCell className="hebrew-text">
-                          ₪{request.price_from?.toLocaleString()} - ₪{request.price_to?.toLocaleString()}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={request.status === 'active' ? 'default' : 'secondary'}>
-                            {request.status === 'active' ? 'פעילה' : 'סגורה'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{new Date(request.created_at).toLocaleDateString('he-IL')}</TableCell>
-                        <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="hebrew-text"
-                              onClick={() => navigate(`/admin/vehicle-requests/${request.id}`)}
-                            >
-                              צפה
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <p className="text-center text-muted-foreground hebrew-text py-8">אין בקשות</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
