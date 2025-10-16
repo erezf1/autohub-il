@@ -70,6 +70,8 @@ const AdminUserDetail = () => {
         return <Badge variant="secondary"><Clock className="w-3 h-3 ml-1" />ממתין לאישור</Badge>;
       case 'suspended':
         return <Badge variant="destructive"><XCircle className="w-3 h-3 ml-1" />מושעה</Badge>;
+      case 'subscription_expired':
+        return <Badge variant="outline" className="border-orange-500 text-orange-500">מנוי פג תוקף</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -223,19 +225,19 @@ const AdminUserDetail = () => {
                     <p className="text-sm text-muted-foreground hebrew-text">שם עסק</p>
                     <p className="font-medium hebrew-text">{user.profile?.business_name || 'לא צוין'}</p>
                   </div>
-                  <div className="flex items-center gap-3 flex-row-reverse">
-                    <Phone className="h-5 w-5 text-muted-foreground" />
-                    <div className="text-right">
+                  <div className="text-right">
+                    <div className="flex items-center gap-2 justify-end mb-1">
                       <p className="text-sm text-muted-foreground hebrew-text">טלפון</p>
-                      <p className="font-medium" dir="ltr">{user.phone_number}</p>
+                      <Phone className="h-4 w-4 text-muted-foreground" />
                     </div>
+                    <p className="font-medium" dir="ltr">{user.phone_number}</p>
                   </div>
-                  <div className="flex items-center gap-3 flex-row-reverse">
-                    <MapPin className="h-5 w-5 text-muted-foreground" />
-                    <div className="text-right">
+                  <div className="text-right">
+                    <div className="flex items-center gap-2 justify-end mb-1">
                       <p className="text-sm text-muted-foreground hebrew-text">מיקום</p>
-                      <p className="font-medium hebrew-text">{user.profile?.location?.name_hebrew || 'לא צוין'}</p>
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
                     </div>
+                    <p className="font-medium hebrew-text">{user.profile?.location?.name_hebrew || 'לא צוין'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground hebrew-text">תיאור העסק</p>
@@ -276,19 +278,19 @@ const AdminUserDetail = () => {
                     <p className="text-sm text-muted-foreground hebrew-text">זמן תגובה ממוצע (דקות)</p>
                     <p className="font-medium">{user.profile?.avg_response_time || 'לא זמין'}</p>
                   </div>
-                  <div className="flex items-center gap-3 flex-row-reverse">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                    <div className="text-right">
+                  <div className="text-right">
+                    <div className="flex items-center gap-2 justify-end mb-1">
                       <p className="text-sm text-muted-foreground hebrew-text">תאריך הצטרפות</p>
-                      <p className="font-medium">{new Date(user.created_at).toLocaleDateString('he-IL')}</p>
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
                     </div>
+                    <p className="font-medium">{new Date(user.created_at).toLocaleDateString('he-IL')}</p>
                   </div>
-                  <div className="flex items-center gap-3 flex-row-reverse">
-                    <Activity className="h-5 w-5 text-muted-foreground" />
-                    <div className="text-right">
+                  <div className="text-right">
+                    <div className="flex items-center gap-2 justify-end mb-1">
                       <p className="text-sm text-muted-foreground hebrew-text">פעילות אחרונה</p>
-                      <p className="font-medium">{new Date(user.updated_at).toLocaleDateString('he-IL')}</p>
+                      <Activity className="h-4 w-4 text-muted-foreground" />
                     </div>
+                    <p className="font-medium">{new Date(user.updated_at).toLocaleDateString('he-IL')}</p>
                   </div>
                   {user.profile?.trade_license_file_url && (
                     <div>

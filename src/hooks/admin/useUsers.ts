@@ -27,7 +27,7 @@ export const useUsers = (searchTerm?: string, statusFilter?: string) => {
       const userIds = usersData.map((u: any) => u.id);
       const { data: profilesData, error: profilesError } = await adminClient
         .from('user_profiles')
-        .select('id, full_name, business_name, subscription_type, location_id')
+        .select('id, full_name, business_name, subscription_type, subscription_valid_until, location_id')
         .in('id', userIds);
       if (profilesError) throw profilesError;
 

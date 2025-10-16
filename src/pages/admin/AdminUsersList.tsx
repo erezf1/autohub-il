@@ -67,7 +67,9 @@ const AdminUsersList = () => {
                     <Filter className="ml-2 h-5 w-5" />
                     {selectedFilter === "all" ? "כל הסטטוסים" : 
                      selectedFilter === "active" ? "פעיל" :
-                     selectedFilter === "pending" ? "ממתין" : "חסום"}
+                     selectedFilter === "pending" ? "ממתין" : 
+                     selectedFilter === "suspended" ? "מושעה" :
+                     selectedFilter === "subscription_expired" ? "מנוי פג תוקף" : selectedFilter}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -82,6 +84,9 @@ const AdminUsersList = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setSelectedFilter("suspended")} className="hebrew-text">
                     מושעה
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSelectedFilter("subscription_expired")} className="hebrew-text">
+                    מנוי פג תוקף
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -106,14 +111,18 @@ const AdminUsersList = () => {
                     <TableHead className="text-right hebrew-text text-base">שם</TableHead>
                     <TableHead className="text-right hebrew-text text-base">חברה</TableHead>
                     <TableHead className="text-right hebrew-text text-base">טלפון</TableHead>
-                    <TableHead className="text-right hebrew-text text-base">תאריך הצטרפות</TableHead>
+                    <TableHead className="text-right hebrew-text text-base">סוג מנוי</TableHead>
+                    <TableHead className="text-right hebrew-text text-base">בתוקף עד</TableHead>
                     <TableHead className="text-right hebrew-text text-base">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text text-base">פעולות</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {users?.map((user: any) => (
-                    <TableRow key={user.id} className="h-16">
+                    <TableRow 
+                      key={user.id} 
+                      className="h-16 cursor-pointer hover:bg-muted/50"
+                      onClick={() => navigate(`/admin/users/${user.id}`)}
+                    >
                       <TableCell className="font-medium hebrew-text text-base">
                         {user.profile?.full_name || 'ללא שם'}
                       </TableCell>
@@ -122,67 +131,30 @@ const AdminUsersList = () => {
                       </TableCell>
                       <TableCell className="text-base" dir="ltr">{user.phone_number}</TableCell>
                       <TableCell className="hebrew-text text-base">
-                        {new Date(user.created_at).toLocaleDateString('he-IL')}
+                        {user.profile?.subscription_type === 'regular' ? 'רגיל' :
+                         user.profile?.subscription_type === 'premium' ? 'פרימיום' :
+                         user.profile?.subscription_type === 'vip' ? 'VIP' : 'לא צוין'}
+                      </TableCell>
+                      <TableCell className="hebrew-text text-base">
+                        {user.profile?.subscription_valid_until 
+                          ? new Date(user.profile.subscription_valid_until).toLocaleDateString('he-IL')
+                          : 'לא צוין'}
                       </TableCell>
                       <TableCell>
                         <Badge 
                           variant={
                             user.status === "active" ? "default" :
                             user.status === "pending" ? "secondary" :
+                            user.status === "subscription_expired" ? "outline" :
                             "destructive"
                           }
                           className="hebrew-text text-sm"
                         >
                           {user.status === "active" ? "פעיל" :
                            user.status === "pending" ? "ממתין" :
-                           user.status === "suspended" ? "מושעה" : user.status}
+                           user.status === "suspended" ? "מושעה" :
+                           user.status === "subscription_expired" ? "מנוי פג תוקף" : user.status}
                         </Badge>
-                      </TableCell>
-                       <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="hebrew-text" 
-                            onClick={() => navigate(`/admin/users/${user.id}`)}
-                          >
-                            <Eye className="h-4 w-4 ml-1" />
-                            צפה
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="hebrew-text" 
-                            onClick={() => navigate(`/admin/users/${user.id}/edit`)}
-                          >
-                            <Edit className="h-4 w-4 ml-1" />
-                            ערוך
-                          </Button>
-                          {user.status === "pending" && (
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="hebrew-text text-success"
-                              onClick={() => handleStatusChange(user.id, 'active')}
-                              disabled={updateStatusMutation.isPending}
-                            >
-                              <UserCheck className="h-4 w-4 ml-1" />
-                              אשר
-                            </Button>
-                          )}
-                          {user.status === "active" && (
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="hebrew-text text-destructive"
-                              onClick={() => handleStatusChange(user.id, 'suspended')}
-                              disabled={updateStatusMutation.isPending}
-                            >
-                              <UserX className="h-4 w-4 ml-1" />
-                              השעה
-                            </Button>
-                          )}
-                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowRight, Loader2, FileText, Upload } from 'lucide-react';
+import { ArrowRight, Loader2, FileText, Upload, UserCheck, UserX } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useUser, useUpdateUserProfile } from '@/hooks/admin/useUsers';
+import { useUser, useUpdateUserProfile, useUpdateUserStatus } from '@/hooks/admin/useUsers';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -16,6 +16,7 @@ const AdminEditUser = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useUser(id!);
   const updateProfileMutation = useUpdateUserProfile();
+  const updateStatusMutation = useUpdateUserStatus();
   
   const { data: locations } = useQuery({
     queryKey: ['locations'],
@@ -36,6 +37,7 @@ const AdminEditUser = () => {
     locationId: '',
     businessDescription: '',
     subscriptionType: '',
+    subscriptionValidUntil: '',
     ratingTier: '',
   });
 
@@ -50,10 +52,26 @@ const AdminEditUser = () => {
         locationId: user.profile?.location_id?.toString() || '',
         businessDescription: user.profile?.business_description || '',
         subscriptionType: user.profile?.subscription_type || 'regular',
+        subscriptionValidUntil: user.profile?.subscription_valid_until || '',
         ratingTier: user.profile?.rating_tier || 'bronze',
       });
     }
   }, [user]);
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!id) return;
+    await updateStatusMutation.mutateAsync({ userId: id, status: newStatus });
+  };
+
+  const getStatusText = (status?: string) => {
+    switch (status) {
+      case 'active': return 'פעיל';
+      case 'pending': return 'ממתין לאישור';
+      case 'suspended': return 'מושעה';
+      case 'subscription_expired': return 'מנוי פג תוקף';
+      default: return status;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +84,7 @@ const AdminEditUser = () => {
         location_id: formData.locationId ? parseInt(formData.locationId) : null,
         business_description: formData.businessDescription || null,
         subscription_type: formData.subscriptionType,
+        subscription_valid_until: formData.subscriptionValidUntil || null,
         rating_tier: formData.ratingTier,
       },
       tradeLicenseFile: tradeLicenseFile || undefined,
@@ -190,6 +209,60 @@ const AdminEditUser = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="subscriptionValidUntil" className="hebrew-text">מנוי בתוקף עד</Label>
+                <Input
+                  id="subscriptionValidUntil"
+                  type="date"
+                  value={formData.subscriptionValidUntil}
+                  onChange={(e) => setFormData({ ...formData, subscriptionValidUntil: e.target.value })}
+                  className="hebrew-text"
+                  dir="rtl"
+                />
+              </div>
+            </div>
+
+            <div className="col-span-2 space-y-4 p-4 bg-muted rounded-lg">
+              <Label className="hebrew-text text-base font-semibold">ניהול סטטוס משתמש</Label>
+              <div className="flex gap-4">
+                {user?.status === 'pending' && (
+                  <Button
+                    type="button"
+                    variant="default"
+                    className="hebrew-text flex-1"
+                    onClick={() => handleStatusChange('active')}
+                  >
+                    <UserCheck className="h-4 w-4 ml-2" />
+                    אשר משתמש
+                  </Button>
+                )}
+                {user?.status === 'active' && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    className="hebrew-text flex-1"
+                    onClick={() => handleStatusChange('suspended')}
+                  >
+                    <UserX className="h-4 w-4 ml-2" />
+                    השעה משתמש
+                  </Button>
+                )}
+                {user?.status === 'suspended' && (
+                  <Button
+                    type="button"
+                    variant="default"
+                    className="hebrew-text flex-1"
+                    onClick={() => handleStatusChange('active')}
+                  >
+                    <UserCheck className="h-4 w-4 ml-2" />
+                    הפעל מחדש
+                  </Button>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground hebrew-text">
+                סטטוס נוכחי: {getStatusText(user?.status)}
+              </p>
             </div>
 
             <div className="space-y-2">
