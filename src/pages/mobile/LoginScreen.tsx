@@ -8,6 +8,7 @@ import { Phone, ArrowLeft, ArrowRight, Loader2, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatPhoneDisplay, cleanPhoneNumber } from '@/utils/phoneValidation';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
 
 export const LoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -21,11 +22,37 @@ export const LoginScreen: React.FC = () => {
     
     setIsLoading(true);
     const { error } = await signIn(phoneNumber, password);
-    setIsLoading(false);
     
     if (!error) {
-      navigate('/mobile/dashboard');
+      // Check user status after successful login
+      const { data: { user } } = await dealerClient.auth.getUser();
+      
+      if (user) {
+        const { data: userData, error: statusError } = await dealerClient
+          .from('users')
+          .select('status')
+          .eq('id', user.id)
+          .single();
+        
+        if (!statusError && userData) {
+          if (userData.status === 'pending') {
+            // Redirect to pending approval page
+            navigate('/mobile/pending-approval');
+          } else if (userData.status === 'active') {
+            // Redirect to dashboard for active users
+            navigate('/mobile/dashboard');
+          } else {
+            // Handle other statuses (suspended, etc.)
+            navigate('/mobile/pending-approval');
+          }
+        } else {
+          // If we can't fetch status, assume pending
+          navigate('/mobile/pending-approval');
+        }
+      }
     }
+    
+    setIsLoading(false);
   };
 
   const handlePhoneChange = (value: string) => {
