@@ -114,14 +114,14 @@ const AdminUsersList = () => {
                     <TableHead className="text-right hebrew-text text-base">סוג מנוי</TableHead>
                     <TableHead className="text-right hebrew-text text-base">בתוקף עד</TableHead>
                     <TableHead className="text-right hebrew-text text-base">סטטוס</TableHead>
+                    <TableHead className="text-right hebrew-text text-base">פעולות</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {users?.map((user: any) => (
                     <TableRow 
                       key={user.id} 
-                      className="h-16 cursor-pointer hover:bg-muted/50"
-                      onClick={() => navigate(`/admin/users/${user.id}`)}
+                      className="h-16 hover:bg-muted/50"
                     >
                       <TableCell className="font-medium hebrew-text text-base">
                         {user.profile?.full_name || 'ללא שם'}
@@ -155,6 +155,58 @@ const AdminUsersList = () => {
                            user.status === "suspended" ? "מושעה" :
                            user.status === "subscription_expired" ? "מנוי פג תוקף" : user.status}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 justify-end">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/admin/users/${user.id}`);
+                            }}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/admin/users/${user.id}/edit`);
+                            }}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          {user.status === 'pending' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStatusChange(user.id, 'active');
+                              }}
+                              className="h-8 w-8 p-0"
+                            >
+                              <UserCheck className="h-4 w-4 text-green-600" />
+                            </Button>
+                          )}
+                          {user.status === 'active' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStatusChange(user.id, 'suspended');
+                              }}
+                              className="h-8 w-8 p-0"
+                            >
+                              <UserX className="h-4 w-4 text-red-600" />
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

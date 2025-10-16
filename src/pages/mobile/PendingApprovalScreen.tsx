@@ -16,21 +16,23 @@ export const PendingApprovalScreen: React.FC = () => {
   const { data: profile, isLoading, error: profileError } = useQuery({
     queryKey: ['pending-profile', user?.id],
     queryFn: async () => {
-      if (!user?.id) return null;
-      
-      console.log('Fetching profile for user:', user.id);
-      
+      console.log('Fetching profile for user:', user?.id);
+      if (!user?.id) {
+        console.log('No user ID found');
+        return null;
+      }
+
       const { data, error } = await dealerClient
         .from('user_profiles')
         .select(`
           *,
-          location:locations(name_hebrew)
+          location:locations(id, name_hebrew, name_english)
         `)
         .eq('id', user.id)
         .single();
-      
+
       if (error) {
-        console.error('Error fetching profile:', error);
+        console.error('Profile fetch error:', error);
         throw error;
       }
       
@@ -38,6 +40,7 @@ export const PendingApprovalScreen: React.FC = () => {
       return data;
     },
     enabled: !!user?.id,
+    staleTime: 0,
     retry: 3,
     retryDelay: 1000,
   });

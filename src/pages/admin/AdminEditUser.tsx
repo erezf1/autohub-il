@@ -103,7 +103,7 @@ const AdminEditUser = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4" dir="rtl">
       <div className="flex items-center gap-4">
         <Button 
           variant="ghost" 
@@ -111,26 +111,77 @@ const AdminEditUser = () => {
           className="hebrew-text"
         >
           <ArrowRight className="h-4 w-4 ml-1" />
-          חזור לפרטי משתמש
+          חזור
         </Button>
+        <div>
+          <h1 className="text-2xl font-bold hebrew-text">עריכת משתמש</h1>
+          <p className="text-sm text-muted-foreground hebrew-text">
+            {user?.profile?.full_name || 'משתמש'}
+          </p>
+        </div>
       </div>
 
-      <div>
-        <h1 className="text-3xl font-bold hebrew-text">עריכת פרטי משתמש</h1>
-        <p className="text-lg text-muted-foreground hebrew-text mt-1">
-          {user?.profile?.full_name || 'משתמש'}
-        </p>
-      </div>
+      {/* Status Actions - Top Left */}
+      {user?.status && (
+        <Card className="bg-muted/50">
+          <CardContent className="p-3">
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2">
+                {user.status === 'pending' && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => handleStatusChange('active')}
+                    disabled={updateStatusMutation.isPending}
+                    className="hebrew-text"
+                  >
+                    <UserCheck className="h-4 w-4 ml-2" />
+                    אשר
+                  </Button>
+                )}
+                {user.status === 'active' && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleStatusChange('suspended')}
+                    disabled={updateStatusMutation.isPending}
+                    className="hebrew-text"
+                  >
+                    <UserX className="h-4 w-4 ml-2" />
+                    השעה
+                  </Button>
+                )}
+                {user.status === 'suspended' && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => handleStatusChange('active')}
+                    disabled={updateStatusMutation.isPending}
+                    className="hebrew-text"
+                  >
+                    <UserCheck className="h-4 w-4 ml-2" />
+                    הפעל
+                  </Button>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground hebrew-text">
+                סטטוס: {getStatusText(user.status)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">פרטי משתמש</CardTitle>
+        <CardHeader className="p-4">
+          <CardTitle className="hebrew-text text-lg">פרטי משתמש</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="hebrew-text">שם מלא</Label>
+        <CardContent className="p-4 pt-0">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="fullName" className="hebrew-text text-sm text-right block">שם מלא</Label>
                 <Input
                   id="fullName"
                   value={formData.fullName}
@@ -141,8 +192,8 @@ const AdminEditUser = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="businessName" className="hebrew-text">שם עסק</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="businessName" className="hebrew-text text-sm text-right block">שם עסק</Label>
                 <Input
                   id="businessName"
                   value={formData.businessName}
@@ -153,23 +204,11 @@ const AdminEditUser = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber" className="hebrew-text">מספר טלפון (לא ניתן לעריכה)</Label>
-                <Input
-                  id="phoneNumber"
-                  type="tel"
-                  value={user?.phone_number || ''}
-                  disabled
-                  dir="ltr"
-                  className="bg-muted"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="locationId" className="hebrew-text">איזור</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="locationId" className="hebrew-text text-sm text-right block">מיקום</Label>
                 <Select value={formData.locationId} onValueChange={(value) => setFormData({ ...formData, locationId: value })}>
                   <SelectTrigger className="hebrew-text" dir="rtl">
-                    <SelectValue placeholder="בחר איזור" />
+                    <SelectValue placeholder="בחר מיקום" />
                   </SelectTrigger>
                   <SelectContent>
                     {locations?.map((location) => (
@@ -181,11 +220,11 @@ const AdminEditUser = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="subscriptionType" className="hebrew-text">סוג מנוי</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="subscriptionType" className="hebrew-text text-sm text-right block">מנוי</Label>
                 <Select value={formData.subscriptionType} onValueChange={(value) => setFormData({ ...formData, subscriptionType: value })}>
                   <SelectTrigger className="hebrew-text" dir="rtl">
-                    <SelectValue placeholder="בחר סוג מנוי" />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="regular" className="hebrew-text">רגיל</SelectItem>
@@ -195,163 +234,104 @@ const AdminEditUser = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="ratingTier" className="hebrew-text">דרגת מוניטין</Label>
-                <Select value={formData.ratingTier} onValueChange={(value) => setFormData({ ...formData, ratingTier: value })}>
-                  <SelectTrigger className="hebrew-text" dir="rtl">
-                    <SelectValue placeholder="בחר דרגה" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="bronze" className="hebrew-text">ארד</SelectItem>
-                    <SelectItem value="silver" className="hebrew-text">כסף</SelectItem>
-                    <SelectItem value="gold" className="hebrew-text">זהב</SelectItem>
-                    <SelectItem value="platinum" className="hebrew-text">פלטינום</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="subscriptionValidUntil" className="hebrew-text">מנוי בתוקף עד</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="subscriptionValidUntil" className="hebrew-text text-sm text-right block">בתוקף עד</Label>
                 <Input
                   id="subscriptionValidUntil"
                   type="date"
                   value={formData.subscriptionValidUntil}
                   onChange={(e) => setFormData({ ...formData, subscriptionValidUntil: e.target.value })}
-                  className="hebrew-text"
                   dir="rtl"
                 />
               </div>
-            </div>
 
-            <div className="col-span-2 space-y-4 p-4 bg-muted rounded-lg">
-              <Label className="hebrew-text text-base font-semibold">ניהול סטטוס משתמש</Label>
-              <div className="flex gap-4">
-                {user?.status === 'pending' && (
-                  <Button
-                    type="button"
-                    variant="default"
-                    className="hebrew-text flex-1"
-                    onClick={() => handleStatusChange('active')}
-                  >
-                    <UserCheck className="h-4 w-4 ml-2" />
-                    אשר משתמש
-                  </Button>
-                )}
-                {user?.status === 'active' && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    className="hebrew-text flex-1"
-                    onClick={() => handleStatusChange('suspended')}
-                  >
-                    <UserX className="h-4 w-4 ml-2" />
-                    השעה משתמש
-                  </Button>
-                )}
-                {user?.status === 'suspended' && (
-                  <Button
-                    type="button"
-                    variant="default"
-                    className="hebrew-text flex-1"
-                    onClick={() => handleStatusChange('active')}
-                  >
-                    <UserCheck className="h-4 w-4 ml-2" />
-                    הפעל מחדש
-                  </Button>
-                )}
+              <div className="space-y-1.5">
+                <Label htmlFor="ratingTier" className="hebrew-text text-sm text-right block">דירוג</Label>
+                <Select value={formData.ratingTier} onValueChange={(value) => setFormData({ ...formData, ratingTier: value })}>
+                  <SelectTrigger className="hebrew-text" dir="rtl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bronze" className="hebrew-text">ארד</SelectItem>
+                    <SelectItem value="silver" className="hebrew-text">כסף</SelectItem>
+                    <SelectItem value="gold" className="hebrew-text">זהב</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <p className="text-sm text-muted-foreground hebrew-text">
-                סטטוס נוכחי: {getStatusText(user?.status)}
-              </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="businessDescription" className="hebrew-text">תיאור העסק</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="businessDescription" className="hebrew-text text-sm text-right block">תיאור</Label>
               <Textarea
                 id="businessDescription"
                 value={formData.businessDescription}
                 onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
-                className="hebrew-text min-h-[100px]"
+                className="hebrew-text min-h-[80px]"
                 dir="rtl"
-                placeholder="תאר את העסק שלך..."
+                placeholder="תאר את העסק..."
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className="hebrew-text">תו סוחר</Label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="hebrew-text text-sm text-right block">תו סוחר</Label>
                 {user?.profile?.trade_license_file_url && (
-                  <div className="flex items-center gap-2 p-3 bg-muted rounded-md mb-2">
+                  <div className="flex items-center gap-2 p-2 bg-muted rounded-md mb-1.5">
                     <FileText className="h-4 w-4" />
-                    <span className="text-sm hebrew-text flex-1">מסמך קיים</span>
+                    <span className="text-xs hebrew-text flex-1">מסמך קיים</span>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => window.open(user.profile.trade_license_file_url, '_blank')}
-                      className="hebrew-text"
+                      className="hebrew-text h-7 px-2"
                     >
                       צפה
                     </Button>
                   </div>
                 )}
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => setTradeLicenseFile(e.target.files?.[0] || null)}
-                    className="flex-1"
-                  />
-                  {tradeLicenseFile && (
-                    <span className="text-sm text-muted-foreground">{tradeLicenseFile.name}</span>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground hebrew-text">
-                  {user?.profile?.trade_license_file_url ? 'העלה קובץ חדש להחלפת המסמך הקיים' : 'העלה תו סוחר (PDF, JPG, PNG)'}
-                </p>
+                <Input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => setTradeLicenseFile(e.target.files?.[0] || null)}
+                  className="text-sm"
+                />
               </div>
 
-              <div className="space-y-2">
-                <Label className="hebrew-text">תמונת פרופיל</Label>
+              <div className="space-y-1.5">
+                <Label className="hebrew-text text-sm text-right block">תמונה</Label>
                 {user?.profile?.profile_picture_url && (
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-1.5">
                     <img 
                       src={user.profile.profile_picture_url} 
                       alt="Profile" 
-                      className="h-16 w-16 rounded-full object-cover"
+                      className="h-12 w-12 rounded-full object-cover"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => window.open(user.profile.profile_picture_url, '_blank')}
-                      className="hebrew-text"
+                      className="hebrew-text h-7 px-2"
                     >
-                      צפה בגודל מלא
+                      צפה
                     </Button>
                   </div>
                 )}
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setProfilePictureFile(e.target.files?.[0] || null)}
-                    className="flex-1"
-                  />
-                  {profilePictureFile && (
-                    <span className="text-sm text-muted-foreground">{profilePictureFile.name}</span>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground hebrew-text">
-                  {user?.profile?.profile_picture_url ? 'העלה תמונה חדשה להחלפת התמונה הקיימת' : 'העלה תמונת פרופיל'}
-                </p>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setProfilePictureFile(e.target.files?.[0] || null)}
+                  className="text-sm"
+                />
               </div>
             </div>
 
-            <div className="flex justify-end gap-4">
+            <div className="flex justify-end gap-3">
               <Button 
                 type="button" 
                 variant="outline" 
+                size="sm"
                 onClick={() => navigate(`/admin/users/${id}`)}
                 className="hebrew-text"
               >
@@ -359,16 +339,17 @@ const AdminEditUser = () => {
               </Button>
               <Button 
                 type="submit" 
+                size="sm"
                 disabled={updateProfileMutation.isPending}
                 className="hebrew-text"
               >
                 {updateProfileMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                    שומר שינויים...
+                    שומר...
                   </>
                 ) : (
-                  'שמור שינויים'
+                  'שמור'
                 )}
               </Button>
             </div>

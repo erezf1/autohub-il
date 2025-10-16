@@ -105,7 +105,7 @@ const AdminUserDetail = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4" dir="rtl">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button 
@@ -136,175 +136,141 @@ const AdminUserDetail = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 lg:grid-cols-5 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="text-right">
-                <p className="text-xs font-medium text-muted-foreground hebrew-text">סטטוס</p>
-                <div className="mt-1">
-                  {getStatusBadge(user.status)}
-                </div>
+      <div className="grid grid-cols-3 lg:grid-cols-5 gap-3">
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
+            <div className="text-right min-w-0">
+              <p className="text-[11px] text-muted-foreground hebrew-text">סטטוס</p>
+              <div className="mt-0.5">
+                {getStatusBadge(user.status)}
               </div>
-              <CheckCircle className="h-6 w-6 text-success" />
             </div>
-          </CardContent>
+          </div>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="text-right">
-                <p className="text-xs font-medium text-muted-foreground hebrew-text">תוכנית</p>
-                <div className="mt-1">
-                  {getPlanBadge(user.profile?.subscription_type || 'regular')}
-                </div>
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <Activity className="h-5 w-5 text-primary flex-shrink-0" />
+            <div className="text-right min-w-0">
+              <p className="text-[11px] text-muted-foreground hebrew-text">תוכנית</p>
+              <div className="mt-0.5">
+                {getPlanBadge(user.profile?.subscription_type || 'regular')}
               </div>
-              <Activity className="h-6 w-6 text-primary" />
             </div>
-          </CardContent>
+          </div>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="text-right">
-                <p className="text-xs font-medium text-muted-foreground hebrew-text">רכבים פעילים</p>
-                <p className="text-xl font-bold">{vehicles?.length || 0}</p>
-              </div>
-              <Car className="h-6 w-6 text-blue-500" />
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <Car className="h-5 w-5 text-blue-500 flex-shrink-0" />
+            <div className="text-right min-w-0">
+              <p className="text-[11px] text-muted-foreground hebrew-text">רכבים</p>
+              <p className="text-lg font-bold">{vehicles?.filter(v => v.status === 'available').length || 0}</p>
             </div>
-          </CardContent>
+          </div>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="text-right">
-                <p className="text-xs font-medium text-muted-foreground hebrew-text">מכירות פומביות</p>
-                <p className="text-xl font-bold">{auctions?.length || 0}</p>
-              </div>
-              <Gavel className="h-6 w-6 text-green-500" />
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <Gavel className="h-5 w-5 text-green-500 flex-shrink-0" />
+            <div className="text-right min-w-0">
+              <p className="text-[11px] text-muted-foreground hebrew-text">מכרזים</p>
+              <p className="text-lg font-bold">{auctions?.filter(a => a.status === 'active').length || 0}</p>
             </div>
-          </CardContent>
+          </div>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="text-right">
-                <p className="text-xs font-medium text-muted-foreground hebrew-text">בוסטים זמינים</p>
-                <p className="text-xl font-bold">{user.profile?.available_boosts || 0}</p>
-              </div>
-              <Activity className="h-6 w-6 text-orange-500" />
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <Activity className="h-5 w-5 text-orange-500 flex-shrink-0" />
+            <div className="text-right min-w-0">
+              <p className="text-[11px] text-muted-foreground hebrew-text">בוסטים</p>
+              <p className="text-lg font-bold">{user.profile?.available_boosts || 0}</p>
             </div>
-          </CardContent>
+          </div>
         </Card>
       </div>
 
       {/* Detailed Information Tabs */}
-      <Tabs defaultValue="details" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2" dir="rtl">
+      <Tabs defaultValue="details" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="vehicles" className="hebrew-text">רכבים</TabsTrigger>
-          <TabsTrigger value="details" className="hebrew-text">פרטי משתמש</TabsTrigger>
+          <TabsTrigger value="details" className="hebrew-text">פרטים</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details">
           <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">מידע אישי ועסקי</CardTitle>
+            <CardHeader className="p-4">
+              <CardTitle className="hebrew-text text-lg">מידע משתמש</CardTitle>
             </CardHeader>
-            <CardContent dir="rtl">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-right">
-                <div className="space-y-4">
+            <CardContent className="p-4 pt-0">
+              <div className="grid grid-cols-2 gap-4 text-right">
+                <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-muted-foreground hebrew-text">שם מלא</p>
-                    <p className="font-medium hebrew-text">{user.profile?.full_name || 'לא צוין'}</p>
+                    <p className="text-sm text-muted-foreground hebrew-text mb-1 text-right">שם מלא</p>
+                    <p className="font-medium hebrew-text text-right">{user.profile?.full_name || 'לא צוין'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground hebrew-text">שם עסק</p>
-                    <p className="font-medium hebrew-text">{user.profile?.business_name || 'לא צוין'}</p>
+                    <p className="text-sm text-muted-foreground hebrew-text mb-1 text-right">שם עסק</p>
+                    <p className="font-medium hebrew-text text-right">{user.profile?.business_name || 'לא צוין'}</p>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-2 justify-end mb-1">
-                      <p className="text-sm text-muted-foreground hebrew-text">טלפון</p>
+                      <p className="text-sm text-muted-foreground hebrew-text text-right">טלפון</p>
                       <Phone className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <p className="font-medium" dir="ltr">{user.phone_number}</p>
+                    <p className="font-medium text-right" dir="ltr">{user.phone_number}</p>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-2 justify-end mb-1">
-                      <p className="text-sm text-muted-foreground hebrew-text">מיקום</p>
+                      <p className="text-sm text-muted-foreground hebrew-text text-right">מיקום</p>
                       <MapPin className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <p className="font-medium hebrew-text">{user.profile?.location?.name_hebrew || 'לא צוין'}</p>
+                    <p className="font-medium hebrew-text text-right">{user.profile?.location?.name_hebrew || 'לא צוין'}</p>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground hebrew-text">תיאור העסק</p>
-                    <p className="font-medium hebrew-text">{user.profile?.business_description || 'לא צוין'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground hebrew-text">דרגת מוניטין</p>
-                    <p className="font-medium hebrew-text">
-                      {user.profile?.rating_tier === 'bronze' ? 'ארד' : 
-                       user.profile?.rating_tier === 'silver' ? 'כסף' :
-                       user.profile?.rating_tier === 'gold' ? 'זהב' :
-                       user.profile?.rating_tier === 'platinum' ? 'פלטינום' : 'לא צוין'}
-                    </p>
-                  </div>
+                  {user.profile?.business_description && (
+                    <div>
+                      <p className="text-sm text-muted-foreground hebrew-text mb-1 text-right">תיאור</p>
+                      <p className="font-medium hebrew-text text-sm text-right">{user.profile.business_description}</p>
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-muted-foreground hebrew-text">סוג מנוי</p>
-                    <p className="font-medium hebrew-text">
-                      {user.profile?.subscription_type === 'regular' ? 'רגיל' :
-                       user.profile?.subscription_type === 'premium' ? 'פרימיום' :
-                       user.profile?.subscription_type === 'vip' ? 'VIP' : 'לא צוין'}
-                    </p>
+                    <p className="text-sm text-muted-foreground hebrew-text mb-1 text-right">מנוי</p>
+                    <div className="text-right">{getPlanBadge(user.profile?.subscription_type || 'regular')}</div>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground hebrew-text">מנוי בתוקף עד</p>
-                    <p className="font-medium hebrew-text">
+                    <p className="text-sm text-muted-foreground hebrew-text mb-1 text-right">בתוקף עד</p>
+                    <p className="font-medium text-right">
                       {user.profile?.subscription_valid_until 
                         ? new Date(user.profile.subscription_valid_until).toLocaleDateString('he-IL')
                         : 'לא צוין'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground hebrew-text">ותק (חודשים)</p>
-                    <p className="font-medium">{user.profile?.tenure || 0}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground hebrew-text">זמן תגובה ממוצע (דקות)</p>
-                    <p className="font-medium">{user.profile?.avg_response_time || 'לא זמין'}</p>
+                    <p className="text-sm text-muted-foreground hebrew-text mb-1 text-right">דירוג</p>
+                    <p className="font-medium hebrew-text text-right">
+                      {user.profile?.rating_tier === 'bronze' ? 'ארד' : 
+                       user.profile?.rating_tier === 'silver' ? 'כסף' :
+                       user.profile?.rating_tier === 'gold' ? 'זהב' : 'לא צוין'}
+                    </p>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-2 justify-end mb-1">
-                      <p className="text-sm text-muted-foreground hebrew-text">תאריך הצטרפות</p>
+                      <p className="text-sm text-muted-foreground hebrew-text text-right">הצטרפות</p>
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <p className="font-medium">{new Date(user.created_at).toLocaleDateString('he-IL')}</p>
+                    <p className="font-medium text-right">{new Date(user.created_at).toLocaleDateString('he-IL')}</p>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-2 justify-end mb-1">
-                      <p className="text-sm text-muted-foreground hebrew-text">פעילות אחרונה</p>
+                      <p className="text-sm text-muted-foreground hebrew-text text-right">פעילות</p>
                       <Activity className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <p className="font-medium">{new Date(user.updated_at).toLocaleDateString('he-IL')}</p>
+                    <p className="font-medium text-right">{new Date(user.updated_at).toLocaleDateString('he-IL')}</p>
                   </div>
-                  {user.profile?.trade_license_file_url && (
-                    <div>
-                      <p className="text-sm text-muted-foreground hebrew-text mb-2">תו סוחר</p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(user.profile.trade_license_file_url, '_blank')}
-                        className="hebrew-text"
-                      >
-                        צפה במסמך
-                      </Button>
-                    </div>
-                  )}
                 </div>
               </div>
             </CardContent>
@@ -313,10 +279,10 @@ const AdminUserDetail = () => {
 
         <TabsContent value="vehicles">
           <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">רכבים ({vehicles?.length || 0})</CardTitle>
+            <CardHeader className="p-4">
+              <CardTitle className="hebrew-text text-lg">רכבים ({vehicles?.length || 0})</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-0">
               {vehicles && vehicles.length > 0 ? (
                 <Table>
                   <TableHeader>
@@ -324,39 +290,26 @@ const AdminUserDetail = () => {
                       <TableHead className="text-right hebrew-text">שנה</TableHead>
                       <TableHead className="text-right hebrew-text">מחיר</TableHead>
                       <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                      <TableHead className="text-right hebrew-text">תאריך הוספה</TableHead>
-                      <TableHead className="text-right hebrew-text">פעולות</TableHead>
+                      <TableHead className="text-right hebrew-text">תאריך</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {vehicles.map((vehicle: any) => (
-                      <TableRow key={vehicle.id}>
-                        <TableCell className="font-medium hebrew-text">{vehicle.year}</TableCell>
-                        <TableCell className="hebrew-text">₪{vehicle.price?.toLocaleString()}</TableCell>
+                      <TableRow key={vehicle.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}>
+                        <TableCell className="font-medium">{vehicle.year}</TableCell>
+                        <TableCell>₪{vehicle.price?.toLocaleString()}</TableCell>
                         <TableCell>
-                          <Badge variant={vehicle.status === 'available' ? 'default' : 'secondary'}>
+                          <Badge variant={vehicle.status === 'available' ? 'default' : 'secondary'} className="text-xs">
                             {vehicle.status === 'available' ? 'זמין' : vehicle.status === 'sold' ? 'נמכר' : 'לא זמין'}
                           </Badge>
                         </TableCell>
-                        <TableCell>{new Date(vehicle.created_at).toLocaleDateString('he-IL')}</TableCell>
-                        <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="hebrew-text"
-                              onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
-                            >
-                              צפה
-                            </Button>
-                          </div>
-                        </TableCell>
+                        <TableCell className="text-sm">{new Date(vehicle.created_at).toLocaleDateString('he-IL')}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               ) : (
-                <p className="text-center text-muted-foreground hebrew-text py-8">אין רכבים</p>
+                <p className="text-center text-muted-foreground hebrew-text py-6 text-sm">אין רכבים</p>
               )}
             </CardContent>
           </Card>
