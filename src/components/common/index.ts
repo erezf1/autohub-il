@@ -1,5 +1,7 @@
 // Cards
 export { VehicleCard } from './VehicleCard';
+export { DealerCard } from './DealerCard';
+export { AnonymousDealerCard } from './AnonymousDealerCard';
 
 // Layout
 export { Logo } from './Logo';

@@ -661,11 +661,13 @@ export type Database = {
           available_auctions: number | null
           available_boosts: number | null
           avg_response_time: number | null
+          business_description: string | null
           business_name: string
           created_at: string | null
           full_name: string
           id: string
           location_id: number | null
+          profile_picture_url: string | null
           rating_tier: string | null
           subscription_type: string | null
           subscription_valid_until: string | null
@@ -679,11 +681,13 @@ export type Database = {
           available_auctions?: number | null
           available_boosts?: number | null
           avg_response_time?: number | null
+          business_description?: string | null
           business_name: string
           created_at?: string | null
           full_name: string
           id: string
           location_id?: number | null
+          profile_picture_url?: string | null
           rating_tier?: string | null
           subscription_type?: string | null
           subscription_valid_until?: string | null
@@ -697,11 +701,13 @@ export type Database = {
           available_auctions?: number | null
           available_boosts?: number | null
           avg_response_time?: number | null
+          business_description?: string | null
           business_name?: string
           created_at?: string | null
           full_name?: string
           id?: string
           location_id?: number | null
+          profile_picture_url?: string | null
           rating_tier?: string | null
           subscription_type?: string | null
           subscription_valid_until?: string | null

@@ -1,14 +1,37 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, CheckCircle, Phone, Mail, ArrowLeft } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Clock, CheckCircle, Phone, Mail, ArrowLeft, FileText, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
 
 export const PendingApprovalScreen: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  const profileData = location.state?.profileData || {};
+  const { user } = useAuth();
+
+  // Fetch complete profile data
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ['pending-profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const { data, error } = await dealerClient
+        .from('user_profiles')
+        .select(`
+          *,
+          location:locations(name_hebrew)
+        `)
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
 
   const handleLogout = () => {
     navigate('/mobile/login');
@@ -52,23 +75,70 @@ export const PendingApprovalScreen: React.FC = () => {
             </ul>
           </div>
 
-          <div className="bg-gray-50 border rounded-lg p-4 space-y-3">
-            <h4 className="font-medium text-gray-800">הפרטים שנרשמו:</h4>
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">שם מלא:</span>
-                <span>{profileData.fullName || 'לא צוין'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">שם העסק:</span>
-                <span>{profileData.businessName || 'לא צוין'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">מיקום:</span>
-                <span>{profileData.location || 'לא צוין'}</span>
+          {/* Profile Details */}
+          {isLoading ? (
+            <div className="bg-gray-50 border rounded-lg p-4 animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
+              <div className="space-y-2">
+                <div className="h-3 bg-gray-200 rounded" />
+                <div className="h-3 bg-gray-200 rounded" />
+                <div className="h-3 bg-gray-200 rounded" />
               </div>
             </div>
-          </div>
+          ) : profile && (
+            <div className="bg-gray-50 border rounded-lg p-4 space-y-3">
+              <h4 className="font-medium text-gray-800 flex items-center gap-2">
+                <User className="w-4 h-4" />
+                הפרטים שנרשמו:
+              </h4>
+              
+              {/* Profile Picture */}
+              {profile.profile_picture_url && (
+                <div className="flex justify-center">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={profile.profile_picture_url} alt="Profile" />
+                    <AvatarFallback>{profile.full_name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </div>
+              )}
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">שם מלא:</span>
+                  <span className="font-medium">{profile.full_name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">שם העסק:</span>
+                  <span className="font-medium">{profile.business_name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">מיקום:</span>
+                  <span className="font-medium">{profile.location?.name_hebrew || 'לא צוין'}</span>
+                </div>
+                {profile.business_description && (
+                  <div className="pt-2 border-t">
+                    <span className="text-muted-foreground block mb-1">תיאור העסק:</span>
+                    <p className="text-sm">{profile.business_description}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Trade License Document */}
+              {profile.trade_license_file_url && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full gap-2"
+                  asChild
+                >
+                  <a href={profile.trade_license_file_url} target="_blank" rel="noopener noreferrer">
+                    <FileText className="w-4 h-4" />
+                    צפה בתו סוחר שהועלה
+                  </a>
+                </Button>
+              )}
+            </div>
+          )}
 
           <div className="space-y-3">
             <p className="text-center text-sm text-muted-foreground">

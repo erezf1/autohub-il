@@ -8,7 +8,16 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (phone: string, password: string, fullName: string, businessName: string) => Promise<{ error: any }>;
+  signUp: (
+    phone: string, 
+    password: string, 
+    fullName: string, 
+    businessName: string,
+    locationId: number,
+    businessDescription: string,
+    tradeLicenseFileUrl: string,
+    profilePictureUrl: string | null
+  ) => Promise<{ error: any }>;
   signIn: (phone: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -43,7 +52,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (phone: string, password: string, fullName: string, businessName: string) => {
+  const signUp = async (
+    phone: string, 
+    password: string, 
+    fullName: string, 
+    businessName: string,
+    locationId: number,
+    businessDescription: string,
+    tradeLicenseFileUrl: string,
+    profilePictureUrl: string | null
+  ) => {
     try {
       // Validate phone format
       const cleanedPhone = cleanPhoneNumber(phone);
@@ -64,6 +82,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             phone_number: cleanedPhone,
             full_name: fullName,
             business_name: businessName,
+            location_id: locationId,
+            business_description: businessDescription,
+            trade_license_file_url: tradeLicenseFileUrl,
+            profile_picture_url: profilePictureUrl,
           }
         }
       });
