@@ -140,9 +140,16 @@ const VehicleDetailScreen = () => {
               alt={`${vehicle.make?.name_hebrew} ${vehicle.model?.name_hebrew}`}
               className="w-full h-full object-cover"
             />
-            <Badge variant="secondary" className="absolute top-2 right-2 hebrew-text">
-              {statusLabel}
-            </Badge>
+            <div className="absolute top-2 right-2 flex gap-2">
+              <Badge variant="secondary" className="hebrew-text">
+                {statusLabel}
+              </Badge>
+              {vehicle.is_boosted && (
+                <Badge className="bg-orange-500 text-white hebrew-text">
+                  מבוסט
+                </Badge>
+              )}
+            </div>
             
             {images.length > 1 && (
               <>
@@ -182,16 +189,40 @@ const VehicleDetailScreen = () => {
       <Card>
         <CardContent className="p-4">
           <div className="flex justify-between items-start mb-2">
-            <h2 className="text-2xl font-bold text-foreground hebrew-text">
-              {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
-            </h2>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-foreground hebrew-text">
+                {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
+              </h2>
+              {vehicle.is_boosted && vehicle.boosted_until && (
+                <p className="text-sm text-orange-500 hebrew-text mt-1">
+                  מבוסט עד: {new Date(vehicle.boosted_until).toLocaleDateString('he-IL')}
+                </p>
+              )}
+            </div>
             <div className="text-left">
-              <p className="text-2xl font-bold text-primary hebrew-text">
-                {parseFloat(vehicle.price.toString()).toLocaleString()} ₪
-              </p>
-              <p className="text-sm text-muted-foreground hebrew-text">
-                ניתן למשא ומתן
-              </p>
+              {vehicle.hot_sale_price && vehicle.is_boosted ? (
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Flame className="h-5 w-5 text-orange-500" />
+                    <Badge className="bg-orange-500 text-white hebrew-text">מבצע חם!</Badge>
+                  </div>
+                  <p className="text-3xl font-bold text-orange-500 hebrew-text">
+                    {parseFloat(vehicle.hot_sale_price.toString()).toLocaleString()} ₪
+                  </p>
+                  <p className="text-lg text-muted-foreground line-through hebrew-text">
+                    {parseFloat(vehicle.price.toString()).toLocaleString()} ₪
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-primary hebrew-text">
+                    {parseFloat(vehicle.price.toString()).toLocaleString()} ₪
+                  </p>
+                  <p className="text-sm text-muted-foreground hebrew-text">
+                    ניתן למשא ומתן
+                  </p>
+                </>
+              )}
             </div>
           </div>
           

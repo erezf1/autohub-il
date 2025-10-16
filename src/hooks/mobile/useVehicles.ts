@@ -15,6 +15,7 @@ export interface VehicleInput {
   price: number;
   description?: string;
   had_severe_crash?: boolean;
+  test_result_file_url?: string | null;
   previous_owners?: number;
   images?: string[] | null;
 }

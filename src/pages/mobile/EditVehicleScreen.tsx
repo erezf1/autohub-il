@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useVehicleMakes, useVehicleModels, useVehicleTags } from "@/hooks/mobile/useVehicles";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -40,6 +41,7 @@ const EditVehicleScreen = () => {
   const [uploading, setUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [uploadingTestFile, setUploadingTestFile] = useState(false);
   const [formData, setFormData] = useState({
     make_id: "",
     model_id: "",
@@ -53,6 +55,8 @@ const EditVehicleScreen = () => {
     previousOwners: "1",
     description: "",
     vehicleType: "",
+    hadSevereCrash: false,
+    testResultFileUrl: "",
   });
   
   const { data: makes } = useVehicleMakes();
@@ -93,6 +97,8 @@ const EditVehicleScreen = () => {
         previousOwners: vehicle.previous_owners?.toString() || "1",
         description: vehicle.description || "",
         vehicleType: vehicle.sub_model || "",
+        hadSevereCrash: vehicle.had_severe_crash || false,
+        testResultFileUrl: vehicle.test_result_file_url || "",
       });
     }
   }, [vehicle]);
@@ -189,6 +195,8 @@ const EditVehicleScreen = () => {
       previous_owners: formData.previousOwners ? parseInt(formData.previousOwners) : 1,
       images: uploadedImages.length > 0 ? uploadedImages : null,
       sub_model: formData.vehicleType || null,
+      had_severe_crash: formData.hadSevereCrash,
+      test_result_file_url: formData.testResultFileUrl || null,
     };
 
     try {
@@ -280,6 +288,51 @@ const EditVehicleScreen = () => {
 
   const removeImage = (url: string) => {
     setUploadedImages(uploadedImages.filter(img => img !== url));
+  };
+
+  const handleTestFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingTestFile(true);
+    try {
+      const { data: { user } } = await dealerClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: 'קובץ גדול מדי',
+          description: 'הקובץ חייב להיות קטן מ-10MB',
+          variant: 'destructive',
+        });
+        setUploadingTestFile(false);
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/test-results/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await dealerClient.storage
+        .from('vehicle-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = dealerClient.storage
+        .from('vehicle-images')
+        .getPublicUrl(fileName);
+
+      setFormData({ ...formData, testResultFileUrl: publicUrl });
+      toast({ title: 'הקובץ הועלה בהצלחה' });
+    } catch (error: any) {
+      toast({
+        title: 'שגיאה בהעלאת הקובץ',
+        description: error?.message || 'אירעה שגיאה',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingTestFile(false);
+    }
   };
 
   if (isLoading) {
@@ -553,6 +606,65 @@ const EditVehicleScreen = () => {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="hebrew-text min-h-[120px]"
               />
+            </div>
+
+            <div className="flex items-center space-x-2 space-x-reverse pt-2">
+              <Checkbox 
+                id="hadSevereCrash"
+                checked={formData.hadSevereCrash}
+                onCheckedChange={(checked) => setFormData({ ...formData, hadSevereCrash: checked as boolean })}
+              />
+              <Label htmlFor="hadSevereCrash" className="hebrew-text cursor-pointer">
+                הרכב היה מעורב בתאונה חמורה
+              </Label>
+            </div>
+
+            <div>
+              <Label className="hebrew-text">קובץ תוצאות טסט (אופציונלי)</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleTestFileUpload}
+                  disabled={uploadingTestFile}
+                  className="hidden"
+                  id="test-file-edit"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('test-file-edit')?.click()}
+                  disabled={uploadingTestFile}
+                  className="hebrew-text"
+                >
+                  <Upload className="h-4 w-4 ml-2" />
+                  {uploadingTestFile ? 'מעלה...' : formData.testResultFileUrl ? 'החלף קובץ' : 'העלה קובץ'}
+                </Button>
+                {formData.testResultFileUrl && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(formData.testResultFileUrl, '_blank')}
+                      className="hebrew-text"
+                    >
+                      צפה בקובץ
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFormData({ ...formData, testResultFileUrl: "" })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
+              {formData.testResultFileUrl && !uploadingTestFile && (
+                <p className="text-sm text-muted-foreground mt-1 hebrew-text">קובץ קיים</p>
+              )}
             </div>
           </CardContent>
         </Card>

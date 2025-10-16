@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { useVehicles, useVehicleMakes, useVehicleModels } from "@/hooks/mobile/useVehicles";
+import { useVehicles, useVehicleMakes, useVehicleModels, useVehicleTags } from "@/hooks/mobile/useVehicles";
 import { dealerClient } from "@/integrations/supabase/dealerClient";
 import { useToast } from "@/hooks/use-toast";
 import { VEHICLE_TYPES } from "@/constants/vehicleTypes";
@@ -29,12 +29,6 @@ const transmissions = [
 
 const colors = ["לבן", "שחור", "כסוף", "אפור", "כחול", "אדום", "ירוק", "חום"];
 
-const availableFeatures = [
-  "מערכת ניווט", "מצלמת רוורס", "חישני חניה", "בקרת שיוט",
-  "מזגן אוטומטי", "חלונות חשמליים", "גג נפתח", "מושבי עור",
-  "מערכת שמע מתקדמת", "מנעולי ילדים", "כרית אוויר", "ABS"
-];
-
 interface VehicleForm {
   brand: string;
   model: string;
@@ -47,9 +41,10 @@ interface VehicleForm {
   color: string;
   previousOwners: string;
   description: string;
-  features: string[];
   condition: string;
   vehicleType: string;
+  hadSevereCrash: boolean;
+  testResultFileUrl: string;
 }
 
 const AddVehicleScreen = () => {
@@ -59,9 +54,12 @@ const AddVehicleScreen = () => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [uploadingTestFile, setUploadingTestFile] = useState(false);
   
   const { data: makes } = useVehicleMakes();
   const { data: models } = useVehicleModels(selectedMakeId);
+  const { data: availableTags } = useVehicleTags();
   const { addVehicle, isAddingVehicle } = useVehicles();
   const { toast } = useToast();
   
@@ -77,9 +75,10 @@ const AddVehicleScreen = () => {
     color: "",
     previousOwners: "1",
     description: "",
-    features: [],
     condition: "",
-    vehicleType: ""
+    vehicleType: "",
+    hadSevereCrash: false,
+    testResultFileUrl: ""
   });
 
   const handleBackClick = () => {
@@ -159,10 +158,27 @@ const AddVehicleScreen = () => {
       previous_owners: formData.previousOwners ? parseInt(formData.previousOwners) : 1,
       images: uploadedImages.length > 0 ? uploadedImages : null,
       sub_model: formData.vehicleType || null,
+      had_severe_crash: formData.hadSevereCrash,
+      test_result_file_url: formData.testResultFileUrl || null,
     };
 
     addVehicle(vehicleData, {
-      onSuccess: () => {
+      onSuccess: async (newVehicle: any) => {
+        // Save tags if any selected
+        if (selectedTagIds.length > 0 && newVehicle?.id) {
+          try {
+            await dealerClient
+              .from('vehicle_listing_tags')
+              .insert(
+                selectedTagIds.map(tagId => ({
+                  vehicle_id: newVehicle.id,
+                  tag_id: tagId
+                }))
+              );
+          } catch (error) {
+            console.error('Error saving tags:', error);
+          }
+        }
         navigate("/mobile/dashboard");
       }
     });
@@ -230,19 +246,55 @@ const AddVehicleScreen = () => {
     setUploadedImages(uploadedImages.filter(img => img !== url));
   };
 
-  const updateFormData = (field: keyof VehicleForm, value: string | string[]) => {
+  const updateFormData = (field: keyof VehicleForm, value: string | string[] | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const toggleFeature = (feature: string) => {
-    const currentFeatures = formData.features;
-    if (currentFeatures.includes(feature)) {
-      updateFormData("features", currentFeatures.filter(f => f !== feature));
-    } else {
-      updateFormData("features", [...currentFeatures, feature]);
+  const handleTestFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingTestFile(true);
+    try {
+      const { data: { user } } = await dealerClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: 'קובץ גדול מדי',
+          description: 'הקובץ חייב להיות קטן מ-10MB',
+          variant: 'destructive',
+        });
+        setUploadingTestFile(false);
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/test-results/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await dealerClient.storage
+        .from('vehicle-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = dealerClient.storage
+        .from('vehicle-images')
+        .getPublicUrl(fileName);
+
+      updateFormData("testResultFileUrl", publicUrl);
+      toast({ title: 'הקובץ הועלה בהצלחה' });
+    } catch (error: any) {
+      toast({
+        title: 'שגיאה בהעלאת הקובץ',
+        description: error?.message || 'אירעה שגיאה',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingTestFile(false);
     }
   };
 
@@ -557,6 +609,54 @@ const AddVehicleScreen = () => {
                 <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.condition}</p>
               )}
             </div>
+
+            <div className="flex items-center space-x-2 space-x-reverse pt-2">
+              <Checkbox 
+                id="hadSevereCrash"
+                checked={formData.hadSevereCrash}
+                onCheckedChange={(checked) => updateFormData("hadSevereCrash", checked as boolean)}
+              />
+              <Label htmlFor="hadSevereCrash" className="hebrew-text cursor-pointer">
+                הרכב היה מעורב בתאונה חמורה
+              </Label>
+            </div>
+
+            <div>
+              <Label className="hebrew-text">קובץ תוצאות טסט (אופציונלי)</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleTestFileUpload}
+                  disabled={uploadingTestFile}
+                  className="hidden"
+                  id="test-file"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('test-file')?.click()}
+                  disabled={uploadingTestFile}
+                  className="hebrew-text"
+                >
+                  <Upload className="h-4 w-4 ml-2" />
+                  {uploadingTestFile ? 'מעלה...' : 'העלה קובץ'}
+                </Button>
+                {formData.testResultFileUrl && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => updateFormData("testResultFileUrl", "")}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              {formData.testResultFileUrl && (
+                <p className="text-sm text-muted-foreground mt-1 hebrew-text">קובץ הועלה בהצלחה</p>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
@@ -587,19 +687,28 @@ const AddVehicleScreen = () => {
             </div>
 
             <div>
-              <Label className="hebrew-text">תכונות נוספות</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {availableFeatures.map(feature => (
-                  <div key={feature} className="flex items-center space-x-2 space-x-reverse">
-                    <Checkbox 
-                      id={feature}
-                      checked={formData.features.includes(feature)}
-                      onCheckedChange={() => toggleFeature(feature)}
-                    />
-                    <Label htmlFor={feature} className="hebrew-text text-sm cursor-pointer">
-                      {feature}
-                    </Label>
-                  </div>
+              <Label className="hebrew-text">תגיות</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {availableTags?.map(tag => (
+                  <Badge
+                    key={tag.id}
+                    variant={selectedTagIds.includes(tag.id) ? "default" : "outline"}
+                    className="cursor-pointer hebrew-text"
+                    style={selectedTagIds.includes(tag.id) ? { 
+                      backgroundColor: tag.color || '#6B7280',
+                      borderColor: tag.color || '#6B7280',
+                      color: '#ffffff'
+                    } : {}}
+                    onClick={() => {
+                      setSelectedTagIds(prev => 
+                        prev.includes(tag.id)
+                          ? prev.filter(id => id !== tag.id)
+                          : [...prev, tag.id]
+                      );
+                    }}
+                  >
+                    {tag.name_hebrew}
+                  </Badge>
                 ))}
               </div>
             </div>
