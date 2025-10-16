@@ -11,6 +11,7 @@ import darkCarImage from "@/assets/dark_car.png";
 import { useState } from "react";
 import { getVehicleTypeLabel } from "@/constants/vehicleTypes";
 import { useAuth } from "@/contexts/AuthContext";
+import { DealerCard } from "@/components/common";
 
 const VehicleDetailScreen = () => {
   const { id } = useParams();
@@ -392,35 +393,15 @@ const VehicleDetailScreen = () => {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text">פרטי המוכר</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-3 space-x-reverse mb-4">
-              <Avatar className="h-12 w-12">
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  {(ownerProfile?.business_name || ownerProfile?.full_name || 'M').charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h3 className="font-semibold text-foreground hebrew-text">
-                  {ownerProfile?.business_name || ownerProfile?.full_name || 'סוחר'}
-                </h3>
-              </div>
-            </div>
-            
-            <div className="flex space-x-2 space-x-reverse">
-              <Button 
-                className="flex-1"
-                onClick={handleContactSeller}
-              >
-                <MessageCircle className="h-4 w-4 ml-2" />
-                <span className="hebrew-text">שלח הודעה</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        vehicle.owner_id && (
+          <DealerCard
+            dealerId={vehicle.owner_id}
+            isRevealed={true}
+            showChatButton={true}
+            showPhoneButton={true}
+            onChatClick={handleContactSeller}
+          />
+        )
       )}
     </div>
   );

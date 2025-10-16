@@ -25,7 +25,7 @@ export const SetPasswordScreen: React.FC = () => {
     setIsLoading(true);
     
     // Create auth user with minimal info
-    const { error } = await signUp(phoneNumber, password, '', '');
+    const { error } = await signUp(phoneNumber, password, '', '', 0, '', '', null);
     
     setIsLoading(false);
     

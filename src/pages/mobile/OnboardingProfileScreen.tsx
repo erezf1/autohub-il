@@ -23,7 +23,7 @@ export const OnboardingProfileScreen: React.FC = () => {
     if (!fullName.trim() || !businessName.trim() || password.length !== 6 || password !== confirmPassword) return;
     
     setIsLoading(true);
-    const { error } = await signUp(phoneNumber, password, fullName, businessName);
+    const { error } = await signUp(phoneNumber, password, fullName, businessName, 0, '', '', null);
     setIsLoading(false);
     
     if (!error) {
