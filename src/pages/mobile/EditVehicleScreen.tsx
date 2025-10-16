@@ -571,6 +571,70 @@ const EditVehicleScreen = () => {
                 </Button>
               </div>
             </div>
+
+            <div className="flex items-center space-x-2 space-x-reverse">
+              <Checkbox
+                id="crash-checkbox"
+                checked={formData.hadSevereCrash}
+                onCheckedChange={(checked) => setFormData({ ...formData, hadSevereCrash: checked as boolean })}
+              />
+              <Label htmlFor="crash-checkbox" className="hebrew-text cursor-pointer">
+                הרכב היה מעורב בתאונה חמורה
+              </Label>
+            </div>
+
+            <div>
+              <Label className="hebrew-text">מסמך בדיקה / טסט (אופציונלי)</Label>
+              <div className="space-y-2">
+                {formData.testResultFileUrl ? (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(formData.testResultFileUrl, '_blank')}
+                      className="flex-1 hebrew-text"
+                    >
+                      צפה במסמך
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFormData({ ...formData, testResultFileUrl: "" })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={handleTestFileUpload}
+                      disabled={uploadingTestFile}
+                      className="hidden"
+                      id="mobile-edit-test-file-upload"
+                    />
+                    <label htmlFor="mobile-edit-test-file-upload">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full hebrew-text"
+                        disabled={uploadingTestFile}
+                        onClick={() => document.getElementById('mobile-edit-test-file-upload')?.click()}
+                      >
+                        <Upload className="h-4 w-4 ml-2" />
+                        {uploadingTestFile ? 'מעלה...' : 'העלה מסמך בדיקה'}
+                      </Button>
+                    </label>
+                  </>
+                )}
+                <p className="text-xs text-muted-foreground hebrew-text">
+                  PDF, Word, או תמונה - עד 10MB
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

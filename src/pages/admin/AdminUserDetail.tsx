@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Edit, Phone, MapPin, Calendar, Activity, CheckCircle, XCircle, Clock, Car, Gavel, Loader2 } from "lucide-react";
+import { ArrowRight, Edit, Phone, MapPin, Calendar, Activity, CheckCircle, XCircle, Clock, Car, Gavel, Loader2, Eye, Edit2, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +20,11 @@ const AdminUserDetail = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('vehicle_listings')
-        .select('*')
+        .select(`
+          *,
+          make:vehicle_makes(name_hebrew),
+          model:vehicle_models(name_hebrew)
+        `)
         .eq('owner_id', id)
         .order('created_at', { ascending: false });
       
@@ -287,15 +291,20 @@ const AdminUserDetail = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="text-right hebrew-text">יצרן</TableHead>
+                      <TableHead className="text-right hebrew-text">דגם</TableHead>
                       <TableHead className="text-right hebrew-text">שנה</TableHead>
                       <TableHead className="text-right hebrew-text">מחיר</TableHead>
                       <TableHead className="text-right hebrew-text">סטטוס</TableHead>
                       <TableHead className="text-right hebrew-text">תאריך</TableHead>
+                      <TableHead className="text-right hebrew-text">פעולות</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {vehicles.map((vehicle: any) => (
-                      <TableRow key={vehicle.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}>
+                      <TableRow key={vehicle.id}>
+                        <TableCell className="font-medium hebrew-text">{vehicle.make?.name_hebrew || '-'}</TableCell>
+                        <TableCell className="hebrew-text">{vehicle.model?.name_hebrew || '-'}</TableCell>
                         <TableCell className="font-medium">{vehicle.year}</TableCell>
                         <TableCell>₪{vehicle.price?.toLocaleString()}</TableCell>
                         <TableCell>
@@ -304,6 +313,24 @@ const AdminUserDetail = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm">{new Date(vehicle.created_at).toLocaleDateString('he-IL')}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => navigate(`/admin/vehicles/${vehicle.id}/edit`)}
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

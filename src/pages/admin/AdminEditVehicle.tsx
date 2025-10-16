@@ -50,6 +50,7 @@ const AdminEditVehicle = () => {
   const [selectedMakeId, setSelectedMakeId] = useState<number | undefined>();
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadingTestFile, setUploadingTestFile] = useState(false);
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [formData, setFormData] = useState({
     make_id: "",
@@ -151,6 +152,49 @@ const AdminEditVehicle = () => {
 
   const removeImage = (url: string) => {
     setUploadedImages(uploadedImages.filter(img => img !== url));
+  };
+
+  const handleTestFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingTestFile(true);
+    try {
+      if (!vehicle?.owner_id) throw new Error('No owner ID');
+
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: 'קובץ גדול מדי',
+          description: 'הקובץ חייב להיות קטן מ-10MB',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${vehicle.owner_id}/test-results/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await adminClient.storage
+        .from('vehicle-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = adminClient.storage
+        .from('vehicle-images')
+        .getPublicUrl(fileName);
+
+      setFormData({ ...formData, testResultFileUrl: publicUrl });
+      toast({ title: 'הקובץ הועלה בהצלחה' });
+    } catch (error: any) {
+      toast({
+        title: 'שגיאה בהעלאת הקובץ',
+        description: error?.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingTestFile(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -477,6 +521,58 @@ const AdminEditVehicle = () => {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="hebrew-text min-h-[120px]"
               />
+            </div>
+
+            <div>
+              <Label className="hebrew-text">מסמך בדיקה / טסט (אופציונלי)</Label>
+              <div className="space-y-2">
+                {formData.testResultFileUrl ? (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(formData.testResultFileUrl, '_blank')}
+                    >
+                      צפה במסמך
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFormData({ ...formData, testResultFileUrl: "" })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={handleTestFileUpload}
+                      disabled={uploadingTestFile}
+                      className="hidden"
+                      id="test-file-upload"
+                    />
+                    <label htmlFor="test-file-upload">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        disabled={uploadingTestFile}
+                        onClick={() => document.getElementById('test-file-upload')?.click()}
+                      >
+                        <Upload className="h-4 w-4 ml-2" />
+                        {uploadingTestFile ? 'מעלה...' : 'העלה מסמך בדיקה'}
+                      </Button>
+                    </label>
+                  </>
+                )}
+                <p className="text-xs text-muted-foreground hebrew-text">
+                  PDF, Word, או תמונה - עד 10MB
+                </p>
+              </div>
             </div>
 
             <div>

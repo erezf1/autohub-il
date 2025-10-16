@@ -50,8 +50,8 @@ export const useAdminVehicles = () => {
         .from('vehicle_listings')
         .select(`
           *,
-          make:vehicle_makes(name_hebrew, name_english),
-          model:vehicle_models(name_hebrew, name_english)
+          make:vehicle_makes(id, name_hebrew, name_english),
+          model:vehicle_models(id, name_hebrew, name_english)
         `)
         .eq('id', id)
         .single();
