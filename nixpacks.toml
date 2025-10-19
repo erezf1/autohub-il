@@ -2,10 +2,11 @@
 nixPkgs = ["nodejs_18"]
 
 [phases.build]
-cmds = ["chmod +x build.sh", "./build.sh"]
+cmds = ["chmod +x build.sh", "./build.sh", "chmod +x start.sh"]
 
 [phases.start]
-cmd = "npm run preview"
+cmd = "./start.sh"
 
 [variables]
 NODE_ENV = "development"
+NIXPACKS_NO_DENO = "true"
