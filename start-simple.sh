@@ -16,4 +16,6 @@ echo "Starting HTTP server on port $PORT"
 echo "Serving from dist/ directory"
 
 # Use npx to run serve from local node_modules
-exec npx serve -s dist -p $PORT -H 0.0.0.0
+# -s flag serves single page app (SPA) with fallback to index.html
+# -l flag listens on all interfaces (0.0.0.0)
+exec npx serve -s dist -l $PORT
