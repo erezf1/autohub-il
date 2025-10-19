@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ["nodejs-18_x", "npm-9_x"]
+nixPkgs = ["nodejs_18"]
 
 [phases.build]
-cmds = ["npm ci", "npm run build"]
+cmds = ["npm install", "npm run build"]
 
 [phases.start]
 cmd = "npm run preview"
