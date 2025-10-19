@@ -8,6 +8,9 @@ export { Logo } from './Logo';
 export { PageHeader } from './PageHeader';
 export { PageContainer } from './PageContainer';
 
+// Icons
+export { SuperArrowsIcon } from './SuperArrowsIcon';
+
 // Search & Filters
 export { SearchBar } from './SearchBar';
 export { FilterButton } from './FilterButton';

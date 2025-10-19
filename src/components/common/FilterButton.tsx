@@ -13,7 +13,7 @@ export const FilterButton = ({ activeCount, onClick }: FilterButtonProps) => {
       variant="outline" 
       size="icon"
       onClick={onClick}
-      className="relative"
+      className="relative border-0"
     >
       <Filter className="h-4 w-4" />
       {activeCount > 0 && (

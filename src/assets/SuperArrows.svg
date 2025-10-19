@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 30.74 22.25">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient-2);
+      }
+
+      .cls-2 {
+        fill: url(#linear-gradient-4);
+      }
+
+      .cls-3 {
+        fill: url(#linear-gradient-3);
+      }
+
+      .cls-4 {
+        fill: url(#linear-gradient-5);
+      }
+
+      .cls-5 {
+        fill: url(#linear-gradient);
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="0" y1="1071.61" x2="10.18" y2="1071.61" gradientTransform="translate(0 1082.74) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5be1fd"/>
+      <stop offset="1" stop-color="#27e"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="5.14" x2="15.32" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-3" x1="10.28" x2="20.46" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-4" x1="15.42" x2="25.6" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-5" x1="20.56" x2="30.74" xlink:href="#linear-gradient"/>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <polygon class="cls-5" points="2 0 0 0 8.17 11.13 0 22.25 2 22.25 10.18 11.13 2 0"/>
+      <polygon class="cls-1" points="7.15 0 5.14 0 13.31 11.13 5.14 22.25 7.15 22.25 15.32 11.13 7.15 0"/>
+      <polygon class="cls-3" points="12.29 0 10.28 0 18.45 11.13 10.28 22.25 12.29 22.25 20.46 11.13 12.29 0"/>
+      <polygon class="cls-2" points="17.43 0 15.42 0 23.59 11.13 15.42 22.25 17.43 22.25 25.6 11.13 17.43 0"/>
+      <polygon class="cls-4" points="22.57 0 20.56 0 28.73 11.13 20.56 22.25 22.57 22.25 30.74 11.13 22.57 0"/>
+    </g>
+  </g>
+</svg>

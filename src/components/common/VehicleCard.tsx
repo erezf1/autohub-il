@@ -1,6 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import darkCarImage from "@/assets/dark_car.png";
+import miniArrowIcon from "@/assets/miniArrow.svg";
 
 interface VehicleCardProps {
   id: string;
@@ -43,53 +44,89 @@ export const VehicleCard = ({
   const isHotSale = isBoosted && boostedUntil && new Date(boostedUntil) > new Date() && hotPrice;
 
   return (
-    <Card 
+    <div 
       className="card-interactive cursor-pointer"
       onClick={onClick}
     >
-      <CardContent className="p-0">
-        <div className="flex h-32">
-          <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-r-lg">
-            <img
-              src={images?.[0] || darkCarImage}
-              alt={`${makeName} ${modelName}`}
-              className="w-full h-full object-cover"
-            />
-            {isHotSale && (
-              <Badge className="absolute top-2 left-2 bg-orange-500">
-                🔥 Hot Sale
-              </Badge>
-            )}
-          </div>
-
-          <div className="flex-1 p-4 flex flex-col justify-between">
-            <div>
-              <h3 className="font-semibold text-foreground hebrew-text mb-1">
-                {makeName} {modelName} {year}
-              </h3>
-              <p className="text-sm text-muted-foreground hebrew-text">
-                {kilometers?.toLocaleString()} ק״מ • {transmissionLabel} • {fuelLabel}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {isHotSale && hotPrice ? (
-                <>
-                  <p className="text-lg font-bold text-orange-600 hebrew-text">
-                    {hotPrice.toLocaleString('he-IL')} ₪
-                  </p>
-                  <p className="text-sm text-muted-foreground line-through hebrew-text">
-                    {originalPrice.toLocaleString('he-IL')} ₪
-                  </p>
-                </>
-              ) : (
-                <p className="text-lg font-bold text-primary hebrew-text">
-                  {originalPrice.toLocaleString('he-IL')} ₪
-                </p>
+      <GradientBorderContainer className="rounded-md flex-1">
+        <div 
+          className="bg-black overflow-hidden h-full shadow-sm relative"
+          style={{ borderRadius: 'calc(var(--radius) - 1px)' }}
+        >
+        <div 
+          className="flex h-32"
+          style={{ borderRadius: 'calc(var(--radius) - 1px)' }}
+        >
+            <div 
+              className="relative w-32 h-32 flex-shrink-0 overflow-hidden"
+              style={{ borderRadius: 'calc(var(--radius) - 1px) 0 0 calc(var(--radius) - 1px)' }}
+            >
+              <img
+                src={images?.[0] || darkCarImage}
+                alt={`${makeName} ${modelName}`}
+                className="w-full h-full object-cover"
+              />
+              {isHotSale && (
+                <Badge className="absolute top-2 left-2 bg-orange-500">
+                  🔥 Hot Sale
+                </Badge>
               )}
             </div>
-          </div>
+
+            <div className="flex-1 p-4 flex flex-col justify-between">
+              <div>
+                <h3 className="font-semibold text-foreground hebrew-text mb-1">
+                  {makeName} {modelName} {year}
+                </h3>
+                <p className="text-sm text-muted-foreground hebrew-text">
+                  {kilometers?.toLocaleString()} ק״מ • {transmissionLabel} • {fuelLabel}
+                </p>
+              </div>
+            </div>
+
+            {/* Price Capsule at the bottom */}
+            <div className="absolute left-2 bottom-2 z-10">
+              <div className="flex rounded-full overflow-hidden" style={{ backgroundColor: '#01394f' }}>
+                {/* Left side with price - 80% */}
+                <div className="px-4 py-0 flex items-center">
+                  {isHotSale && hotPrice ? (
+                    <div className="flex flex-col items-start">
+                      <div className="flex items-baseline gap-0">
+                        <p className="text-lg font-black text-orange-400 hebrew-text leading-none">
+                          {hotPrice.toLocaleString('he-IL')}
+                        </p>
+                        <span className="text-xl font-black text-orange-300">₪</span>
+                      </div>
+                      <div className="flex items-baseline gap-0">
+                        <p className="text-sm text-gray-400 line-through hebrew-text leading-none">
+                          {originalPrice.toLocaleString('he-IL')}
+                        </p>
+                        <span className="text-xl font-black text-gray-500">₪</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-baseline gap-0">
+                      <p className="text-lg font-black text-white hebrew-text leading-none">
+                        {originalPrice.toLocaleString('he-IL')}
+                      </p>
+                      <span className="text-xl font-black text-gray-300">₪</span>
+                    </div>
+                  )}
+                </div>
+                {/* Right side with gradient and arrow - 20% */}
+                <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-r from-[#2277ee] to-[#5be1fd]">
+                  <img 
+                    src={miniArrowIcon} 
+                    alt="arrow" 
+                    className="w-3 h-3"
+                    style={{ filter: 'brightness(0) saturate(100%) invert(0%) sepia(83%) saturate(3594%) hue-rotate(174deg) brightness(95%) contrast(100%)' }}
+                  />
+                </div>
+              </div>
+            </div>
+            </div>
         </div>
-      </CardContent>
-    </Card>
+      </GradientBorderContainer>
+    </div>
   );
 };

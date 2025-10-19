@@ -1,5 +1,6 @@
 import { SearchBar } from "./SearchBar";
 import { FilterButton } from "./FilterButton";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 
 interface SearchFilterBarProps {
   searchValue: string;
@@ -18,16 +19,20 @@ export const SearchFilterBar = ({
 }: SearchFilterBarProps) => {
   return (
     <div className="flex gap-2">
-      <SearchBar
-        placeholder={searchPlaceholder}
-        value={searchValue}
-        onChange={onSearchChange}
-        className="flex-1"
-      />
-      <FilterButton
-        activeCount={filterCount}
-        onClick={onFilterClick}
-      />
+      <GradientBorderContainer className="rounded-md flex-1">
+        <SearchBar
+          placeholder={searchPlaceholder}
+          value={searchValue}
+          onChange={onSearchChange}
+          className="flex-1"
+        />
+      </GradientBorderContainer>
+      <GradientBorderContainer className="rounded-md">
+        <FilterButton
+          activeCount={filterCount}
+          onClick={onFilterClick}
+        />
+      </GradientBorderContainer>
     </div>
   );
 };
