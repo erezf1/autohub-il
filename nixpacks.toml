@@ -1,7 +1,3 @@
-[providers]
-node = true
-deno = false
-
 [phases.setup]
 nixPkgs = ["nodejs_18"]
 
@@ -10,7 +6,6 @@ cmds = ["chmod +x build.sh", "./build.sh", "chmod +x start.sh"]
 
 [phases.start]
 cmd = "./start.sh"
-nixpacksPath = false
 
 [variables]
 NODE_ENV = "development"
