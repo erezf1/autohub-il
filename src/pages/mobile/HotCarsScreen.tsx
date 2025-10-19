@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, ArrowRight, Loader2, Flame } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { ArrowRight, Loader2, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,10 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { useBoosts } from "@/hooks/mobile/useBoosts";
 import { VehicleFilterDrawer } from "@/components/mobile/VehicleFilterDrawer";
 import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from "@/utils/mobile/vehicleFilters";
+import { FilterButton } from "@/components/common/FilterButton";
+import { ActiveFiltersDisplay } from "@/components/common/ActiveFiltersDisplay";
+import { ResultsCount } from "@/components/common/ResultsCount";
 import darkCarImage from "@/assets/dark_car.png";
 
 export const HotCarsScreen = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<VehicleFilters>({});
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const navigate = useNavigate();
@@ -19,8 +20,7 @@ export const HotCarsScreen = () => {
 
   const filteredResults = applyVehicleFilters(
     boostedVehicles || [],
-    filters,
-    searchQuery
+    filters
   );
 
   const activeFilterCount = getActiveFilterCount(filters);
@@ -51,55 +51,19 @@ export const HotCarsScreen = () => {
         </Button>
       </div>
 
-      {/* Search and Filter */}
-      <div className="flex gap-2">
-        <div className="flex-1 relative">
-          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="חפש לפי יצרן, דגם או שנה..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-10"
-          />
-        </div>
-        <Button 
-          variant="outline" 
-          size="icon"
+      {/* Results count and filter button */}
+      <div className="flex items-center justify-between">
+        <ResultsCount count={filteredResults.length} isLoading={isLoadingBoosted} />
+        <FilterButton
+          activeCount={activeFilterCount}
           onClick={() => setFilterDrawerOpen(true)}
-          className="relative"
-        >
-          <Filter className="h-4 w-4" />
-          {activeFilterCount > 0 && (
-            <Badge 
-              className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
-              variant="destructive"
-            >
-              {activeFilterCount}
-            </Badge>
-          )}
-        </Button>
+        />
       </div>
 
-      {/* Active Filters Display */}
-      {activeFilterCount > 0 && (
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm text-muted-foreground hebrew-text">
-            {activeFilterCount} פילטרים פעילים
-          </span>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => setFilters({})}
-          >
-            נקה הכל
-          </Button>
-        </div>
-      )}
-
-      {/* Results */}
-      <p className="text-sm text-muted-foreground hebrew-text">
-        נמצאו {filteredResults.length} רכבים חמים
-      </p>
+      <ActiveFiltersDisplay
+        filterCount={activeFilterCount}
+        onClearAll={() => setFilters({})}
+      />
 
       {isLoadingBoosted ? (
         <div className="flex justify-center py-12">

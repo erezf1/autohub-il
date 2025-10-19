@@ -6,6 +6,7 @@ export interface VehicleFilters {
   priceFrom?: number;
   priceTo?: number;
   tagIds?: number[];
+  vehicleType?: string;
 }
 
 export const applyVehicleFilters = (vehicles: any[], filters: VehicleFilters, searchQuery?: string) => {
@@ -63,6 +64,11 @@ export const applyVehicleFilters = (vehicles: any[], filters: VehicleFilters, se
       }
     }
 
+    // Vehicle type filter
+    if (filters.vehicleType && vehicle.sub_model !== filters.vehicleType) {
+      return false;
+    }
+
     return true;
   });
 };
@@ -77,6 +83,7 @@ export const getActiveFilterCount = (filters: VehicleFilters): number => {
   if (filters.priceFrom) count++;
   if (filters.priceTo) count++;
   if (filters.tagIds && filters.tagIds.length > 0) count++;
+  if (filters.vehicleType) count++;
 
   return count;
 };

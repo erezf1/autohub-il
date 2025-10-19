@@ -3,10 +3,12 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Gavel, Clock, Filter, Plus } from 'lucide-react';
+import { Gavel, Clock, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
 import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
+import { FilterButton } from '@/components/common/FilterButton';
+import { ActiveFiltersDisplay } from '@/components/common/ActiveFiltersDisplay';
 import darkCarImage from "@/assets/dark_car.png";
 
 // Mock data for bids and auctions
@@ -127,42 +129,21 @@ export const BidsScreen: React.FC = () => {
         </TabsList>
 
           <TabsContent value="active-auctions" className="space-y-4">
-            {/* Filter Button */}
-            <div className="flex justify-end">
-              <Button 
-                variant="outline" 
-                size="sm"
+            {/* Filter section */}
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground hebrew-text">
+                {filteredActiveAuctions.length} מכרזים פעילים
+              </p>
+              <FilterButton
+                activeCount={activeFilterCount}
                 onClick={() => setFilterDrawerOpen(true)}
-                className="relative gap-2"
-              >
-                <Filter className="h-4 w-4" />
-                סנן מכרזים
-                {activeFilterCount > 0 && (
-                  <Badge 
-                    className="h-5 w-5 p-0 flex items-center justify-center text-xs"
-                    variant="destructive"
-                  >
-                    {activeFilterCount}
-                  </Badge>
-                )}
-              </Button>
+              />
             </div>
 
-            {/* Active Filters Display */}
-            {activeFilterCount > 0 && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-muted-foreground hebrew-text">
-                  {activeFilterCount} פילטרים פעילים
-                </span>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setFilters({})}
-                >
-                  נקה הכל
-                </Button>
-              </div>
-            )}
+            <ActiveFiltersDisplay
+              filterCount={activeFilterCount}
+              onClearAll={() => setFilters({})}
+            />
 
             {/* My Bids Section First */}
             <div>

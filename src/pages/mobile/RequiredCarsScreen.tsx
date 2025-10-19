@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-// import MobileLayout from '@/components/mobile/MobileLayout'; // <--- This line is removed
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Clock, CheckCircle, Search } from 'lucide-react';
+import { Plus, Clock, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader } from '@/components/common';
+import { PageHeader, FilterButton, ResultsCount, ActiveFiltersDisplay } from '@/components/common';
+import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
+import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
 
 // Mock data for ISO requests
 const mockISORequests = [
@@ -60,9 +61,18 @@ const getStatusText = (status: string) => {
   }
 };
 
-export const RequiredCarsScreen: React.FC = () => {
+export const RequiredCarsScreen = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState('all');
+  const [filters, setFilters] = useState<VehicleFilters>({});
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+
+  const filteredRequests = applyVehicleFilters(
+    mockISORequests,
+    filters
+  );
+
+  const activeFilterCount = getActiveFilterCount(filters);
 
   return (
     // The MobileLayout component has been replaced with a div
@@ -75,11 +85,24 @@ export const RequiredCarsScreen: React.FC = () => {
           <TabsTrigger value="mine">הבקשות שלי</TabsTrigger>
         </TabsList>
 
-          <TabsContent value="all" className="space-y-4">
+          <TabsContent value="all" className="space-y-3">
+            {/* Filter section */}
+            <div className="flex items-center justify-between mb-4">
+              <ResultsCount count={filteredRequests.length} isLoading={false} />
+              <FilterButton
+                activeCount={activeFilterCount}
+                onClick={() => setFilterDrawerOpen(true)}
+              />
+            </div>
+
+            <ActiveFiltersDisplay
+              filterCount={activeFilterCount}
+              onClearAll={() => setFilters({})}
+            />
 
             {/* ISO Requests List */}
             <div className="space-y-3">
-              {mockISORequests.map((request) => (
+              {filteredRequests.map((request) => (
                 <Card
                   key={request.id}
                   // Added text-right for RTL alignment
@@ -221,6 +244,16 @@ export const RequiredCarsScreen: React.FC = () => {
             )}
           </TabsContent>
       </Tabs>
+
+      {/* Filter Drawer */}
+      <VehicleFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        currentFilters={filters}
+        onApplyFilters={setFilters}
+      />
     </div>
   );
 };
+
+export default RequiredCarsScreen;

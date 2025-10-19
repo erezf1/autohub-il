@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Minus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useVehicleMakes, useVehicleModels, useVehicleTags } from "@/hooks/mobile/useVehicles";
 import { VehicleFilters } from "@/utils/mobile/vehicleFilters";
+import { VEHICLE_TYPES } from "@/constants/vehicleTypes";
 
 interface VehicleFilterDrawerProps {
   open: boolean;
@@ -80,6 +80,11 @@ export const VehicleFilterDrawer = ({
     setLocalFilters({ ...localFilters, tagIds: newTags.length > 0 ? newTags : undefined });
   };
 
+  const handleVehicleTypeChange = (value: string) => {
+    const vehicleType = value === "all" ? undefined : value;
+    setLocalFilters({ ...localFilters, vehicleType });
+  };
+
   const handleReset = () => {
     setLocalFilters({});
     onApplyFilters({});
@@ -93,15 +98,15 @@ export const VehicleFilterDrawer = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh] w-full" dir="rtl">
+      <DrawerContent className="max-h-[90vh] max-w-md mx-auto" dir="rtl">
         <DrawerHeader>
           <DrawerTitle className="text-right hebrew-text">סינון רכבים</DrawerTitle>
         </DrawerHeader>
 
-        <div className="overflow-y-auto px-4 pb-4 space-y-6">
-          {/* Make Selector */}
-          <div>
-            <Label className="hebrew-text">יצרן</Label>
+        <div className="overflow-y-auto px-4 pb-4 space-y-4">
+          {/* Make Selector - Horizontal */}
+          <div className="grid grid-cols-[120px_1fr] items-center gap-3">
+            <Label className="hebrew-text text-right">יצרן</Label>
             <Select 
               value={localFilters.makeId?.toString() || "all"} 
               onValueChange={handleMakeChange}
@@ -120,9 +125,9 @@ export const VehicleFilterDrawer = ({
             </Select>
           </div>
 
-          {/* Model Selector */}
-          <div>
-            <Label className="hebrew-text">דגם</Label>
+          {/* Model Selector - Horizontal */}
+          <div className="grid grid-cols-[120px_1fr] items-center gap-3">
+            <Label className="hebrew-text text-right">דגם</Label>
             <Select 
               value={localFilters.modelId?.toString() || "all"} 
               onValueChange={handleModelChange}
@@ -142,119 +147,74 @@ export const VehicleFilterDrawer = ({
             </Select>
           </div>
 
-          {/* Year Range */}
-          <div>
-            <Label className="hebrew-text mb-2 block">טווח שנים</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm text-muted-foreground hebrew-text">משנה</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      const current = localFilters.yearFrom || currentYear;
-                      handleYearFromChange(Math.max(1980, current - 1).toString());
-                    }}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    min={1980}
-                    max={currentYear}
-                    value={localFilters.yearFrom || ""}
-                    onChange={(e) => handleYearFromChange(e.target.value)}
-                    placeholder="1980"
-                    className="text-center"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      const current = localFilters.yearFrom || 1980;
-                      handleYearFromChange(Math.min(currentYear, current + 1).toString());
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+          {/* Vehicle Type - Horizontal */}
+          <div className="grid grid-cols-[120px_1fr] items-center gap-3">
+            <Label className="hebrew-text text-right">סוג רכב</Label>
+            <Select 
+              value={localFilters.vehicleType || "all"} 
+              onValueChange={handleVehicleTypeChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="בחר סוג רכב" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">הכל</SelectItem>
+                {VEHICLE_TYPES.map(type => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-              <div>
-                <Label className="text-sm text-muted-foreground hebrew-text">עד שנה</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      const current = localFilters.yearTo || currentYear;
-                      const minYear = localFilters.yearFrom || 1980;
-                      handleYearToChange(Math.max(minYear, current - 1).toString());
-                    }}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    min={localFilters.yearFrom || 1980}
-                    max={currentYear}
-                    value={localFilters.yearTo || ""}
-                    onChange={(e) => handleYearToChange(e.target.value)}
-                    placeholder={currentYear.toString()}
-                    className="text-center"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      const current = localFilters.yearTo || (localFilters.yearFrom || currentYear);
-                      handleYearToChange(Math.min(currentYear, current + 1).toString());
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+          {/* Year Range - Simplified - Horizontal */}
+          <div className="grid grid-cols-[120px_1fr] items-center gap-3">
+            <Label className="hebrew-text text-right">טווח שנים</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                type="number"
+                min={1980}
+                max={currentYear}
+                value={localFilters.yearFrom || ""}
+                onChange={(e) => handleYearFromChange(e.target.value)}
+                placeholder="משנה"
+              />
+              <Input
+                type="number"
+                min={localFilters.yearFrom || 1980}
+                max={currentYear}
+                value={localFilters.yearTo || ""}
+                onChange={(e) => handleYearToChange(e.target.value)}
+                placeholder="עד"
+              />
             </div>
           </div>
 
-          {/* Price Range */}
-          <div>
-            <Label className="hebrew-text mb-2 block">טווח מחירים (₪)</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm text-muted-foreground hebrew-text">ממחיר</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={localFilters.priceFrom || ""}
-                  onChange={(e) => handlePriceFromChange(e.target.value)}
-                  placeholder="0"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label className="text-sm text-muted-foreground hebrew-text">עד מחיר</Label>
-                <Input
-                  type="number"
-                  min={localFilters.priceFrom || 0}
-                  value={localFilters.priceTo || ""}
-                  onChange={(e) => handlePriceToChange(e.target.value)}
-                  placeholder="אין מגבלה"
-                  className="mt-1"
-                />
-              </div>
+          {/* Price Range - Simplified - Horizontal */}
+          <div className="grid grid-cols-[120px_1fr] items-center gap-3">
+            <Label className="hebrew-text text-right">טווח מחירים (₪)</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                type="number"
+                min={0}
+                value={localFilters.priceFrom || ""}
+                onChange={(e) => handlePriceFromChange(e.target.value)}
+                placeholder="ממחיר"
+              />
+              <Input
+                type="number"
+                min={localFilters.priceFrom || 0}
+                value={localFilters.priceTo || ""}
+                onChange={(e) => handlePriceToChange(e.target.value)}
+                placeholder="עד מחיר"
+              />
             </div>
           </div>
 
-          {/* Tags */}
+          {/* Tags - Compact */}
           <div>
-            <Label className="hebrew-text mb-2 block">
+            <Label className="hebrew-text mb-2 block text-right">
               תגיות {localFilters.tagIds && localFilters.tagIds.length > 0 && (
                 <span className="text-sm text-muted-foreground">
                   ({localFilters.tagIds.length} נבחרו)

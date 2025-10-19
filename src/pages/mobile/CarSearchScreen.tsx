@@ -7,15 +7,14 @@ import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from "@/uti
 import {
   PageContainer,
   PageHeader,
-  SearchFilterBar,
   ActiveFiltersDisplay,
   ResultsCount,
   LoadingSpinner,
   VehicleCard,
+  FilterButton,
 } from "@/components/common";
 
 const CarSearchScreen = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<VehicleFilters>({});
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const navigate = useNavigate();
@@ -32,8 +31,7 @@ const CarSearchScreen = () => {
 
   const filteredResults = applyVehicleFilters(
     sortedVehicles,
-    filters,
-    searchQuery
+    filters
   );
 
   const activeFilterCount = getActiveFilterCount(filters);
@@ -53,20 +51,18 @@ const CarSearchScreen = () => {
         }
       />
 
-      <SearchFilterBar
-        searchValue={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="חפש לפי יצרן, דגם או שנה..."
-        filterCount={activeFilterCount}
-        onFilterClick={() => setFilterDrawerOpen(true)}
-      />
+      <div className="flex items-center justify-between">
+        <ResultsCount count={filteredResults.length} isLoading={isLoading} />
+        <FilterButton
+          activeCount={activeFilterCount}
+          onClick={() => setFilterDrawerOpen(true)}
+        />
+      </div>
 
       <ActiveFiltersDisplay
         filterCount={activeFilterCount}
         onClearAll={() => setFilters({})}
       />
-
-      <ResultsCount count={filteredResults.length} isLoading={isLoading} />
 
       {isLoading ? (
         <LoadingSpinner />
