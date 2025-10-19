@@ -8,7 +8,7 @@ interface MobileLayoutProps {
 
 const MobileLayout = ({ children }: MobileLayoutProps) => {
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
+    <div className="min-h-screen" dir="rtl">
       <MobileHeader />
       <main className="pb-16 pt-4 min-h-[calc(100vh-8rem)]">
         <div className="container max-w-md mx-auto px-4">

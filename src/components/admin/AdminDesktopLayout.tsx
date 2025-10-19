@@ -16,7 +16,7 @@ interface AdminDesktopLayoutProps {
 
 const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
   return (
-    <div className="h-screen w-full bg-background overflow-hidden" dir="rtl">
+    <div className="h-screen w-full overflow-hidden" dir="rtl">
       {/* Fixed Admin Header */}
       <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-4">

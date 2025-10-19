@@ -7,7 +7,7 @@
 @layer base {
   :root {
     /* Core Background & Text - Black Theme */
-    --background: 0 0% 8%;
+    --background: 0 0% 0%;
     --foreground: 0 0% 100%;
 
     /* Card System - Dark Gray Cards */
@@ -130,9 +130,43 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     direction: rtl;
+    background: hsl(var(--background)) url('./assets/DeskBG.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  /* Mobile-specific background handling */
+  @media (max-width: 768px) {
+    body {
+      background-attachment: scroll;
+      background-size: cover;
+      min-height: 100vh;
+    }
+    
+    /* Create a fixed background for mobile */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: hsl(var(--background)) url('./assets/BG.svg');
+      background-size: 100vw 100vh;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    body {
+      background: hsl(var(--background));
+    }
   }
 
   /* RTL Support */

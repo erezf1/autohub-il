@@ -7,7 +7,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-muted/20" dir="rtl">
+    <div className="min-h-screen" dir="rtl">
       {/* Header */}
       <header className="py-8 text-center">
         <div className="container mx-auto px-4">

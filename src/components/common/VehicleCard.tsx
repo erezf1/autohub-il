@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import darkCarImage from "@/assets/dark_car.png";
 import miniArrowIcon from "@/assets/miniArrow.svg";
 
@@ -75,10 +76,11 @@ export const VehicleCard = ({
 
             <div className="flex-1 p-4 flex flex-col justify-between">
               <div>
-                <h3 className="font-semibold text-foreground hebrew-text mb-1">
+                <h3 className="font-semibold text-foreground hebrew-text mb-1 flex items-center gap-2">
+                  <SuperArrowsIcon className="w-4 h-4 transform scale-x-[-1]" />
                   {makeName} {modelName} {year}
                 </h3>
-                <p className="text-sm text-muted-foreground hebrew-text">
+                <p className="text-sm text-white hebrew-text">
                   {kilometers?.toLocaleString()} ק״מ • {transmissionLabel} • {fuelLabel}
                 </p>
               </div>
@@ -92,24 +94,24 @@ export const VehicleCard = ({
                   {isHotSale && hotPrice ? (
                     <div className="flex flex-col items-start">
                       <div className="flex items-baseline gap-0">
-                        <p className="text-lg font-black text-orange-400 hebrew-text leading-none">
+                        <p className="text-xl font-black text-orange-400 hebrew-text leading-none">
                           {hotPrice.toLocaleString('he-IL')}
                         </p>
-                        <span className="text-xl font-black text-orange-300">₪</span>
+                        <span className="text-sm font-black text-orange-300">₪</span>
                       </div>
                       <div className="flex items-baseline gap-0">
-                        <p className="text-sm text-gray-400 line-through hebrew-text leading-none">
+                        <p className="text-base text-gray-400 line-through hebrew-text leading-none">
                           {originalPrice.toLocaleString('he-IL')}
                         </p>
-                        <span className="text-xl font-black text-gray-500">₪</span>
+                        <span className="text-xs font-black text-gray-500">₪</span>
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-baseline gap-0">
-                      <p className="text-lg font-black text-white hebrew-text leading-none">
+                      <p className="text-xl font-black text-white hebrew-text leading-none">
                         {originalPrice.toLocaleString('he-IL')}
                       </p>
-                      <span className="text-xl font-black text-gray-300">₪</span>
+                      <span className="text-sm font-black text-gray-300">₪</span>
                     </div>
                   )}
                 </div>
