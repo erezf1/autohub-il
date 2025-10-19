@@ -1,0 +1,8 @@
+{
+  "name": "@nixpacks/node",
+  "detectFiles": ["package.json"],
+  "setup": ["nodejs_18"],
+  "buildCommand": "chmod +x build.sh && ./build.sh && chmod +x start.sh",
+  "startCommand": "./start.sh",
+  "staticDir": "dist"
+}
