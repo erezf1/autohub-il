@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Search, Eye, Edit, Trash2, Plus, FileText, Clock, CheckCircle } from "lucide-react";
+import { Eye, Edit, Trash2, Plus, FileText, Clock, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminVehicleFilterBar } from "@/components/admin";
+import { AdminVehicleFilters, applyAdminRequestFilters } from "@/utils/admin/vehicleFilters";
 import { 
   Table, 
   TableBody, 
@@ -79,7 +80,7 @@ const mockRequests = [
 
 const AdminVehicleRequestsList = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<AdminVehicleFilters>({});
   const [activeTab, setActiveTab] = useState("all");
 
   const getStatusBadge = (status: string) => {
@@ -95,18 +96,7 @@ const AdminVehicleRequestsList = () => {
     }
   };
 
-  const filteredRequests = mockRequests.filter(request => {
-    const matchesSearch = request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         request.requester.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         request.requesterBusiness.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesTab = activeTab === "all" || 
-                      (activeTab === "open" && request.status === "פתוח") ||
-                      (activeTab === "closed" && request.status === "סגור") ||
-                      (activeTab === "pending" && request.status === "ממתין");
-    
-    return matchesSearch && matchesTab;
-  });
+  const filteredRequests = applyAdminRequestFilters(mockRequests, filters, activeTab);
 
   return (
     <div className="space-y-6 min-h-full">
@@ -124,28 +114,15 @@ const AdminVehicleRequestsList = () => {
         </Button>
       </div>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">סינון וחיפוש</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="חפש לפי כותרת, מבקש או עסק..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 hebrew-text"
-              />
-            </div>
-            <Button variant="outline" className="hebrew-text">
-              סינון מתקדם
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Filter Bar */}
+      <AdminVehicleFilterBar
+        filters={filters}
+        onFiltersChange={setFilters}
+        resultCount={filteredRequests.length}
+        isLoading={false}
+        showTags={false}
+        showVehicleType={false}
+      />
 
       {/* Requests Tabs and Table */}
       <Card>

@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Gavel, Eye, Edit, Trash2, Plus, Clock, TrendingUp, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminVehicleFilterBar } from "@/components/admin";
+import { AdminVehicleFilters, applyAdminAuctionFilters } from "@/utils/admin/vehicleFilters";
 import { 
   Table, 
   TableBody, 
@@ -83,7 +84,7 @@ const mockAuctions = [
 
 const AdminAuctionsList = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<AdminVehicleFilters>({});
   const [activeTab, setActiveTab] = useState("all");
 
   const getStatusBadge = (status: string) => {
@@ -112,17 +113,7 @@ const AdminAuctionsList = () => {
     return "text-muted-foreground"; // More than a day
   };
 
-  const filteredAuctions = mockAuctions.filter(auction => {
-    const matchesSearch = auction.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         auction.seller.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesTab = activeTab === "all" || 
-                      (activeTab === "active" && auction.status === "פעיל") ||
-                      (activeTab === "ended" && auction.status === "הסתיים") ||
-                      (activeTab === "cancelled" && auction.status === "מבוטל");
-    
-    return matchesSearch && matchesTab;
-  });
+  const filteredAuctions = applyAdminAuctionFilters(mockAuctions, filters, activeTab);
 
   return (
     <div className="space-y-6 min-h-full">
@@ -140,28 +131,15 @@ const AdminAuctionsList = () => {
         </Button>
       </div>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">סינון וחיפוש</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Gavel className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="חפש לפי כותרת או מוכר..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 hebrew-text"
-              />
-            </div>
-            <Button variant="outline" className="hebrew-text">
-              סינון מתקדם
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Filter Bar */}
+      <AdminVehicleFilterBar
+        filters={filters}
+        onFiltersChange={setFilters}
+        resultCount={filteredAuctions.length}
+        isLoading={false}
+        showTags={false}
+        showVehicleType={false}
+      />
 
       {/* Auctions Tabs and Table */}
       <Card>

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Car, Eye, Edit, Trash2, Plus, Search, Loader2 } from "lucide-react";
+import { Car, Eye, Edit, Trash2, Plus, Loader2 } from "lucide-react";
 import { useAdminVehicles } from "@/hooks/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { AdminVehicleFilterBar } from "@/components/admin";
+import { AdminVehicleFilters, applyAdminVehicleFilters } from "@/utils/admin/vehicleFilters";
 import { 
   Table, 
   TableBody, 
@@ -23,7 +24,7 @@ import { useNavigate } from "react-router-dom";
 
 const AdminVehiclesList = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<AdminVehicleFilters>({});
   const { vehicles, isLoading } = useAdminVehicles();
 
   const getStatusBadge = (status: string) => {
@@ -39,16 +40,7 @@ const AdminVehiclesList = () => {
     }
   };
 
-  const filteredVehicles = (vehicles || []).filter(vehicle => {
-    const makeName = vehicle.make?.name_hebrew || '';
-    const modelName = vehicle.model?.name_hebrew || '';
-    const ownerName = vehicle.owner?.business_name || vehicle.owner?.full_name || '';
-    const search = searchTerm.toLowerCase();
-    
-    return makeName.toLowerCase().includes(search) ||
-           modelName.toLowerCase().includes(search) ||
-           ownerName.toLowerCase().includes(search);
-  });
+  const filteredVehicles = applyAdminVehicleFilters(vehicles || [], filters);
 
   return (
     <div className="space-y-8">
@@ -66,25 +58,15 @@ const AdminVehiclesList = () => {
           </Button>
         </div>
 
-        {/* Filters and Search */}
-        <Card>
-          <CardContent className="p-8">
-            <div className="flex gap-6">
-              <div className="relative flex-1">
-                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  placeholder="חפש לפי יצרן, דגם או מוכר..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-12 h-12 text-base hebrew-text"
-                />
-              </div>
-              <Button variant="outline" size="lg" className="hebrew-text">
-                סינון מתקדם
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Filter Bar */}
+        <AdminVehicleFilterBar
+          filters={filters}
+          onFiltersChange={setFilters}
+          resultCount={filteredVehicles.length}
+          isLoading={isLoading}
+          showTags={true}
+          showVehicleType={true}
+        />
 
         {/* Vehicles Table */}
         <Card>
