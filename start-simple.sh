@@ -11,14 +11,9 @@ if [ ! -d "dist" ]; then
     exit 1
 fi
 
-# Install serve if not available
-if ! command -v serve >/dev/null 2>&1; then
-    echo "Installing serve package..."
-    npm install -g serve
-fi
-
 PORT=${PORT:-4173}
 echo "Starting HTTP server on port $PORT"
 echo "Serving from dist/ directory"
 
-exec serve -s dist -p $PORT -H 0.0.0.0
+# Use npx to run serve from local node_modules
+exec npx serve -s dist -p $PORT -H 0.0.0.0
