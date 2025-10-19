@@ -17,9 +17,13 @@ COPY . .
 # Build the application (Vite should now be available)
 RUN npm run build
 
-# Copy and prepare startup script
+# Copy and prepare startup scripts
 COPY start.sh ./
-RUN chmod +x start.sh
+COPY start-simple.sh ./
+RUN chmod +x start.sh start-simple.sh
+
+# Install serve globally
+RUN npm install -g serve
 
 # Switch to production and clean up devDependencies
 ENV NODE_ENV=production
@@ -29,4 +33,4 @@ RUN npm prune --production
 EXPOSE 4173
 
 # Start the application
-CMD ["./start.sh"]
+CMD ["./start-simple.sh"]

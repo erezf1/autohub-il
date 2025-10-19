@@ -2,10 +2,10 @@
 nixPkgs = ["nodejs_18"]
 
 [phases.build]
-cmds = ["chmod +x build.sh", "./build.sh", "chmod +x start.sh", "chmod +x start-simple.sh", "npm install -g serve"]
+cmds = ["chmod +x build.sh", "./build.sh", "npm install -g serve"]
 
 [phases.start]
-cmd = "./start-simple.sh"
+cmd = "chmod +x start-simple.sh && ./start-simple.sh"
 
 [variables]
 NODE_ENV = "development"
