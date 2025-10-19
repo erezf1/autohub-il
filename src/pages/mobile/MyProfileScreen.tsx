@@ -1,17 +1,25 @@
-import { useState } from "react";
-import { User, Building, Phone, MapPin, Edit3, Loader2, Crown, Calendar, Award, Flame, Gavel, Car } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { useProfile } from "@/hooks/mobile/useProfile";
-import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { dealerClient } from "@/integrations/supabase/dealerClient";
 import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
-import { he } from "date-fns/locale";
-import { formatPhoneDisplay } from '@/utils/phoneValidation';
+import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/mobile/useProfile";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { MobilePageTitle } from "@/components/mobile";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { 
+  User, 
+  Building2, 
+  Phone, 
+  MapPin, 
+  FileText,
+  Calendar,
+  Package,
+  Zap,
+  Gavel,
+  Car
+} from "lucide-react";
+import { dealerClient } from "@/integrations/supabase/dealerClient";
+import { useQuery } from "@tanstack/react-query";
 
 const MyProfileScreen = () => {
   const navigate = useNavigate();
@@ -19,8 +27,8 @@ const MyProfileScreen = () => {
   const { profile, isLoading: profileLoading } = useProfile();
   
   // Fetch phone from users table
-  const { data: userData, isLoading: userLoading } = useQuery({
-    queryKey: ['user-data', user?.id],
+  const { data: phoneData, isLoading: phoneLoading } = useQuery({
+    queryKey: ['user-phone', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
       const { data } = await dealerClient
@@ -28,36 +36,33 @@ const MyProfileScreen = () => {
         .select('phone_number')
         .eq('id', user.id)
         .single();
-      return data;
+      return data?.phone_number;
     },
     enabled: !!user?.id,
   });
 
+  const phoneNumber = phoneData;
+
   // Fetch active vehicle count
-  const { data: activeVehiclesCount } = useQuery({
+  const { data: activeVehicles } = useQuery({
     queryKey: ['active-vehicles-count', user?.id],
     queryFn: async () => {
       if (!user?.id) return 0;
-      const { count, error } = await dealerClient
+      const { count } = await dealerClient
         .from('vehicle_listings')
         .select('*', { count: 'exact', head: true })
         .eq('owner_id', user.id)
         .eq('status', 'available');
       
-      if (error) throw error;
       return count || 0;
     },
     enabled: !!user?.id,
   });
 
-  const isLoading = profileLoading || userLoading;
+  const isLoading = profileLoading || phoneLoading;
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+  if (isLoading || !profile) {
+    return <LoadingSpinner />;
   }
 
   const getSubscriptionLabel = (type: string) => {
@@ -88,147 +93,164 @@ const MyProfileScreen = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground hebrew-text">הפרופיל שלי</h1>
-        <Button onClick={() => navigate('/mobile/profile-edit')} variant="outline" size="sm">
-          <Edit3 className="h-4 w-4 ml-1" />
-          ערוך פרופיל
-        </Button>
-      </div>
+    <div className="space-y-5">
+      <MobilePageTitle
+        title="הפרופיל שלי"
+        onBack={() => navigate(-1)}
+        rightAction={
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate("/mobile/profile/edit")}
+            className="hebrew-text"
+          >
+            ערוך
+          </Button>
+        }
+      />
 
-      {/* Subscription & Status Card */}
-      <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
-        <CardContent className="p-6 space-y-4">
+      {/* Subscription Details Card */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-bold hebrew-text">פרטי מנוי</CardTitle>
+        </CardHeader>
+        <Separator className="opacity-30" />
+        <CardContent className="pt-6 space-y-4">
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label className="text-sm font-medium hebrew-text text-muted-foreground">
-                סוג מנוי
-              </Label>
-              <div className="flex items-center space-x-2 space-x-reverse">
-                <Crown className="h-5 w-5 text-primary" />
-                <span className="text-lg font-bold text-foreground hebrew-text">
-                  {getSubscriptionLabel(profile?.subscription_type || 'regular')}
-                </span>
+            <div className="flex items-center gap-3">
+              <Package className="h-5 w-5 text-primary/80" />
+              <div>
+                <p className="text-sm font-medium text-foreground/70 hebrew-text">סוג מנוי</p>
+                <p className="font-medium text-foreground hebrew-text">{getSubscriptionLabel(profile.subscription_type)}</p>
               </div>
             </div>
-            <Badge variant="outline" className={`${getRatingTierColor(profile?.rating_tier || 'bronze')} border-current`}>
-              <Award className="h-3 w-3 ml-1" />
-              {getRatingTierLabel(profile?.rating_tier || 'bronze')}
-            </Badge>
+          </div>
+          
+          <Separator className="my-3 opacity-30" />
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-primary/80" />
+              <div>
+                <p className="text-sm font-medium text-foreground/70 hebrew-text">תוקף המנוי</p>
+                <p className="font-medium text-foreground hebrew-text">
+                  {profile.subscription_valid_until 
+                    ? new Date(profile.subscription_valid_until).toLocaleDateString('he-IL')
+                    : 'לא מוגדר'}
+                </p>
+              </div>
+            </div>
           </div>
 
-          {profile?.subscription_valid_until && (
-            <div className="flex items-center space-x-2 space-x-reverse pt-2 border-t">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground hebrew-text">
-                תוקף עד: {format(new Date(profile.subscription_valid_until), 'dd/MM/yyyy', { locale: he })}
-              </span>
-            </div>
-          )}
+          <Separator className="my-3 opacity-30" />
 
-          {/* Subscription Resources */}
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-            <div className="text-center space-y-1">
-              <div className="flex items-center justify-center">
-                <Flame className="h-5 w-5 text-orange-500" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Zap className="h-5 w-5 text-primary/80" />
+              <div>
+                <p className="text-sm font-medium text-foreground/70 hebrew-text">בוסטים זמינים</p>
+                <p className="font-medium text-foreground hebrew-text">{profile.available_boosts || 0}</p>
               </div>
-              <div className="text-2xl font-bold text-foreground">{profile?.available_boosts || 0}</div>
-              <div className="text-xs text-muted-foreground hebrew-text">בוסטים</div>
             </div>
-            <div className="text-center space-y-1">
-              <div className="flex items-center justify-center">
-                <Gavel className="h-5 w-5 text-blue-500" />
+          </div>
+
+          <Separator className="my-3 opacity-30" />
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Gavel className="h-5 w-5 text-primary/80" />
+              <div>
+                <p className="text-sm font-medium text-foreground/70 hebrew-text">מכרזים זמינים</p>
+                <p className="font-medium text-foreground hebrew-text">{profile.available_auctions || 0}</p>
               </div>
-              <div className="text-2xl font-bold text-foreground">{profile?.available_auctions || 0}</div>
-              <div className="text-xs text-muted-foreground hebrew-text">מכרזים</div>
             </div>
-            <div className="text-center space-y-1">
-              <div className="flex items-center justify-center">
-                <Car className="h-5 w-5 text-green-500" />
+          </div>
+
+          <Separator className="my-3 opacity-30" />
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Car className="h-5 w-5 text-primary/80" />
+              <div>
+                <p className="text-sm font-medium text-foreground/70 hebrew-text">מכסת רכבים</p>
+                <p className="font-medium text-foreground hebrew-text">{activeVehicles || 0} / {profile.vehicles_limit || 0}</p>
               </div>
-              <div className="text-2xl font-bold text-foreground">
-                {activeVehiclesCount || 0}/{profile?.vehicles_limit || 0}
-              </div>
-              <div className="text-xs text-muted-foreground hebrew-text">רכבים פעילים</div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Profile Information */}
+      {/* User Details Card */}
       <Card>
-        <CardContent className="p-6 space-y-6">
-          {/* Business Name */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium hebrew-text">
-              שם העסק
-            </Label>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <Building className="h-4 w-4 text-muted-foreground" />
-              <span className="text-foreground hebrew-text">{profile?.business_name || 'לא הוגדר'}</span>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-bold hebrew-text">פרטים אישיים</CardTitle>
+        </CardHeader>
+        <Separator className="opacity-30" />
+        <CardContent className="pt-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <Building2 className="h-5 w-5 text-primary/80" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground/70 hebrew-text">שם העסק</p>
+              <p className="font-medium text-foreground hebrew-text">{profile.business_name}</p>
             </div>
           </div>
 
-          {/* Full Name */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium hebrew-text">
-              שם מלא
-            </Label>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-foreground hebrew-text">{profile?.full_name || 'לא הוגדר'}</span>
+          <Separator className="my-3 opacity-30" />
+
+          <div className="flex items-center gap-3">
+            <User className="h-5 w-5 text-primary/80" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground/70 hebrew-text">שם מלא</p>
+              <p className="font-medium text-foreground hebrew-text">{profile.full_name}</p>
             </div>
           </div>
 
-          {/* Phone */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium hebrew-text">
-              טלפון
-            </Label>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <span className="text-foreground hebrew-text">
-                {userData?.phone_number ? formatPhoneDisplay(userData.phone_number) : 'לא הוגדר'}
-              </span>
+          <Separator className="my-3 opacity-30" />
+
+          <div className="flex items-center gap-3">
+            <Phone className="h-5 w-5 text-primary/80" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground/70 hebrew-text">טלפון</p>
+              <p className="font-medium text-foreground hebrew-text" dir="ltr">{phoneNumber || 'לא זמין'}</p>
             </div>
           </div>
 
-          {/* Location */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium hebrew-text">
-              מיקום
-            </Label>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="text-foreground hebrew-text">
-                {profile?.location?.name_hebrew || 'לא הוגדר'}
-              </span>
+          <Separator className="my-3 opacity-30" />
+
+          <div className="flex items-center gap-3">
+            <MapPin className="h-5 w-5 text-primary/80" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground/70 hebrew-text">מיקום</p>
+              <p className="font-medium text-foreground hebrew-text">
+                {profile.location?.name_hebrew || 'לא מוגדר'}
+              </p>
             </div>
           </div>
 
-          {/* License Number */}
-          {profile?.trade_license_number && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium hebrew-text">
-                מספר רישיון עסק
-              </Label>
-              <span className="text-foreground hebrew-text">{profile.trade_license_number}</span>
-            </div>
-          )}
+          <Separator className="my-3 opacity-30" />
 
-          {/* Tenure */}
-          {profile?.tenure !== undefined && profile.tenure > 0 && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium hebrew-text">
-                ותק במערכת
-              </Label>
-              <span className="text-foreground hebrew-text">
-                {profile.tenure} {profile.tenure === 1 ? 'חודש' : 'חודשים'}
-              </span>
+          <div className="flex items-center gap-3">
+            <FileText className="h-5 w-5 text-primary/80" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground/70 hebrew-text">רישיון עוסק מורשה</p>
+              <p className="font-medium text-foreground hebrew-text">{profile.trade_license_number || 'לא מוגדר'}</p>
             </div>
-          )}
+          </div>
+
+          <Separator className="my-3 opacity-30" />
+
+          <div className="flex items-center gap-3">
+            <Calendar className="h-5 w-5 text-primary/80" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground/70 hebrew-text">ותק</p>
+              <p className="font-medium text-foreground hebrew-text">
+                {getRatingTierLabel(profile.rating_tier)}
+                <span className={`mr-2 ${getRatingTierColor(profile.rating_tier)}`}>
+                  ({profile.rating_tier})
+                </span>
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

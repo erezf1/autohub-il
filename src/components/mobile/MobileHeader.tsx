@@ -20,7 +20,7 @@ const MobileHeader = () => {
   const { profile } = useProfile();
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-card border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-sm bg-card/95 border-b border-border/50 shadow-sm">
       <div className="container max-w-md mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
@@ -37,19 +37,19 @@ const MobileHeader = () => {
         </div>
 
         {/* Right Icons */}
-        <div className="flex items-center space-x-4 space-x-reverse">
+        <div className="flex items-center space-x-5 space-x-reverse">
           {/* Chat Icon with Badge */}
           <div className="relative cursor-pointer" onClick={() => navigate("/mobile/chats")}>
-            <MessageCircle className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
-            <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs rounded-full p-0 flex items-center justify-center">
+            <MessageCircle className="h-7 w-7 text-muted-foreground hover:text-primary transition-colors" />
+            <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 min-w-[20px] text-xs font-semibold rounded-full p-0 flex items-center justify-center">
               3
             </Badge>
           </div>
 
           {/* Notifications Icon with Badge */}
           <div className="relative cursor-pointer" onClick={() => navigate("/mobile/notifications")}>
-            <Bell className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
-            <Badge variant="secondary" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs rounded-full p-0 flex items-center justify-center bg-accent text-accent-foreground">
+            <Bell className="h-7 w-7 text-muted-foreground hover:text-primary transition-colors" />
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 min-w-[20px] text-xs font-semibold rounded-full p-0 flex items-center justify-center bg-gradient-to-r from-[#5be1fd] to-[#2277ee] text-white border-0">
               7
             </Badge>
           </div>

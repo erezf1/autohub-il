@@ -135,6 +135,16 @@
     direction: rtl;
   }
 
+  /* Mobile gradient background */
+  .bg-mobile-gradient {
+    background: linear-gradient(180deg, 
+      hsl(193 97% 67% / 0.05) 0%, 
+      hsl(215 85% 53% / 0.03) 50%,
+      hsl(var(--background)) 100%
+    );
+    background-attachment: fixed;
+  }
+
   /* RTL Support */
   [dir="rtl"] {
     direction: rtl;

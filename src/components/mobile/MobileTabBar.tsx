@@ -40,7 +40,7 @@ const MobileTabBar = () => {
   const navigate = useNavigate();
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
+    <footer className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md bg-card/95 border-t border-border/50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
       <div className="container max-w-md mx-auto">
         <div className="grid grid-cols-5 h-16">
           {tabs.map((tab) => {
@@ -53,14 +53,18 @@ const MobileTabBar = () => {
                 key={tab.id}
                 onClick={() => navigate(tab.path)}
                 className={cn(
-                  "flex flex-col items-center justify-center space-y-1 transition-colors hebrew-text",
+                  "flex flex-col items-center justify-center space-y-1 transition-colors hebrew-text relative",
                   isActive 
                     ? "text-primary" 
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Icon className="h-5 w-5" />
-                <span className="text-xs font-medium">{tab.label}</span>
+                {isActive && <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />}
+                <Icon className="h-6 w-6" />
+                <span className={cn(
+                  "text-[11px]",
+                  isActive ? "font-bold" : "font-semibold"
+                )}>{tab.label}</span>
               </button>
             );
           })}
