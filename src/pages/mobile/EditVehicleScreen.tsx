@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowRight, Loader2, Upload, X, Plus, Minus } from "lucide-react";
+import { Loader2, Upload, X, Plus, Minus } from "lucide-react";
+import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -346,9 +347,12 @@ const EditVehicleScreen = () => {
   return (
     <div className="space-y-4" dir="rtl">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/mobile/my-vehicles')}>
-          <ArrowRight className="h-5 w-5" />
-        </Button>
+        <div 
+          onClick={() => navigate('/mobile/my-vehicles')}
+          className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
+        >
+          <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
+        </div>
         <h1 className="text-2xl font-bold text-foreground hebrew-text">עריכת רכב</h1>
       </div>
 

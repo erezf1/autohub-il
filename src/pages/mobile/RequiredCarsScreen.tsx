@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Clock, CheckCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/common';
+import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
 
 // Mock data for ISO requests
 const mockISORequests = [
@@ -67,7 +68,10 @@ export const RequiredCarsScreen: React.FC = () => {
   return (
     // The MobileLayout component has been replaced with a div
     <div>
-      <PageHeader title="חיפוש רכבים" />
+      <PageHeader 
+        title="חיפוש רכבים" 
+        onBack={() => navigate('/mobile/dashboard')}
+      />
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
@@ -80,17 +84,21 @@ export const RequiredCarsScreen: React.FC = () => {
             {/* ISO Requests List */}
             <div className="space-y-3">
               {mockISORequests.map((request) => (
-                <Card
+                <GradientBorderContainer
                   key={request.id}
-                  // Added text-right for RTL alignment
-                  className="p-4 cursor-pointer hover:shadow-md transition-shadow text-right"
-                  onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
+          
+                  className="rounded-md flex-1"
                 >
+                  <Card
+                    // Added text-right for RTL alignment
+                    className="p-4 cursor-pointer hover:shadow-md transition-shadow text-right border-0 bg-black rounded-md flex-1"
+                    onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
+                  >
                   {/* Added flex-row-reverse to move badge to the left */}
                   <div className="flex justify-between items-start mb-3 flex-row-reverse">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg mb-1">{request.vehicleType}</h3>
-                      <p className="text-sm text-muted-foreground">{request.year}</p>
+                      <h3 className="font-semibold text-lg mb-1 text-white">{request.vehicleType}</h3>
+                      <p className="text-sm text-white">{request.year}</p>
                     </div>
                     <Badge
                       className={`text-white ${getStatusColor(request.status)}`}
@@ -101,17 +109,17 @@ export const RequiredCarsScreen: React.FC = () => {
 
                   <div className="space-y-2 mb-3">
                     <div className="flex items-center gap-2 justify-end">
-                      <span className="text-sm font-medium">{request.priceRange}</span>
-                      <span className="text-sm text-muted-foreground">:טווח מחיר</span>
+                      <span className="text-sm font-medium text-white">{request.priceRange}</span>
+                      <span className="text-sm text-white">:טווח מחיר</span>
                     </div>
                     <div className="flex items-center gap-2 justify-end">
-                      <span className="text-sm">{request.requirements}</span>
-                      <span className="text-sm text-muted-foreground">:דרישות</span>
+                      <span className="text-sm text-white">{request.requirements}</span>
+                      <span className="text-sm text-white">:דרישות</span>
                     </div>
                   </div>
 
                   {/* Added flex-row-reverse to move match count to the left */}
-                  <div className="flex justify-between items-center text-sm text-muted-foreground flex-row-reverse">
+                  <div className="flex justify-between items-center text-sm text-white flex-row-reverse">
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       <span>{request.createdDate}</span>
@@ -124,7 +132,8 @@ export const RequiredCarsScreen: React.FC = () => {
                       </div>
                     )}
                   </div>
-                </Card>
+                  </Card>
+                </GradientBorderContainer>
               ))}
             </div>
           </TabsContent>
@@ -158,17 +167,20 @@ export const RequiredCarsScreen: React.FC = () => {
             {/* My ISO Requests List - filtered to show only user's requests */}
             <div className="space-y-3">
               {mockISORequests.filter(req => req.id <= 2).map((request) => (
-                <Card
+                <GradientBorderContainer
                   key={request.id}
-                  // Added text-right for RTL alignment
-                  className="p-4 cursor-pointer hover:shadow-md transition-shadow border-blue-200 text-right"
-                  onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
+                  className="rounded-md flex-1"
                 >
+                  <Card
+                    // Added text-right for RTL alignment
+                    className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-black border-0 text-right"
+                    onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
+                  >
                   {/* Added flex-row-reverse to move badge to the left */}
                   <div className="flex justify-between items-start mb-3 flex-row-reverse">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg mb-1">{request.vehicleType}</h3>
-                      <p className="text-sm text-muted-foreground">{request.year}</p>
+                      <h3 className="font-semibold text-lg mb-1 text-white">{request.vehicleType}</h3>
+                      <p className="text-sm text-gray-300">{request.year}</p>
                     </div>
                     <Badge
                       className={`text-white ${getStatusColor(request.status)}`}
@@ -179,17 +191,17 @@ export const RequiredCarsScreen: React.FC = () => {
 
                   <div className="space-y-2 mb-3">
                     <div className="flex items-center gap-2 justify-end">
-                      <span className="text-sm font-medium">{request.priceRange}</span>
-                      <span className="text-sm text-muted-foreground">:טווח מחיר</span>
+                      <span className="text-sm font-medium text-white">{request.priceRange}</span>
+                      <span className="text-sm text-gray-300">:טווח מחיר</span>
                     </div>
                     <div className="flex items-center gap-2 justify-end">
-                      <span className="text-sm">{request.requirements}</span>
-                      <span className="text-sm text-muted-foreground">:דרישות</span>
+                      <span className="text-sm text-white">{request.requirements}</span>
+                      <span className="text-sm text-gray-300">:דרישות</span>
                     </div>
                   </div>
 
                   {/* Added flex-row-reverse to move match count to the left */}
-                  <div className="flex justify-between items-center text-sm text-muted-foreground flex-row-reverse">
+                  <div className="flex justify-between items-center text-sm text-gray-300 flex-row-reverse">
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       <span>{request.createdDate}</span>
@@ -203,6 +215,7 @@ export const RequiredCarsScreen: React.FC = () => {
                     )}
                   </div>
                 </Card>
+                </GradientBorderContainer>
               ))}
             </div>
 

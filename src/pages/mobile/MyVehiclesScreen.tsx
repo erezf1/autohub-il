@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { ArrowRight, Plus, Loader2, Edit, Trash2, Search, Filter } from "lucide-react";
+import { Plus, Loader2, Edit, Trash2, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/mobile/useVehicles";
 import { VehicleFilterDrawer } from "@/components/mobile/VehicleFilterDrawer";
@@ -33,13 +34,12 @@ const MyVehiclesScreen = () => {
     <div className="space-y-4" dir="rtl">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon"
+          <div 
             onClick={handleBackClick}
+            className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
           >
-            <ArrowRight className="h-5 w-5" />
-          </Button>
+            <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
+          </div>
           <h1 className="text-2xl font-bold text-foreground hebrew-text">הרכבים שלי</h1>
         </div>
         <Button onClick={() => navigate('/mobile/add-vehicle')}>

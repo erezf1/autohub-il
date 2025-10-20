@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { Plus, Minus, X } from "lucide-react";
 import { useVehicleMakes, useVehicleModels, useVehicleTags } from "@/hooks/mobile/useVehicles";
 import { VehicleFilters } from "@/utils/mobile/vehicleFilters";
@@ -93,131 +94,163 @@ export const VehicleFilterDrawer = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh] w-full" dir="rtl">
+      <DrawerContent 
+        className="max-h-[90vh] w-full border-0 bg-black" 
+        dir="rtl"
+        style={{
+          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.9) 100%)',
+          border: '2px solid transparent',
+          borderTop: '2px solid #2277ee',
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'content-box, border-box',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)'
+        }}
+      >
         <DrawerHeader>
-          <DrawerTitle className="text-right hebrew-text">סינון רכבים</DrawerTitle>
+          <DrawerTitle className="text-right hebrew-text text-white">סינון רכבים</DrawerTitle>
         </DrawerHeader>
 
         <div className="overflow-y-auto px-4 pb-4 space-y-6">
           {/* Make Selector */}
           <div>
-            <Label className="hebrew-text">יצרן</Label>
-            <Select 
-              value={localFilters.makeId?.toString() || "all"} 
-              onValueChange={handleMakeChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="בחר יצרן" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">הכל</SelectItem>
-                {makes?.map(make => (
-                  <SelectItem key={make.id} value={make.id.toString()}>
-                    {make.name_hebrew}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label className="hebrew-text text-white">יצרן</Label>
+            <GradientBorderContainer className="rounded-md">
+              <Select 
+                value={localFilters.makeId?.toString() || "all"} 
+                onValueChange={handleMakeChange}
+              >
+                <SelectTrigger className="text-right" dir="rtl">
+                  <SelectValue placeholder="בחר יצרן" />
+                </SelectTrigger>
+                <SelectContent dir="rtl" align="end">
+                  <SelectItem value="all">הכל</SelectItem>
+                  {makes?.map(make => (
+                    <SelectItem key={make.id} value={make.id.toString()}>
+                      {make.name_hebrew}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </GradientBorderContainer>
           </div>
 
           {/* Model Selector */}
           <div>
-            <Label className="hebrew-text">דגם</Label>
-            <Select 
-              value={localFilters.modelId?.toString() || "all"} 
-              onValueChange={handleModelChange}
-              disabled={!localFilters.makeId}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={localFilters.makeId ? "בחר דגם" : "בחר תחילה יצרן"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">הכל</SelectItem>
-                {models?.map(model => (
-                  <SelectItem key={model.id} value={model.id.toString()}>
-                    {model.name_hebrew}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label className="hebrew-text text-white">דגם</Label>
+            <GradientBorderContainer className="rounded-md">
+              <Select 
+                value={localFilters.modelId?.toString() || "all"} 
+                onValueChange={handleModelChange}
+                disabled={!localFilters.makeId}
+              >
+                <SelectTrigger className="text-right" dir="rtl">
+                  <SelectValue placeholder={localFilters.makeId ? "בחר דגם" : "בחר תחילה יצרן"} />
+                </SelectTrigger>
+                <SelectContent dir="rtl" align="end">
+                  <SelectItem value="all">הכל</SelectItem>
+                  {models?.map(model => (
+                    <SelectItem key={model.id} value={model.id.toString()}>
+                      {model.name_hebrew}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </GradientBorderContainer>
           </div>
 
           {/* Year Range */}
           <div>
-            <Label className="hebrew-text mb-2 block">טווח שנים</Label>
+            <Label className="hebrew-text mb-2 block text-white">טווח שנים</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm text-muted-foreground hebrew-text">משנה</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      const current = localFilters.yearFrom || currentYear;
-                      handleYearFromChange(Math.max(1980, current - 1).toString());
-                    }}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    min={1980}
-                    max={currentYear}
-                    value={localFilters.yearFrom || ""}
-                    onChange={(e) => handleYearFromChange(e.target.value)}
-                    placeholder="1980"
-                    className="text-center"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      const current = localFilters.yearFrom || 1980;
-                      handleYearFromChange(Math.min(currentYear, current + 1).toString());
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                <div className="flex items-end gap-2 mt-1">
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        const current = localFilters.yearFrom || currentYear;
+                        handleYearFromChange(Math.max(1980, current - 1).toString());
+                      }}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
+                  <div className="flex-1 flex flex-col">
+                    <Label className="text-sm text-gray-300 hebrew-text text-center mb-1">משנה</Label>
+                    <GradientBorderContainer className="rounded-md">
+                      <Input
+                        type="number"
+                        min={1980}
+                        max={currentYear}
+                        value={localFilters.yearFrom || ""}
+                        onChange={(e) => handleYearFromChange(e.target.value)}
+                        placeholder="1980"
+                        className="text-center"
+                      />
+                    </GradientBorderContainer>
+                  </div>
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        const current = localFilters.yearFrom || 1980;
+                        handleYearFromChange(Math.min(currentYear, current + 1).toString());
+                      }}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
                 </div>
               </div>
 
               <div>
-                <Label className="text-sm text-muted-foreground hebrew-text">עד שנה</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      const current = localFilters.yearTo || currentYear;
-                      const minYear = localFilters.yearFrom || 1980;
-                      handleYearToChange(Math.max(minYear, current - 1).toString());
-                    }}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    min={localFilters.yearFrom || 1980}
-                    max={currentYear}
-                    value={localFilters.yearTo || ""}
-                    onChange={(e) => handleYearToChange(e.target.value)}
-                    placeholder={currentYear.toString()}
-                    className="text-center"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      const current = localFilters.yearTo || (localFilters.yearFrom || currentYear);
-                      handleYearToChange(Math.min(currentYear, current + 1).toString());
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                <div className="flex items-end gap-2 mt-1">
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        const current = localFilters.yearTo || currentYear;
+                        const minYear = localFilters.yearFrom || 1980;
+                        handleYearToChange(Math.max(minYear, current - 1).toString());
+                      }}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
+                  <div className="flex-1 flex flex-col">
+                    <Label className="text-sm text-gray-300 hebrew-text text-center mb-1">עד שנה</Label>
+                    <GradientBorderContainer className="rounded-md">
+                      <Input
+                        type="number"
+                        min={localFilters.yearFrom || 1980}
+                        max={currentYear}
+                        value={localFilters.yearTo || ""}
+                        onChange={(e) => handleYearToChange(e.target.value)}
+                        placeholder={currentYear.toString()}
+                        className="text-center"
+                      />
+                    </GradientBorderContainer>
+                  </div>
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        const current = localFilters.yearTo || (localFilters.yearFrom || currentYear);
+                        handleYearToChange(Math.min(currentYear, current + 1).toString());
+                      }}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
                 </div>
               </div>
             </div>
@@ -229,25 +262,29 @@ export const VehicleFilterDrawer = ({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-sm text-muted-foreground hebrew-text">ממחיר</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={localFilters.priceFrom || ""}
-                  onChange={(e) => handlePriceFromChange(e.target.value)}
-                  placeholder="0"
-                  className="mt-1"
-                />
+                <GradientBorderContainer className="rounded-md flex-1">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={localFilters.priceFrom || ""}
+                    onChange={(e) => handlePriceFromChange(e.target.value)}
+                    placeholder="0"
+                    className="mt-1"
+                  />
+                </GradientBorderContainer>
               </div>
               <div>
                 <Label className="text-sm text-muted-foreground hebrew-text">עד מחיר</Label>
-                <Input
-                  type="number"
-                  min={localFilters.priceFrom || 0}
-                  value={localFilters.priceTo || ""}
-                  onChange={(e) => handlePriceToChange(e.target.value)}
-                  placeholder="אין מגבלה"
-                  className="mt-1"
-                />
+                <GradientBorderContainer className="rounded-md flex-1">
+                  <Input
+                    type="number"
+                    min={localFilters.priceFrom || 0}
+                    value={localFilters.priceTo || ""}
+                    onChange={(e) => handlePriceToChange(e.target.value)}
+                    placeholder="אין מגבלה"
+                    className="mt-1"
+                  />
+                </GradientBorderContainer>
               </div>
             </div>
           </div>
@@ -285,19 +322,23 @@ export const VehicleFilterDrawer = ({
         </div>
 
         <DrawerFooter className="flex-row gap-2" dir="rtl">
-          <Button 
-            variant="outline" 
-            onClick={handleReset}
-            className="flex-1"
-          >
-            אפס הכל
-          </Button>
-          <Button 
-            onClick={handleApply}
-            className="flex-1"
-          >
-            החל פילטרים
-          </Button>
+          <GradientBorderContainer className="rounded-md flex-1">
+            <Button 
+              variant="outline" 
+              onClick={handleReset}
+              className="w-full"
+            >
+              אפס הכל
+            </Button>
+          </GradientBorderContainer>
+          <GradientBorderContainer className="rounded-md flex-1">
+            <Button 
+              onClick={handleApply}
+              className="w-full text-black"
+            >
+              החל פילטרים
+            </Button>
+          </GradientBorderContainer>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

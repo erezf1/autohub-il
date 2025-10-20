@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { GRADIENT_COLORS } from "@/constants/gradientColors"
 
 export interface GradientBorderContainerProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -16,8 +17,8 @@ const GradientBorderContainer = React.forwardRef<
   className, 
   children, 
   borderWidth = 1, 
-  fromColor = "#2277ee", 
-  toColor = "#5be1fd", 
+  fromColor = GRADIENT_COLORS.from, 
+  toColor = GRADIENT_COLORS.to, 
   style,
   ...props 
 }, ref) => {

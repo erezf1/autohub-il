@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, ArrowRight, Loader2, User, Building, MapPin, FileText, Crown, Calendar, Award } from 'lucide-react';
+import { ArrowLeft, Loader2, User, Building, MapPin, FileText, Crown, Calendar, Award } from 'lucide-react';
+import { SuperArrowsIcon } from '@/components/common/SuperArrowsIcon';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
+import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
 
 export const ProfileEditScreen: React.FC = () => {
   const [fullName, setFullName] = useState('');
@@ -197,14 +199,12 @@ export const ProfileEditScreen: React.FC = () => {
   return (
     <div className="container max-w-md mx-auto px-4 space-y-4" dir="rtl">
       <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => navigate(-1)} 
-          disabled={isLoading}
+        <div 
+          onClick={() => navigate(-1)}
+          className={`h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
         >
-          <ArrowRight className="w-4 h-4" />
-        </Button>
+          <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
+        </div>
         <h1 className="text-2xl font-bold text-foreground hebrew-text">
           {isOnboarding ? 'השלמת פרטים' : 'עריכת פרטים'}
         </h1>
@@ -212,46 +212,53 @@ export const ProfileEditScreen: React.FC = () => {
 
       {/* Subscription Info (Only when not onboarding) */}
       {!isOnboarding && userProfile && (
-        <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
-          <div className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 space-x-reverse">
-                <Crown className="h-5 w-5 text-primary" />
-                <span className="font-bold text-foreground hebrew-text">
-                  {getSubscriptionLabel(userProfile?.subscription_type || 'regular')}
+        <GradientBorderContainer
+          className="rounded-md flex-1"
+        >
+          <Card className="bg-black border-0 rounded-md">
+            <div className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Crown className="h-5 w-5 text-primary" />
+                  <span className="font-bold text-white hebrew-text">
+                    {getSubscriptionLabel(userProfile?.subscription_type || 'regular')}
+                  </span>
+                </div>
+                <Badge variant="outline" className={`${getRatingTierColor(userProfile?.rating_tier || 'bronze')} border-current`}>
+                  <Award className="h-3 w-3 ml-1" />
+                  {getRatingTierLabel(userProfile?.rating_tier || 'bronze')}
+                </Badge>
+              </div>
+
+              {userProfile?.subscription_valid_until && (
+                <div className="flex items-center space-x-2 space-x-reverse text-sm">
+                  <Calendar className="h-4 w-4 text-white" />
+                  <span className="text-white hebrew-text">
+                    תוקף עד: {format(new Date(userProfile.subscription_valid_until), 'dd/MM/yyyy', { locale: he })}
+                  </span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-2 border-t">
+                <span className="text-sm text-white hebrew-text">רכבים פעילים</span>
+                <span className="text-sm font-medium text-white">
+                  {activeVehiclesCount || 0}/{userProfile?.vehicles_limit || 0}
                 </span>
               </div>
-              <Badge variant="outline" className={`${getRatingTierColor(userProfile?.rating_tier || 'bronze')} border-current`}>
-                <Award className="h-3 w-3 ml-1" />
-                {getRatingTierLabel(userProfile?.rating_tier || 'bronze')}
-              </Badge>
             </div>
-
-            {userProfile?.subscription_valid_until && (
-              <div className="flex items-center space-x-2 space-x-reverse text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground hebrew-text">
-                  תוקף עד: {format(new Date(userProfile.subscription_valid_until), 'dd/MM/yyyy', { locale: he })}
-                </span>
-              </div>
-            )}
-
-            <div className="flex items-center justify-between pt-2 border-t">
-              <span className="text-sm text-muted-foreground hebrew-text">רכבים פעילים</span>
-              <span className="text-sm font-medium text-foreground">
-                {activeVehiclesCount || 0}/{userProfile?.vehicles_limit || 0}
-              </span>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </GradientBorderContainer>
       )}
 
-      <Card className="p-6 space-y-6">
+      <GradientBorderContainer
+        className="rounded-md flex-1"
+      >
+        <Card className="p-6 space-y-6 bg-black border-0 rounded-md">
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl font-semibold text-white">
               {isOnboarding ? 'השלמת פרטים אישיים' : 'עריכת פרטים אישיים'}
             </h2>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-white text-sm">
               {isOnboarding 
                 ? 'אנא מלאו את הפרטים הבאים להשלמת ההרשמה'
                 : 'עדכנו את הפרטים האישיים שלכם'}
@@ -363,7 +370,8 @@ export const ProfileEditScreen: React.FC = () => {
             </p>
           </div>
         )}
-      </Card>
+        </Card>
+      </GradientBorderContainer>
     </div>
   );
 };

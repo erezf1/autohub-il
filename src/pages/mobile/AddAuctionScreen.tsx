@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Gavel, Calendar, Clock, DollarSign, Car } from "lucide-react";
+import { Gavel, Calendar, Clock, DollarSign, Car } from "lucide-react";
+import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,7 +82,7 @@ const AddAuctionScreen = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     } else {
-      navigate("/mobile");
+      navigate("/mobile/bids");
     }
   };
 
@@ -135,9 +136,12 @@ const AddAuctionScreen = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3 space-x-reverse">
-          <Button variant="ghost" size="icon" onClick={handleBackClick}>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+          <div 
+            onClick={handleBackClick}
+            className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
+          >
+            <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
+          </div>
           <h1 className="text-xl font-bold text-foreground hebrew-text">
             יצירת מכירה פומבית
           </h1>

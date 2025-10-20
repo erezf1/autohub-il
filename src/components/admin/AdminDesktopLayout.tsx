@@ -16,9 +16,9 @@ interface AdminDesktopLayoutProps {
 
 const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
   return (
-    <div className="h-screen w-full overflow-hidden" dir="rtl">
+    <div className="h-screen w-full flex flex-col overflow-hidden fixed inset-0" dir="rtl">
       {/* Fixed Admin Header */}
-      <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-50">
+      <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between flex-shrink-0 z-50">
         <div className="flex items-center gap-4">
           {/* Logo Section */}
           <div className="flex items-center gap-3">
@@ -71,20 +71,28 @@ const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-8rem)]">
+      <div className="flex flex-1 overflow-hidden">
         {/* Fixed Admin Sidebar */}
         <AdminDesktopSidebar />
 
-        {/* Scrollable Content Area */}
-        <main className="flex-1 overflow-y-auto bg-muted/20 p-8">
+        {/* Scrollable Content Area - ONLY this scrolls */}
+        <main 
+          className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/20 p-8"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain'
+          }}
+        >
           <div className="max-w-none mx-auto">
             {children}
+            {/* Bottom Spacer - Height of footer + 20px breathing room */}
+            <div style={{ height: 'calc(3rem + 20px)' }} aria-hidden="true" />
           </div>
         </main>
       </div>
 
       {/* Fixed Admin Footer */}
-      <footer className="h-12 bg-card border-t border-border px-6 flex items-center justify-center sticky bottom-0 z-50">
+      <footer className="h-12 bg-card border-t border-border px-6 flex items-center justify-center flex-shrink-0 z-50">
         <p className="text-sm text-muted-foreground hebrew-text">
           © 2024 אוטו-האב - פאנל ניהול. כל הזכויות שמורות.
         </p>

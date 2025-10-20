@@ -36,6 +36,13 @@
     --accent: 193 97% 67%;
     --accent-foreground: 0 0% 8%;
 
+    /* Global Hover States - CUSTOMIZE HERE */
+    /* Change --hover-bg to modify the hover background color globally */
+    /* Change --hover-text to modify the hover text color globally */
+    --hover-bg: 193 97% 67%;  /* Cyan background on hover */
+    --hover-text: 0 0% 0%;     /* Black text on hover */
+    --hover-icon: 0 0% 0%;     /* Black icon on hover */
+
     /* Status Colors */
     --success: 142 76% 45%;
     --success-foreground: 0 0% 100%;
@@ -129,44 +136,42 @@
     @apply border-border;
   }
 
+  html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
   body {
     @apply text-foreground;
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     direction: rtl;
-    background: hsl(var(--background)) url('./assets/DeskBG.svg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+    background: hsl(var(--background));
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    inset: 0;
+    overscroll-behavior: none;
+    touch-action: none;
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* Mobile-specific background handling */
-  @media (max-width: 768px) {
-    body {
-      background-attachment: scroll;
-      background-size: cover;
-      min-height: 100vh;
-    }
-    
-    /* Create a fixed background for mobile */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: hsl(var(--background)) url('./assets/BG.svg');
-      background-size: 100vw 100vh;
-      background-position: center;
-      background-repeat: no-repeat;
-      z-index: -1;
-      pointer-events: none;
-    }
-    
-    body {
-      background: hsl(var(--background));
-    }
+  #root {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    overscroll-behavior: none;
+    touch-action: none;
   }
 
   /* RTL Support */
@@ -177,6 +182,51 @@
   /* Hebrew font optimization */
   .hebrew-text {
     font-family: 'Noto Sans Hebrew', 'Arial Hebrew', Arial, sans-serif;
+  }
+
+  /* Dark Mode Scrollbar Styling - Minimalistic & Transparent */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 100, 100, 0.5) transparent;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.5);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 120, 120, 0.7);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:active {
+    background: rgba(140, 140, 140, 0.8);
+  }
+
+  /* Hide scrollbar on mobile for cleaner look */
+  @media (max-width: 768px) {
+    *::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    *::-webkit-scrollbar-thumb {
+      background: rgba(80, 80, 80, 0.4);
+    }
   }
 }
 
@@ -218,6 +268,32 @@
     margin-right: 0.5rem;
     margin-left: 0;
   }
+
+  /* Global Hover Utilities - Consistent hover behavior across all buttons */
+  /* Use these classes for consistent hover effects throughout the app */
+  .btn-hover-cyan {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .btn-hover-cyan:hover {
+    background-color: hsl(var(--hover-bg)) !important;
+    color: hsl(var(--hover-text)) !important;
+  }
+
+  .btn-hover-cyan:hover svg,
+  .btn-hover-cyan:hover .lucide {
+    color: hsl(var(--hover-icon)) !important;
+  }
+
+  /* Icon-only hover (for navigation icons, etc.) */
+  .icon-hover-cyan {
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .icon-hover-cyan:hover {
+    color: hsl(var(--hover-bg)) !important;
+  }
+
   
   [dir="ltr"] .space-x-rtl > * + * {
     margin-right: 0;

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ArrowRight, Flame, Plus, X, Loader2 } from "lucide-react";
+import { Flame, Plus, X, Loader2 } from "lucide-react";
+import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -97,13 +98,12 @@ export const BoostManagementScreen = () => {
     <div className="space-y-4" dir="rtl">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon"
+        <div 
           onClick={() => navigate('/mobile/hot-cars')}
+          className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
         >
-          <ArrowRight className="h-5 w-5" />
-        </Button>
+          <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
+        </div>
         <div className="flex items-center gap-2">
           <Flame className="h-6 w-6 text-orange-500" />
           <h1 className="text-2xl font-bold text-foreground hebrew-text">ניהול בוסטים</h1>
