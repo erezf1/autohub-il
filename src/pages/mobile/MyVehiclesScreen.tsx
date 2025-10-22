@@ -1,114 +1,72 @@
 import { useState } from "react";
-import { Plus, Loader2, Edit, Trash2, Search, Filter } from "lucide-react";
+import { Plus, Loader2, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
+import { Card, CardContent } from "@/components/ui/card";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/mobile/useVehicles";
 import { VehicleFilterDrawer } from "@/components/mobile/VehicleFilterDrawer";
 import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from "@/utils/mobile/vehicleFilters";
+import {
+  PageContainer,
+  PageHeader,
+  FilterButton,
+  ActiveFiltersDisplay,
+  ResultsCount,
+} from "@/components/common";
 import darkCarImage from "@/assets/dark_car.png";
 
 const MyVehiclesScreen = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<VehicleFilters>({});
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const { myVehicles, isLoading } = useVehicles();
 
-  const handleBackClick = () => {
-    navigate('/mobile/search');
-  };
-
   const filteredVehicles = applyVehicleFilters(
     myVehicles || [],
     filters,
-    searchQuery
+    ""
   );
 
   const activeFilterCount = getActiveFilterCount(filters);
 
   return (
-    <div className="container max-w-md mx-auto px-4 space-y-6" dir="rtl">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div 
-            onClick={handleBackClick}
-            className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
-          >
-            <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground hebrew-text">הרכבים שלי</h1>
-        </div>
-        <GradientBorderContainer className="rounded-md">
-          <Button 
-            onClick={() => navigate('/mobile/add-vehicle')} 
-            variant="ghost"
-            size="sm"
-            className="bg-black border-0 text-white hebrew-text"
-          >
-            <Plus className="h-4 w-4 ml-2" />
-            הוסף רכב
-          </Button>
-        </GradientBorderContainer>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="הרכבים שלי"
+        onBack={() => navigate('/mobile/search')}
+        rightAction={
+          <GradientBorderContainer className="rounded-md">
+            <Button 
+              onClick={() => navigate('/mobile/add-vehicle')} 
+              variant="outline"
+              className="border-0"
+            >
+              <Plus className="h-4 w-4 ml-2" />
+              הוסף רכב
+            </Button>
+          </GradientBorderContainer>
+        }
+      />
 
       {/* Search and Filter */}
       {myVehicles && myVehicles.length > 0 && (
-        <div className="flex gap-2">
-          <GradientBorderContainer className="rounded-md flex-1">
-            <div className="relative">
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="חפש ברכבים שלי..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 bg-black border-0 text-right hebrew-text"
-                dir="rtl"
-              />
-            </div>
-          </GradientBorderContainer>
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <ResultsCount count={filteredVehicles.length} isLoading={isLoading} />
           <GradientBorderContainer className="rounded-md">
-            <Button 
-              variant="ghost" 
-              size="icon"
+            <FilterButton
+              activeCount={activeFilterCount}
               onClick={() => setFilterDrawerOpen(true)}
-              className="relative bg-black border-0"
-            >
-              <Filter className="h-4 w-4" />
-              {activeFilterCount > 0 && (
-                <Badge 
-                  className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
-                  variant="destructive"
-                >
-                  {activeFilterCount}
-                </Badge>
-              )}
-            </Button>
+            />
           </GradientBorderContainer>
         </div>
       )}
 
-      {/* Active Filters Display */}
-      {activeFilterCount > 0 && (
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm text-muted-foreground hebrew-text">
-            {activeFilterCount} פילטרים פעילים
-          </span>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => setFilters({})}
-            className="hebrew-text"
-          >
-            נקה הכל
-          </Button>
-        </div>
-      )}
+      <ActiveFiltersDisplay
+        filterCount={activeFilterCount}
+        onClearAll={() => setFilters({})}
+      />
 
       {/* Loading State */}
       {isLoading ? (
@@ -116,14 +74,8 @@ const MyVehiclesScreen = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : myVehicles && myVehicles.length > 0 ? (
-        <>
-          <p className="text-sm text-muted-foreground hebrew-text">
-            מציג {filteredVehicles.length} רכבים
-          </p>
-
-          {/* Vehicles List */}
-          <div className="space-y-3">
-            {filteredVehicles.map((vehicle) => {
+        <div className="space-y-3">
+          {filteredVehicles.map((vehicle) => {
               const transmissionLabel = vehicle.transmission === 'automatic' ? 'אוטומט' : 
                                        vehicle.transmission === 'manual' ? 'ידנית' : 'טיפטרוניק';
               const fuelLabel = vehicle.fuel_type === 'gasoline' ? 'בנזין' :
@@ -200,7 +152,6 @@ const MyVehiclesScreen = () => {
               );
             })}
           </div>
-        </>
       ) : (
         <GradientBorderContainer className="rounded-md">
           <Card className="bg-black border-0 rounded-md p-8 text-center">
@@ -232,7 +183,7 @@ const MyVehiclesScreen = () => {
         currentFilters={filters}
         onApplyFilters={setFilters}
       />
-    </div>
+    </PageContainer>
   );
 };
 

@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { SuperArrowsIcon } from "./SuperArrowsIcon";
 
 interface PageHeaderProps {
-  title: string;
+  title: string | ReactNode;
   onBack?: () => void;
   rightAction?: ReactNode;
 }

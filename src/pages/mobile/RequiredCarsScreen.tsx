@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
-// import MobileLayout from '@/components/mobile/MobileLayout'; // <--- This line is removed
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Clock, CheckCircle, Search } from 'lucide-react';
+import { Plus, Clock, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader } from '@/components/common';
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
+import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
+import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
+import {
+  PageContainer,
+  PageHeader,
+  FilterButton,
+  ActiveFiltersDisplay,
+  ResultsCount,
+} from "@/components/common";
 
 // Mock data for ISO requests
 const mockISORequests = [
@@ -63,26 +69,63 @@ const getStatusText = (status: string) => {
 
 export const RequiredCarsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("all");
+  const [showMyRequests, setShowMyRequests] = useState(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [filters, setFilters] = useState<VehicleFilters>({});
+
+  const activeFilterCount = getActiveFilterCount(filters);
 
   return (
-    // The MobileLayout component has been replaced with a div
-    <div>
+    <PageContainer>
       <PageHeader 
-        title="חיפוש רכבים" 
-        onBack={() => navigate('/mobile/dashboard')}
+        title={showMyRequests ? "הבקשות שלי" : "כל הבקשות"}
+        onBack={showMyRequests ? () => setShowMyRequests(false) : () => navigate('/mobile/dashboard')}
+        rightAction={
+          !showMyRequests ? (
+            <GradientBorderContainer className="rounded-md">
+              <Button 
+                variant="outline"
+                onClick={() => setShowMyRequests(true)}
+                className="border-0"
+              >
+                הבקשות שלי
+              </Button>
+            </GradientBorderContainer>
+          ) : (
+            <GradientBorderContainer className="rounded-md">
+              <Button
+                onClick={() => navigate('/mobile/create-iso-request')}
+                variant="outline"
+                className="border-0"
+              >
+                <Plus className="w-4 h-4 ml-2" />
+                צור בקשה
+              </Button>
+            </GradientBorderContainer>
+          )
+        }
       />
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
-          <TabsTrigger value="all">כל הבקשות</TabsTrigger>
-          <TabsTrigger value="mine">הבקשות שלי</TabsTrigger>
-        </TabsList>
+      {!showMyRequests ? (
+        <>
+          {/* All Requests View */}
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <ResultsCount count={mockISORequests.length} isLoading={false} />
+            <GradientBorderContainer className="rounded-md">
+              <FilterButton
+                activeCount={activeFilterCount}
+                onClick={() => setFilterDrawerOpen(true)}
+              />
+            </GradientBorderContainer>
+          </div>
 
-          <TabsContent value="all" className="space-y-4">
+          <ActiveFiltersDisplay
+            filterCount={activeFilterCount}
+            onClearAll={() => setFilters({})}
+          />
 
-            {/* ISO Requests List */}
-            <div className="space-y-3">
+          {/* ISO Requests List */}
+          <div className="space-y-3">
               {mockISORequests.map((request) => (
                 <GradientBorderContainer
                   key={request.id}
@@ -136,37 +179,33 @@ export const RequiredCarsScreen: React.FC = () => {
                 </GradientBorderContainer>
               ))}
             </div>
-          </TabsContent>
+        </>
+      ) : (
+        <>
+          {/* My Requests View */}
+          <div className="mb-4">
+            <ResultsCount count={mockISORequests.filter(req => req.id <= 2).length} isLoading={false} />
+          </div>
 
-          <TabsContent value="mine" className="space-y-4">
-            {/* My Requests Management */}
-            <Button
-              onClick={() => navigate('/mobile/create-iso-request')}
-              className="w-full gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              צור בקשה חדשה
+          {/* Filter Options */}
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+            <Button variant="default" size="sm" className="px-4 whitespace-nowrap">
+              הכל
             </Button>
+            <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
+              פעיל
+            </Button>
+            <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
+              התאמות
+            </Button>
+            <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
+              הושלם
+            </Button>
+          </div>
 
-            {/* Filter Options */}
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-              <Button variant="default" size="sm" className="px-4 whitespace-nowrap">
-                הכל
-              </Button>
-              <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
-                פעיל
-              </Button>
-              <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
-                התאמות
-              </Button>
-              <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
-                הושלם
-              </Button>
-            </div>
-
-            {/* My ISO Requests List - filtered to show only user's requests */}
-            <div className="space-y-3">
-              {mockISORequests.filter(req => req.id <= 2).map((request) => (
+          {/* My ISO Requests List - filtered to show only user's requests */}
+          <div className="space-y-3">
+            {mockISORequests.filter(req => req.id <= 2).map((request) => (
                 <GradientBorderContainer
                   key={request.id}
                   className="rounded-md flex-1"
@@ -215,25 +254,33 @@ export const RequiredCarsScreen: React.FC = () => {
                     )}
                   </div>
                 </Card>
-                </GradientBorderContainer>
-              ))}
-            </div>
+              </GradientBorderContainer>
+            ))}
+          </div>
 
-            {/* Empty State for My Requests */}
-            {mockISORequests.filter(req => req.id <= 2).length === 0 && (
-              <div className="text-center py-12">
-                <Search className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">אין לך בקשות פעילות</h3>
-                <p className="text-muted-foreground mb-4">
-                  צור בקשה חדשה לרכב שאתה מחפש
-                </p>
-                <Button onClick={() => navigate('/mobile/create-iso-request')}>
-                  צור בקשה ראשונה
-                </Button>
-              </div>
-            )}
-          </TabsContent>
-      </Tabs>
-    </div>
+          {/* Empty State for My Requests */}
+          {mockISORequests.filter(req => req.id <= 2).length === 0 && (
+            <div className="text-center py-12">
+              <Search className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-medium mb-2">אין לך בקשות פעילות</h3>
+              <p className="text-muted-foreground mb-4">
+                צור בקשה חדשה לרכב שאתה מחפש
+              </p>
+              <Button onClick={() => navigate('/mobile/create-iso-request')}>
+                צור בקשה ראשונה
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Filter Drawer */}
+      <VehicleFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        currentFilters={filters}
+        onApplyFilters={setFilters}
+      />
+    </PageContainer>
   );
 };

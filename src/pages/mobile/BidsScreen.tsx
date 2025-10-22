@@ -2,14 +2,19 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Gavel, Clock, Filter, Plus } from 'lucide-react';
+import { Gavel, Clock, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
 import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
 import darkCarImage from "@/assets/dark_car.png";
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
-import { SuperArrowsIcon } from '@/components/common/SuperArrowsIcon';
+import {
+  PageContainer,
+  PageHeader,
+  FilterButton,
+  ActiveFiltersDisplay,
+  ResultsCount,
+} from "@/components/common";
 
 // Mock data for bids and auctions
 const mockMyBids = [
@@ -106,7 +111,7 @@ const getBidStatusText = (status: string) => {
 
 export const BidsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("active-auctions");
+  const [showMyAuctions, setShowMyAuctions] = useState(false);
   const [filters, setFilters] = useState<VehicleFilters>({});
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
@@ -118,73 +123,63 @@ export const BidsScreen: React.FC = () => {
   const activeFilterCount = getActiveFilterCount(filters);
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <div 
-          onClick={() => navigate('/mobile/dashboard')}
-          className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
-        >
-          <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Gavel className="h-6 w-6 text-blue-500" />
-          <h1 className="text-2xl font-bold text-foreground hebrew-text">מכרזים</h1>
-        </div>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
-          <TabsTrigger value="active-auctions">כל המכרזים</TabsTrigger>
-          <TabsTrigger value="my-auctions">המכרזים שלי</TabsTrigger>
-        </TabsList>
-
-          <TabsContent value="active-auctions" className="space-y-4">
-            {/* Filter Button */}
-            <div className="flex justify-end">
-              <GradientBorderContainer
-                className="rounded-md"
+    <PageContainer>
+      <PageHeader
+        title={
+          <div className="flex items-center gap-2">
+            <Gavel className="h-6 w-6 text-blue-500" />
+            <span className="hebrew-text">{showMyAuctions ? "המכרזים שלי" : "כל המכרזים"}</span>
+          </div>
+        }
+        onBack={showMyAuctions ? () => setShowMyAuctions(false) : () => navigate('/mobile/dashboard')}
+        rightAction={
+          !showMyAuctions ? (
+            <GradientBorderContainer className="rounded-md">
+              <Button 
+                variant="outline"
+                onClick={() => setShowMyAuctions(true)}
+                className="border-0"
               >
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setFilterDrawerOpen(true)}
-                  className="relative gap-2 bg-black border-0 text-white"
-                >
-                  <Filter className="h-4 w-4" />
-                  סנן מכרזים
-                  {activeFilterCount > 0 && (
-                    <Badge 
-                      className="h-5 w-5 p-0 flex items-center justify-center text-xs"
-                      variant="destructive"
-                    >
-                      {activeFilterCount}
-                    </Badge>
-                  )}
-                </Button>
-              </GradientBorderContainer>
-            </div>
+                המכרזים שלי
+              </Button>
+            </GradientBorderContainer>
+          ) : (
+            <GradientBorderContainer className="rounded-md">
+              <Button 
+                onClick={() => navigate('/mobile/add-auction')}
+                variant="outline"
+                className="border-0"
+              >
+                <Plus className="h-4 w-4 ml-2" />
+                צור מכרז
+              </Button>
+            </GradientBorderContainer>
+          )
+        }
+      />
 
-            {/* Active Filters Display */}
-            {activeFilterCount > 0 && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-muted-foreground hebrew-text">
-                  {activeFilterCount} פילטרים פעילים
-                </span>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setFilters({})}
-                >
-                  נקה הכל
-                </Button>
-              </div>
-            )}
+      {!showMyAuctions ? (
+        <>
+          {/* All Auctions View */}
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <ResultsCount count={filteredActiveAuctions.length + mockMyBids.length} isLoading={false} />
+            <GradientBorderContainer className="rounded-md">
+              <FilterButton
+                activeCount={activeFilterCount}
+                onClick={() => setFilterDrawerOpen(true)}
+              />
+            </GradientBorderContainer>
+          </div>
 
-            {/* My Bids Section First */}
-            <div>
-              <h3 className="font-medium mb-3 text-white text-right hebrew-text">ההצעות שלי</h3>
-              <div className="space-y-3">
+          <ActiveFiltersDisplay
+            filterCount={activeFilterCount}
+            onClearAll={() => setFilters({})}
+          />
+
+          {/* My Bids Section First */}
+          <div>
+            <h3 className="font-medium mb-3 text-white text-right hebrew-text">ההצעות שלי</h3>
+            <div className="space-y-3">
                 {mockMyBids.map((bid) => (
                   <GradientBorderContainer
                     key={bid.id}
@@ -236,14 +231,14 @@ export const BidsScreen: React.FC = () => {
                       </div>
                     </Card>
                   </GradientBorderContainer>
-                ))}
-              </div>
+              ))}
             </div>
+          </div>
 
-            {/* All Other Auctions */}
-            <div>
-              <h3 className="font-medium mb-3 text-right">כל המכרזים ({filteredActiveAuctions.length})</h3>
-              <div className="space-y-3">
+          {/* All Other Auctions */}
+          <div>
+            <h3 className="font-medium mb-3 text-right">כל המכרזים ({filteredActiveAuctions.length})</h3>
+            <div className="space-y-3">
                 {filteredActiveAuctions.map((auction) => (
                   <GradientBorderContainer
                     key={auction.id}
@@ -300,27 +295,15 @@ export const BidsScreen: React.FC = () => {
                       </div>
                     </Card>
                   </GradientBorderContainer>
-                ))}
-              </div>
+              ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="my-auctions" className="space-y-4">
-            {/* Create New Auction Button */}
-            <GradientBorderContainer className="rounded-md">
-              <Button
-                onClick={() => navigate('/mobile/add-auction')}
-                className="w-full gap-2 bg-black border-0 text-white"
-                variant="ghost"
-              >
-                <Plus className="w-4 h-4" />
-                צור מכרז חדש
-              </Button>
-            </GradientBorderContainer>
-
-            {/* My Auctions List */}
-            <div className="space-y-3">
-              {mockMyAuctions.map((auction) => (
+          </div>
+        </>
+      ) : (
+        <>
+          {/* My Auctions View */}
+          <div className="space-y-3">
+            {mockMyAuctions.map((auction) => (
                 <GradientBorderContainer
                   key={auction.id}
                   className="rounded-md flex-1"
@@ -371,38 +354,36 @@ export const BidsScreen: React.FC = () => {
                     </div>
                   </Card>
                 </GradientBorderContainer>
-              ))}
+            ))}
+          </div>
+
+          {/* Empty State for My Auctions */}
+          {mockMyAuctions.length === 0 && (
+            <div className="text-center py-12">
+              <Gavel className="w-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-medium mb-2">אין לך מכרזים פעילים</h3>
+              <p className="text-muted-foreground mb-4">
+                צור מכרז חדש לרכב שלך
+              </p>
+              <GradientBorderContainer className="rounded-md">
+                <Button 
+                  onClick={() => navigate('/mobile/add-auction')}
+                  variant="ghost"
+                  className="bg-black border-0 text-white"
+                >
+                  צור מכרז ראשון
+                </Button>
+              </GradientBorderContainer>
             </div>
-
-            {/* Empty State for My Auctions */}
-            {mockMyAuctions.length === 0 && (
-              <div className="text-center py-12">
-                <Gavel className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">אין לך מכרזים פעילים</h3>
-                <p className="text-muted-foreground mb-4">
-                  צור מכרז חדש לרכב שלך
-                </p>
-                <GradientBorderContainer className="rounded-md">
-                  <Button 
-                    onClick={() => navigate('/mobile/add-auction')}
-                    variant="ghost"
-                    className="bg-black border-0 text-white"
-                  >
-                    צור מכרז ראשון
-                  </Button>
-                </GradientBorderContainer>
-              </div>
-            )}
-          </TabsContent>
-      </Tabs>
-
-      {/* Filter Drawer */}
+          )}
+        </>
+      )}      {/* Filter Drawer */}
       <VehicleFilterDrawer
         open={filterDrawerOpen}
         onOpenChange={setFilterDrawerOpen}
         currentFilters={filters}
         onApplyFilters={setFilters}
       />
-    </div>
+    </PageContainer>
   );
 };
