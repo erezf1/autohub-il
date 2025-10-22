@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import logo from '@/assets/logo.svg';
 
 export const RegisterScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -257,6 +258,11 @@ export const RegisterScreen: React.FC = () => {
             חזור
           </Button>
           <div className="text-center">
+            <img 
+              src={logo}
+              alt="AutoHub Logo" 
+              className="h-16 w-auto mx-auto mb-4"
+            />
             <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 mb-2 hebrew-text">Auto-Hub</h1>
             <p className="text-gray-300 hebrew-text">הרשמה חדשה</p>
           </div>

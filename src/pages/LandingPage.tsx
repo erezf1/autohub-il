@@ -14,9 +14,9 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center gap-3 mb-4">
             <img 
-              src="/lovable-uploads/5f941758-f133-4982-a8a0-3da09c4677f5.png" 
+              src="/src/assets/logo.svg" 
               alt="Auto Hub" 
-              className="w-12 h-12"
+              className="w-22 h-20"
             />
             <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 hebrew-text">אוטו-האב</h1>
           </div>

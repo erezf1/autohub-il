@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Car, Shield, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
-import logo from '@/assets/auto-hub-logo.png';
+import logo from '@/assets/logo.svg';
 
 export const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();

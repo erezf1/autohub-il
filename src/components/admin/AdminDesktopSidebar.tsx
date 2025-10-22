@@ -85,7 +85,7 @@ const AdminDesktopSidebar = () => {
 
   return (
     <aside className={cn(
-      "bg-card border-l border-border transition-all duration-300 flex flex-col",
+      "bg-black border-l border-border transition-all duration-300 flex flex-col",
       collapsed ? "w-20" : "w-80"
     )}>
       {/* Collapse Toggle */}
@@ -94,7 +94,7 @@ const AdminDesktopSidebar = () => {
           variant="ghost"
           size="sm"
           onClick={() => setCollapsed(!collapsed)}
-          className="w-full justify-center"
+          className="w-full justify-center text-white btn-hover-cyan"
         >
           <ChevronDown className={cn(
             "h-4 w-4 transition-transform",
@@ -116,14 +116,14 @@ const AdminDesktopSidebar = () => {
                 end
                 className={({ isActive: navIsActive }) => cn(
                   "flex items-center gap-4 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200",
-                  "hover:bg-primary/10 hover:text-primary group",
+                  "btn-hover-cyan group",
                   navIsActive
-                    ? "bg-primary text-primary-foreground shadow-sm" 
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black shadow-sm" 
+                    : "text-muted-foreground hover:text-white"
                 )}
               >
                 <item.icon className={cn(
-                  "h-5 w-5 flex-shrink-0",
+                  "h-5 w-5 flex-shrink-0 icon-hover-cyan",
                   collapsed ? "mx-auto" : ""
                 )} />
                 {!collapsed && (
@@ -142,11 +142,11 @@ const AdminDesktopSidebar = () => {
       {!collapsed && (
         <div className="p-4 border-t border-border">
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-sm font-bold text-primary-foreground">מנ</span>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-r from-[#2277ee] to-[#5be1fd]">
+              <span className="text-sm font-bold text-black">מנ</span>
             </div>
             <div className="flex-1 text-right hebrew-text">
-              <p className="text-sm font-medium">מנהל מערכת</p>
+              <p className="text-sm font-medium text-white">מנהל מערכת</p>
               <p className="text-xs text-muted-foreground">admin@auto-hub.co.il</p>
             </div>
           </div>

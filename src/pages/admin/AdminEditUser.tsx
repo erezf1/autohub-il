@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
 import { useUser, useUpdateUserProfile, useUpdateUserStatus } from '@/hooks/admin/useUsers';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -108,13 +109,13 @@ const AdminEditUser = () => {
         <Button 
           variant="ghost" 
           onClick={() => navigate(`/admin/users/${id}`)}
-          className="hebrew-text"
+          className="hebrew-text btn-hover-cyan"
         >
           <ArrowRight className="h-4 w-4 ml-1" />
           חזור
         </Button>
         <div>
-          <h1 className="text-2xl font-bold hebrew-text">עריכת משתמש</h1>
+          <h1 className="text-2xl font-bold text-white hebrew-text">עריכת משתמש</h1>
           <p className="text-sm text-muted-foreground hebrew-text">
             {user?.profile?.full_name || 'משתמש'}
           </p>
@@ -123,8 +124,9 @@ const AdminEditUser = () => {
 
       {/* Status Actions - Top Left */}
       {user?.status && (
-        <Card className="bg-muted/50">
-          <CardContent className="p-3">
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div className="flex gap-2">
                 {user.status === 'pending' && (
@@ -165,141 +167,160 @@ const AdminEditUser = () => {
                   </Button>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground hebrew-text">
+              <p className="text-sm text-white hebrew-text">
                 סטטוס: {getStatusText(user.status)}
               </p>
             </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       )}
 
-      <Card>
-        <CardHeader className="p-4">
-          <CardTitle className="hebrew-text text-lg">פרטי משתמש</CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 pt-0">
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader className="p-4">
+            <CardTitle className="text-white hebrew-text text-lg">פרטי משתמש</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-0">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="fullName" className="hebrew-text text-sm text-right block">שם מלא</Label>
-                <Input
-                  id="fullName"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  required
-                  className="hebrew-text"
-                  dir="rtl"
-                />
+                <Label htmlFor="fullName" className="text-white hebrew-text text-sm text-right block">שם מלא</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    id="fullName"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    required
+                    className="hebrew-text border-0 bg-black rounded-md"
+                    dir="rtl"
+                  />
+                </GradientBorderContainer>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="businessName" className="hebrew-text text-sm text-right block">שם עסק</Label>
-                <Input
-                  id="businessName"
-                  value={formData.businessName}
-                  onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  required
-                  className="hebrew-text"
-                  dir="rtl"
-                />
+                <Label htmlFor="businessName" className="text-white hebrew-text text-sm text-right block">שם עסק</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    id="businessName"
+                    value={formData.businessName}
+                    onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+                    required
+                    className="hebrew-text border-0 bg-black rounded-md"
+                    dir="rtl"
+                  />
+                </GradientBorderContainer>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="locationId" className="hebrew-text text-sm text-right block">מיקום</Label>
-                <Select value={formData.locationId} onValueChange={(value) => setFormData({ ...formData, locationId: value })}>
-                  <SelectTrigger className="hebrew-text" dir="rtl">
-                    <SelectValue placeholder="בחר מיקום" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locations?.map((location) => (
-                      <SelectItem key={location.id} value={location.id.toString()} className="hebrew-text">
-                        {location.name_hebrew}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="locationId" className="text-white hebrew-text text-sm text-right block">מיקום</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select value={formData.locationId} onValueChange={(value) => setFormData({ ...formData, locationId: value })}>
+                    <SelectTrigger className="hebrew-text border-0 bg-black rounded-md" dir="rtl">
+                      <SelectValue placeholder="בחר מיקום" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {locations?.map((location) => (
+                        <SelectItem key={location.id} value={location.id.toString()} className="hebrew-text">
+                          {location.name_hebrew}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="subscriptionType" className="hebrew-text text-sm text-right block">מנוי</Label>
-                <Select value={formData.subscriptionType} onValueChange={(value) => setFormData({ ...formData, subscriptionType: value })}>
-                  <SelectTrigger className="hebrew-text" dir="rtl">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="regular" className="hebrew-text">רגיל</SelectItem>
-                    <SelectItem value="premium" className="hebrew-text">פרימיום</SelectItem>
-                    <SelectItem value="vip" className="hebrew-text">VIP</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="subscriptionType" className="text-white hebrew-text text-sm text-right block">מנוי</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select value={formData.subscriptionType} onValueChange={(value) => setFormData({ ...formData, subscriptionType: value })}>
+                    <SelectTrigger className="hebrew-text border-0 bg-black rounded-md" dir="rtl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="regular" className="hebrew-text">רגיל</SelectItem>
+                      <SelectItem value="premium" className="hebrew-text">פרימיום</SelectItem>
+                      <SelectItem value="vip" className="hebrew-text">VIP</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="subscriptionValidUntil" className="hebrew-text text-sm text-right block">בתוקף עד</Label>
-                <Input
-                  id="subscriptionValidUntil"
-                  type="date"
-                  value={formData.subscriptionValidUntil}
-                  onChange={(e) => setFormData({ ...formData, subscriptionValidUntil: e.target.value })}
-                  dir="rtl"
-                />
+                <Label htmlFor="subscriptionValidUntil" className="text-white hebrew-text text-sm text-right block">בתוקף עד</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    id="subscriptionValidUntil"
+                    type="date"
+                    value={formData.subscriptionValidUntil}
+                    onChange={(e) => setFormData({ ...formData, subscriptionValidUntil: e.target.value })}
+                    className="border-0 bg-black rounded-md"
+                    dir="rtl"
+                  />
+                </GradientBorderContainer>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="ratingTier" className="hebrew-text text-sm text-right block">דירוג</Label>
-                <Select value={formData.ratingTier} onValueChange={(value) => setFormData({ ...formData, ratingTier: value })}>
-                  <SelectTrigger className="hebrew-text" dir="rtl">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="bronze" className="hebrew-text">ארד</SelectItem>
-                    <SelectItem value="silver" className="hebrew-text">כסף</SelectItem>
-                    <SelectItem value="gold" className="hebrew-text">זהב</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="ratingTier" className="text-white hebrew-text text-sm text-right block">דירוג</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select value={formData.ratingTier} onValueChange={(value) => setFormData({ ...formData, ratingTier: value })}>
+                    <SelectTrigger className="hebrew-text border-0 bg-black rounded-md" dir="rtl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bronze" className="hebrew-text">ארד</SelectItem>
+                      <SelectItem value="silver" className="hebrew-text">כסף</SelectItem>
+                      <SelectItem value="gold" className="hebrew-text">זהב</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="businessDescription" className="hebrew-text text-sm text-right block">תיאור</Label>
-              <Textarea
-                id="businessDescription"
-                value={formData.businessDescription}
-                onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
-                className="hebrew-text min-h-[80px]"
-                dir="rtl"
-                placeholder="תאר את העסק..."
-              />
+              <Label htmlFor="businessDescription" className="text-white hebrew-text text-sm text-right block">תיאור</Label>
+              <GradientBorderContainer className="rounded-md">
+                <Textarea
+                  id="businessDescription"
+                  value={formData.businessDescription}
+                  onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
+                  className="hebrew-text min-h-[80px] border-0 bg-black rounded-md"
+                  dir="rtl"
+                  placeholder="תאר את העסק..."
+                />
+              </GradientBorderContainer>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="hebrew-text text-sm text-right block">תו סוחר</Label>
+                <Label className="text-white hebrew-text text-sm text-right block">תו סוחר</Label>
                 {user?.profile?.trade_license_file_url && (
                   <div className="flex items-center gap-2 p-2 bg-muted rounded-md mb-1.5">
                     <FileText className="h-4 w-4" />
-                    <span className="text-xs hebrew-text flex-1">מסמך קיים</span>
+                    <span className="text-xs text-white hebrew-text flex-1">מסמך קיים</span>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => window.open(user.profile.trade_license_file_url, '_blank')}
-                      className="hebrew-text h-7 px-2"
+                      className="hebrew-text h-7 px-2 btn-hover-cyan"
                     >
                       צפה
                     </Button>
                   </div>
                 )}
-                <Input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => setTradeLicenseFile(e.target.files?.[0] || null)}
-                  className="text-sm"
-                />
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => setTradeLicenseFile(e.target.files?.[0] || null)}
+                    className="text-sm border-0 bg-black rounded-md"
+                  />
+                </GradientBorderContainer>
               </div>
 
               <div className="space-y-1.5">
-                <Label className="hebrew-text text-sm text-right block">תמונה</Label>
+                <Label className="text-white hebrew-text text-sm text-right block">תמונה</Label>
                 {user?.profile?.profile_picture_url && (
                   <div className="flex items-center gap-2 mb-1.5">
                     <img 
@@ -312,18 +333,20 @@ const AdminEditUser = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => window.open(user.profile.profile_picture_url, '_blank')}
-                      className="hebrew-text h-7 px-2"
+                      className="hebrew-text h-7 px-2 btn-hover-cyan"
                     >
                       צפה
                     </Button>
                   </div>
                 )}
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setProfilePictureFile(e.target.files?.[0] || null)}
-                  className="text-sm"
-                />
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setProfilePictureFile(e.target.files?.[0] || null)}
+                    className="text-sm border-0 bg-black rounded-md"
+                  />
+                </GradientBorderContainer>
               </div>
             </div>
 
@@ -333,7 +356,7 @@ const AdminEditUser = () => {
                 variant="outline" 
                 size="sm"
                 onClick={() => navigate(`/admin/users/${id}`)}
-                className="hebrew-text"
+                className="hebrew-text btn-hover-cyan"
               >
                 ביטול
               </Button>
@@ -354,8 +377,9 @@ const AdminEditUser = () => {
               </Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
     </div>
   );
 };

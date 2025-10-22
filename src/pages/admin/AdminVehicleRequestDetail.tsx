@@ -207,7 +207,7 @@ const AdminVehicleRequestDetail = () => {
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="details" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3" dir="rtl">
+        <TabsList className="grid w-full grid-cols-3 bg-gray-900" dir="rtl">
           <TabsTrigger value="offers" className="hebrew-text">הצעות ({mockOffers.length})</TabsTrigger>
           <TabsTrigger value="requester" className="hebrew-text">פרטי מבקש</TabsTrigger>
           <TabsTrigger value="details" className="hebrew-text">פרטי הבקשה</TabsTrigger>

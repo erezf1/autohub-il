@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 
 // Mock data for vehicle requests
 const mockRequests = [
@@ -113,103 +114,106 @@ const AdminVehicleRequestsList = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground hebrew-text">רכבים דרושים</h1>
+          <h1 className="text-3xl font-bold text-white hebrew-text">רכבים דרושים</h1>
           <p className="text-muted-foreground hebrew-text">
             ניהול בקשות חיפוש רכבים מסוחרים
           </p>
         </div>
-        <Button className="hebrew-text">
+        <Button className="hebrew-text text-black">
           <Plus className="h-4 w-4 ml-2" />
           הוסף בקשה חדשה
         </Button>
       </div>
 
       {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">סינון וחיפוש</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="חפש לפי כותרת, מבקש או עסק..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 hebrew-text"
-              />
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="hebrew-text text-white">סינון וחיפוש</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="חפש לפי כותרת, מבקש או עסק..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-10 hebrew-text bg-muted text-white"
+                />
+              </div>
+              <Button variant="outline" className="hebrew-text btn-hover-cyan">
+                סינון מתקדם
+              </Button>
             </div>
-            <Button variant="outline" className="hebrew-text">
-              סינון מתקדם
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Requests Tabs and Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">בקשות חיפוש ({filteredRequests.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="all" className="hebrew-text">כל הבקשות</TabsTrigger>
-              <TabsTrigger value="open" className="hebrew-text">פתוחות</TabsTrigger>
-              <TabsTrigger value="pending" className="hebrew-text">ממתינות</TabsTrigger>
-              <TabsTrigger value="closed" className="hebrew-text">סגורות</TabsTrigger>
-            </TabsList>
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="hebrew-text text-white">בקשות חיפוש ({filteredRequests.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4 bg-gray-900">
+                <TabsTrigger value="all" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">כל הבקשות</TabsTrigger>
+                <TabsTrigger value="open" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">פתוחות</TabsTrigger>
+                <TabsTrigger value="pending" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">ממתינות</TabsTrigger>
+                <TabsTrigger value="closed" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">סגורות</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value={activeTab} className="mt-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
-                    <TableHead className="text-right hebrew-text">פעילות אחרונה</TableHead>
-                    <TableHead className="text-right hebrew-text">הצעות</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">תקציב</TableHead>
-                    <TableHead className="text-right hebrew-text">מבקש</TableHead>
-                    <TableHead className="text-right hebrew-text">בקשה</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <TabsContent value={activeTab} className="mt-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right hebrew-text text-white">פעולות</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">פעילות אחרונה</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">הצעות</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">סטטוס</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">תקציב</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">מבקש</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">בקשה</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                   {filteredRequests.map((request) => (
                     <TableRow key={request.id}>
                       <TableCell>
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/vehicle-requests/${request.id}`)}>
+                          <Button variant="ghost" size="sm" className="hebrew-text btn-hover-cyan" onClick={() => navigate(`/admin/vehicle-requests/${request.id}`)}>
                             <Eye className="h-4 w-4 ml-1" />
                             צפה
                           </Button>
-                          <Button variant="ghost" size="sm" className="hebrew-text">
+                          <Button variant="ghost" size="sm" className="hebrew-text btn-hover-cyan">
                             <Edit className="h-4 w-4 ml-1" />
                             ערוך
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-destructive hebrew-text">
+                          <Button variant="ghost" size="sm" className="text-destructive hebrew-text hover:bg-destructive/10">
                             <Trash2 className="h-4 w-4 ml-1" />
                             מחק
                           </Button>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1 justify-end">
+                        <div className="flex items-center gap-1 justify-end text-white">
                           <span className="text-sm hebrew-text">{request.lastActivity}</span>
                           <Clock className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1 justify-end">
+                        <div className="flex items-center gap-1 justify-end text-white">
                           <span className="hebrew-text">{request.offersCount}</span>
                           <CheckCircle className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </TableCell>
                       <TableCell>{getStatusBadge(request.status)}</TableCell>
-                      <TableCell className="font-medium hebrew-text text-right">{request.budget}</TableCell>
+                      <TableCell className="font-medium hebrew-text text-right text-white">{request.budget}</TableCell>
                       <TableCell>
                         <div className="text-right">
-                          <div className="font-medium hebrew-text">{request.requester}</div>
+                          <div className="font-medium hebrew-text text-white">{request.requester}</div>
                           <div className="text-sm text-muted-foreground hebrew-text">
                             {request.requesterBusiness}
                           </div>
@@ -221,7 +225,7 @@ const AdminVehicleRequestsList = () => {
                             <FileText className="h-5 w-5 text-muted-foreground" />
                           </div>
                           <div>
-                            <div className="font-medium hebrew-text">
+                            <div className="font-medium hebrew-text text-white">
                               {request.title}
                             </div>
                             <div className="text-sm text-muted-foreground hebrew-text">
@@ -238,6 +242,7 @@ const AdminVehicleRequestsList = () => {
           </Tabs>
         </CardContent>
       </Card>
+      </GradientBorderContainer>
     </div>
   );
 };

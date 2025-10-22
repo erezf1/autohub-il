@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 
 // Mock notifications data
 const mockNotifications = [
@@ -245,7 +246,7 @@ const AdminNotifications = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold hebrew-text">עדכונים</h1>
+          <h1 className="text-3xl font-bold hebrew-text text-white">עדכונים</h1>
           <p className="text-lg text-muted-foreground hebrew-text mt-1">
             התראות ועדכונים מהמערכת
           </p>
@@ -255,7 +256,7 @@ const AdminNotifications = () => {
             <Bell className="h-4 w-4 ml-1" />
             {unreadCount} לא נקראו
           </Badge>
-          <Button onClick={markAllAsRead} variant="outline" className="hebrew-text">
+          <Button onClick={markAllAsRead} variant="outline" className="hebrew-text btn-hover-cyan">
             <CheckCircle className="h-4 w-4 ml-2" />
             סמן הכל כנקרא
           </Button>
@@ -265,36 +266,37 @@ const AdminNotifications = () => {
 
       {/* Notifications Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="all" className="hebrew-text">
+        <TabsList className="grid w-full grid-cols-4 bg-gray-900">
+          <TabsTrigger value="all" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">
             הכל ({mockNotifications.length})
           </TabsTrigger>
-          <TabsTrigger value="unread" className="hebrew-text">
+          <TabsTrigger value="unread" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">
             לא נקראו ({unreadCount})
           </TabsTrigger>
-          <TabsTrigger value="users" className="hebrew-text">
+          <TabsTrigger value="users" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">
             משתמשים ({mockNotifications.filter(n => n.category === "users").length})
           </TabsTrigger>
-          <TabsTrigger value="reports" className="hebrew-text">
+          <TabsTrigger value="reports" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">
             דיווחים ({mockNotifications.filter(n => n.category === "reports").length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab}>
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right hebrew-text">סוג</TableHead>
-                    <TableHead className="text-right hebrew-text">תיאור</TableHead>
-                    <TableHead className="text-right hebrew-text">עדיפות</TableHead>
-                    <TableHead className="text-right hebrew-text">זמן</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text w-12"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right hebrew-text text-white">סוג</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">תיאור</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">עדיפות</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">זמן</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">סטטוס</TableHead>
+                      <TableHead className="text-right hebrew-text w-12 text-white"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                   {filteredNotifications.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8">
@@ -308,7 +310,7 @@ const AdminNotifications = () => {
                     filteredNotifications.map((notification) => (
                       <TableRow 
                         key={notification.id}
-                        className={`cursor-pointer hover:bg-muted/50 ${!notification.isRead ? 'bg-blue-50/50' : ''}`}
+                        className={`cursor-pointer hover:bg-muted/50 ${!notification.isRead ? 'bg-cyan-950/50' : ''}`}
                         onClick={() => handleNotificationClick(notification)}
                       >
                         <TableCell>
@@ -318,7 +320,7 @@ const AdminNotifications = () => {
                         </TableCell>
                         <TableCell>
                           <div>
-                            <p className={`font-medium hebrew-text ${!notification.isRead ? 'text-foreground' : 'text-muted-foreground'}`}>
+                            <p className={`font-medium hebrew-text ${!notification.isRead ? 'text-white' : 'text-muted-foreground'}`}>
                               {notification.title}
                             </p>
                             <p className={`text-sm text-muted-foreground hebrew-text mt-1 ${!notification.isRead ? 'font-semibold' : ''}`}>
@@ -329,7 +331,7 @@ const AdminNotifications = () => {
                         <TableCell>
                           {getPriorityBadge(notification.priority)}
                         </TableCell>
-                        <TableCell className="hebrew-text">
+                        <TableCell className="hebrew-text text-white">
                           <div className="flex flex-col">
                             <span className="text-sm">{formatTimeAgo(notification.timestamp)}</span>
                             <span className="text-xs text-muted-foreground">{notification.timestamp}</span>
@@ -362,6 +364,7 @@ const AdminNotifications = () => {
               </Table>
             </CardContent>
           </Card>
+          </GradientBorderContainer>
         </TabsContent>
       </Tabs>
     </div>

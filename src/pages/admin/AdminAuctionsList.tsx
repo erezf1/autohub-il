@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 
 // Mock data for auctions
 const mockAuctions = [
@@ -129,88 +130,91 @@ const AdminAuctionsList = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground hebrew-text">מכירות פומביות</h1>
+          <h1 className="text-3xl font-bold text-white hebrew-text">מכירות פומביות</h1>
           <p className="text-muted-foreground hebrew-text">
             ניהול כל המכירות הפומביות במערכת
           </p>
         </div>
-        <Button className="hebrew-text">
+        <Button className="hebrew-text text-black">
           <Plus className="h-4 w-4 ml-2" />
           צור מכירה חדשה
         </Button>
       </div>
 
       {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">סינון וחיפוש</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Gavel className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="חפש לפי כותרת או מוכר..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 hebrew-text"
-              />
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="hebrew-text text-white">סינון וחיפוש</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Gavel className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="חפש לפי כותרת או מוכר..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-10 hebrew-text bg-muted text-white"
+                />
+              </div>
+              <Button variant="outline" className="hebrew-text btn-hover-cyan">
+                סינון מתקדם
+              </Button>
             </div>
-            <Button variant="outline" className="hebrew-text">
-              סינון מתקדם
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Auctions Tabs and Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">מכירות פומביות ({filteredAuctions.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="all" className="hebrew-text">כל המכירות</TabsTrigger>
-              <TabsTrigger value="active" className="hebrew-text">פעילות</TabsTrigger>
-              <TabsTrigger value="ended" className="hebrew-text">הסתיימו</TabsTrigger>
-              <TabsTrigger value="cancelled" className="hebrew-text">מבוטלות</TabsTrigger>
-            </TabsList>
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="hebrew-text text-white">מכירות פומביות ({filteredAuctions.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4 bg-gray-900">
+                <TabsTrigger value="all" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">כל המכירות</TabsTrigger>
+                <TabsTrigger value="active" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">פעילות</TabsTrigger>
+                <TabsTrigger value="ended" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">הסתיימו</TabsTrigger>
+                <TabsTrigger value="cancelled" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">מבוטלות</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value={activeTab} className="mt-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
-                    <TableHead className="text-right hebrew-text">הצעות</TableHead>
-                    <TableHead className="text-right hebrew-text">זמן נותר</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">הצעה נוכחית</TableHead>
-                    <TableHead className="text-right hebrew-text">מוכר</TableHead>
-                    <TableHead className="text-right hebrew-text">מכירה</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAuctions.map((auction) => (
-                    <TableRow key={auction.id}>
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/auctions/${auction.id}`)}>
-                            <Eye className="h-4 w-4 ml-1" />
+              <TabsContent value={activeTab} className="mt-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right hebrew-text text-white">פעולות</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">הצעות</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">זמן נותר</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">סטטוס</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">הצעה נוכחית</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">מוכר</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">מכירה</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredAuctions.map((auction) => (
+                      <TableRow key={auction.id}>
+                        <TableCell>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" className="hebrew-text btn-hover-cyan" onClick={() => navigate(`/admin/auctions/${auction.id}`)}>
+                              <Eye className="h-4 w-4 ml-1" />
                             צפה
                           </Button>
-                          <Button variant="ghost" size="sm" className="hebrew-text">
+                          <Button variant="ghost" size="sm" className="hebrew-text btn-hover-cyan">
                             <Edit className="h-4 w-4 ml-1" />
                             ערוך
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-destructive hebrew-text">
+                          <Button variant="ghost" size="sm" className="text-destructive hebrew-text hover:bg-destructive/10">
                             <Trash2 className="h-4 w-4 ml-1" />
                             בטל
                           </Button>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1 justify-end">
+                        <div className="flex items-center gap-1 justify-end text-white">
                           <span className="hebrew-text">{auction.bidCount}</span>
                           <TrendingUp className="h-4 w-4 text-muted-foreground" />
                         </div>
@@ -226,20 +230,20 @@ const AdminAuctionsList = () => {
                       <TableCell>{getStatusBadge(auction.status)}</TableCell>
                       <TableCell>
                         <div className="text-right">
-                          <div className="font-medium hebrew-text">{auction.currentBid}</div>
+                          <div className="font-medium hebrew-text text-white">{auction.currentBid}</div>
                           <div className="text-sm text-muted-foreground hebrew-text">
                             התחלה: {auction.startingPrice}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="hebrew-text text-right">{auction.seller}</TableCell>
+                      <TableCell className="hebrew-text text-right text-white">{auction.seller}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-3 space-x-reverse">
                           <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
                             <Gavel className="h-5 w-5 text-muted-foreground" />
                           </div>
                           <div>
-                            <div className="font-medium hebrew-text">
+                            <div className="font-medium hebrew-text text-white">
                               {auction.title}
                             </div>
                             <div className="text-sm text-muted-foreground hebrew-text">
@@ -256,6 +260,7 @@ const AdminAuctionsList = () => {
           </Tabs>
         </CardContent>
       </Card>
+      </GradientBorderContainer>
     </div>
   );
 };

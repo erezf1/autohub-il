@@ -212,7 +212,7 @@ const AdminAuctionDetail = () => {
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="vehicle" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4" dir="rtl">
+        <TabsList className="grid w-full grid-cols-4 bg-gray-900" dir="rtl">
           <TabsTrigger value="activity" className="hebrew-text">פעילות</TabsTrigger>
           <TabsTrigger value="bids" className="hebrew-text">הצעות ({mockBids.length})</TabsTrigger>
           <TabsTrigger value="seller" className="hebrew-text">פרטי מוכר</TabsTrigger>

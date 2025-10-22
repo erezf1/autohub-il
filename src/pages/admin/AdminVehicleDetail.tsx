@@ -135,7 +135,7 @@ const AdminVehicleDetail = () => {
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="details" className="w-full">
-        <TabsList className="grid w-full grid-cols-4" dir="rtl">
+        <TabsList className="grid w-full grid-cols-4 bg-gray-900" dir="rtl">
           <TabsTrigger value="images" className="hebrew-text">תמונות</TabsTrigger>
           <TabsTrigger value="activity" className="hebrew-text">פעילות</TabsTrigger>
           <TabsTrigger value="seller" className="hebrew-text">פרטי מוכר</TabsTrigger>
