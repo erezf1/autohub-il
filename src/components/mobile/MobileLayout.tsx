@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import MobileHeader from "./MobileHeader";
 import MobileTabBar from "./MobileTabBar";
-import BgSvg from "@/assets/BG.svg";
-import DeskBgSvg from "@/assets/DeskBG.svg";
+import BgSvg from "@/assets/BG.svg?url";
+import DeskBgSvg from "@/assets/DeskBG.svg?url";
 
 interface MobileLayoutProps {
   children: ReactNode;

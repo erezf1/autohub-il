@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
+import { GradientSeparator } from '@/components/ui/gradient-separator';
 
 export const ProfileEditScreen: React.FC = () => {
   const [fullName, setFullName] = useState('');
@@ -197,18 +198,20 @@ export const ProfileEditScreen: React.FC = () => {
   }
 
   return (
-    <div className="container max-w-md mx-auto px-4 space-y-4" dir="rtl">
-      <div className="flex items-center gap-2">
-        <div 
-          onClick={() => navigate(-1)}
-          className={`h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
-        >
-          <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
-        </div>
-        <h1 className="text-2xl font-bold text-foreground hebrew-text">
-          {isOnboarding ? 'השלמת פרטים' : 'עריכת פרטים'}
-        </h1>
-      </div>
+    <div className="flex flex-col h-screen overflow-hidden" dir="rtl">
+      <div className="flex-1 overflow-y-auto">
+        <div className="container max-w-md mx-auto px-4 py-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <div 
+              onClick={() => navigate(-1)}
+              className={`h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
+            >
+              <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground hebrew-text">
+              {isOnboarding ? 'השלמת פרטים' : 'עריכת פרטים'}
+            </h1>
+          </div>
 
       {/* Subscription Info (Only when not onboarding) */}
       {!isOnboarding && userProfile && (
@@ -268,99 +271,114 @@ export const ProfileEditScreen: React.FC = () => {
           <div className="space-y-4">
             {/* Phone Number (Read-Only) */}
             {userData?.phone_number && (
-              <div className="space-y-2">
-                <Label htmlFor="phone">טלפון</Label>
-                <div className="relative">
-                  <Input 
-                    id="phone" 
-                    type="text" 
-                    value={formatPhoneDisplay(userData.phone_number)}
-                    disabled
-                    className="pr-10 text-right bg-muted" 
-                    dir="rtl"
-                  />
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-white hebrew-text">טלפון</Label>
+                  <div className="relative">
+                    <Input 
+                      id="phone" 
+                      type="text" 
+                      value={formatPhoneDisplay(userData.phone_number)}
+                      disabled
+                      className="pr-10 text-right bg-muted" 
+                      dir="rtl"
+                    />
+                  </div>
                 </div>
-              </div>
+                <GradientSeparator />
+              </>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="fullName">שם מלא</Label>
-              <div className="relative">
-                <User className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  id="fullName" 
-                  type="text" 
-                  placeholder="הזן שם מלא" 
-                  value={fullName} 
-                  onChange={(e) => setFullName(e.target.value)} 
-                  className="pr-10 text-right" 
-                  dir="rtl"
-                />
-              </div>
+              <Label htmlFor="fullName" className="text-white hebrew-text">שם מלא</Label>
+              <GradientBorderContainer className="rounded-md">
+                <div className="relative">
+                  <User className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                  <Input 
+                    id="fullName" 
+                    type="text" 
+                    placeholder="הזן שם מלא" 
+                    value={fullName} 
+                    onChange={(e) => setFullName(e.target.value)} 
+                    className="bg-black border-0 pr-10 text-right hebrew-text" 
+                    dir="rtl"
+                  />
+                </div>
+              </GradientBorderContainer>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="businessName">שם העסק</Label>
-              <div className="relative">
-                <Building className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  id="businessName" 
-                  type="text" 
-                  placeholder="הזן שם עסק" 
-                  value={businessName} 
-                  onChange={(e) => setBusinessName(e.target.value)} 
-                  className="pr-10 text-right" 
-                  dir="rtl"
-                />
-              </div>
+              <Label htmlFor="businessName" className="text-white hebrew-text">שם העסק</Label>
+              <GradientBorderContainer className="rounded-md">
+                <div className="relative">
+                  <Building className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                  <Input 
+                    id="businessName" 
+                    type="text" 
+                    placeholder="הזן שם עסק" 
+                    value={businessName} 
+                    onChange={(e) => setBusinessName(e.target.value)} 
+                    className="bg-black border-0 pr-10 text-right hebrew-text" 
+                    dir="rtl"
+                  />
+                </div>
+              </GradientBorderContainer>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location">מיקום</Label>
-              <div className="relative">
-                <MapPin className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
-                <Select value={locationId} onValueChange={setLocationId}>
-                  <SelectTrigger className="pr-10 text-right">
-                    <SelectValue placeholder="בחר מיקום" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locations?.map(loc => (
-                      <SelectItem key={loc.id} value={loc.id.toString()}>
-                        {loc.name_hebrew}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Label htmlFor="location" className="text-white hebrew-text">מיקום</Label>
+              <GradientBorderContainer className="rounded-md">
+                <div className="relative">
+                  <MapPin className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
+                  <Select value={locationId} onValueChange={setLocationId}>
+                    <SelectTrigger className="bg-black border-0 pr-10 text-right">
+                      <SelectValue placeholder="בחר מיקום" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {locations?.map(loc => (
+                        <SelectItem key={loc.id} value={loc.id.toString()}>
+                          {loc.name_hebrew}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </GradientBorderContainer>
             </div>
+
+            <GradientSeparator />
 
             <div className="space-y-2">
-              <Label htmlFor="description">תיאור</Label>
-              <div className="relative">
-                <FileText className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10" />
-                <Textarea 
-                  id="description" 
-                  placeholder="ספר קצת על העסק שלך..." 
-                  value={description} 
-                  onChange={(e) => setDescription(e.target.value)} 
-                  className="pr-10 text-right min-h-[100px] hebrew-text" 
-                  dir="rtl"
-                />
-              </div>
+              <Label htmlFor="description" className="text-white hebrew-text">תיאור</Label>
+              <GradientBorderContainer className="rounded-md">
+                <div className="relative">
+                  <FileText className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                  <Textarea 
+                    id="description" 
+                    placeholder="ספר קצת על העסק שלך..." 
+                    value={description} 
+                    onChange={(e) => setDescription(e.target.value)} 
+                    className="bg-black border-0 pr-10 text-right min-h-[100px] hebrew-text" 
+                    dir="rtl"
+                  />
+                </div>
+              </GradientBorderContainer>
             </div>
 
-            <Button 
-              onClick={handleSave}
-              disabled={!fullName.trim() || !businessName.trim() || isLoading}
-              className="w-full gap-2"
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <ArrowLeft className="w-4 h-4" />
-              )}
-              {isLoading ? 'שומר...' : isOnboarding ? 'סיים הרשמה' : 'שמור שינויים'}
-            </Button>
+            <GradientBorderContainer className="rounded-md">
+              <Button 
+                onClick={handleSave}
+                disabled={!fullName.trim() || !businessName.trim() || isLoading}
+                className="bg-black border-0 w-full gap-2"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <ArrowLeft className="w-4 h-4" />
+                )}
+                {isLoading ? 'שומר...' : isOnboarding ? 'סיים הרשמה' : 'שמור שינויים'}
+              </Button>
+            </GradientBorderContainer>
           </div>
 
         {isOnboarding && (
@@ -370,8 +388,10 @@ export const ProfileEditScreen: React.FC = () => {
             </p>
           </div>
         )}
-        </Card>
-      </GradientBorderContainer>
+            </Card>
+          </GradientBorderContainer>
+        </div>
+      </div>
     </div>
   );
 };

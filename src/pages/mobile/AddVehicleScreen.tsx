@@ -4,12 +4,14 @@ import { Upload, Car, Plus, X, ChevronLeft, Minus } from "lucide-react";
 import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useVehicles, useVehicleMakes, useVehicleModels, useVehicleTags } from "@/hooks/mobile/useVehicles";
 import { dealerClient } from "@/integrations/supabase/dealerClient";
 import { useToast } from "@/hooks/use-toast";
@@ -300,17 +302,17 @@ const AddVehicleScreen = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="container max-w-md mx-auto px-4 space-y-6" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3 space-x-reverse">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
           <div 
             onClick={handleBackClick}
             className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
           >
             <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
           </div>
-          <h1 className="text-xl font-bold text-foreground hebrew-text">
+          <h1 className="text-2xl font-bold text-foreground hebrew-text">
             הוספת רכב חדש
           </h1>
         </div>
@@ -320,465 +322,527 @@ const AddVehicleScreen = () => {
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-muted rounded-full h-2">
-        <div 
-          className="bg-primary h-2 rounded-full transition-all duration-300"
-          style={{ width: `${(currentStep / 4) * 100}%` }}
-        />
-      </div>
+      <GradientBorderContainer className="rounded-sm flex-1">
+        <div className="w-full bg-black rounded-md p-1">
+          <div 
+            className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(currentStep / 4) * 100}%` }}
+          />
+        </div>
+      </GradientBorderContainer>
 
       {/* Step 1: Basic Vehicle Info */}
       {currentStep === 1 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 space-x-reverse hebrew-text">
-              <Car className="h-5 w-5" />
-              <span>פרטי הרכב הבסיסיים</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="hebrew-text">יצרן הרכב *</Label>
-              <Select 
-                value={formData.brand}
-                onValueChange={(value) => {
-                  setSelectedMakeId(parseInt(value));
-                  updateFormData("brand", value);
-                  updateFormData("model", "");
-                  if (fieldErrors.brand) {
-                    setFieldErrors({ ...fieldErrors, brand: "" });
-                  }
-                }}
-              >
-                <SelectTrigger className={fieldErrors.brand ? "border-destructive" : ""}>
-                  <SelectValue placeholder="בחר יצרן" />
-                </SelectTrigger>
-                <SelectContent>
-                  {makes?.map(make => (
-                    <SelectItem key={make.id} value={make.id.toString()}>{make.name_hebrew}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldErrors.brand && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.brand}</p>
-              )}
-            </div>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 space-x-reverse text-white hebrew-text">
+                <Car className="h-5 w-5" />
+                <span>פרטי הרכב הבסיסיים</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-white hebrew-text">יצרן הרכב *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select 
+                    value={formData.brand}
+                    onValueChange={(value) => {
+                      setSelectedMakeId(parseInt(value));
+                      updateFormData("brand", value);
+                      updateFormData("model", "");
+                      if (fieldErrors.brand) {
+                        setFieldErrors({ ...fieldErrors, brand: "" });
+                      }
+                    }}
+                  >
+                    <SelectTrigger className={`bg-black border-0 ${fieldErrors.brand ? "border-destructive" : ""}`}>
+                      <SelectValue placeholder="בחר יצרן" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {makes?.map(make => (
+                        <SelectItem key={make.id} value={make.id.toString()}>{make.name_hebrew}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
+                {fieldErrors.brand && (
+                  <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.brand}</p>
+                )}
+              </div>
 
-            <div>
-              <Label className="hebrew-text">דגם *</Label>
-              <Select 
-                value={formData.model}
-                onValueChange={(value) => {
-                  updateFormData("model", value);
-                  if (fieldErrors.model) {
-                    setFieldErrors({ ...fieldErrors, model: "" });
-                  }
-                }}
-                disabled={!selectedMakeId}
-              >
-                <SelectTrigger className={fieldErrors.model ? "border-destructive" : ""}>
-                  <SelectValue placeholder={selectedMakeId ? "בחר דגם" : "בחר תחילה יצרן"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {models?.map(model => (
-                    <SelectItem key={model.id} value={model.id.toString()}>{model.name_hebrew}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldErrors.model && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.model}</p>
-              )}
-            </div>
+              <div>
+                <Label className="text-white hebrew-text">דגם *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select 
+                    value={formData.model}
+                    onValueChange={(value) => {
+                      updateFormData("model", value);
+                      if (fieldErrors.model) {
+                        setFieldErrors({ ...fieldErrors, model: "" });
+                      }
+                    }}
+                    disabled={!selectedMakeId}
+                  >
+                    <SelectTrigger className={`bg-black border-0 ${fieldErrors.model ? "border-destructive" : ""}`}>
+                      <SelectValue placeholder={selectedMakeId ? "בחר דגם" : "בחר תחילה יצרן"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {models?.map(model => (
+                        <SelectItem key={model.id} value={model.id.toString()}>{model.name_hebrew}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
+                {fieldErrors.model && (
+                  <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.model}</p>
+                )}
+              </div>
 
-            <div>
-              <Label className="hebrew-text">שנת ייצור *</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder="2020"
-                value={formData.year}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, '');
-                  updateFormData("year", value);
-                  if (fieldErrors.year) {
-                    setFieldErrors({ ...fieldErrors, year: "" });
-                  }
-                }}
-                className={fieldErrors.year ? "border-destructive" : ""}
-              />
-              {fieldErrors.year && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.year}</p>
-              )}
-            </div>
+              <div>
+                <Label className="text-white hebrew-text">שנת ייצור *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="2020"
+                    value={formData.year}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '');
+                      updateFormData("year", value);
+                      if (fieldErrors.year) {
+                        setFieldErrors({ ...fieldErrors, year: "" });
+                      }
+                    }}
+                    className={`bg-black border-0 text-right hebrew-text ${fieldErrors.year ? "border-destructive" : ""}`}
+                    dir="rtl"
+                  />
+                </GradientBorderContainer>
+                {fieldErrors.year && (
+                  <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.year}</p>
+                )}
+              </div>
 
-            <div>
-              <Label className="hebrew-text">סוג</Label>
-              <Select value={formData.vehicleType} onValueChange={(value) => updateFormData("vehicleType", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="בחר סוג רכב" />
-                </SelectTrigger>
-                <SelectContent>
-                  {VEHICLE_TYPES.map(type => (
-                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              <div>
+                <Label className="text-white hebrew-text">סוג</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select value={formData.vehicleType} onValueChange={(value) => updateFormData("vehicleType", value)}>
+                    <SelectTrigger className="bg-black border-0">
+                      <SelectValue placeholder="בחר סוג רכב" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VEHICLE_TYPES.map(type => (
+                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
+              </div>
 
-            <div>
-              <Label className="hebrew-text">צבע</Label>
-              <Select value={formData.color} onValueChange={(value) => updateFormData("color", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="בחר צבע" />
-                </SelectTrigger>
-                <SelectContent>
-                  {colors.map(color => (
-                    <SelectItem key={color} value={color}>{color}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+              <div>
+                <Label className="text-white hebrew-text">צבע</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select value={formData.color} onValueChange={(value) => updateFormData("color", value)}>
+                    <SelectTrigger className="bg-black border-0">
+                      <SelectValue placeholder="בחר צבע" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {colors.map(color => (
+                        <SelectItem key={color} value={color}>{color}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       )}
 
       {/* Step 2: Technical Details */}
       {currentStep === 2 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text">מפרט טכני</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="hebrew-text">קילומטרז׳ *</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder="120000"
-                value={formData.kilometers}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, '');
-                  updateFormData("kilometers", value);
-                  if (fieldErrors.kilometers) {
-                    setFieldErrors({ ...fieldErrors, kilometers: "" });
-                  }
-                }}
-                className={fieldErrors.kilometers ? "border-destructive" : ""}
-              />
-              {fieldErrors.kilometers && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.kilometers}</p>
-              )}
-            </div>
-
-            <div>
-              <Label className="hebrew-text">סוג דלק (אופציונלי)</Label>
-              <Select 
-                value={formData.fuelType}
-                onValueChange={(value) => updateFormData("fuelType", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="בחר סוג דלק" />
-                </SelectTrigger>
-                <SelectContent>
-                  {fuelTypes.map(fuel => (
-                    <SelectItem key={fuel.value} value={fuel.value}>{fuel.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="hebrew-text">תיבת הילוכים (אופציונלי)</Label>
-              <Select 
-                value={formData.transmission}
-                onValueChange={(value) => updateFormData("transmission", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="בחר תיבת הילוכים" />
-                </SelectTrigger>
-                <SelectContent>
-                  {transmissions.map(trans => (
-                    <SelectItem key={trans.value} value={trans.value}>{trans.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="hebrew-text">נפח מנוע (סמ"ק)</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder="1600 סמ״ק"
-                value={formData.engineSize}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, '');
-                  updateFormData("engineSize", value);
-                }}
-              />
-            </div>
-
-            <div>
-              <Label className="hebrew-text">מספר בעלים קודמים</Label>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => {
-                    const current = parseInt(formData.previousOwners) || 1;
-                    updateFormData("previousOwners", Math.max(0, current - 1).toString());
-                  }}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="1"
-                  value={formData.previousOwners}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9]/g, '');
-                    updateFormData("previousOwners", value || "1");
-                  }}
-                  className="text-center"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => {
-                    const current = parseInt(formData.previousOwners) || 1;
-                    updateFormData("previousOwners", (current + 1).toString());
-                  }}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-white hebrew-text">מפרט טכני</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-white hebrew-text">קילומטרז׳ *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="120000"
+                    value={formData.kilometers}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '');
+                      updateFormData("kilometers", value);
+                      if (fieldErrors.kilometers) {
+                        setFieldErrors({ ...fieldErrors, kilometers: "" });
+                      }
+                    }}
+                    className={`bg-black border-0 text-right hebrew-text ${fieldErrors.kilometers ? "border-destructive" : ""}`}
+                    dir="rtl"
+                  />
+                </GradientBorderContainer>
+                {fieldErrors.kilometers && (
+                  <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.kilometers}</p>
+                )}
               </div>
-            </div>
-          </CardContent>
+
+              <div>
+                <Label className="text-white hebrew-text">סוג דלק (אופציונלי)</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select 
+                    value={formData.fuelType}
+                    onValueChange={(value) => updateFormData("fuelType", value)}
+                  >
+                    <SelectTrigger className="bg-black border-0">
+                      <SelectValue placeholder="בחר סוג דלק" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fuelTypes.map(fuel => (
+                        <SelectItem key={fuel.value} value={fuel.value}>{fuel.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
+              </div>
+
+              <div>
+                <Label className="text-white hebrew-text">תיבת הילוכים (אופציונלי)</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select 
+                    value={formData.transmission}
+                    onValueChange={(value) => updateFormData("transmission", value)}
+                  >
+                    <SelectTrigger className="bg-black border-0">
+                      <SelectValue placeholder="בחר תיבת הילוכים" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {transmissions.map(trans => (
+                        <SelectItem key={trans.value} value={trans.value}>{trans.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
+              </div>
+
+              <div>
+                <Label className="text-white hebrew-text">נפח מנוע (סמ"ק)</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="1600 סמ״ק"
+                    value={formData.engineSize}
+                    onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    updateFormData("engineSize", value);
+                  }}
+                  className="bg-black border-0 text-right hebrew-text"
+                  dir="rtl"
+                  />
+                </GradientBorderContainer>
+              </div>
+
+              <GradientSeparator />
+
+              <div>
+                <Label className="text-white hebrew-text">מספר בעלים קודמים</Label>
+                <div className="flex items-center gap-2">
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        const current = parseInt(formData.previousOwners) || 1;
+                        updateFormData("previousOwners", Math.max(0, current - 1).toString());
+                      }}
+                      className="bg-black border-0"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
+                  <GradientBorderContainer className="rounded-md flex-1">
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="1"
+                      value={formData.previousOwners}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, '');
+                        updateFormData("previousOwners", value || "1");
+                      }}
+                      className="bg-black border-0 text-center hebrew-text"
+                    />
+                  </GradientBorderContainer>
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        const current = parseInt(formData.previousOwners) || 1;
+                        updateFormData("previousOwners", (current + 1).toString());
+                      }}
+                      className="bg-black border-0"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
+                </div>
+              </div>
+            </CardContent>
         </Card>
+      </GradientBorderContainer>
       )}
 
       {/* Step 3: Price and Condition */}
       {currentStep === 3 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text">מחיר ומצב</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="hebrew-text">מחיר מבוקש (₪) *</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder="50000"
-                value={formData.price}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, '');
-                  updateFormData("price", value);
-                  if (fieldErrors.price) {
-                    setFieldErrors({ ...fieldErrors, price: "" });
-                  }
-                }}
-                className={fieldErrors.price ? "border-destructive" : ""}
-              />
-              {fieldErrors.price && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.price}</p>
-              )}
-            </div>
-
-            <div>
-              <Label className="hebrew-text">מצב הרכב *</Label>
-              <Select 
-                value={formData.condition}
-                onValueChange={(value) => {
-                  updateFormData("condition", value);
-                  if (fieldErrors.condition) {
-                    setFieldErrors({ ...fieldErrors, condition: "" });
-                  }
-                }}
-              >
-                <SelectTrigger className={fieldErrors.condition ? "border-destructive" : ""}>
-                  <SelectValue placeholder="בחר מצב" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="excellent">מצוין</SelectItem>
-                  <SelectItem value="very_good">טוב מאוד</SelectItem>
-                  <SelectItem value="good">טוב</SelectItem>
-                  <SelectItem value="fair">סביר</SelectItem>
-                </SelectContent>
-              </Select>
-              {fieldErrors.condition && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.condition}</p>
-              )}
-            </div>
-
-            <div className="flex items-center space-x-2 space-x-reverse pt-2">
-              <Checkbox 
-                id="hadSevereCrash"
-                checked={formData.hadSevereCrash}
-                onCheckedChange={(checked) => updateFormData("hadSevereCrash", checked as boolean)}
-              />
-              <Label htmlFor="hadSevereCrash" className="hebrew-text cursor-pointer">
-                הרכב היה מעורב בתאונה חמורה
-              </Label>
-            </div>
-
-            <div>
-              <Label className="hebrew-text">קובץ תוצאות טסט (אופציונלי)</Label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={handleTestFileUpload}
-                  disabled={uploadingTestFile}
-                  className="hidden"
-                  id="test-file"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => document.getElementById('test-file')?.click()}
-                  disabled={uploadingTestFile}
-                  className="hebrew-text"
-                >
-                  <Upload className="h-4 w-4 ml-2" />
-                  {uploadingTestFile ? 'מעלה...' : 'העלה קובץ'}
-                </Button>
-                {formData.testResultFileUrl && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => updateFormData("testResultFileUrl", "")}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-white hebrew-text">מחיר ומצב</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-white hebrew-text">מחיר מבוקש (₪) *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="50000"
+                    value={formData.price}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '');
+                      updateFormData("price", value);
+                      if (fieldErrors.price) {
+                        setFieldErrors({ ...fieldErrors, price: "" });
+                      }
+                    }}
+                    className={`bg-black border-0 text-right hebrew-text ${fieldErrors.price ? "border-destructive" : ""}`}
+                    dir="rtl"
+                  />
+                </GradientBorderContainer>
+                {fieldErrors.price && (
+                  <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.price}</p>
                 )}
               </div>
-              {formData.testResultFileUrl && (
-                <p className="text-sm text-muted-foreground mt-1 hebrew-text">קובץ הועלה בהצלחה</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+
+              <div>
+                <Label className="text-white hebrew-text">מצב הרכב *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select 
+                    value={formData.condition}
+                    onValueChange={(value) => {
+                      updateFormData("condition", value);
+                      if (fieldErrors.condition) {
+                        setFieldErrors({ ...fieldErrors, condition: "" });
+                      }
+                    }}
+                  >
+                    <SelectTrigger className={`bg-black border-0 ${fieldErrors.condition ? "border-destructive" : ""}`}>
+                      <SelectValue placeholder="בחר מצב" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="excellent">מצוין</SelectItem>
+                      <SelectItem value="very_good">טוב מאוד</SelectItem>
+                      <SelectItem value="good">טוב</SelectItem>
+                      <SelectItem value="fair">סביר</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
+                {fieldErrors.condition && (
+                  <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.condition}</p>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2 space-x-reverse pt-2">
+                <Checkbox 
+                  id="hadSevereCrash"
+                  checked={formData.hadSevereCrash}
+                  onCheckedChange={(checked) => updateFormData("hadSevereCrash", checked as boolean)}
+                />
+                <Label htmlFor="hadSevereCrash" className="text-white hebrew-text cursor-pointer">
+                  הרכב היה מעורב בתאונה חמורה
+                </Label>
+              </div>
+
+              <GradientSeparator />
+
+              <div>
+                <Label className="text-white hebrew-text">קובץ תוצאות טסט (אופציונלי)</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={handleTestFileUpload}
+                    disabled={uploadingTestFile}
+                    className="hidden"
+                    id="test-file"
+                  />
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById('test-file')?.click()}
+                      disabled={uploadingTestFile}
+                      className="bg-black border-0 hebrew-text"
+                    >
+                      <Upload className="h-4 w-4 ml-2" />
+                      {uploadingTestFile ? 'מעלה...' : 'העלה קובץ'}
+                    </Button>
+                  </GradientBorderContainer>
+                  {formData.testResultFileUrl && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => updateFormData("testResultFileUrl", "")}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                {formData.testResultFileUrl && (
+                  <p className="text-sm text-muted-foreground mt-1 hebrew-text">קובץ הועלה בהצלחה</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       )}
 
       {/* Step 4: Description and Images */}
       {currentStep === 4 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text">תיאור ותמונות</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="hebrew-text">תיאור הרכב *</Label>
-              <Textarea
-                placeholder="תאר את הרכב - מצב כללי, תיקונים שבוצעו, אביזרים נוספים וכו'"
-                value={formData.description}
-                onChange={(e) => {
-                  updateFormData("description", e.target.value);
-                  if (fieldErrors.description) {
-                    setFieldErrors({ ...fieldErrors, description: "" });
-                  }
-                }}
-                className={`hebrew-text min-h-[120px] ${fieldErrors.description ? "border-destructive" : ""}`}
-              />
-              {fieldErrors.description && (
-                <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.description}</p>
-              )}
-            </div>
-
-            <div>
-              <Label className="hebrew-text">תגיות</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {availableTags?.map(tag => (
-                  <Badge
-                    key={tag.id}
-                    variant={selectedTagIds.includes(tag.id) ? "default" : "outline"}
-                    className="cursor-pointer hebrew-text"
-                    style={selectedTagIds.includes(tag.id) ? { 
-                      backgroundColor: tag.color || '#6B7280',
-                      borderColor: tag.color || '#6B7280',
-                      color: '#ffffff'
-                    } : {}}
-                    onClick={() => {
-                      setSelectedTagIds(prev => 
-                        prev.includes(tag.id)
-                          ? prev.filter(id => id !== tag.id)
-                          : [...prev, tag.id]
-                      );
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-white hebrew-text">תיאור ותמונות</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-white hebrew-text">תיאור הרכב *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Textarea
+                    placeholder="תאר את הרכב - מצב כללי, תיקונים שבוצעו, אביזרים נוספים וכו'"
+                    value={formData.description}
+                    onChange={(e) => {
+                      updateFormData("description", e.target.value);
+                      if (fieldErrors.description) {
+                        setFieldErrors({ ...fieldErrors, description: "" });
+                      }
                     }}
-                  >
-                    {tag.name_hebrew}
-                  </Badge>
-                ))}
+                    className={`bg-black border-0 text-right hebrew-text min-h-[120px] ${fieldErrors.description ? "border-destructive" : ""}`}
+                    dir="rtl"
+                  />
+                </GradientBorderContainer>
+                {fieldErrors.description && (
+                  <p className="text-sm text-destructive mt-1 hebrew-text">{fieldErrors.description}</p>
+                )}
               </div>
-            </div>
 
-            <div>
-              <Label className="hebrew-text">תמונות רכב</Label>
-              <div className="border-2 border-dashed rounded-lg p-6">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={uploading}
-                  className="hidden"
-                  id="vehicle-images"
-                />
-                <label
-                  htmlFor="vehicle-images"
-                  className="flex flex-col items-center cursor-pointer"
-                >
-                  <Upload className="h-12 w-12 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground hebrew-text">
-                    {uploading ? 'מעלה...' : 'לחץ להעלאת תמונות'}
-                  </p>
-                </label>
-              </div>
-              {uploadedImages.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mt-4">
-                  {uploadedImages.map((url, index) => (
-                    <div key={index} className="relative">
-                      <img src={url} alt={`תמונה ${index + 1}`} className="w-full h-24 object-cover rounded" />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(url)}
-                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
+              <div>
+                <Label className="text-white hebrew-text">תגיות</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {availableTags?.map(tag => (
+                    <Badge
+                      key={tag.id}
+                      variant={selectedTagIds.includes(tag.id) ? "default" : "outline"}
+                      className="cursor-pointer hebrew-text"
+                      style={selectedTagIds.includes(tag.id) ? { 
+                        backgroundColor: tag.color || '#6B7280',
+                        borderColor: tag.color || '#6B7280',
+                        color: '#ffffff'
+                      } : {}}
+                      onClick={() => {
+                        setSelectedTagIds(prev => 
+                          prev.includes(tag.id)
+                            ? prev.filter(id => id !== tag.id)
+                            : [...prev, tag.id]
+                        );
+                      }}
+                    >
+                      {tag.name_hebrew}
+                    </Badge>
                   ))}
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+
+              <GradientSeparator />
+
+              <div>
+                <Label className="text-white hebrew-text">תמונות רכב</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <div className="bg-black border-2 border-dashed border-border/50 rounded-md p-6">
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                      className="hidden"
+                      id="vehicle-images"
+                    />
+                    <label
+                      htmlFor="vehicle-images"
+                      className="flex flex-col items-center cursor-pointer"
+                    >
+                      <Upload className="h-12 w-12 text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground hebrew-text">
+                        {uploading ? 'מעלה...' : 'לחץ להעלאת תמונות'}
+                      </p>
+                    </label>
+                  </div>
+                </GradientBorderContainer>
+                {uploadedImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-4">
+                    {uploadedImages.map((url, index) => (
+                      <div key={index} className="relative">
+                        <img src={url} alt={`תמונה ${index + 1}`} className="w-full h-24 object-cover rounded" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(url)}
+                          className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       )}
 
       {/* Navigation Buttons */}
       <div className="flex justify-between gap-4">
         {currentStep > 1 && (
-          <Button 
-            variant="outline" 
-            onClick={() => setCurrentStep(prev => prev - 1)}
-            className="hebrew-text"
-          >
-            חזור
-          </Button>
+          <GradientBorderContainer className="rounded-md">
+            <Button 
+              variant="outline" 
+              onClick={() => setCurrentStep(prev => prev - 1)}
+              className="bg-black border-0 hebrew-text"
+            >
+              חזור
+            </Button>
+          </GradientBorderContainer>
         )}
-        <Button 
-          onClick={handleNext}
-          disabled={isAddingVehicle}
-          className="mr-auto hebrew-text"
-        >
-          {currentStep === 4 ? (isAddingVehicle ? 'מוסיף...' : 'פרסם רכב') : 'המשך'}
-          <ChevronLeft className="mr-2 h-4 w-4" />
-        </Button>
+        <GradientBorderContainer className="rounded-md flex-1">
+          <Button 
+            onClick={handleNext}
+            disabled={isAddingVehicle}
+            className="bg-black border-0 w-full hebrew-text"
+          >
+            {currentStep === 4 ? (isAddingVehicle ? 'מוסיף...' : 'פרסם רכב') : 'המשך'}
+            <ChevronLeft className="mr-2 h-4 w-4" />
+          </Button>
+        </GradientBorderContainer>
       </div>
     </div>
   );

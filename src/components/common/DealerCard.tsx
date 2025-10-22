@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
 import { MessageCircle, Phone } from 'lucide-react';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
 
@@ -68,17 +69,19 @@ export const DealerCard: React.FC<DealerCardProps> = ({
 
   if (isLoading && isRevealed) {
     return (
-      <Card className={className}>
-        <CardContent className="p-4">
-          <div className="flex gap-4 animate-pulse">
-            <div className="h-16 w-16 bg-gray-200 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4" />
-              <div className="h-3 bg-gray-200 rounded w-1/2" />
+      <GradientBorderContainer className="rounded-lg">
+        <Card className="bg-black border-0 rounded-lg">
+          <CardContent className="p-4">
+            <div className="flex gap-4 animate-pulse">
+              <div className="h-16 w-16 bg-gray-700 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-700 rounded w-3/4" />
+                <div className="h-3 bg-gray-700 rounded w-1/2" />
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
     );
   }
 
@@ -92,23 +95,24 @@ export const DealerCard: React.FC<DealerCardProps> = ({
   };
 
   return (
-    <Card className={className} dir="rtl">
-      <CardContent className="p-4">
-        <div className="flex gap-4">
-          {/* Profile Picture */}
-          <Avatar className="h-16 w-16 shrink-0">
-            {displayData.profilePicture ? (
-              <AvatarImage src={displayData.profilePicture} alt={displayData.name || ''} />
-            ) : (
-              <AvatarFallback className="text-lg">
-                {isRevealed ? displayData.name?.charAt(0) : '?'}
-              </AvatarFallback>
-            )}
-          </Avatar>
+    <GradientBorderContainer className={`rounded-lg ${className}`}>
+      <Card className="bg-black border-0 rounded-lg" dir="rtl">
+        <CardContent className="p-4">
+          <div className="flex gap-4">
+            {/* Profile Picture */}
+            <Avatar className="h-16 w-16 shrink-0">
+              {displayData.profilePicture ? (
+                <AvatarImage src={displayData.profilePicture} alt={displayData.name || ''} />
+              ) : (
+                <AvatarFallback className="text-lg bg-gray-700 text-white">
+                  {isRevealed ? displayData.name?.charAt(0) : '?'}
+                </AvatarFallback>
+              )}
+            </Avatar>
 
           {/* Dealer Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-lg truncate">{displayData.businessName}</h3>
+            <h3 className="font-bold text-lg truncate text-white">{displayData.businessName}</h3>
             <p className="text-sm text-muted-foreground truncate">
               {displayData.name}
             </p>
@@ -142,30 +146,34 @@ export const DealerCard: React.FC<DealerCardProps> = ({
         {/* Action Buttons */}
         <div className="flex gap-2 mt-4">
           {showChatButton && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={onChatClick}
-              className="flex-1 gap-2"
-            >
-              <MessageCircle className="h-4 w-4" />
-              שלח הודעה
-            </Button>
+            <GradientBorderContainer className="rounded-md flex-1">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={onChatClick}
+                className="bg-black border-0 w-full gap-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                שלח הודעה
+              </Button>
+            </GradientBorderContainer>
           )}
           
           {showPhoneButton && isRevealed && displayData.phone && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onPhoneClick}
-              className="gap-2"
-              asChild
-            >
-              <a href={`tel:${displayData.phone}`}>
-                <Phone className="h-4 w-4" />
-                התקשר
-              </a>
-            </Button>
+            <GradientBorderContainer className="rounded-md">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onPhoneClick}
+                className="bg-black border-0 gap-2"
+                asChild
+              >
+                <a href={`tel:${displayData.phone}`}>
+                  <Phone className="h-4 w-4" />
+                  התקשר
+                </a>
+              </Button>
+            </GradientBorderContainer>
           )}
         </div>
 
@@ -177,5 +185,6 @@ export const DealerCard: React.FC<DealerCardProps> = ({
         )}
       </CardContent>
     </Card>
+    </GradientBorderContainer>
   );
 };

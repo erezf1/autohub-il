@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -89,7 +90,7 @@ const ISORequestDetailScreen = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" dir="rtl">
       {/* Header */}
       <div className="flex items-center space-x-3 space-x-reverse">
         <div 
@@ -98,114 +99,127 @@ const ISORequestDetailScreen = () => {
         >
           <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
         </div>
-        <h1 className="text-xl font-semibold text-foreground hebrew-text">פרטי בקשת חיפוש</h1>
+        <h1 className="text-xl font-semibold text-white hebrew-text">פרטי בקשת חיפוש</h1>
       </div>
 
       {/* Request Overview */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-lg hebrew-text">{mockISORequest.title}</CardTitle>
-              <div className="flex items-center space-x-4 space-x-reverse mt-2 text-sm text-muted-foreground">
-                <div className="flex items-center">
-                  <Clock className="h-4 w-4 ml-1" />
-                  <span className="hebrew-text">{mockISORequest.dateCreated}</span>
-                </div>
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 ml-1" />
-                  <span className="hebrew-text">{mockISORequest.location}</span>
+      <GradientBorderContainer className="rounded-lg">
+        <Card className="bg-black border-0 rounded-lg">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle className="text-lg text-white hebrew-text">{mockISORequest.title}</CardTitle>
+                <div className="flex items-center space-x-4 space-x-reverse mt-2 text-sm text-muted-foreground">
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 ml-1" />
+                    <span className="hebrew-text">{mockISORequest.dateCreated}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 ml-1" />
+                    <span className="hebrew-text">{mockISORequest.location}</span>
+                  </div>
                 </div>
               </div>
+              <Badge variant="default" className="hebrew-text">
+                {mockISORequest.status}
+              </Badge>
             </div>
-            <Badge variant="default" className="hebrew-text">
-              {mockISORequest.status}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-medium text-foreground hebrew-text mb-2">תיאור הבקשה</h4>
-              <p className="text-muted-foreground text-sm hebrew-text">{mockISORequest.description}</p>
-            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium text-white hebrew-text mb-2">תיאור הבקשה</h4>
+                <p className="text-muted-foreground text-sm hebrew-text">{mockISORequest.description}</p>
+              </div>
             
-            <div>
-              <h4 className="font-medium text-foreground hebrew-text mb-2">תקציב</h4>
-              <p className="text-primary font-semibold hebrew-text">{mockISORequest.budgetRange}</p>
-            </div>
+              <div>
+                <h4 className="font-medium text-white hebrew-text mb-2">תקציב</h4>
+                <p className="text-primary font-semibold hebrew-text">{mockISORequest.budgetRange}</p>
+              </div>
 
-            <div>
-              <h4 className="font-medium text-foreground hebrew-text mb-2">דרישות</h4>
-              <ul className="space-y-1">
-                {mockISORequest.requirements.map((req, index) => (
-                  <li key={index} className="text-sm text-muted-foreground hebrew-text flex items-center">
-                    <CheckCircle className="h-3 w-3 text-primary ml-2 flex-shrink-0" />
-                    {req}
-                  </li>
-                ))}
-              </ul>
+              <div>
+                <h4 className="font-medium text-white hebrew-text mb-2">דרישות</h4>
+                <ul className="space-y-1">
+                  {mockISORequest.requirements.map((req, index) => (
+                    <li key={index} className="text-sm text-muted-foreground hebrew-text flex items-center">
+                      <CheckCircle className="h-3 w-3 text-primary ml-2 flex-shrink-0" />
+                      {req}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Offers */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">הצעות שהתקבלו ({mockISORequest.offers.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {mockISORequest.offers.map((offer) => (
-              <div key={offer.id} className="border rounded-lg p-3">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h5 className="font-medium text-foreground hebrew-text">{offer.dealerName}</h5>
-                    <p className="text-sm text-muted-foreground hebrew-text">{offer.vehicle}</p>
+      <GradientBorderContainer className="rounded-lg">
+        <Card className="bg-black border-0 rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-white hebrew-text">הצעות שהתקבלו ({mockISORequest.offers.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {mockISORequest.offers.map((offer) => (
+                <GradientBorderContainer key={offer.id} className="rounded-md">
+                  <div className="bg-black border-0 rounded-md p-3">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h5 className="font-medium text-white hebrew-text">{offer.dealerName}</h5>
+                        <p className="text-sm text-muted-foreground hebrew-text">{offer.vehicle}</p>
+                      </div>
+                      <Badge variant={getStatusColor(offer.status)} className="hebrew-text">
+                        {offer.status}
+                      </Badge>
+                    </div>
+                  
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="space-y-1">
+                        <p className="text-primary font-semibold hebrew-text">{offer.price}</p>
+                        <p className="text-muted-foreground hebrew-text">{offer.mileage}</p>
+                      </div>
+                      <p className="text-muted-foreground hebrew-text">{offer.submittedAt}</p>
+                    </div>
                   </div>
-                  <Badge variant={getStatusColor(offer.status)} className="hebrew-text">
-                    {offer.status}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-center justify-between text-sm">
-                  <div className="space-y-1">
-                    <p className="text-primary font-semibold hebrew-text">{offer.price}</p>
-                    <p className="text-muted-foreground hebrew-text">{offer.mileage}</p>
-                  </div>
-                  <p className="text-muted-foreground hebrew-text">{offer.submittedAt}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                </GradientBorderContainer>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Add Offer Section (if user is a dealer) */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">הגש הצעה</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <Textarea
-              placeholder="כתוב את הצעתך כאן - פרט על הרכב שברשותך, המחיר, הקילומטרז' ופרטים נוספים..."
-              value={newOffer}
-              onChange={(e) => setNewOffer(e.target.value)}
-              className="hebrew-text"
-              rows={4}
-            />
-            <Button 
-              onClick={handleSubmitOffer}
-              disabled={!newOffer.trim()}
-              className="w-full hebrew-text"
-            >
-              שלח הצעה
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <GradientBorderContainer className="rounded-lg">
+        <Card className="bg-black border-0 rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-white hebrew-text">הגש הצעה</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <GradientBorderContainer className="rounded-md">
+                <Textarea
+                  placeholder="כתוב את הצעתך כאן - פרט על הרכב שברשותך, המחיר, הקילומטרז' ופרטים נוספים..."
+                  value={newOffer}
+                  onChange={(e) => setNewOffer(e.target.value)}
+                  className="bg-black border-0 hebrew-text text-right"
+                  rows={4}
+                  dir="rtl"
+                />
+              </GradientBorderContainer>
+              <GradientBorderContainer className="rounded-md">
+                <Button 
+                  onClick={handleSubmitOffer}
+                  disabled={!newOffer.trim()}
+                  className="bg-black border-0 w-full hebrew-text"
+                >
+                  שלח הצעה
+                </Button>
+              </GradientBorderContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
     </div>
   );
 };
