@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
+import { DealerCard } from "@/components/common";
 
 // Mock auction data
 const mockAuction = {
@@ -256,39 +257,71 @@ const AuctionDetailScreen = () => {
       <GradientBorderContainer className="rounded-md">
         <Card className="bg-black border-0 rounded-md">
           <CardHeader>
-            <CardTitle className="text-xl hebrew-text">פרטי הרכב</CardTitle>
+            <CardTitle className="text-xl hebrew-text">מפרט טכני</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground hebrew-text">שנת ייצור</p>
-                <p className="font-medium text-foreground">{mockAuction.vehicle.year}</p>
+          <CardContent className="space-y-0">
+            <div className="grid grid-cols-2 gap-4 py-3">
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground hebrew-text">שנת ייצור</p>
+                <p className="font-medium text-white">{mockAuction.vehicle.year}</p>
               </div>
-              <div>
-                <p className="text-muted-foreground hebrew-text">קילומטרז׳</p>
-                <p className="font-medium text-foreground">{mockAuction.vehicle.kilometers.toLocaleString()} ק״מ</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground hebrew-text">תיבת הילוכים</p>
-                <p className="font-medium text-foreground hebrew-text">{mockAuction.vehicle.transmission}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground hebrew-text">סוג דלק</p>
-                <p className="font-medium text-foreground hebrew-text">{mockAuction.vehicle.fuelType}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground hebrew-text">קילומטרז׳</p>
+                <p className="font-medium text-white">{mockAuction.vehicle.kilometers.toLocaleString()} ק״מ</p>
               </div>
             </div>
             
             <GradientSeparator />
             
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text mb-2">תיאור</p>
-              <p className="text-foreground hebrew-text leading-relaxed">
-                {mockAuction.vehicle.description}
-              </p>
+            <div className="grid grid-cols-2 gap-4 py-3">
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
+                <p className="font-medium text-white hebrew-text">{mockAuction.vehicle.transmission}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground hebrew-text">סוג דלק</p>
+                <p className="font-medium text-white hebrew-text">{mockAuction.vehicle.fuelType}</p>
+              </div>
             </div>
+
+            {(mockAuction.vehicle.engineSize || mockAuction.vehicle.color) && (
+              <>
+                <GradientSeparator />
+                <div className="grid grid-cols-2 gap-4 py-3">
+                  {mockAuction.vehicle.engineSize && (
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
+                      <p className="font-medium text-white hebrew-text">{mockAuction.vehicle.engineSize}</p>
+                    </div>
+                  )}
+                  {mockAuction.vehicle.color && (
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
+                      <p className="font-medium text-white hebrew-text">{mockAuction.vehicle.color}</p>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </GradientBorderContainer>
+
+      {/* Vehicle Description */}
+      {mockAuction.vehicle.description && (
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="hebrew-text text-white">תיאור</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-white hebrew-text leading-relaxed">
+                {mockAuction.vehicle.description}
+              </p>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
+      )}
 
       {/* Bid History */}
       <GradientBorderContainer className="rounded-md">
@@ -361,6 +394,33 @@ const AuctionDetailScreen = () => {
           </CardContent>
         </Card>
       </GradientBorderContainer>
+
+      {/* Vehicle Condition & History */}
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="hebrew-text text-white">מצב ורקע הרכב</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">מצב כללי</p>
+                <p className="font-medium text-white hebrew-text">
+                  מצוין
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
+
+      {/* Dealer Card */}
+      <DealerCard
+        dealerId={mockAuction.seller.name}
+        isRevealed={true}
+        showChatButton={true}
+        showPhoneButton={true}
+      />
     </div>
   );
 };

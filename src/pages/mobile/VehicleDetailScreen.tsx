@@ -120,9 +120,8 @@ const VehicleDetailScreen = () => {
                      vehicle.status === 'sold' ? 'נמכר' : 'לא פעיל';
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden" dir="rtl">
-      <div className="flex-1 overflow-y-auto">
-        <div className="container max-w-md mx-auto px-4 py-6 space-y-4">
+    <div className="w-full" dir="rtl">
+      <div className="container max-w-md mx-auto space-y-4">
           {/* Header with Back Button */}
           <div className="flex items-center space-x-3 space-x-reverse">
             <div 
@@ -257,11 +256,11 @@ const VehicleDetailScreen = () => {
         <CardContent className="space-y-0">
           {/* Year */}
           <div className="grid grid-cols-2 gap-4 py-3">
-            <div>
+            <div className="flex items-center gap-2">
               <p className="text-sm text-muted-foreground hebrew-text">שנת ייצור</p>
               <p className="font-medium text-white">{vehicle.year}</p>
             </div>
-            <div>
+            <div className="flex items-center gap-2">
               <p className="text-sm text-muted-foreground hebrew-text">קילומטרז׳</p>
               <p className="font-medium text-white">{vehicle.kilometers?.toLocaleString()} ק״מ</p>
             </div>
@@ -272,13 +271,13 @@ const VehicleDetailScreen = () => {
           {/* Transmission and Fuel */}
           <div className="grid grid-cols-2 gap-4 py-3">
             {vehicle.transmission && (
-              <div>
+              <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
                 <p className="font-medium text-white hebrew-text">{transmissionLabel}</p>
               </div>
             )}
             {vehicle.fuel_type && (
-              <div>
+              <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground hebrew-text">סוג דלק</p>
                 <p className="font-medium text-white hebrew-text">{fuelLabel}</p>
               </div>
@@ -290,13 +289,13 @@ const VehicleDetailScreen = () => {
               <GradientSeparator />
               <div className="grid grid-cols-2 gap-4 py-3">
                 {vehicle.engine_size && (
-                  <div>
+                  <div className="flex items-center gap-2">
                     <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
                     <p className="font-medium text-white hebrew-text">{vehicle.engine_size.toLocaleString()} סמ״ק</p>
                   </div>
                 )}
                 {vehicle.sub_model && (
-                  <div>
+                  <div className="flex items-center gap-2">
                     <p className="text-sm text-muted-foreground hebrew-text">סוג</p>
                     <p className="font-medium text-white hebrew-text">{getVehicleTypeLabel(vehicle.sub_model)}</p>
                   </div>
@@ -310,13 +309,13 @@ const VehicleDetailScreen = () => {
               <GradientSeparator />
               <div className="grid grid-cols-2 gap-4 py-3">
                 {vehicle.color && (
-                  <div>
+                  <div className="flex items-center gap-2">
                     <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
                     <p className="font-medium text-white hebrew-text">{vehicle.color}</p>
                   </div>
                 )}
                 {vehicle.previous_owners && (
-                  <div>
+                  <div className="flex items-center gap-2">
                     <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
                     <p className="font-medium text-white">{vehicle.previous_owners}</p>
                   </div>
@@ -412,8 +411,8 @@ const VehicleDetailScreen = () => {
 
       {/* Conditional Actions Based on Ownership */}
       {isOwnVehicle ? (
-        <GradientBorderContainer className="rounded-md">
-          <Card className="bg-black border-0 rounded-md">
+        <GradientBorderContainer className="rounded-md flex-1">
+          <Card className="bg-black border-0">
             <CardContent className="p-4">
               <div className="flex gap-2">
                 <GradientBorderContainer className="rounded-md flex-1">
@@ -450,7 +449,6 @@ const VehicleDetailScreen = () => {
           />
         )
       )}
-        </div>
       </div>
     </div>
   );
