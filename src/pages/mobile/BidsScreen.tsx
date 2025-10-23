@@ -6,8 +6,6 @@ import { Gavel, Clock, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
 import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
-import { FilterButton } from '@/components/common/FilterButton';
-import { ActiveFiltersDisplay } from '@/components/common/ActiveFiltersDisplay';
 import darkCarImage from "@/assets/dark_car.png";
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
 import {
