@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Plus, Clock, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
+import { GradientSeparator } from '@/components/ui/gradient-separator';
 import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
 import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
+import darkCarImage from "@/assets/dark_car.png";
 import {
   PageContainer,
   PageHeader,
@@ -25,7 +27,8 @@ const mockISORequests = [
     status: "active",
     matchCount: 3,
     createdDate: "לפני שבוע",
-    requirements: "אוטומט, לא אחרי תאונה"
+    requirements: "אוטומט, לא אחרי תאונה",
+    image: darkCarImage
   },
   {
     id: 2,
@@ -35,7 +38,8 @@ const mockISORequests = [
     status: "matches",
     matchCount: 1,
     createdDate: "לפני 3 ימים",
-    requirements: "דיזל, צבע כהה"
+    requirements: "דיזל, צבע כהה",
+    image: darkCarImage
   },
   {
     id: 3,
@@ -45,7 +49,8 @@ const mockISORequests = [
     status: "completed",
     matchCount: 0,
     createdDate: "לפני חודש",
-    requirements: "4WD, עור"
+    requirements: "4WD, עור",
+    image: darkCarImage
   }
 ];
 
@@ -129,52 +134,74 @@ export const RequiredCarsScreen: React.FC = () => {
               {mockISORequests.map((request) => (
                 <GradientBorderContainer
                   key={request.id}
-          
                   className="rounded-md flex-1"
                 >
                   <Card
-                    // Added text-right for RTL alignment
-                    className="p-4 cursor-pointer hover:shadow-md transition-shadow text-right border-0 bg-black rounded-md flex-1"
+                    className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
                     onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
                   >
-                  {/* Added flex-row-reverse to move badge to the left */}
-                  <div className="flex justify-between items-start mb-3 flex-row-reverse">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg mb-1 text-white">{request.vehicleType}</h3>
-                      <p className="text-sm text-white">{request.year}</p>
-                    </div>
-                    <Badge
-                      className={`text-white ${getStatusColor(request.status)}`}
-                    >
-                      {getStatusText(request.status)}
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <span className="text-sm font-medium text-white">{request.priceRange}</span>
-                      <span className="text-sm text-white">:טווח מחיר</span>
-                    </div>
-                    <div className="flex items-center gap-2 justify-end">
-                      <span className="text-sm text-white">{request.requirements}</span>
-                      <span className="text-sm text-white">:דרישות</span>
-                    </div>
-                  </div>
-
-                  {/* Added flex-row-reverse to move match count to the left */}
-                  <div className="flex justify-between items-center text-sm text-white flex-row-reverse">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span>{request.createdDate}</span>
-                    </div>
-
-                    {request.matchCount > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Search className="w-3 h-3" />
-                        <span>{request.matchCount} התאמות</span>
+                    {/* Row 1: Image + Details */}
+                    <div className="flex items-stretch">
+                      {/* Column 1: Request Image */}
+                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
+                        <img
+                          src={request.image}
+                          alt={request.vehicleType}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    )}
-                  </div>
+                      
+                      {/* Column 2: Two Rows */}
+                      <div className="flex-1 flex flex-col">
+                        {/* Top Row: Name/Year/Status + Matches */}
+                        <div className="flex items-center justify-between p-4 pb-2">
+                          {/* Left side: Name, Year, Status */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-white hebrew-text">
+                              {request.vehicleType}
+                            </h3>
+                            <p className="text-sm text-white/70 hebrew-text mb-2">
+                              {request.year}
+                            </p>
+                            <Badge className={`text-white ${getStatusColor(request.status)} w-fit`}>
+                              {getStatusText(request.status)}
+                            </Badge>
+                          </div>
+                          
+                          {/* Right side: Match Count */}
+                          <div className="flex flex-col items-center space-y-1 pl-4">
+                            {request.matchCount > 0 ? (
+                              <>
+                                <span className="text-white/70 hebrew-text text-center text-xs">התאמות</span>
+                                <span className="text-2xl font-bold text-green-400 hebrew-text text-center">{request.matchCount}</span>
+                              </>
+                            ) : (
+                              <span className="text-white/70 hebrew-text text-center text-xs">אין התאמות</span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        
+                        {/* Bottom Row: Price Range */}
+                        <div className="px-4 py-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-white/70 hebrew-text">טווח מחיר:</span>
+                            <span className="font-medium text-white hebrew-text text-sm">{request.priceRange}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <GradientSeparator />
+                    
+                    {/* Row 2: Time + Requirements */}
+                    <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70 py-2">
+                      <div className="flex items-center gap-1 justify-center">
+                        <Clock className="w-3 h-3" />
+                        <span className="hebrew-text text-center">{request.createdDate}</span>
+                      </div>
+                      <span className="hebrew-text text-center">{request.requirements}</span>
+                    </div>
                   </Card>
                 </GradientBorderContainer>
               ))}
@@ -211,50 +238,74 @@ export const RequiredCarsScreen: React.FC = () => {
                   className="rounded-md flex-1"
                 >
                   <Card
-                    // Added text-right for RTL alignment
-                    className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-black border-0 text-right"
+                    className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
                     onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
                   >
-                  {/* Added flex-row-reverse to move badge to the left */}
-                  <div className="flex justify-between items-start mb-3 flex-row-reverse">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg mb-1 text-white">{request.vehicleType}</h3>
-                      <p className="text-sm text-gray-300">{request.year}</p>
-                    </div>
-                    <Badge
-                      className={`text-white ${getStatusColor(request.status)}`}
-                    >
-                      {getStatusText(request.status)}
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <span className="text-sm font-medium text-white">{request.priceRange}</span>
-                      <span className="text-sm text-gray-300">:טווח מחיר</span>
-                    </div>
-                    <div className="flex items-center gap-2 justify-end">
-                      <span className="text-sm text-white">{request.requirements}</span>
-                      <span className="text-sm text-gray-300">:דרישות</span>
-                    </div>
-                  </div>
-
-                  {/* Added flex-row-reverse to move match count to the left */}
-                  <div className="flex justify-between items-center text-sm text-gray-300 flex-row-reverse">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span>{request.createdDate}</span>
-                    </div>
-
-                    {request.matchCount > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Search className="w-3 h-3" />
-                        <span>{request.matchCount} התאמות</span>
+                    {/* Row 1: Image + Details */}
+                    <div className="flex items-stretch">
+                      {/* Column 1: Request Image */}
+                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
+                        <img
+                          src={request.image}
+                          alt={request.vehicleType}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    )}
-                  </div>
-                </Card>
-              </GradientBorderContainer>
+                      
+                      {/* Column 2: Two Rows */}
+                      <div className="flex-1 flex flex-col">
+                        {/* Top Row: Name/Year/Status + Matches */}
+                        <div className="flex items-center justify-between p-4 pb-2">
+                          {/* Left side: Name, Year, Status */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-white hebrew-text">
+                              {request.vehicleType}
+                            </h3>
+                            <p className="text-sm text-white/70 hebrew-text mb-2">
+                              {request.year}
+                            </p>
+                            <Badge className={`text-white ${getStatusColor(request.status)} w-fit`}>
+                              {getStatusText(request.status)}
+                            </Badge>
+                          </div>
+                          
+                          {/* Right side: Match Count */}
+                          <div className="flex flex-col items-center space-y-1 pl-4">
+                            {request.matchCount > 0 ? (
+                              <>
+                                <span className="text-white/70 hebrew-text text-center text-xs">התאמות</span>
+                                <span className="text-2xl font-bold text-green-400 hebrew-text text-center">{request.matchCount}</span>
+                              </>
+                            ) : (
+                              <span className="text-white/70 hebrew-text text-center text-xs">אין התאמות</span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <GradientSeparator />
+                        
+                        {/* Bottom Row: Price Range */}
+                        <div className="px-4 py-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-white/70 hebrew-text">טווח מחיר:</span>
+                            <span className="font-medium text-white hebrew-text text-sm">{request.priceRange}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <GradientSeparator />
+                    
+                    {/* Row 2: Time + Requirements */}
+                    <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70 py-2">
+                      <div className="flex items-center gap-1 justify-center">
+                        <Clock className="w-3 h-3" />
+                        <span className="hebrew-text text-center">{request.createdDate}</span>
+                      </div>
+                      <span className="hebrew-text text-center">{request.requirements}</span>
+                    </div>
+                  </Card>
+                </GradientBorderContainer>
             ))}
           </div>
 
