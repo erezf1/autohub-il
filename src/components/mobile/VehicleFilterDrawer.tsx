@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { Plus, Minus, X } from "lucide-react";
 import { useVehicleMakes, useVehicleModels, useVehicleTags } from "@/hooks/mobile/useVehicles";
 import { VehicleFilters } from "@/utils/mobile/vehicleFilters";
+import { VEHICLE_TYPES } from "@/constants/vehicleTypes";
 
 interface VehicleFilterDrawerProps {
   open: boolean;
@@ -79,6 +79,11 @@ export const VehicleFilterDrawer = ({
       ? currentTags.filter(id => id !== tagId)
       : [...currentTags, tagId];
     setLocalFilters({ ...localFilters, tagIds: newTags.length > 0 ? newTags : undefined });
+  };
+
+  const handleVehicleTypeChange = (value: string) => {
+    const vehicleType = value === "all" ? undefined : value;
+    setLocalFilters({ ...localFilters, vehicleType });
   };
 
   const handleReset = () => {
@@ -289,9 +294,9 @@ export const VehicleFilterDrawer = ({
             </div>
           </div>
 
-          {/* Tags */}
+          {/* Tags - Compact */}
           <div>
-            <Label className="hebrew-text mb-2 block">
+            <Label className="hebrew-text mb-2 block text-right">
               תגיות {localFilters.tagIds && localFilters.tagIds.length > 0 && (
                 <span className="text-sm text-muted-foreground">
                   ({localFilters.tagIds.length} נבחרו)

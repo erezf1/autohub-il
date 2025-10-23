@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Car, Eye, Edit, Trash2, Plus, Search, Loader2 } from "lucide-react";
+import { Car, Eye, Edit, Trash2, Plus, Loader2 } from "lucide-react";
 import { useAdminVehicles } from "@/hooks/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { AdminVehicleFilterBar } from "@/components/admin";
+import { AdminVehicleFilters, applyAdminVehicleFilters } from "@/utils/admin/vehicleFilters";
 import { 
   Table, 
   TableBody, 
@@ -24,7 +25,7 @@ import { GradientBorderContainer } from "@/components/ui/gradient-border-contain
 
 const AdminVehiclesList = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<AdminVehicleFilters>({});
   const { vehicles, isLoading } = useAdminVehicles();
 
   const getStatusBadge = (status: string) => {
@@ -40,16 +41,7 @@ const AdminVehiclesList = () => {
     }
   };
 
-  const filteredVehicles = (vehicles || []).filter(vehicle => {
-    const makeName = vehicle.make?.name_hebrew || '';
-    const modelName = vehicle.model?.name_hebrew || '';
-    const ownerName = vehicle.owner?.business_name || vehicle.owner?.full_name || '';
-    const search = searchTerm.toLowerCase();
-    
-    return makeName.toLowerCase().includes(search) ||
-           modelName.toLowerCase().includes(search) ||
-           ownerName.toLowerCase().includes(search);
-  });
+  const filteredVehicles = applyAdminVehicleFilters(vehicles || [], filters);
 
   return (
     <div className="space-y-8">

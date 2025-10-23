@@ -50,7 +50,7 @@ const MyVehiclesScreen = () => {
         }
       />
 
-      {/* Search and Filter */}
+      {/* Results count and filter button */}
       {myVehicles && myVehicles.length > 0 && (
         <div className="flex items-center justify-between gap-2 mb-4">
           <ResultsCount count={filteredVehicles.length} isLoading={isLoading} />

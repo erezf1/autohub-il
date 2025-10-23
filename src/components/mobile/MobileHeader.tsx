@@ -38,7 +38,7 @@ const MobileHeader = () => {
         </div>
 
         {/* Right Icons */}
-        <div className="flex items-center space-x-4 space-x-reverse">
+        <div className="flex items-center space-x-5 space-x-reverse">
           {/* Chat Icon with Badge */}
           <div className="relative cursor-pointer" onClick={() => navigate("/mobile/chats")}>
             <MessageCircle className="h-6 w-6 text-muted-foreground icon-hover-cyan transition-colors" />

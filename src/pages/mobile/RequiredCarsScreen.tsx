@@ -72,7 +72,7 @@ const getStatusText = (status: string) => {
   }
 };
 
-export const RequiredCarsScreen: React.FC = () => {
+export const RequiredCarsScreen = () => {
   const navigate = useNavigate();
   const [showMyRequests, setShowMyRequests] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
@@ -322,3 +322,5 @@ export const RequiredCarsScreen: React.FC = () => {
     </PageContainer>
   );
 };
+
+export default RequiredCarsScreen;

@@ -1,13 +1,3 @@
-import { useState } from "react";
-import { User, Building, Phone, MapPin, Edit3, Loader2, Crown, Calendar, Award, Flame, Gavel, Car } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { useProfile } from "@/hooks/mobile/useProfile";
-import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { dealerClient } from "@/integrations/supabase/dealerClient";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
@@ -22,8 +12,8 @@ const MyProfileScreen = () => {
   const { profile, isLoading: profileLoading } = useProfile();
   
   // Fetch phone from users table
-  const { data: userData, isLoading: userLoading } = useQuery({
-    queryKey: ['user-data', user?.id],
+  const { data: phoneData, isLoading: phoneLoading } = useQuery({
+    queryKey: ['user-phone', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
       const { data } = await dealerClient
@@ -31,36 +21,33 @@ const MyProfileScreen = () => {
         .select('phone_number')
         .eq('id', user.id)
         .single();
-      return data;
+      return data?.phone_number;
     },
     enabled: !!user?.id,
   });
 
+  const phoneNumber = phoneData;
+
   // Fetch active vehicle count
-  const { data: activeVehiclesCount } = useQuery({
+  const { data: activeVehicles } = useQuery({
     queryKey: ['active-vehicles-count', user?.id],
     queryFn: async () => {
       if (!user?.id) return 0;
-      const { count, error } = await dealerClient
+      const { count } = await dealerClient
         .from('vehicle_listings')
         .select('*', { count: 'exact', head: true })
         .eq('owner_id', user.id)
         .eq('status', 'available');
       
-      if (error) throw error;
       return count || 0;
     },
     enabled: !!user?.id,
   });
 
-  const isLoading = profileLoading || userLoading;
+  const isLoading = profileLoading || phoneLoading;
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+  if (isLoading || !profile) {
+    return <LoadingSpinner />;
   }
 
   const getSubscriptionLabel = (type: string) => {
