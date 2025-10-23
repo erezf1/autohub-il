@@ -312,7 +312,7 @@ export const BidsScreen: React.FC = () => {
                       <span className="hebrew-text text-center">{auction.bidCount} הצעות</span>
                     </div>
                     {auction.canBid && (
-                      <div className="px-4 pb-4">
+                      <div className="px-4 pb-2 pt-1">
                         <Button
                           size="sm"
                           className="w-full gap-2 bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
@@ -321,7 +321,7 @@ export const BidsScreen: React.FC = () => {
                             navigate(`/mobile/create-bid-details/${auction.vehicleId}`);
                           }}
                         >
-                          <Gavel className="w-4 h-4" />
+                          <Gavel className="w-4 h-4 pr" />
                           הגש הצעה
                         </Button>
                       </div>

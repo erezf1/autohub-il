@@ -238,13 +238,12 @@ export const ProfileEditScreen: React.FC = () => {
             </p>
           </div>
 
-          <GradientSeparator />
 
           <div className="space-y-4">
             {/* Phone Number (Read-Only) */}
             {userData?.phone_number && (
               <>
-                <div className="flex items-start space-x-3 space-x-reverse">
+                <div className="flex items-center space-x-3 space-x-reverse">
                   <div className="flex items-center space-x-2 space-x-reverse flex-shrink-0 min-w-[100px]">
                     <Phone className="h-4 w-4" style={{ stroke: 'url(#icon-gradient)' }} />
                     <Label htmlFor="phone" className="text-base font-bold text-white hebrew-text">טלפון:</Label>
@@ -264,7 +263,7 @@ export const ProfileEditScreen: React.FC = () => {
               </>
             )}
 
-            <div className="flex items-start space-x-3 space-x-reverse">
+            <div className="flex items-center space-x-3 space-x-reverse">
               <div className="flex items-center space-x-2 space-x-reverse flex-shrink-0 min-w-[100px]">
                 <User className="h-4 w-4" style={{ stroke: 'url(#icon-gradient)' }} />
                 <Label htmlFor="fullName" className="text-base font-bold text-white hebrew-text">שם מלא:</Label>
@@ -286,7 +285,7 @@ export const ProfileEditScreen: React.FC = () => {
 
             <GradientSeparator />
 
-            <div className="flex items-start space-x-3 space-x-reverse">
+            <div className="flex items-center space-x-3 space-x-reverse">
               <div className="flex items-center space-x-2 space-x-reverse flex-shrink-0 min-w-[100px]">
                 <Building className="h-4 w-4" style={{ stroke: 'url(#icon-gradient)' }} />
                 <Label htmlFor="businessName" className="text-base font-bold text-white hebrew-text">שם העסק:</Label>
@@ -308,7 +307,7 @@ export const ProfileEditScreen: React.FC = () => {
 
             <GradientSeparator />
 
-            <div className="flex items-start space-x-3 space-x-reverse">
+            <div className="flex items-center space-x-3 space-x-reverse">
               <div className="flex items-center space-x-2 space-x-reverse flex-shrink-0 min-w-[100px]">
                 <MapPin className="h-4 w-4" style={{ stroke: 'url(#icon-gradient)' }} />
                 <Label htmlFor="location" className="text-base font-bold text-white hebrew-text">מיקום:</Label>
@@ -350,7 +349,6 @@ export const ProfileEditScreen: React.FC = () => {
               </GradientBorderContainer>
             </div>
 
-            <GradientSeparator />
 
             <Button 
               onClick={handleSave}
