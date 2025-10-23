@@ -15,6 +15,8 @@ import {
   ActiveFiltersDisplay,
   ResultsCount,
 } from "@/components/common";
+import { GradientSeparator } from "@/components/ui/gradient-separator";
+
 
 // Mock data for bids and auctions
 const mockMyBids = [
@@ -135,7 +137,7 @@ export const BidsScreen: React.FC = () => {
         rightAction={
           !showMyAuctions ? (
             <GradientBorderContainer className="rounded-md">
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => setShowMyAuctions(true)}
                 className="border-0"
@@ -145,7 +147,7 @@ export const BidsScreen: React.FC = () => {
             </GradientBorderContainer>
           ) : (
             <GradientBorderContainer className="rounded-md">
-              <Button 
+              <Button
                 onClick={() => navigate('/mobile/add-auction')}
                 variant="outline"
                 className="border-0"
@@ -180,121 +182,152 @@ export const BidsScreen: React.FC = () => {
           <div>
             <h3 className="font-medium mb-3 text-white text-right hebrew-text">ההצעות שלי</h3>
             <div className="space-y-3">
-                {mockMyBids.map((bid) => (
-                  <GradientBorderContainer
-                    key={bid.id}
-                    className="rounded-md flex-1"
+              {mockMyBids.map((bid) => (
+                <GradientBorderContainer
+                  key={bid.id}
+                  className="rounded-md flex-1"
+                >
+                  <Card
+                    className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
+                    onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
                   >
-                    <Card
-                      className="p-4 cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md"
-                      onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
-                    >
-                      <div className="flex">
-                        <div className="flex-1 p-4">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="text-right">
-                              <h3 className="font-semibold text-white">{bid.make} {bid.model}</h3>
-                              <p className="text-sm text-white">{bid.year}</p>
-                            </div>
-                            <Badge className={`text-white ${getBidStatusColor(bid.status)}`}>
-                              {getBidStatusText(bid.status)}
-                            </Badge>
-                          </div>
+                    <div className="flex items-stretch">
 
-                          <div className="space-y-1 mb-2">
-                            <div className="flex justify-between text-sm">
-                              <span className="text-white">ההצעה שלי:</span>
-                              <span className="font-medium text-white">{bid.myBid}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                              <span className="text-white">הצעה גבוהה:</span>
-                              <span className="font-medium text-green-400">{bid.currentHighest}</span>
-                            </div>
-                          </div>
-
-                          <div className="flex justify-between items-center text-sm text-white">
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              <span>{bid.timeRemaining}</span>
-                            </div>
-                            <span>{bid.bidCount} הצעות</span>
-                          </div>
+                      {/* Bid Image - Right Side, Full Height Square */}
+                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
+                        <img
+                          src={bid.image}
+                          alt={`${bid.make} ${bid.model}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      {/* Bid Details - Middle */}
+                      <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
+                        <div className="mb-2">
+                          <h3 className="font-semibold text-white hebrew-text">
+                            {bid.make} {bid.model}
+                          </h3>
+                          <p className="text-sm text-white/70 hebrew-text">
+                            {bid.year}
+                          </p>
                         </div>
 
-                        <div className="w-24 h-24 overflow-hidden flex-shrink-0">
-                          <img
-                            src={bid.image}
-                            alt={`${bid.make} ${bid.model}`}
-                            className="w-full h-full object-cover"
-                          />
+                        <Badge className={`text-white ${getBidStatusColor(bid.status)} w-fit`}>
+                          {getBidStatusText(bid.status)}
+                        </Badge>
+                      </div>
+                      {/* Price Column - Left Side, Vertically Centered */}
+                      <div className="flex flex-col justify-center p-4 space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex flex-col items-center space-y-1">
+                            <span className="text-white/70 hebrew-text text-center">ההצעה שלי</span>
+
+
+                            <span className="font-medium text-white hebrew-text text-center">{bid.myBid}</span>
+                          </div>
+                        </div>
+                        <GradientSeparator />
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex flex-col items-center space-y-1">
+                            <span className="text-white/70 hebrew-text text-center">הצעה גבוהה</span>
+                            <span className="font-medium text-green-400 hebrew-text text-center">{bid.currentHighest}</span>
+
+                          </div>
                         </div>
                       </div>
-                    </Card>
-                  </GradientBorderContainer>
+                    </div>
+                    <GradientSeparator />
+                    {/* Bottom Section */}
+                 <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70">
+                      <div className="flex items-center gap-1 justify-center">
+                                                <Clock className="w-3 h-" />
+
+                        <span className="hebrew-text text-center">{bid.timeRemaining}</span>
+                        <span className="hebrew-text text-center pr-2">{bid.bidCount} הצעות</span>
+                      </div>
+                    </div>
+                  </Card>
+                </GradientBorderContainer>
               ))}
             </div>
           </div>
 
           {/* All Other Auctions */}
           <div>
-            <h3 className="font-medium mb-3 text-right">כל המכרזים ({filteredActiveAuctions.length})</h3>
+            <h3 className="font-medium mb-3 text-right text-white hebrew-text">כל המכרזים ({filteredActiveAuctions.length})</h3>
             <div className="space-y-3">
-                {filteredActiveAuctions.map((auction) => (
-                  <GradientBorderContainer
-                    key={auction.id}
-                    className="rounded-md flex-1"
+              {filteredActiveAuctions.map((auction) => (
+                <GradientBorderContainer
+                  key={auction.id}
+                  className="rounded-md flex-1"
+                >
+                  <Card
+                    className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
+                    onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                   >
-                    <Card
-                      className="p-4 cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md"
-                      onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
-                    >
-                      <div className="flex">
-                        <div className="flex-1 p-4">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="text-right">
-                              <h3 className="font-semibold text-white">{auction.make} {auction.model}</h3>
-                              <p className="text-sm text-white">{auction.year}</p>
-                            </div>
-                            <div className="text-left">
-                              <div className="text-lg font-bold text-green-400">
-                                {auction.currentBid}
-                              </div>
-                            </div>
-                          </div>
 
-                          <div className="flex justify-between items-center text-sm text-white mb-3">
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              <span>{auction.timeRemaining}</span>
-                            </div>
-                            <span>{auction.bidCount} הצעות</span>
-                          </div>
-
-                          {auction.canBid && (
-                            <Button
-                              size="sm"
-                              className="w-full gap-2"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/mobile/create-bid-details/${auction.vehicleId}`);
-                              }}
-                            >
-                              <Gavel className="w-4 h-4" />
-                              הגש הצעה
-                            </Button>
-                          )}
+                    <div className="flex items-stretch">
+                      {/* Auction Image - Right Side, Full Height Square */}
+                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
+                        <img
+                          src={auction.image}
+                          alt={`${auction.make} ${auction.model}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      {/* Auction Details - Middle */}
+                      <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
+                        <div className="mb-2">
+                          <h3 className="font-semibold text-white hebrew-text">
+                            {auction.make} {auction.model}
+                          </h3>
+                          <p className="text-sm text-white/70 hebrew-text">
+                            {auction.year}
+                          </p>
                         </div>
 
-                        <div className="w-24 h-24 overflow-hidden flex-shrink-0">
-                          <img
-                            src={auction.image}
-                            alt={`${auction.make} ${auction.model}`}
-                            className="w-full h-full object-cover"
-                          />
+                        <Badge variant="secondary" className="hebrew-text bg-green-500/20 text-green-400 border-green-500/30 w-fit">
+                          פעיל
+                        </Badge>
+
+
+                      </div>
+                      {/* Price Column - Left Side, Vertically Centered */}
+                      <div className="flex flex-col justify-center p-4">
+
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex flex-col items-end space-y-1">
+                            <span className="text-white/70 hebrew-text">הצעה נוכחית</span>
+                            <span className="text-lg font-bold text-green-400 hebrew-text">{auction.currentBid}</span>
+                          </div>
                         </div>
                       </div>
-                    </Card>
-                  </GradientBorderContainer>
+                    </div>
+                          <GradientSeparator />
+                    <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70">
+                      <div className="flex items-center gap-1 justify-center">
+                        <Clock className="w-3 h-3" />
+                        <span className="hebrew-text text-center">{auction.timeRemaining}</span>
+                      </div>
+                      <span className="hebrew-text text-center">{auction.bidCount} הצעות</span>
+                    </div>
+                    {auction.canBid && (
+                      <div className="px-4 pb-4">
+                        <Button
+                          size="sm"
+                          className="w-full gap-2 bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/mobile/create-bid-details/${auction.vehicleId}`);
+                          }}
+                        >
+                          <Gavel className="w-4 h-4" />
+                          הגש הצעה
+                        </Button>
+                      </div>
+                    )}
+                  </Card>
+                </GradientBorderContainer>
               ))}
             </div>
           </div>
@@ -304,56 +337,60 @@ export const BidsScreen: React.FC = () => {
           {/* My Auctions View */}
           <div className="space-y-3">
             {mockMyAuctions.map((auction) => (
-                <GradientBorderContainer
-                  key={auction.id}
-                  className="rounded-md flex-1"
+              <GradientBorderContainer
+                key={auction.id}
+                className="rounded-md flex-1"
+              >
+                <Card
+                  className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
+                  onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                 >
-                  <Card
-                    className="p-4 cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md"
-                    onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
-                  >
-                    <div className="flex">
-                      <div className="flex-1 p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="text-right">
-                            <h3 className="font-semibold text-white">{auction.make} {auction.model}</h3>
-                            <p className="text-sm text-white">{auction.year}</p>
-                          </div>
-                          <Badge className="bg-green-500 text-white">
-                            פעיל
-                          </Badge>
-                        </div>
-
-                        <div className="space-y-1 mb-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-white">מחיר פתיחה:</span>
-                            <span className="font-medium text-white">{auction.startingPrice}</span>
-                          </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-white">הצעה נוכחית:</span>
-                            <span className="font-medium text-green-400">{auction.currentBid}</span>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between items-center text-sm text-white">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            <span>{auction.timeRemaining}</span>
-                          </div>
-                          <span>{auction.bidCount} הצעות</span>
-                        </div>
+                  <div className="flex items-stretch">
+                    {/* Auction Image - Right Side, Full Height Square */}
+                    <div className="w-24 h-24 bg-muted flex-shrink-0">
+                      <img
+                        src={auction.image}
+                        alt={`${auction.make} ${auction.model}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    {/* Auction Details - Middle */}
+                    <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
+                      <div className="mb-2">
+                        <h3 className="font-semibold text-white hebrew-text">
+                          {auction.make} {auction.model}
+                        </h3>
+                        <p className="text-sm text-white/70 hebrew-text">
+                          {auction.year}
+                        </p>
                       </div>
 
-                      <div className="w-24 h-24 overflow-hidden flex-shrink-0">
-                        <img
-                          src={auction.image}
-                          alt={`${auction.make} ${auction.model}`}
-                          className="w-full h-full object-cover"
-                        />
+                      <Badge className="hebrew-text bg-green-500/20 text-green-400 border-green-500/30 w-fit">
+                        פעיל
+                      </Badge>
+                    </div>
+                    {/* Price Column - Left Side, Vertically Centered */}
+                    <div className="flex flex-col justify-center p-4 space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium text-white hebrew-text">{auction.startingPrice}</span>
+                        <span className="text-white/70 hebrew-text">:מחיר פתיחה</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium text-green-400 hebrew-text">{auction.currentBid}</span>
+                        <span className="text-white/70 hebrew-text">:הצעה נוכחית</span>
                       </div>
                     </div>
-                  </Card>
-                </GradientBorderContainer>
+                  </div>
+
+                  {/* Bottom Section */}
+                  <div className="px-4 pb-4">
+                    <div className="flex items-center justify-between text-sm text-white/70">
+                      <span className="hebrew-text">{auction.timeRemaining}</span>
+                      <span className="hebrew-text">{auction.bidCount} הצעות</span>
+                    </div>
+                  </div>
+                </Card>
+              </GradientBorderContainer>
             ))}
           </div>
 
@@ -366,7 +403,7 @@ export const BidsScreen: React.FC = () => {
                 צור מכרז חדש לרכב שלך
               </p>
               <GradientBorderContainer className="rounded-md">
-                <Button 
+                <Button
                   onClick={() => navigate('/mobile/add-auction')}
                   variant="ghost"
                   className="bg-black border-0 text-white"

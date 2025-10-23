@@ -135,7 +135,7 @@ const AdminAuctionsList = () => {
             ניהול כל המכירות הפומביות במערכת
           </p>
         </div>
-        <Button className="hebrew-text text-black">
+        <Button className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
           <Plus className="h-4 w-4 ml-2" />
           צור מכירה חדשה
         </Button>
@@ -151,14 +151,16 @@ const AdminAuctionsList = () => {
             <div className="flex gap-4">
               <div className="relative flex-1">
                 <Gavel className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="חפש לפי כותרת או מוכר..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-10 hebrew-text bg-muted text-white"
-                />
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    placeholder="חפש לפי כותרת או מוכר..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pr-10 hebrew-text border-0 bg-black rounded-md text-white"
+                  />
+                </GradientBorderContainer>
               </div>
-              <Button variant="outline" className="hebrew-text btn-hover-cyan">
+              <Button variant="ghost" className="hebrew-text btn-hover-cyan">
                 סינון מתקדם
               </Button>
             </div>

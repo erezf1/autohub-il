@@ -242,7 +242,7 @@ const AdminAddVehicle = () => {
         <Button 
           variant="ghost" 
           onClick={() => navigate('/admin/vehicles')}
-          className="hebrew-text"
+          className="hebrew-text btn-hover-cyan"
         >
           <ArrowRight className="h-4 w-4 ml-1" />
           חזור לרשימת רכבים
@@ -250,8 +250,8 @@ const AdminAddVehicle = () => {
       </div>
 
       <div>
-        <h1 className="text-3xl font-bold hebrew-text">הוספת רכב חדש</h1>
-        <p className="text-lg text-muted-foreground hebrew-text mt-1">הוסף רכב למערכת</p>
+        <h1 className="text-3xl font-bold text-white hebrew-text">הוספת רכב חדש</h1>
+        <p className="text-lg text-white/70 hebrew-text mt-1">הוסף רכב למערכת</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">

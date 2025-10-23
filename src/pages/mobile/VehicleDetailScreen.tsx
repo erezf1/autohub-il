@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { useQuery } from '@tanstack/react-query';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
 import darkCarImage from "@/assets/dark_car.png";
@@ -253,8 +254,9 @@ const VehicleDetailScreen = () => {
           <CardHeader>
             <CardTitle className="hebrew-text text-white">מפרט טכני</CardTitle>
           </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
+        <CardContent className="space-y-0">
+          {/* Year */}
+          <div className="grid grid-cols-2 gap-4 py-3">
             <div>
               <p className="text-sm text-muted-foreground hebrew-text">שנת ייצור</p>
               <p className="font-medium text-white">{vehicle.year}</p>
@@ -263,6 +265,12 @@ const VehicleDetailScreen = () => {
               <p className="text-sm text-muted-foreground hebrew-text">קילומטרז׳</p>
               <p className="font-medium text-white">{vehicle.kilometers?.toLocaleString()} ק״מ</p>
             </div>
+          </div>
+          
+          <GradientSeparator />
+          
+          {/* Transmission and Fuel */}
+          <div className="grid grid-cols-2 gap-4 py-3">
             {vehicle.transmission && (
               <div>
                 <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
@@ -275,31 +283,47 @@ const VehicleDetailScreen = () => {
                 <p className="font-medium text-white hebrew-text">{fuelLabel}</p>
               </div>
             )}
-            {vehicle.engine_size && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
-                <p className="font-medium text-white hebrew-text">{vehicle.engine_size.toLocaleString()} סמ״ק</p>
-              </div>
-            )}
-            {vehicle.sub_model && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">סוג</p>
-                <p className="font-medium text-white hebrew-text">{getVehicleTypeLabel(vehicle.sub_model)}</p>
-              </div>
-            )}
-            {vehicle.color && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
-                <p className="font-medium text-white hebrew-text">{vehicle.color}</p>
-              </div>
-            )}
-            {vehicle.previous_owners && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
-                <p className="font-medium text-white">{vehicle.previous_owners}</p>
-              </div>
-            )}
           </div>
+          
+          {(vehicle.engine_size || vehicle.sub_model) && (
+            <>
+              <GradientSeparator />
+              <div className="grid grid-cols-2 gap-4 py-3">
+                {vehicle.engine_size && (
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
+                    <p className="font-medium text-white hebrew-text">{vehicle.engine_size.toLocaleString()} סמ״ק</p>
+                  </div>
+                )}
+                {vehicle.sub_model && (
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">סוג</p>
+                    <p className="font-medium text-white hebrew-text">{getVehicleTypeLabel(vehicle.sub_model)}</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+          
+          {(vehicle.color || vehicle.previous_owners) && (
+            <>
+              <GradientSeparator />
+              <div className="grid grid-cols-2 gap-4 py-3">
+                {vehicle.color && (
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
+                    <p className="font-medium text-white hebrew-text">{vehicle.color}</p>
+                  </div>
+                )}
+                {vehicle.previous_owners && (
+                  <div>
+                    <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
+                    <p className="font-medium text-white">{vehicle.previous_owners}</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
       </GradientBorderContainer>

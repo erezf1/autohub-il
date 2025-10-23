@@ -61,7 +61,11 @@ const AdminVehiclesList = () => {
               ניהול כל הרכבים במערכת
             </p>
           </div>
-          <Button size="lg" className="hebrew-text text-black " onClick={() => navigate('/admin/vehicles/create')}>
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] hebrew-text" 
+            onClick={() => navigate('/admin/vehicles/create')}
+          >
             <Plus className="h-4 w-4 ml-2" />
             הוסף רכב חדש
           </Button>

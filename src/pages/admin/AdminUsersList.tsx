@@ -44,7 +44,11 @@ const AdminUsersList = () => {
               ניהול סוחרים ומשתמשי המערכת
             </p>
           </div>
-          <Button size="lg" className="hebrew-text text-black" onClick={() => navigate('/admin/users/create')}>
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] hebrew-text" 
+            onClick={() => navigate('/admin/users/create')}
+          >
             הוסף משתמש חדש
           </Button>
         </div>

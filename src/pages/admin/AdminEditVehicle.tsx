@@ -569,7 +569,7 @@ const AdminEditVehicle = () => {
             </div>
 
             <div>
-              <Label className="hebrew-text">מסמך בדיקה / טסט (אופציונלי)</Label>
+              <Label className="text-white hebrew-text">מסמך בדיקה / טסט (אופציונלי)</Label>
               <div className="space-y-2">
                 {formData.testResultFileUrl ? (
                   <div className="flex items-center gap-2">
@@ -601,16 +601,18 @@ const AdminEditVehicle = () => {
                       id="test-file-upload"
                     />
                     <label htmlFor="test-file-upload">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        disabled={uploadingTestFile}
-                        onClick={() => document.getElementById('test-file-upload')?.click()}
-                      >
-                        <Upload className="h-4 w-4 ml-2" />
-                        {uploadingTestFile ? 'מעלה...' : 'העלה מסמך בדיקה'}
-                      </Button>
+                      <GradientBorderContainer className="rounded-md">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full border-0 bg-black rounded-md hover:bg-gradient-to-r hover:from-[#5be1fd] hover:to-[#2277ee] hover:text-black transition-all"
+                          disabled={uploadingTestFile}
+                          onClick={() => document.getElementById('test-file-upload')?.click()}
+                        >
+                          <Upload className="h-4 w-4 ml-2" />
+                          {uploadingTestFile ? 'מעלה...' : 'העלה מסמך בדיקה'}
+                        </Button>
+                      </GradientBorderContainer>
                     </label>
                   </>
                 )}
@@ -677,7 +679,7 @@ const AdminEditVehicle = () => {
                   <Badge
                     key={tag.id}
                     variant={selectedTags.includes(tag.id) ? "default" : "outline"}
-                    className="cursor-pointer hebrew-text"
+                    className={`cursor-pointer hebrew-text ${selectedTags.includes(tag.id) ? 'text-black' : ''}`}
                     onClick={() => {
                       setSelectedTags(prev =>
                         prev.includes(tag.id)
@@ -696,15 +698,22 @@ const AdminEditVehicle = () => {
         </GradientBorderContainer>
 
         <div className="flex gap-4 justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate(`/admin/vehicles/${id}`)}
-            disabled={isUpdatingVehicle}
+          <GradientBorderContainer className="rounded-md">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate(`/admin/vehicles/${id}`)}
+              disabled={isUpdatingVehicle}
+              className="border-0 bg-black rounded-md"
+            >
+              ביטול
+            </Button>
+          </GradientBorderContainer>
+          <Button 
+            type="submit" 
+            disabled={isUpdatingVehicle} 
+            className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]"
           >
-            ביטול
-          </Button>
-          <Button type="submit" disabled={isUpdatingVehicle}>
             {isUpdatingVehicle ? (
               <>
                 <Loader2 className="ml-2 h-4 w-4 animate-spin" />

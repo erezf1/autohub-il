@@ -10,4 +10,9 @@ export const GRADIENT_COLORS = {
   to: "#5be1fd",
 } as const;
 
+
+export const GRADIENT_COLORS_Hover = {
+  from: "#5be1fd",
+  to: "#2277ee",
+} as const;
 export type GradientColors = typeof GRADIENT_COLORS;

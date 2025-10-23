@@ -65,7 +65,7 @@ const AdminSettings = () => {
               ניהול פרמטרים גלובליים של המערכת
             </p>
           </div>
-            <Button size="lg" className="hebrew-text text-black">
+            <Button size="lg" className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
             <Save className="h-4 w-4 ml-2" />
             שמור שינויים
             </Button>
@@ -88,7 +88,7 @@ const AdminSettings = () => {
                   <CardTitle className="text-white hebrew-text">קטגוריות רכב</CardTitle>
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                    <Button className="hebrew-text text-black">
+                    <Button className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
                       <Plus className="h-4 w-4 ml-2" />
                       הוסף קטגוריה
                     </Button>
@@ -102,28 +102,32 @@ const AdminSettings = () => {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="category-name" className="text-right hebrew-text">
+                        <Label htmlFor="category-name" className="text-right hebrew-text text-white">
                           שם קטגוריה
                         </Label>
-                        <Input
-                          id="category-name"
-                          placeholder="הזן שם קטגוריה"
-                          className="col-span-3 hebrew-text"
-                        />
+                        <GradientBorderContainer className="rounded-md col-span-3">
+                          <Input
+                            id="category-name"
+                            placeholder="הזן שם קטגוריה"
+                            className="hebrew-text border-0 bg-black rounded-md"
+                          />
+                        </GradientBorderContainer>
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="subcategories" className="text-right hebrew-text">
+                        <Label htmlFor="subcategories" className="text-right hebrew-text text-white">
                           תת-קטגוריות
                         </Label>
-                        <Textarea
-                          id="subcategories"
-                          placeholder="הזן תת-קטגוריות מופרדות בפסיק"
-                          className="col-span-3 hebrew-text"
-                        />
+                        <GradientBorderContainer className="rounded-md col-span-3">
+                          <Textarea
+                            id="subcategories"
+                            placeholder="הזן תת-קטגוריות מופרדות בפסיק"
+                            className="hebrew-text border-0 bg-black rounded-md"
+                          />
+                        </GradientBorderContainer>
                       </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit" className="hebrew-text text-black">
+                        <Button type="submit" className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
                         הוסף קטגוריה
                         </Button>
                     </DialogFooter>
@@ -192,7 +196,7 @@ const AdminSettings = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-white hebrew-text">סיבות לדיווח</CardTitle>
-                  <Button className="hebrew-text">
+                  <Button className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
                     <Plus className="h-4 w-4 ml-2" />
                     הוסף סיבה
                   </Button>

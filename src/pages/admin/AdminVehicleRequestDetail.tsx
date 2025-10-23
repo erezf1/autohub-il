@@ -126,7 +126,7 @@ const AdminVehicleRequestDetail = () => {
         <Button 
           variant="ghost" 
           onClick={() => navigate('/admin/vehicle-requests')}
-          className="hebrew-text"
+          className="hebrew-text btn-hover-cyan"
         >
           <ArrowRight className="h-4 w-4 ml-1" />
           חזור לרשימת בקשות
@@ -135,15 +135,18 @@ const AdminVehicleRequestDetail = () => {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold hebrew-text">{mockRequestData.title}</h1>
-          <p className="text-lg text-muted-foreground hebrew-text mt-1">בקשה #{mockRequestData.id}</p>
+          <h1 className="text-3xl font-bold text-white hebrew-text">{mockRequestData.title}</h1>
+          <p className="text-lg text-white/70 hebrew-text mt-1">בקשה #{mockRequestData.id}</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="hebrew-text">
+          <Button 
+            variant="outline" 
+            className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
+          >
             <Edit className="h-4 w-4 ml-2" />
             עריכת בקשה
           </Button>
-          <Button className="hebrew-text">
+          <Button className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] hebrew-text">
             <MessageSquare className="h-4 w-4 ml-2" />
             יצירת קשר עם מבקש
           </Button>

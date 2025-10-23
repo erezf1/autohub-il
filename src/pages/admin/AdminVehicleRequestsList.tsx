@@ -119,7 +119,7 @@ const AdminVehicleRequestsList = () => {
             ניהול בקשות חיפוש רכבים מסוחרים
           </p>
         </div>
-        <Button className="hebrew-text text-black">
+        <Button className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] hebrew-text">
           <Plus className="h-4 w-4 ml-2" />
           הוסף בקשה חדשה
         </Button>

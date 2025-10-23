@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Loader2, User, Building, MapPin, FileText, Crown, Calendar, Award } from 'lucide-react';
+import { ArrowLeft, Loader2, User, Building, MapPin, FileText, Phone } from 'lucide-react';
 import { SuperArrowsIcon } from '@/components/common/SuperArrowsIcon';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
@@ -213,74 +213,49 @@ export const ProfileEditScreen: React.FC = () => {
             </h1>
           </div>
 
-      {/* Subscription Info (Only when not onboarding) */}
-      {!isOnboarding && userProfile && (
-        <GradientBorderContainer
-          className="rounded-md flex-1"
-        >
-          <Card className="bg-black border-0 rounded-md">
-            <div className="p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <Crown className="h-5 w-5 text-primary" />
-                  <span className="font-bold text-white hebrew-text">
-                    {getSubscriptionLabel(userProfile?.subscription_type || 'regular')}
-                  </span>
-                </div>
-                <Badge variant="outline" className={`${getRatingTierColor(userProfile?.rating_tier || 'bronze')} border-current`}>
-                  <Award className="h-3 w-3 ml-1" />
-                  {getRatingTierLabel(userProfile?.rating_tier || 'bronze')}
-                </Badge>
-              </div>
-
-              {userProfile?.subscription_valid_until && (
-                <div className="flex items-center space-x-2 space-x-reverse text-sm">
-                  <Calendar className="h-4 w-4 text-white" />
-                  <span className="text-white hebrew-text">
-                    תוקף עד: {format(new Date(userProfile.subscription_valid_until), 'dd/MM/yyyy', { locale: he })}
-                  </span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between pt-2 border-t">
-                <span className="text-sm text-white hebrew-text">רכבים פעילים</span>
-                <span className="text-sm font-medium text-white">
-                  {activeVehiclesCount || 0}/{userProfile?.vehicles_limit || 0}
-                </span>
-              </div>
-            </div>
-          </Card>
-        </GradientBorderContainer>
-      )}
-
       <GradientBorderContainer
         className="rounded-md flex-1"
       >
         <Card className="p-6 space-y-6 bg-black border-0 rounded-md">
+          {/* SVG Gradient Definition for Icons */}
+          <svg width="0" height="0" className="absolute">
+            <defs>
+              <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#2277ee" />
+                <stop offset="100%" stopColor="#5be1fd" />
+              </linearGradient>
+            </defs>
+          </svg>
+
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-white">
               {isOnboarding ? 'השלמת פרטים אישיים' : 'עריכת פרטים אישיים'}
             </h2>
-            <p className="text-white text-sm">
+            <p className="text-white/70 text-sm">
               {isOnboarding 
                 ? 'אנא מלאו את הפרטים הבאים להשלמת ההרשמה'
                 : 'עדכנו את הפרטים האישיים שלכם'}
             </p>
           </div>
 
+          <GradientSeparator />
+
           <div className="space-y-4">
             {/* Phone Number (Read-Only) */}
             {userData?.phone_number && (
               <>
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-white hebrew-text">טלפון</Label>
-                  <div className="relative">
+                <div className="flex items-start space-x-3 space-x-reverse">
+                  <div className="flex items-center space-x-2 space-x-reverse flex-shrink-0 min-w-[100px]">
+                    <Phone className="h-4 w-4" style={{ stroke: 'url(#icon-gradient)' }} />
+                    <Label htmlFor="phone" className="text-base font-bold text-white hebrew-text">טלפון:</Label>
+                  </div>
+                  <div className="flex-1">
                     <Input 
                       id="phone" 
                       type="text" 
                       value={formatPhoneDisplay(userData.phone_number)}
                       disabled
-                      className="pr-10 text-right bg-muted" 
+                      className="text-right bg-muted border-0" 
                       dir="rtl"
                     />
                   </div>
@@ -289,49 +264,59 @@ export const ProfileEditScreen: React.FC = () => {
               </>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-white hebrew-text">שם מלא</Label>
-              <GradientBorderContainer className="rounded-md">
-                <div className="relative">
-                  <User className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+            <div className="flex items-start space-x-3 space-x-reverse">
+              <div className="flex items-center space-x-2 space-x-reverse flex-shrink-0 min-w-[100px]">
+                <User className="h-4 w-4" style={{ stroke: 'url(#icon-gradient)' }} />
+                <Label htmlFor="fullName" className="text-base font-bold text-white hebrew-text">שם מלא:</Label>
+              </div>
+              <div className="flex-1">
+                <GradientBorderContainer className="rounded-md">
                   <Input 
                     id="fullName" 
                     type="text" 
                     placeholder="הזן שם מלא" 
                     value={fullName} 
                     onChange={(e) => setFullName(e.target.value)} 
-                    className="bg-black border-0 pr-10 text-right hebrew-text" 
+                    className="bg-black border-0 text-right hebrew-text text-white" 
                     dir="rtl"
                   />
-                </div>
-              </GradientBorderContainer>
+                </GradientBorderContainer>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="businessName" className="text-white hebrew-text">שם העסק</Label>
-              <GradientBorderContainer className="rounded-md">
-                <div className="relative">
-                  <Building className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+            <GradientSeparator />
+
+            <div className="flex items-start space-x-3 space-x-reverse">
+              <div className="flex items-center space-x-2 space-x-reverse flex-shrink-0 min-w-[100px]">
+                <Building className="h-4 w-4" style={{ stroke: 'url(#icon-gradient)' }} />
+                <Label htmlFor="businessName" className="text-base font-bold text-white hebrew-text">שם העסק:</Label>
+              </div>
+              <div className="flex-1">
+                <GradientBorderContainer className="rounded-md">
                   <Input 
                     id="businessName" 
                     type="text" 
                     placeholder="הזן שם עסק" 
                     value={businessName} 
                     onChange={(e) => setBusinessName(e.target.value)} 
-                    className="bg-black border-0 pr-10 text-right hebrew-text" 
+                    className="bg-black border-0 text-right hebrew-text text-white" 
                     dir="rtl"
                   />
-                </div>
-              </GradientBorderContainer>
+                </GradientBorderContainer>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="location" className="text-white hebrew-text">מיקום</Label>
-              <GradientBorderContainer className="rounded-md">
-                <div className="relative">
-                  <MapPin className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
+            <GradientSeparator />
+
+            <div className="flex items-start space-x-3 space-x-reverse">
+              <div className="flex items-center space-x-2 space-x-reverse flex-shrink-0 min-w-[100px]">
+                <MapPin className="h-4 w-4" style={{ stroke: 'url(#icon-gradient)' }} />
+                <Label htmlFor="location" className="text-base font-bold text-white hebrew-text">מיקום:</Label>
+              </div>
+              <div className="flex-1">
+                <GradientBorderContainer className="rounded-md">
                   <Select value={locationId} onValueChange={setLocationId}>
-                    <SelectTrigger className="bg-black border-0 pr-10 text-right">
+                    <SelectTrigger className="bg-black border-0 text-right text-white">
                       <SelectValue placeholder="בחר מיקום" />
                     </SelectTrigger>
                     <SelectContent>
@@ -342,51 +327,54 @@ export const ProfileEditScreen: React.FC = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-              </GradientBorderContainer>
+                </GradientBorderContainer>
+              </div>
             </div>
 
             <GradientSeparator />
 
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-white hebrew-text">תיאור</Label>
+              <div className="flex items-center space-x-2 space-x-reverse mb-2">
+                <FileText className="h-4 w-4" style={{ stroke: 'url(#icon-gradient)' }} />
+                <Label htmlFor="description" className="text-base font-bold text-white hebrew-text">תיאור</Label>
+              </div>
               <GradientBorderContainer className="rounded-md">
-                <div className="relative">
-                  <FileText className="absolute right-3 top-3 h-4 w-4 text-muted-foreground z-10" />
-                  <Textarea 
-                    id="description" 
-                    placeholder="ספר קצת על העסק שלך..." 
-                    value={description} 
-                    onChange={(e) => setDescription(e.target.value)} 
-                    className="bg-black border-0 pr-10 text-right min-h-[100px] hebrew-text" 
-                    dir="rtl"
-                  />
-                </div>
+                <Textarea 
+                  id="description" 
+                  placeholder="ספר קצת על העסק שלך..." 
+                  value={description} 
+                  onChange={(e) => setDescription(e.target.value)} 
+                  className="bg-black border-0 text-right min-h-[100px] hebrew-text text-white" 
+                  dir="rtl"
+                />
               </GradientBorderContainer>
             </div>
 
-            <GradientBorderContainer className="rounded-md">
-              <Button 
-                onClick={handleSave}
-                disabled={!fullName.trim() || !businessName.trim() || isLoading}
-                className="bg-black border-0 w-full gap-2"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ArrowLeft className="w-4 h-4" />
-                )}
-                {isLoading ? 'שומר...' : isOnboarding ? 'סיים הרשמה' : 'שמור שינויים'}
-              </Button>
-            </GradientBorderContainer>
+            <GradientSeparator />
+
+            <Button 
+              onClick={handleSave}
+              disabled={!fullName.trim() || !businessName.trim() || isLoading}
+              className="w-full gap-2 bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ArrowLeft className="w-4 h-4" />
+              )}
+              {isLoading ? 'שומר...' : isOnboarding ? 'סיים הרשמה' : 'שמור שינויים'}
+            </Button>
           </div>
 
         {isOnboarding && (
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground hebrew-text">
-              לאחר השלמת ההרשמה, תועברו למסך המתנה לאישור מנהל
-            </p>
-          </div>
+          <>
+            <GradientSeparator />
+            <div className="text-center">
+              <p className="text-xs text-white/70 hebrew-text">
+                לאחר השלמת ההרשמה, תועברו למסך המתנה לאישור מנהל
+              </p>
+            </div>
+          </>
         )}
             </Card>
           </GradientBorderContainer>

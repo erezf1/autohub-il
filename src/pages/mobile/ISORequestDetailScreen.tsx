@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -132,10 +133,14 @@ const ISORequestDetailScreen = () => {
                 <p className="text-muted-foreground text-sm hebrew-text">{mockISORequest.description}</p>
               </div>
             
+              <GradientSeparator />
+
               <div>
                 <h4 className="font-medium text-white hebrew-text mb-2">תקציב</h4>
                 <p className="text-primary font-semibold hebrew-text">{mockISORequest.budgetRange}</p>
               </div>
+
+              <GradientSeparator />
 
               <div>
                 <h4 className="font-medium text-white hebrew-text mb-2">דרישות</h4>
