@@ -87,6 +87,7 @@ const mockAuctions = [
 const AdminAuctionsList = () => {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<AdminVehicleFilters>({});
+  const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 

@@ -5,15 +5,15 @@ import { formatPhoneDisplay } from '@/utils/phoneValidation';
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
-import { useAuth } from '@/contexts/AuthContext';
-import { useProfile } from '@/hooks/mobile/useProfile';
-import { useQuery } from '@tanstack/react-query';
-import { dealerClient } from '@/integrations/supabase/dealerClient';
+import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/mobile/useProfile";
+import { useQuery } from "@tanstack/react-query";
+import { dealerClient } from "@/integrations/supabase/dealerClient";
+import { LoadingSpinner, PageContainer, PageHeader } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { LoadingSpinner } from "@/components/common";
 import { Edit3, Crown, Award, Calendar, Flame, Gavel, Car, Building, User, Phone, MapPin } from "lucide-react";
 
 const MyProfileScreen = () => {
