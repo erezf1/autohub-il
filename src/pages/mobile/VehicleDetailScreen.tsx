@@ -1,17 +1,20 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, MessageCircle, Phone, Star, MapPin, Calendar, Gauge, ChevronLeft, ChevronRight, Loader2, Edit, Flame } from "lucide-react";
+import { MessageCircle, Phone, Star, MapPin, Calendar, Gauge, ChevronLeft, ChevronRight, Loader2, Edit, Flame } from "lucide-react";
+import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { useQuery } from '@tanstack/react-query';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
 import darkCarImage from "@/assets/dark_car.png";
 import { useState } from "react";
 import { getVehicleTypeLabel } from "@/constants/vehicleTypes";
 import { useAuth } from "@/contexts/AuthContext";
-import { DealerCard } from "@/components/common";
+import { DealerCard, VehicleSpecsCard } from "@/components/common";
 
 const VehicleDetailScreen = () => {
   const { id } = useParams();
@@ -117,25 +120,26 @@ const VehicleDetailScreen = () => {
                      vehicle.status === 'sold' ? 'נמכר' : 'לא פעיל';
 
   return (
-    <div className="space-y-4">
-      {/* Header with Back Button */}
-      <div className="flex items-center space-x-3 space-x-reverse mb-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleBackClick}
-        >
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-        <h1 className="text-xl font-bold text-foreground hebrew-text">
-          פרטי רכב
-        </h1>
-      </div>
+    <div className="w-full" dir="rtl">
+      <div className="container max-w-md mx-auto space-y-4">
+          {/* Header with Back Button */}
+          <div className="flex items-center space-x-3 space-x-reverse">
+            <div 
+              onClick={handleBackClick}
+              className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
+            >
+              <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
+            </div>
+            <h1 className="text-xl font-bold text-foreground hebrew-text">
+              פרטי רכב
+            </h1>
+          </div>
 
       {/* Vehicle Images with Carousel */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="relative h-64 overflow-hidden rounded-lg">
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardContent className="p-0">
+          <div className="relative h-64 overflow-hidden rounded-md">
             <img
               src={images[currentImageIndex]}
               alt={`${vehicle.make?.name_hebrew} ${vehicle.model?.name_hebrew}`}
@@ -185,13 +189,15 @@ const VehicleDetailScreen = () => {
           </div>
         </CardContent>
       </Card>
+      </GradientBorderContainer>
 
       {/* Vehicle Title and Price */}
-      <Card>
-        <CardContent className="p-4">
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardContent className="p-4">
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-foreground hebrew-text">
+              <h2 className="text-2xl font-bold text-white hebrew-text">
                 {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
               </h2>
               {vehicle.is_boosted && vehicle.boosted_until && (
@@ -239,159 +245,145 @@ const VehicleDetailScreen = () => {
           </div>
         </CardContent>
       </Card>
+      </GradientBorderContainer>
 
       {/* Vehicle Specifications */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">מפרט טכני</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text">שנת ייצור</p>
-              <p className="font-medium text-foreground">{vehicle.year}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text">קילומטרז׳</p>
-              <p className="font-medium text-foreground">{vehicle.kilometers?.toLocaleString()} ק״מ</p>
-            </div>
-            {vehicle.transmission && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
-                <p className="font-medium text-foreground hebrew-text">{transmissionLabel}</p>
-              </div>
-            )}
-            {vehicle.fuel_type && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">סוג דלק</p>
-                <p className="font-medium text-foreground hebrew-text">{fuelLabel}</p>
-              </div>
-            )}
-            {vehicle.engine_size && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
-                <p className="font-medium text-foreground hebrew-text">{vehicle.engine_size.toLocaleString()} סמ״ק</p>
-              </div>
-            )}
-            {vehicle.sub_model && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">סוג</p>
-                <p className="font-medium text-foreground hebrew-text">{getVehicleTypeLabel(vehicle.sub_model)}</p>
-              </div>
-            )}
-            {vehicle.color && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
-                <p className="font-medium text-foreground hebrew-text">{vehicle.color}</p>
-              </div>
-            )}
-            {vehicle.previous_owners && (
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
-                <p className="font-medium text-foreground">{vehicle.previous_owners}</p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {
+        (() => {
+          const specsRows = [
+            {
+              col1: { label: 'שנת ייצור', value: vehicle.year },
+              col2: { label: 'קילומטרז׳', value: vehicle.kilometers?.toLocaleString(), unit: 'ק״מ' }
+            },
+            {
+              col1: vehicle.transmission ? { label: 'תיבת הילוכים', value: transmissionLabel } : undefined,
+              col2: vehicle.fuel_type ? { label: 'סוג דלק', value: fuelLabel } : undefined
+            },
+            ...(vehicle.engine_size || vehicle.sub_model ? [{
+              col1: vehicle.engine_size ? { label: 'נפח מנוע', value: vehicle.engine_size.toLocaleString(), unit: 'סמ״ק' } : undefined,
+              col2: vehicle.sub_model ? { label: 'סוג', value: getVehicleTypeLabel(vehicle.sub_model) } : undefined
+            }] : []),
+            ...(vehicle.color || vehicle.previous_owners ? [{
+              col1: vehicle.color ? { label: 'צבע', value: vehicle.color } : undefined,
+              col2: vehicle.previous_owners ? { label: 'בעלים קודמים', value: vehicle.previous_owners } : undefined
+            }] : [])
+          ].filter(row => row.col1 || row.col2);
+
+          return <VehicleSpecsCard rows={specsRows} />;
+        })()
+      }
 
       {/* Description */}
       {vehicle.description && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text">תיאור</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-foreground hebrew-text leading-relaxed">
-              {vehicle.description}
-            </p>
-          </CardContent>
-        </Card>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="hebrew-text text-white">תיאור</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-white hebrew-text leading-relaxed">
+                {vehicle.description}
+              </p>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       )}
 
       {/* Tags Section */}
       {vehicle.vehicle_listing_tags && vehicle.vehicle_listing_tags.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text">תגיות</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {vehicle.vehicle_listing_tags.map((vlt: any) => (
-                <Badge
-                  key={vlt.tag.id}
-                  style={{ 
-                    backgroundColor: vlt.tag.color || '#6B7280',
-                    borderColor: vlt.tag.color || '#6B7280'
-                  }}
-                  className="text-white"
-                >
-                  {vlt.tag.name_hebrew}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="hebrew-text text-white">תגיות</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {vehicle.vehicle_listing_tags.map((vlt: any) => (
+                  <Badge
+                    key={vlt.tag.id}
+                    style={{ 
+                      backgroundColor: vlt.tag.color || '#6B7280',
+                      borderColor: vlt.tag.color || '#6B7280'
+                    }}
+                    className="text-white"
+                  >
+                    {vlt.tag.name_hebrew}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       )}
 
       {/* Vehicle Condition & History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">מצב ורקע הרכב</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text">תאונה חמורה</p>
-              <p className="font-medium text-foreground hebrew-text">
-                {vehicle.had_severe_crash ? 'כן' : 'לא'}
-              </p>
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="hebrew-text text-white">מצב ורקע הרכב</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">תאונה חמורה</p>
+                <p className="font-medium text-white hebrew-text">
+                  {vehicle.had_severe_crash ? 'כן' : 'לא'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
+                <p className="font-medium text-white">{vehicle.previous_owners || '-'}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
-              <p className="font-medium text-foreground">{vehicle.previous_owners || '-'}</p>
-            </div>
-          </div>
           
           {vehicle.test_result_file_url && (
             <div className="pt-2 border-t">
               <p className="text-sm text-muted-foreground hebrew-text mb-2">קובץ תוצאות טסט</p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full hebrew-text"
-                onClick={() => window.open(vehicle.test_result_file_url, '_blank')}
-              >
-                צפה בקובץ הטסט
-              </Button>
+              <GradientBorderContainer className="rounded-md">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-black border-0 w-full hebrew-text"
+                  onClick={() => window.open(vehicle.test_result_file_url, '_blank')}
+                >
+                  צפה בקובץ הטסט
+                </Button>
+              </GradientBorderContainer>
             </div>
           )}
         </CardContent>
       </Card>
+      </GradientBorderContainer>
 
       {/* Conditional Actions Based on Ownership */}
       {isOwnVehicle ? (
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex gap-2">
-              <Button 
-                className="flex-1"
-                onClick={() => navigate(`/mobile/vehicle/${id}/edit`)}
-              >
-                <Edit className="h-4 w-4 ml-2" />
-                ערוך רכב
-              </Button>
-              <Button 
-                variant="outline"
-                className="flex-1"
-                onClick={() => navigate('/mobile/boost-management')}
-              >
-                <Flame className="h-4 w-4 ml-2" />
-                בוסט
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <GradientBorderContainer className="rounded-md flex-1">
+          <Card className="bg-black border-0">
+            <CardContent className="p-4">
+              <div className="flex gap-2">
+                <GradientBorderContainer className="rounded-md flex-1">
+                  <Button 
+                    className="bg-black border-0 w-full hebrew-text"
+                    onClick={() => navigate(`/mobile/vehicle/${id}/edit`)}
+                  >
+                    <Edit className="h-4 w-4 ml-2" />
+                    ערוך רכב
+                  </Button>
+                </GradientBorderContainer>
+                <GradientBorderContainer className="rounded-md flex-1">
+                  <Button 
+                    variant="outline"
+                    className="bg-black border-0 w-full hebrew-text"
+                    onClick={() => navigate('/mobile/boost-management')}
+                  >
+                    <Flame className="h-4 w-4 ml-2" />
+                    בוסט
+                  </Button>
+                </GradientBorderContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       ) : (
         vehicle.owner_id && (
           <DealerCard
@@ -403,6 +395,7 @@ const VehicleDetailScreen = () => {
           />
         )
       )}
+      </div>
     </div>
   );
 };

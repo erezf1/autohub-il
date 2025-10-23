@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 
 // Mock data for support tickets
 const mockTickets = [
@@ -139,74 +140,79 @@ const AdminSupportTickets = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground hebrew-text">פניות תמיכה</h1>
+          <h1 className="text-3xl font-bold text-white hebrew-text">פניות תמיכה</h1>
           <p className="text-muted-foreground hebrew-text">
             ניהול פניות תמיכה ודיווחים מהמשתמשים
           </p>
         </div>
         <div className="flex gap-2">
-          <Select>
-            <SelectTrigger className="w-40 hebrew-text">
-              <SelectValue placeholder="שיוך נציג" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="israel" className="hebrew-text">ישראל ישראלי</SelectItem>
-              <SelectItem value="sara" className="hebrew-text">שרה כהן</SelectItem>
-              <SelectItem value="unassigned" className="hebrew-text">לא משוייך</SelectItem>
-            </SelectContent>
-          </Select>
+          <GradientBorderContainer className="rounded-md">
+            <Select>
+              <SelectTrigger className="w-40 hebrew-text border-0 bg-black rounded-md">
+                <SelectValue placeholder="שיוך נציג" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="israel" className="hebrew-text">ישראל ישראלי</SelectItem>
+                <SelectItem value="sara" className="hebrew-text">שרה כהן</SelectItem>
+                <SelectItem value="unassigned" className="hebrew-text">לא משוייך</SelectItem>
+              </SelectContent>
+            </Select>
+          </GradientBorderContainer>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">חיפוש וסינון</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <HelpCircle className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="חפש לפי כותרת או שם מדווח..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 hebrew-text"
-              />
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="hebrew-text text-white">חיפוש וסינון</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <HelpCircle className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="חפש לפי כותרת או שם מדווח..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-10 hebrew-text bg-muted text-white"
+                />
+              </div>
+              <Button variant="outline" className="hebrew-text btn-hover-cyan">
+                סינון מתקדם
+              </Button>
             </div>
-            <Button variant="outline" className="hebrew-text">
-              סינון מתקדם
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Support Tickets Tabs and Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">פניות תמיכה ({filteredTickets.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="all" className="hebrew-text">כל הפניות</TabsTrigger>
-              <TabsTrigger value="open" className="hebrew-text">פתוחות</TabsTrigger>
-              <TabsTrigger value="pending" className="hebrew-text">ממתינות</TabsTrigger>
-              <TabsTrigger value="resolved" className="hebrew-text">נפתרו</TabsTrigger>
-            </TabsList>
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="hebrew-text text-white">פניות תמיכה ({filteredTickets.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4 bg-gray-900">
+                <TabsTrigger value="all" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">כל הפניות</TabsTrigger>
+                <TabsTrigger value="open" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">פתוחות</TabsTrigger>
+                <TabsTrigger value="pending" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">ממתינות</TabsTrigger>
+                <TabsTrigger value="resolved" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">נפתרו</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value={activeTab} className="mt-4">
-              <Table>
+              <TabsContent value={activeTab} className="mt-4">
+                <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
-                    <TableHead className="text-right hebrew-text">פעילות אחרונה</TableHead>
-                    <TableHead className="text-right hebrew-text">משוייך לנציג</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">עדיפות</TableHead>
-                    <TableHead className="text-right hebrew-text">קטגוריה</TableHead>
-                    <TableHead className="text-right hebrew-text">מדווח</TableHead>
-                    <TableHead className="text-right hebrew-text">פנייה</TableHead>
+                    <TableHead className="text-left hebrew-text text-white">פעולות</TableHead>
+                    <TableHead className="text-right hebrew-text text-white">פעילות אחרונה</TableHead>
+                    <TableHead className="text-right hebrew-text text-white">משוייך לנציג</TableHead>
+                    <TableHead className="text-right hebrew-text text-white">סטטוס</TableHead>
+                    <TableHead className="text-right hebrew-text text-white">עדיפות</TableHead>
+                    <TableHead className="text-right hebrew-text text-white">קטגוריה</TableHead>
+                    <TableHead className="text-right hebrew-text text-white">מדווח</TableHead>
+                    <TableHead className="text-right hebrew-text text-white">פנייה</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -278,6 +284,7 @@ const AdminSupportTickets = () => {
           </Tabs>
         </CardContent>
       </Card>
+      </GradientBorderContainer>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { FileText, Plus, Clock, CheckCircle, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 
@@ -46,14 +47,16 @@ const ISORequestsScreen = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" dir="rtl">
       {/* Screen Title */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground hebrew-text">רכבים דרושים</h1>
-        <Button size="sm" className="hebrew-text">
-          <Plus className="h-4 w-4 ml-2" />
-          בקשה חדשה
-        </Button>
+        <h1 className="text-2xl font-bold text-white hebrew-text">רכבים דרושים</h1>
+        <GradientBorderContainer className="rounded-md">
+          <Button size="sm" className="bg-black border-0 text-white hebrew-text">
+            <Plus className="h-4 w-4 ml-2" />
+            בקשה חדשה
+          </Button>
+        </GradientBorderContainer>
       </div>
       
       <Tabs defaultValue="mine" className="w-full">
@@ -65,48 +68,49 @@ const ISORequestsScreen = () => {
         <TabsContent value="mine" className="space-y-4">
           <div className="space-y-3">
             {searchRequests.map((request) => (
-              <Card 
-                key={request.id} 
-                className="card-interactive cursor-pointer"
-                onClick={() => handleRequestClick(request.id)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-4 space-x-reverse">
-                    {/* Request Details */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-foreground hebrew-text">
-                            {request.title}
-                          </h3>
+              <GradientBorderContainer key={request.id} className="rounded-lg">
+                <Card 
+                  className="bg-black border-0 rounded-lg cursor-pointer"
+                  onClick={() => handleRequestClick(request.id)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start space-x-4 space-x-reverse">
+                      {/* Request Details */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3 className="font-semibold text-white hebrew-text">
+                              {request.title}
+                            </h3>
+                          </div>
+                          <Badge 
+                            variant={request.status === "פתוח" ? "default" : "secondary"}
+                            className="hebrew-text mr-2"
+                          >
+                            {request.status}
+                          </Badge>
                         </div>
-                        <Badge 
-                          variant={request.status === "פתוח" ? "default" : "secondary"}
-                          className="hebrew-text mr-2"
-                        >
-                          {request.status}
-                        </Badge>
-                      </div>
                       
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <CheckCircle className="h-4 w-4 ml-1" />
-                          <span className="hebrew-text">{request.offersCount} הצעות</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4 ml-1" />
-                          <span className="hebrew-text">{request.dateCreated}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <CheckCircle className="h-4 w-4 ml-1" />
+                            <span className="hebrew-text">{request.offersCount} הצעות</span>
+                          </div>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <Clock className="h-4 w-4 ml-1" />
+                            <span className="hebrew-text">{request.dateCreated}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Request Icon - moved to right */}
-                    <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Search className="h-10 w-10 text-muted-foreground" />
+                      {/* Request Icon - moved to right */}
+                      <div className="w-20 h-20 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Search className="h-10 w-10 text-muted-foreground" />
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </GradientBorderContainer>
             ))}
 
             {searchRequests.length === 0 && (
@@ -121,48 +125,49 @@ const ISORequestsScreen = () => {
         <TabsContent value="all" className="space-y-4">
           <div className="space-y-3">
             {searchRequests.map((request) => (
-              <Card 
-                key={request.id} 
-                className="card-interactive cursor-pointer"
-                onClick={() => handleRequestClick(request.id)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-4 space-x-reverse">
-                    {/* Request Details */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-foreground hebrew-text">
-                            {request.title}
-                          </h3>
+              <GradientBorderContainer key={request.id} className="rounded-lg">
+                <Card 
+                  className="bg-black border-0 rounded-lg cursor-pointer"
+                  onClick={() => handleRequestClick(request.id)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start space-x-4 space-x-reverse">
+                      {/* Request Details */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3 className="font-semibold text-white hebrew-text">
+                              {request.title}
+                            </h3>
+                          </div>
+                          <Badge 
+                            variant={request.status === "פתוח" ? "default" : "secondary"}
+                            className="hebrew-text mr-2"
+                          >
+                            {request.status}
+                          </Badge>
                         </div>
-                        <Badge 
-                          variant={request.status === "פתוח" ? "default" : "secondary"}
-                          className="hebrew-text mr-2"
-                        >
-                          {request.status}
-                        </Badge>
-                      </div>
                       
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <CheckCircle className="h-4 w-4 ml-1" />
-                          <span className="hebrew-text">{request.offersCount} הצעות</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4 ml-1" />
-                          <span className="hebrew-text">{request.dateCreated}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <CheckCircle className="h-4 w-4 ml-1" />
+                            <span className="hebrew-text">{request.offersCount} הצעות</span>
+                          </div>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <Clock className="h-4 w-4 ml-1" />
+                            <span className="hebrew-text">{request.dateCreated}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Request Icon - moved to right */}
-                    <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Search className="h-10 w-10 text-muted-foreground" />
+                      {/* Request Icon - moved to right */}
+                      <div className="w-20 h-20 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Search className="h-10 w-10 text-muted-foreground" />
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </GradientBorderContainer>
             ))}
 
             {searchRequests.filter(() => true).length === 0 && (

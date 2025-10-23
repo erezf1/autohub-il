@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/mobile/useVehicles";
 import { VehicleFilterDrawer } from "@/components/mobile/VehicleFilterDrawer";
@@ -7,6 +8,7 @@ import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from "@/uti
 import {
   PageContainer,
   PageHeader,
+  FilterButton,
   ActiveFiltersDisplay,
   ResultsCount,
   LoadingSpinner,
@@ -31,7 +33,8 @@ const CarSearchScreen = () => {
 
   const filteredResults = applyVehicleFilters(
     sortedVehicles,
-    filters
+    filters,
+    ""
   );
 
   const activeFilterCount = getActiveFilterCount(filters);
@@ -42,21 +45,26 @@ const CarSearchScreen = () => {
         title="מאגר הרכבים"
         onBack={() => navigate('/mobile/dashboard')}
         rightAction={
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/mobile/my-vehicles')}
-          >
-            הרכבים שלי
-          </Button>
+          <GradientBorderContainer className="rounded-md">
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/mobile/my-vehicles')}
+              className="border-0"
+            >
+              הרכבים שלי
+            </Button>
+          </GradientBorderContainer>
         }
       />
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 mb-4">
         <ResultsCount count={filteredResults.length} isLoading={isLoading} />
-        <FilterButton
-          activeCount={activeFilterCount}
-          onClick={() => setFilterDrawerOpen(true)}
-        />
+        <GradientBorderContainer className="rounded-md">
+          <FilterButton
+            activeCount={activeFilterCount}
+            onClick={() => setFilterDrawerOpen(true)}
+          />
+        </GradientBorderContainer>
       </div>
 
       <ActiveFiltersDisplay

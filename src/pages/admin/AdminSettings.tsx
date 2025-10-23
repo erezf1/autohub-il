@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { 
   Table, 
   TableBody, 
@@ -59,38 +60,39 @@ const AdminSettings = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-foreground hebrew-text">הגדרות מערכת</h1>
+            <h1 className="text-4xl font-bold text-white hebrew-text">הגדרות מערכת</h1>
             <p className="text-lg text-muted-foreground hebrew-text mt-2">
               ניהול פרמטרים גלובליים של המערכת
             </p>
           </div>
-          <Button size="lg" className="hebrew-text">
+            <Button size="lg" className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
             <Save className="h-4 w-4 ml-2" />
             שמור שינויים
-          </Button>
-        </div>
+            </Button>
+          </div>
 
         <Tabs defaultValue="categories" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="categories" className="hebrew-text">קטגוריות רכב</TabsTrigger>
-            <TabsTrigger value="reports" className="hebrew-text">סיבות דיווח</TabsTrigger>
-            <TabsTrigger value="system" className="hebrew-text">הגדרות מערכת</TabsTrigger>
-            <TabsTrigger value="users" className="hebrew-text">הגדרות משתמשים</TabsTrigger>
+          <TabsList className="bg-gray-900 grid w-full grid-cols-4">
+            <TabsTrigger value="categories" className="hebrew-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">קטגוריות רכב</TabsTrigger>
+            <TabsTrigger value="reports" className="hebrew-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">סיבות דיווח</TabsTrigger>
+            <TabsTrigger value="system" className="hebrew-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">הגדרות מערכת</TabsTrigger>
+            <TabsTrigger value="users" className="hebrew-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">הגדרות משתמשים</TabsTrigger>
           </TabsList>
 
           {/* Vehicle Categories Tab */}
         <TabsContent value="categories">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="hebrew-text">קטגוריות רכב</CardTitle>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="hebrew-text">
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-white hebrew-text">קטגוריות רכב</CardTitle>
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                    <Button className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
                       <Plus className="h-4 w-4 ml-2" />
                       הוסף קטגוריה
                     </Button>
-                  </DialogTrigger>
+                    </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]" dir="rtl">
                     <DialogHeader>
                       <DialogTitle className="hebrew-text">הוסף קטגוריה חדשה</DialogTitle>
@@ -100,30 +102,34 @@ const AdminSettings = () => {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="category-name" className="text-right hebrew-text">
+                        <Label htmlFor="category-name" className="text-right hebrew-text text-white">
                           שם קטגוריה
                         </Label>
-                        <Input
-                          id="category-name"
-                          placeholder="הזן שם קטגוריה"
-                          className="col-span-3 hebrew-text"
-                        />
+                        <GradientBorderContainer className="rounded-md col-span-3">
+                          <Input
+                            id="category-name"
+                            placeholder="הזן שם קטגוריה"
+                            className="hebrew-text border-0 bg-black rounded-md"
+                          />
+                        </GradientBorderContainer>
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="subcategories" className="text-right hebrew-text">
+                        <Label htmlFor="subcategories" className="text-right hebrew-text text-white">
                           תת-קטגוריות
                         </Label>
-                        <Textarea
-                          id="subcategories"
-                          placeholder="הזן תת-קטגוריות מופרדות בפסיק"
-                          className="col-span-3 hebrew-text"
-                        />
+                        <GradientBorderContainer className="rounded-md col-span-3">
+                          <Textarea
+                            id="subcategories"
+                            placeholder="הזן תת-קטגוריות מופרדות בפסיק"
+                            className="hebrew-text border-0 bg-black rounded-md"
+                          />
+                        </GradientBorderContainer>
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button type="submit" className="hebrew-text">
+                        <Button type="submit" className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
                         הוסף קטגוריה
-                      </Button>
+                        </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -133,10 +139,10 @@ const AdminSettings = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">תת-קטגוריות</TableHead>
-                    <TableHead className="text-right hebrew-text">קטגוריה</TableHead>
+                    <TableHead className="text-left text-white hebrew-text">פעולות</TableHead>
+                    <TableHead className="text-right text-white hebrew-text">סטטוס</TableHead>
+                    <TableHead className="text-right text-white hebrew-text">תת-קטגוריות</TableHead>
+                    <TableHead className="text-right text-white hebrew-text">קטגוריה</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -144,11 +150,11 @@ const AdminSettings = () => {
                     <TableRow key={category.id}>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" className="hebrew-text">
+                          <Button variant="outline" size="sm" className="hebrew-text btn-hover-cyan">
                             <Edit className="h-4 w-4 ml-1" />
                             ערוך
                           </Button>
-                          <Button variant="outline" size="sm" className="text-destructive hebrew-text">
+                          <Button variant="outline" size="sm" className="text-destructive hebrew-text btn-hover-cyan">
                             <Trash2 className="h-4 w-4 ml-1" />
                             מחק
                           </Button>
@@ -171,7 +177,7 @@ const AdminSettings = () => {
                           ))}
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium hebrew-text text-right">
+                      <TableCell className="font-medium text-white hebrew-text text-right">
                         {category.name}
                       </TableCell>
                     </TableRow>
@@ -179,29 +185,31 @@ const AdminSettings = () => {
                 </TableBody>
               </Table>
             </CardContent>
-          </Card>
+            </Card>
+          </GradientBorderContainer>
         </TabsContent>
 
         {/* Report Reasons Tab */}
         <TabsContent value="reports">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="hebrew-text">סיבות לדיווח</CardTitle>
-                <Button className="hebrew-text">
-                  <Plus className="h-4 w-4 ml-2" />
-                  הוסף סיבה
-                </Button>
-              </div>
-            </CardHeader>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-white hebrew-text">סיבות לדיווח</CardTitle>
+                  <Button className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
+                    <Plus className="h-4 w-4 ml-2" />
+                    הוסף סיבה
+                  </Button>
+                </div>
+              </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-left hebrew-text">פעולות</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">קטגוריה</TableHead>
-                    <TableHead className="text-right hebrew-text">סיבת דיווח</TableHead>
+                    <TableHead className="text-left text-white hebrew-text">פעולות</TableHead>
+                    <TableHead className="text-right text-white hebrew-text">סטטוס</TableHead>
+                    <TableHead className="text-right text-white hebrew-text">קטגוריה</TableHead>
+                    <TableHead className="text-right text-white hebrew-text">סיבת דיווח</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -209,11 +217,11 @@ const AdminSettings = () => {
                     <TableRow key={reason.id}>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" className="hebrew-text">
+                          <Button variant="outline" size="sm" className="hebrew-text btn-hover-cyan">
                             <Edit className="h-4 w-4 ml-1" />
                             ערוך
                           </Button>
-                          <Button variant="outline" size="sm" className="text-destructive hebrew-text">
+                          <Button variant="outline" size="sm" className="text-destructive hebrew-text btn-hover-cyan">
                             <Trash2 className="h-4 w-4 ml-1" />
                             מחק
                           </Button>
@@ -232,7 +240,7 @@ const AdminSettings = () => {
                           {reason.category}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-medium hebrew-text text-right">
+                      <TableCell className="font-medium text-white hebrew-text text-right">
                         {reason.reason}
                       </TableCell>
                     </TableRow>
@@ -240,135 +248,158 @@ const AdminSettings = () => {
                 </TableBody>
               </Table>
             </CardContent>
-          </Card>
+            </Card>
+          </GradientBorderContainer>
         </TabsContent>
 
         {/* System Settings Tab */}
         <TabsContent value="system">
           <div className="grid gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="hebrew-text">הגדרות כלליות</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label className="hebrew-text">אחוז עמלה (%)</Label>
-                    <Input 
-                      type="number" 
-                      value={systemSettings.commissionRate}
-                      className="hebrew-text"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="hebrew-text">מקסימום תמונות לרכב</Label>
-                    <Input 
-                      type="number" 
-                      value={systemSettings.maxPhotosPerListing}
-                      className="hebrew-text"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="hebrew-text">אפשרויות משך מכירה פומבית (ימים)</Label>
-                  <div className="flex gap-2">
-                    {systemSettings.auctionDurationOptions.map((duration) => (
-                      <Badge key={duration} variant="outline" className="hebrew-text">
-                        {duration} ימים
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="hebrew-text">הגדרות מערכת</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="hebrew-text">אישור אוטומטי למשתמשים חדשים</Label>
-                    <p className="text-sm text-muted-foreground hebrew-text">
-                      משתמשים חדשים יאושרו אוטומטית ללא בדיקה ידנית
-                    </p>
-                  </div>
-                  <Switch checked={systemSettings.autoApproveUsers} />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="hebrew-text">התראות אימייל</Label>
-                    <p className="text-sm text-muted-foreground hebrew-text">
-                      שלח התראות אימייל למשתמשים על פעילות במערכת
-                    </p>
-                  </div>
-                  <Switch checked={systemSettings.emailNotifications} />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5 flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-destructive" />
-                    <div>
-                      <Label className="hebrew-text">מצב תחזוקה</Label>
-                      <p className="text-sm text-muted-foreground hebrew-text">
-                        הפעלת מצב תחזוקה תמנע מהמשתמשים גישה למערכת
-                      </p>
+            <GradientBorderContainer className="rounded-md">
+              <Card className="bg-black border-0 rounded-md">
+                <CardHeader>
+                  <CardTitle className="text-white hebrew-text">הגדרות כלליות</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-white hebrew-text">אחוז עמלה (%)</Label>
+                      <GradientBorderContainer className="rounded-md">
+                        <Input 
+                          type="number" 
+                          value={systemSettings.commissionRate}
+                          className="hebrew-text border-0 bg-black rounded-md"
+                        />
+                      </GradientBorderContainer>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-white hebrew-text">מקסימום תמונות לרכב</Label>
+                      <GradientBorderContainer className="rounded-md">
+                        <Input 
+                          type="number" 
+                          value={systemSettings.maxPhotosPerListing}
+                          className="hebrew-text border-0 bg-black rounded-md"
+                        />
+                      </GradientBorderContainer>
                     </div>
                   </div>
-                  <Switch checked={systemSettings.maintenanceMode} />
-                </div>
-              </CardContent>
-            </Card>
+
+                  <div className="space-y-2">
+                    <Label className="text-white hebrew-text">אפשרויות משך מכירה פומבית (ימים)</Label>
+                    <div className="flex gap-2">
+                      {systemSettings.auctionDurationOptions.map((duration) => (
+                        <Badge key={duration} variant="outline" className="hebrew-text">
+                          {duration} ימים
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </GradientBorderContainer>
+
+            <GradientBorderContainer className="rounded-md">
+              <Card className="bg-black border-0 rounded-md">
+                <CardHeader>
+                  <CardTitle className="text-white hebrew-text">הגדרות מערכת</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-white hebrew-text">אישור אוטומטי למשתמשים חדשים</Label>
+                      <p className="text-sm text-muted-foreground hebrew-text">
+                        משתמשים חדשים יאושרו אוטומטית ללא בדיקה ידנית
+                      </p>
+                    </div>
+                    <Switch checked={systemSettings.autoApproveUsers} />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-white hebrew-text">התראות אימייל</Label>
+                      <p className="text-sm text-muted-foreground hebrew-text">
+                        שלח התראות אימייל למשתמשים על פעילות במערכת
+                      </p>
+                    </div>
+                    <Switch checked={systemSettings.emailNotifications} />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5 flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-destructive" />
+                      <div>
+                        <Label className="text-white hebrew-text">מצב תחזוקה</Label>
+                        <p className="text-sm text-muted-foreground hebrew-text">
+                          הפעלת מצב תחזוקה תמנע מהמשתמשים גישה למערכת
+                        </p>
+                      </div>
+                    </div>
+                    <Switch checked={systemSettings.maintenanceMode} />
+                  </div>
+                </CardContent>
+              </Card>
+            </GradientBorderContainer>
           </div>
         </TabsContent>
 
         {/* User Settings Tab */}
         <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">הגדרות משתמשים</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="hebrew-text">מספר רכבים מקסימלי למשתמש רגיל</Label>
-                  <Input type="number" defaultValue="10" className="hebrew-text" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="hebrew-text">מספר רכבים מקסימלי למשתמש פרימיום</Label>
-                  <Input type="number" defaultValue="50" className="hebrew-text" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="hebrew-text">מספר מכירות פומביות מקסימלי בו-זמנית</Label>
-                  <Input type="number" defaultValue="5" className="hebrew-text" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="hebrew-text">ימי שמירת נתונים לאחר מחיקת משתמש</Label>
-                  <Input type="number" defaultValue="30" className="hebrew-text" />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <Label className="hebrew-text">הגדרות דירוג סוחרים</Label>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-white hebrew-text">הגדרות משתמשים</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-sm hebrew-text">משקל מכירות (0-1)</Label>
-                    <Input type="number" step="0.1" defaultValue="0.4" className="hebrew-text" />
+                    <Label className="text-white hebrew-text">מספר רכבים מקסימלי למשתמש רגיל</Label>
+                    <GradientBorderContainer className="rounded-md">
+                      <Input type="number" defaultValue="10" className="hebrew-text border-0 bg-black rounded-md" />
+                    </GradientBorderContainer>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm hebrew-text">משקל ביקורות (0-1)</Label>
-                    <Input type="number" step="0.1" defaultValue="0.6" className="hebrew-text" />
+                    <Label className="text-white hebrew-text">מספר רכבים מקסימלי למשתמש פרימיום</Label>
+                    <GradientBorderContainer className="rounded-md">
+                      <Input type="number" defaultValue="50" className="hebrew-text border-0 bg-black rounded-md" />
+                    </GradientBorderContainer>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-white hebrew-text">מספר מכירות פומביות מקסימלי בו-זמנית</Label>
+                    <GradientBorderContainer className="rounded-md">
+                      <Input type="number" defaultValue="5" className="hebrew-text border-0 bg-black rounded-md" />
+                    </GradientBorderContainer>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-white hebrew-text">ימי שמירת נתונים לאחר מחיקת משתמש</Label>
+                    <GradientBorderContainer className="rounded-md">
+                      <Input type="number" defaultValue="30" className="hebrew-text border-0 bg-black rounded-md" />
+                    </GradientBorderContainer>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Label className="text-white hebrew-text">הגדרות דירוג סוחרים</Label>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-sm text-white hebrew-text">משקל מכירות (0-1)</Label>
+                      <GradientBorderContainer className="rounded-md">
+                        <Input type="number" step="0.1" defaultValue="0.4" className="hebrew-text border-0 bg-black rounded-md" />
+                      </GradientBorderContainer>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm text-white hebrew-text">משקל דירוג (0-1)</Label>
+                      <GradientBorderContainer className="rounded-md">
+                        <Input type="number" step="0.1" defaultValue="0.6" className="hebrew-text border-0 bg-black rounded-md" />
+                      </GradientBorderContainer>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
         </TabsContent>
         </Tabs>
       </div>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Gavel, Clock, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
@@ -10,6 +9,16 @@ import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/uti
 import { FilterButton } from '@/components/common/FilterButton';
 import { ActiveFiltersDisplay } from '@/components/common/ActiveFiltersDisplay';
 import darkCarImage from "@/assets/dark_car.png";
+import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
+import {
+  PageContainer,
+  PageHeader,
+  FilterButton,
+  ActiveFiltersDisplay,
+  ResultsCount,
+} from "@/components/common";
+import { GradientSeparator } from "@/components/ui/gradient-separator";
+
 
 // Mock data for bids and auctions
 const mockMyBids = [
@@ -106,7 +115,7 @@ const getBidStatusText = (status: string) => {
 
 export const BidsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("active-auctions");
+  const [showMyAuctions, setShowMyAuctions] = useState(false);
   const [filters, setFilters] = useState<VehicleFilters>({});
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
@@ -118,234 +127,304 @@ export const BidsScreen: React.FC = () => {
   const activeFilterCount = getActiveFilterCount(filters);
 
   return (
-    // The MobileLayout component is replaced with a div
-    // You might want to add some padding or margin classes here
-    // e.g., <div className="p-4"> to mimic a layout's spacing
-    <div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
-          <TabsTrigger value="active-auctions">כל המכרזים</TabsTrigger>
-          <TabsTrigger value="my-auctions">המכרזים שלי</TabsTrigger>
-        </TabsList>
+    <PageContainer>
+      <PageHeader
+        title={
+          <div className="flex items-center gap-2">
+            <Gavel className="h-6 w-6 text-blue-500" />
+            <span className="hebrew-text">{showMyAuctions ? "המכרזים שלי" : "כל המכרזים"}</span>
+          </div>
+        }
+        onBack={showMyAuctions ? () => setShowMyAuctions(false) : () => navigate('/mobile/dashboard')}
+        rightAction={
+          !showMyAuctions ? (
+            <GradientBorderContainer className="rounded-md">
+              <Button
+                variant="outline"
+                onClick={() => setShowMyAuctions(true)}
+                className="border-0"
+              >
+                המכרזים שלי
+              </Button>
+            </GradientBorderContainer>
+          ) : (
+            <GradientBorderContainer className="rounded-md">
+              <Button
+                onClick={() => navigate('/mobile/add-auction')}
+                variant="outline"
+                className="border-0"
+              >
+                <Plus className="h-4 w-4 ml-2" />
+                צור מכרז
+              </Button>
+            </GradientBorderContainer>
+          )
+        }
+      />
 
-          <TabsContent value="active-auctions" className="space-y-4">
-            {/* Filter section */}
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground hebrew-text">
-                {filteredActiveAuctions.length} מכרזים פעילים
-              </p>
+      {!showMyAuctions ? (
+        <>
+          {/* All Auctions View */}
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <ResultsCount count={filteredActiveAuctions.length + mockMyBids.length} isLoading={false} />
+            <GradientBorderContainer className="rounded-md">
               <FilterButton
                 activeCount={activeFilterCount}
                 onClick={() => setFilterDrawerOpen(true)}
               />
-            </div>
+            </GradientBorderContainer>
+          </div>
 
-            <ActiveFiltersDisplay
-              filterCount={activeFilterCount}
-              onClearAll={() => setFilters({})}
-            />
+          <ActiveFiltersDisplay
+            filterCount={activeFilterCount}
+            onClearAll={() => setFilters({})}
+          />
 
-            {/* My Bids Section First */}
-            <div>
-              <h3 className="font-medium mb-3 text-blue-800 text-right">ההצעות שלי</h3>
-              <div className="space-y-3">
-                {mockMyBids.map((bid) => (
+          {/* My Bids Section First */}
+          <div>
+            <h3 className="font-medium mb-3 text-white text-right hebrew-text">ההצעות שלי</h3>
+            <div className="space-y-3">
+              {mockMyBids.map((bid) => (
+                <GradientBorderContainer
+                  key={bid.id}
+                  className="rounded-md flex-1"
+                >
                   <Card
-                    key={bid.id}
-                    className="p-4 cursor-pointer hover:shadow-md transition-shadow border-blue-200"
+                    className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
                     onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
                   >
-                    <div className="flex">
-                      <div className="flex-1 p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="text-right">
-                            <h3 className="font-semibold">{bid.make} {bid.model}</h3>
-                            <p className="text-sm text-muted-foreground">{bid.year}</p>
-                          </div>
-                          <Badge className={`text-white ${getBidStatusColor(bid.status)}`}>
-                            {getBidStatusText(bid.status)}
-                          </Badge>
-                        </div>
+                    <div className="flex items-stretch">
 
-                        <div className="space-y-1 mb-2">
-                          <div className="flex justify-between text-sm">
-                            <span>ההצעה שלי:</span>
-                            <span className="font-medium">{bid.myBid}</span>
-                          </div>
-                          <div className="flex justify-between text-sm">
-                            <span>הצעה גבוהה:</span>
-                            <span className="font-medium text-green-600">{bid.currentHighest}</span>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between items-center text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            <span>{bid.timeRemaining}</span>
-                          </div>
-                          <span>{bid.bidCount} הצעות</span>
-                        </div>
-                      </div>
-
-                      <div className="w-24 h-24 overflow-hidden flex-shrink-0">
+                      {/* Bid Image - Right Side, Full Height Square */}
+                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
                         <img
                           src={bid.image}
                           alt={`${bid.make} ${bid.model}`}
                           className="w-full h-full object-cover"
                         />
                       </div>
+                      {/* Bid Details - Middle */}
+                      <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
+                        <div className="mb-2">
+                          <h3 className="font-semibold text-white hebrew-text">
+                            {bid.make} {bid.model}
+                          </h3>
+                          <p className="text-sm text-white/70 hebrew-text">
+                            {bid.year}
+                          </p>
+                        </div>
+
+                        <Badge className={`text-white ${getBidStatusColor(bid.status)} w-fit`}>
+                          {getBidStatusText(bid.status)}
+                        </Badge>
+                      </div>
+                      {/* Price Column - Left Side, Vertically Centered */}
+                      <div className="flex flex-col justify-center p-4 space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex flex-col items-center space-y-1">
+                            <span className="text-white/70 hebrew-text text-center">ההצעה שלי</span>
+
+
+                            <span className="font-medium text-white hebrew-text text-center">{bid.myBid}</span>
+                          </div>
+                        </div>
+                        <GradientSeparator />
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex flex-col items-center space-y-1">
+                            <span className="text-white/70 hebrew-text text-center">הצעה גבוהה</span>
+                            <span className="font-medium text-green-400 hebrew-text text-center">{bid.currentHighest}</span>
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <GradientSeparator />
+                    {/* Bottom Section */}
+                    <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70">
+                      <div className="flex items-center gap-1 justify-center">
+                        <Clock className="w-3 h-" />
+
+                        <span className="hebrew-text text-center">{bid.timeRemaining}</span>
+                        <span className="hebrew-text text-center pr-2">{bid.bidCount} הצעות</span>
+                      </div>
                     </div>
                   </Card>
-                ))}
-              </div>
+                </GradientBorderContainer>
+              ))}
             </div>
+          </div>
 
-            {/* All Other Auctions */}
-            <div>
-              <h3 className="font-medium mb-3 text-right">כל המכרזים ({filteredActiveAuctions.length})</h3>
-              <div className="space-y-3">
-                {filteredActiveAuctions.map((auction) => (
+          {/* All Other Auctions */}
+          <div>
+            <h3 className="font-medium mb-3 text-right text-white hebrew-text">כל המכרזים ({filteredActiveAuctions.length})</h3>
+            <div className="space-y-3">
+              {filteredActiveAuctions.map((auction) => (
+                <GradientBorderContainer
+                  key={auction.id}
+                  className="rounded-md flex-1"
+                >
                   <Card
-                    key={auction.id}
-                    className="p-4 cursor-pointer hover:shadow-md transition-shadow"
+                    className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
                     onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
                   >
-                    <div className="flex">
-                      <div className="flex-1 p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="text-right">
-                            <h3 className="font-semibold">{auction.make} {auction.model}</h3>
-                            <p className="text-sm text-muted-foreground">{auction.year}</p>
-                          </div>
-                          <div className="text-left">
-                            <div className="text-lg font-bold text-green-600">
-                              {auction.currentBid}
-                            </div>
-                          </div>
-                        </div>
 
-                        <div className="flex justify-between items-center text-sm text-muted-foreground mb-3">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            <span>{auction.timeRemaining}</span>
-                          </div>
-                          <span>{auction.bidCount} הצעות</span>
-                        </div>
-
-                        {auction.canBid && (
-                          <Button
-                            size="sm"
-                            className="w-full gap-2"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/mobile/create-bid-details/${auction.vehicleId}`);
-                            }}
-                          >
-                            <Gavel className="w-4 h-4" />
-                            הגש הצעה
-                          </Button>
-                        )}
-                      </div>
-
-                      <div className="w-24 h-24 overflow-hidden flex-shrink-0">
+                    <div className="flex items-stretch">
+                      {/* Auction Image - Right Side, Full Height Square */}
+                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
                         <img
                           src={auction.image}
                           alt={`${auction.make} ${auction.model}`}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="my-auctions" className="space-y-4">
-            {/* Create New Auction Button */}
-            <Button
-              onClick={() => navigate('/mobile/add-auction')}
-              className="w-full gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              צור מכרז חדש
-            </Button>
-
-            {/* My Auctions List */}
-            <div className="space-y-3">
-              {mockMyAuctions.map((auction) => (
-                <Card
-                  key={auction.id}
-                  className="p-4 cursor-pointer hover:shadow-md transition-shadow border-green-200"
-                  onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
-                >
-                  <div className="flex">
-                    <div className="flex-1 p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="text-right">
-                          <h3 className="font-semibold">{auction.make} {auction.model}</h3>
-                          <p className="text-sm text-muted-foreground">{auction.year}</p>
+                      {/* Auction Details - Middle */}
+                      <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
+                        <div className="mb-2">
+                          <h3 className="font-semibold text-white hebrew-text">
+                            {auction.make} {auction.model}
+                          </h3>
+                          <p className="text-sm text-white/70 hebrew-text">
+                            {auction.year}
+                          </p>
                         </div>
-                        <Badge className="bg-green-500 text-white">
+
+                        <Badge variant="secondary" className="hebrew-text bg-green-500/20 text-green-400 border-green-500/30 w-fit">
                           פעיל
                         </Badge>
+
+
+                      </div>
+                      {/* Price Column - Left Side, Vertically Centered */}
+                      <div className="flex flex-col justify-center p-4">
+
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex flex-col items-end space-y-1">
+                            <span className="text-white/70 hebrew-text">הצעה נוכחית</span>
+                            <span className="text-lg font-bold text-green-400 hebrew-text">{auction.currentBid}</span>
+                          </div>
+                        </div>
+                        {auction.canBid && (
+                          <div className="px-0 pb-0 pt-">
+                            <Button
+                              size="sm"
+                              className="w-20 px-2 py-1 gap-1 text-sm bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/mobile/create-bid-details/${auction.vehicleId}`);
+                              }}
+                            >
+                              <Gavel className="w-3 h-3" />
+                              <span className="text-sm">הגשה</span>
+                            </Button>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="space-y-1 mb-2">
-                        <div className="flex justify-between text-sm">
-                          <span>מחיר פתיחה:</span>
-                          <span className="font-medium">{auction.startingPrice}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>הצעה נוכחית:</span>
-                          <span className="font-medium text-green-600">{auction.currentBid}</span>
-                        </div>
+                    </div>
+                    <GradientSeparator />
+                    <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70">
+                      <div className="flex items-center gap-1 justify-center">
+                        <Clock className="w-3 h-3" />
+                        <span className="hebrew-text text-center">{auction.timeRemaining}</span>
                       </div>
-
-                      <div className="flex justify-between items-center text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>{auction.timeRemaining}</span>
-                        </div>
-                        <span>{auction.bidCount} הצעות</span>
-                      </div>
+                      <span className="hebrew-text text-center">{auction.bidCount} הצעות</span>
                     </div>
 
-                    <div className="w-24 h-24 overflow-hidden flex-shrink-0">
+                  </Card>
+                </GradientBorderContainer>
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* My Auctions View */}
+          <div className="space-y-3">
+            {mockMyAuctions.map((auction) => (
+              <GradientBorderContainer
+                key={auction.id}
+                className="rounded-md flex-1"
+              >
+                <Card
+                  className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
+                  onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
+                >
+                  <div className="flex items-stretch">
+                    {/* Auction Image - Right Side, Full Height Square */}
+                    <div className="w-24 h-24 bg-muted flex-shrink-0">
                       <img
                         src={auction.image}
                         alt={`${auction.make} ${auction.model}`}
                         className="w-full h-full object-cover"
                       />
                     </div>
+                    {/* Auction Details - Middle */}
+                    <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
+                      <div className="mb-2">
+                        <h3 className="font-semibold text-white hebrew-text">
+                          {auction.make} {auction.model}
+                        </h3>
+                        <p className="text-sm text-white/70 hebrew-text">
+                          {auction.year}
+                        </p>
+                      </div>
+
+                      <Badge className="hebrew-text bg-green-500/20 text-green-400 border-green-500/30 w-fit">
+                        פעיל
+                      </Badge>
+                    </div>
+                    {/* Price Column - Left Side, Vertically Centered */}
+                    <div className="flex flex-col justify-center p-4 space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium text-white hebrew-text">{auction.startingPrice}</span>
+                        <span className="text-white/70 hebrew-text">:מחיר פתיחה</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium text-green-400 hebrew-text">{auction.currentBid}</span>
+                        <span className="text-white/70 hebrew-text">:הצעה נוכחית</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Section */}
+                  <div className="px-4 pb-4">
+                    <div className="flex items-center justify-between text-sm text-white/70">
+                      <span className="hebrew-text">{auction.timeRemaining}</span>
+                      <span className="hebrew-text">{auction.bidCount} הצעות</span>
+                    </div>
                   </div>
                 </Card>
-              ))}
-            </div>
+              </GradientBorderContainer>
+            ))}
+          </div>
 
-            {/* Empty State for My Auctions */}
-            {mockMyAuctions.length === 0 && (
-              <div className="text-center py-12">
-                <Gavel className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">אין לך מכרזים פעילים</h3>
-                <p className="text-muted-foreground mb-4">
-                  צור מכרז חדש לרכב שלך
-                </p>
-                <Button onClick={() => navigate('/mobile/add-auction')}>
+          {/* Empty State for My Auctions */}
+          {mockMyAuctions.length === 0 && (
+            <div className="text-center py-12">
+              <Gavel className="w-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-medium mb-2">אין לך מכרזים פעילים</h3>
+              <p className="text-muted-foreground mb-4">
+                צור מכרז חדש לרכב שלך
+              </p>
+              <GradientBorderContainer className="rounded-md">
+                <Button
+                  onClick={() => navigate('/mobile/add-auction')}
+                  variant="ghost"
+                  className="bg-black border-0 text-white"
+                >
                   צור מכרז ראשון
                 </Button>
-              </div>
-            )}
-          </TabsContent>
-      </Tabs>
-
-      {/* Filter Drawer */}
+              </GradientBorderContainer>
+            </div>
+          )}
+        </>
+      )}      {/* Filter Drawer */}
       <VehicleFilterDrawer
         open={filterDrawerOpen}
         onOpenChange={setFilterDrawerOpen}
         currentFilters={filters}
         onApplyFilters={setFilters}
       />
-    </div>
+    </PageContainer>
   );
 };

@@ -1,36 +1,42 @@
-import { Search, FileText, Flame, Gavel, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+
+// Import custom tab icons
+import SearchTabIcon from "@/assets/Search-tab.svg";
+import StarTabIcon from "@/assets/Star-tab.svg";
+import HotTabIcon from "@/assets/Hot-tab.svg";
+import BidTabIcon from "@/assets/Bid-tab.svg";
+import ProfileTabIcon from "@/assets/Profile-tab.svg";
 
 const tabs = [
   {
     id: "search",
     label: "מאגר הרכבים",
-    icon: Search,
+    icon: SearchTabIcon,
     path: "/mobile/search"
   },
   {
     id: "required-cars",
     label: "חיפוש רכבים",
-    icon: FileText,
+    icon: StarTabIcon,
     path: "/mobile/required-cars"
   },
   {
     id: "hot-cars",
     label: "רכבים חמים",
-    icon: Flame,
+    icon: HotTabIcon,
     path: "/mobile/hot-cars"
   },
   {
     id: "bids",
     label: "מכרזים",
-    icon: Gavel,
+    icon: BidTabIcon,
     path: "/mobile/bids"
   },
   {
     id: "profile",
     label: "הפרופיל שלי",
-    icon: User,
+    icon: ProfileTabIcon,
     path: "/mobile/profile"
   }
 ];
@@ -40,11 +46,10 @@ const MobileTabBar = () => {
   const navigate = useNavigate();
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md bg-card/95 border-t border-border/50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-      <div className="container max-w-md mx-auto">
-        <div className="grid grid-cols-5 h-16">
+    <footer className="fixed bottom-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-md border-t border-border/20 shadow-lg">
+      <div className="w-full max-w-[500px] mx-auto">
+        <div className="flex h-16">
           {tabs.map((tab) => {
-            const Icon = tab.icon;
             const isActive = location.pathname === tab.path || 
               (tab.path === "/mobile/search" && (location.pathname === "/mobile" || location.pathname === "/mobile/"));
             
@@ -53,18 +58,14 @@ const MobileTabBar = () => {
                 key={tab.id}
                 onClick={() => navigate(tab.path)}
                 className={cn(
-                  "flex flex-col items-center justify-center space-y-1 transition-colors hebrew-text relative",
+                  "flex flex-col items-center justify-center space-y-1 transition-colors hebrew-text w-1/5 p-0",
                   isActive 
                     ? "text-primary" 
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground icon-hover-cyan"
                 )}
               >
-                {isActive && <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />}
-                <Icon className="h-6 w-6" />
-                <span className={cn(
-                  "text-[11px]",
-                  isActive ? "font-bold" : "font-semibold"
-                )}>{tab.label}</span>
+                <img src={tab.icon} alt={tab.label} className="h-9 w-9" />
+                <span className="text-xs font-medium">{tab.label}</span>
               </button>
             );
           })}

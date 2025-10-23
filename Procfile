@@ -1,0 +1,1 @@
+web: chmod +x start-simple.sh && ./start-simple.sh

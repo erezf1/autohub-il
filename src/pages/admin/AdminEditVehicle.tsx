@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { adminClient } from '@/integrations/supabase/adminClient';
 import { useToast } from '@/hooks/use-toast';
 import { useVehicleMakes, useVehicleModels } from '@/hooks/mobile/useVehicles';
+import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
 // Vehicle type constants for dropdown
 import { VEHICLE_TYPES } from '@/constants/vehicleTypes';
 
@@ -260,7 +261,7 @@ const AdminEditVehicle = () => {
         <Button 
           variant="ghost" 
           onClick={() => navigate(`/admin/vehicles/${id}`)}
-          className="hebrew-text"
+          className="hebrew-text btn-hover-cyan"
         >
           <ArrowRight className="h-4 w-4 ml-1" />
           חזור לפרטי רכב
@@ -268,238 +269,280 @@ const AdminEditVehicle = () => {
       </div>
 
       <div>
-        <h1 className="text-3xl font-bold hebrew-text">עריכת רכב</h1>
-        <p className="text-lg text-muted-foreground hebrew-text mt-1">
+        <h1 className="text-3xl font-bold text-white hebrew-text">עריכת רכב</h1>
+        <p className="text-lg text-white/70 hebrew-text mt-1">
           {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} - {vehicle.year}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Owner Info - Read Only */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text">בעל הרכב</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground hebrew-text mb-1">שם העסק</p>
-              <p className="font-medium hebrew-text">{vehicle.owner?.business_name}</p>
-              <p className="text-sm text-muted-foreground hebrew-text mt-2 mb-1">שם מלא</p>
-              <p className="font-medium hebrew-text">{vehicle.owner?.full_name}</p>
-              <p className="text-xs text-muted-foreground hebrew-text mt-2">
-                לא ניתן לשנות בעל רכב
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-white hebrew-text">בעל הרכב</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-muted p-4 rounded-lg">
+                <p className="text-sm text-muted-foreground hebrew-text mb-1">שם העסק</p>
+                <p className="font-medium text-white hebrew-text">{vehicle.owner?.business_name}</p>
+                <p className="text-sm text-muted-foreground hebrew-text mt-2 mb-1">שם מלא</p>
+                <p className="font-medium text-white hebrew-text">{vehicle.owner?.full_name}</p>
+                <p className="text-xs text-muted-foreground hebrew-text mt-2">
+                  לא ניתן לשנות בעל רכב
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text">פרטי רכב בסיסיים</CardTitle>
-          </CardHeader>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-white hebrew-text">פרטי רכב בסיסיים</CardTitle>
+            </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="hebrew-text">יצרן *</Label>
-                <Select
-                  value={formData.make_id}
-                  onValueChange={(value) => {
-                    setSelectedMakeId(parseInt(value));
-                    setFormData({ ...formData, make_id: value, model_id: "" });
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר יצרן" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {makes?.map(make => (
-                      <SelectItem key={make.id} value={make.id.toString()}>{make.name_hebrew}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-white hebrew-text">יצרן *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select
+                    value={formData.make_id}
+                    onValueChange={(value) => {
+                      setSelectedMakeId(parseInt(value));
+                      setFormData({ ...formData, make_id: value, model_id: "" });
+                    }}
+                  >
+                    <SelectTrigger className="border-0 bg-black rounded-md">
+                      <SelectValue placeholder="בחר יצרן" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {makes?.map(make => (
+                        <SelectItem key={make.id} value={make.id.toString()}>{make.name_hebrew}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
 
               <div>
-                <Label className="hebrew-text">דגם *</Label>
-                <Select
-                  key={`model-${selectedMakeId}`}
-                  value={formData.model_id}
-                  onValueChange={(value) => setFormData({ ...formData, model_id: value })}
-                  disabled={!selectedMakeId}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={selectedMakeId ? "בחר דגם" : "בחר תחילה יצרן"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {models?.map(model => (
-                      <SelectItem key={model.id} value={model.id.toString()}>{model.name_hebrew}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-white hebrew-text">דגם *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select
+                    key={`model-${selectedMakeId}`}
+                    value={formData.model_id}
+                    onValueChange={(value) => setFormData({ ...formData, model_id: value })}
+                    disabled={!selectedMakeId}
+                  >
+                    <SelectTrigger className="border-0 bg-black rounded-md">
+                      <SelectValue placeholder={selectedMakeId ? "בחר דגם" : "בחר תחילה יצרן"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {models?.map(model => (
+                        <SelectItem key={model.id} value={model.id.toString()}>{model.name_hebrew}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
 
               <div>
-                <Label className="hebrew-text">סוג</Label>
-                <Select
-                  value={formData.sub_model}
-                  onValueChange={(value) => setFormData({ ...formData, sub_model: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר סוג רכב" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {VEHICLE_TYPES.map(type => (
-                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-white hebrew-text">סוג</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select
+                    value={formData.sub_model}
+                    onValueChange={(value) => setFormData({ ...formData, sub_model: value })}
+                  >
+                    <SelectTrigger className="border-0 bg-black rounded-md">
+                      <SelectValue placeholder="בחר סוג רכב" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VEHICLE_TYPES.map(type => (
+                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
 
               <div>
-                <Label className="hebrew-text">שנת ייצור *</Label>
+                <Label className="text-white hebrew-text">שנת ייצור *</Label>
                 <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setFormData({ ...formData, year: (parseInt(formData.year) - 1).toString() })}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    value={formData.year}
-                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                    required
-                    min="1990"
-                    max="2025"
-                    className="text-center"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setFormData({ ...formData, year: (parseInt(formData.year) + 1).toString() })}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setFormData({ ...formData, year: (parseInt(formData.year) - 1).toString() })}
+                      className="border-0 bg-black rounded-md"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
+                  <GradientBorderContainer className="rounded-md flex-1">
+                    <Input
+                      type="number"
+                      value={formData.year}
+                      onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                      required
+                      min="1990"
+                      max="2025"
+                      className="border-0 bg-black rounded-md text-center"
+                    />
+                  </GradientBorderContainer>
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setFormData({ ...formData, year: (parseInt(formData.year) + 1).toString() })}
+                      className="border-0 bg-black rounded-md"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
                 </div>
               </div>
 
               <div>
-                <Label className="hebrew-text">צבע</Label>
-                <Select value={formData.color} onValueChange={(value) => setFormData({ ...formData, color: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר צבע" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {colors.map(color => (
-                      <SelectItem key={color} value={color}>{color}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-white hebrew-text">צבע</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select value={formData.color} onValueChange={(value) => setFormData({ ...formData, color: value })}>
+                    <SelectTrigger className="border-0 bg-black rounded-md">
+                      <SelectValue placeholder="בחר צבע" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {colors.map(color => (
+                        <SelectItem key={color} value={color}>{color}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
 
               <div>
-                <Label className="hebrew-text">קילומטרז׳ *</Label>
-                <Input
-                  type="number"
-                  value={formData.kilometers}
-                  onChange={(e) => setFormData({ ...formData, kilometers: e.target.value })}
-                  required
-                />
+                <Label className="text-white hebrew-text">קילומטרז׳ *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    type="number"
+                    value={formData.kilometers}
+                    onChange={(e) => setFormData({ ...formData, kilometers: e.target.value })}
+                    required
+                    className="border-0 bg-black rounded-md"
+                  />
+                </GradientBorderContainer>
               </div>
 
               <div>
-                <Label className="hebrew-text">סוג דלק</Label>
-                <Select value={formData.fuelType} onValueChange={(value) => setFormData({ ...formData, fuelType: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר סוג דלק" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {fuelTypes.map(fuel => (
-                      <SelectItem key={fuel.value} value={fuel.value}>{fuel.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-white hebrew-text">סוג דלק</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select value={formData.fuelType} onValueChange={(value) => setFormData({ ...formData, fuelType: value })}>
+                    <SelectTrigger className="border-0 bg-black rounded-md">
+                      <SelectValue placeholder="בחר סוג דלק" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fuelTypes.map(fuel => (
+                        <SelectItem key={fuel.value} value={fuel.value}>{fuel.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
 
               <div>
-                <Label className="hebrew-text">תיבת הילוכים</Label>
-                <Select value={formData.transmission} onValueChange={(value) => setFormData({ ...formData, transmission: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר תיבת הילוכים" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {transmissions.map(trans => (
-                      <SelectItem key={trans.value} value={trans.value}>{trans.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-white hebrew-text">תיבת הילוכים</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select value={formData.transmission} onValueChange={(value) => setFormData({ ...formData, transmission: value })}>
+                    <SelectTrigger className="border-0 bg-black rounded-md">
+                      <SelectValue placeholder="בחר תיבת הילוכים" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {transmissions.map(trans => (
+                        <SelectItem key={trans.value} value={trans.value}>{trans.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
 
               <div>
-                <Label className="hebrew-text">נפח מנוע</Label>
-                <Input
-                  value={formData.engineSize}
-                  onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
-                  placeholder="2.5"
-                  type="text"
-                />
+                <Label className="text-white hebrew-text">נפח מנוע</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    value={formData.engineSize}
+                    onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
+                    placeholder="2.5"
+                    type="text"
+                    className="border-0 bg-black rounded-md"
+                  />
+                </GradientBorderContainer>
                 <p className="text-xs text-muted-foreground mt-1 hebrew-text">ערך מקסימלי: 99.9 ליטר</p>
               </div>
 
               <div>
-                <Label className="hebrew-text">מספר בעלים קודמים</Label>
+                <Label className="text-white hebrew-text">מספר בעלים קודמים</Label>
                 <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setFormData({ ...formData, previousOwners: Math.max(1, parseInt(formData.previousOwners) - 1).toString() })}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    value={formData.previousOwners}
-                    onChange={(e) => setFormData({ ...formData, previousOwners: e.target.value })}
-                    min="1"
-                    className="text-center"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setFormData({ ...formData, previousOwners: (parseInt(formData.previousOwners) + 1).toString() })}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setFormData({ ...formData, previousOwners: Math.max(1, parseInt(formData.previousOwners) - 1).toString() })}
+                      className="border-0 bg-black rounded-md"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
+                  <GradientBorderContainer className="rounded-md flex-1">
+                    <Input
+                      type="number"
+                      value={formData.previousOwners}
+                      onChange={(e) => setFormData({ ...formData, previousOwners: e.target.value })}
+                      min="1"
+                      className="border-0 bg-black rounded-md text-center"
+                    />
+                  </GradientBorderContainer>
+                  <GradientBorderContainer className="rounded-md">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setFormData({ ...formData, previousOwners: (parseInt(formData.previousOwners) + 1).toString() })}
+                      className="border-0 bg-black rounded-md"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </GradientBorderContainer>
                 </div>
               </div>
 
               <div>
-                <Label className="hebrew-text">מחיר (₪) *</Label>
-                <Input
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  required
-                />
+                <Label className="text-white hebrew-text">מחיר (₪) *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Input
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    required
+                    className="border-0 bg-black rounded-md"
+                  />
+                </GradientBorderContainer>
               </div>
 
               <div>
-                <Label className="hebrew-text">סטטוס *</Label>
-                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statuses.map(status => (
-                      <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-white hebrew-text">סטטוס *</Label>
+                <GradientBorderContainer className="rounded-md">
+                  <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                    <SelectTrigger className="border-0 bg-black rounded-md">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statuses.map(status => (
+                        <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </GradientBorderContainer>
               </div>
             </div>
 
@@ -515,16 +558,18 @@ const AdminEditVehicle = () => {
             </div>
 
             <div>
-              <Label className="hebrew-text">תיאור</Label>
-              <Textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="hebrew-text min-h-[120px]"
-              />
+              <Label className="text-white hebrew-text">תיאור</Label>
+              <GradientBorderContainer className="rounded-md">
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="border-0 bg-black rounded-md hebrew-text min-h-[120px]"
+                />
+              </GradientBorderContainer>
             </div>
 
             <div>
-              <Label className="hebrew-text">מסמך בדיקה / טסט (אופציונלי)</Label>
+              <Label className="text-white hebrew-text">מסמך בדיקה / טסט (אופציונלי)</Label>
               <div className="space-y-2">
                 {formData.testResultFileUrl ? (
                   <div className="flex items-center gap-2">
@@ -556,16 +601,18 @@ const AdminEditVehicle = () => {
                       id="test-file-upload"
                     />
                     <label htmlFor="test-file-upload">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        disabled={uploadingTestFile}
-                        onClick={() => document.getElementById('test-file-upload')?.click()}
-                      >
-                        <Upload className="h-4 w-4 ml-2" />
-                        {uploadingTestFile ? 'מעלה...' : 'העלה מסמך בדיקה'}
-                      </Button>
+                      <GradientBorderContainer className="rounded-md">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full border-0 bg-black rounded-md hover:bg-gradient-to-r hover:from-[#5be1fd] hover:to-[#2277ee] hover:text-black transition-all"
+                          disabled={uploadingTestFile}
+                          onClick={() => document.getElementById('test-file-upload')?.click()}
+                        >
+                          <Upload className="h-4 w-4 ml-2" />
+                          {uploadingTestFile ? 'מעלה...' : 'העלה מסמך בדיקה'}
+                        </Button>
+                      </GradientBorderContainer>
                     </label>
                   </>
                 )}
@@ -616,11 +663,13 @@ const AdminEditVehicle = () => {
             </div>
           </CardContent>
         </Card>
+        </GradientBorderContainer>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text text-right">תגיות</CardTitle>
-          </CardHeader>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-white hebrew-text text-right">תגיות</CardTitle>
+            </CardHeader>
           <CardContent>
             {!availableTags || availableTags.length === 0 ? (
               <p className="text-sm text-muted-foreground hebrew-text text-right">אין תגיות זמינות</p>
@@ -630,7 +679,7 @@ const AdminEditVehicle = () => {
                   <Badge
                     key={tag.id}
                     variant={selectedTags.includes(tag.id) ? "default" : "outline"}
-                    className="cursor-pointer hebrew-text"
+                    className={`cursor-pointer hebrew-text ${selectedTags.includes(tag.id) ? 'text-black' : ''}`}
                     onClick={() => {
                       setSelectedTags(prev =>
                         prev.includes(tag.id)
@@ -646,17 +695,25 @@ const AdminEditVehicle = () => {
             )}
           </CardContent>
         </Card>
+        </GradientBorderContainer>
 
         <div className="flex gap-4 justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate(`/admin/vehicles/${id}`)}
-            disabled={isUpdatingVehicle}
+          <GradientBorderContainer className="rounded-md">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate(`/admin/vehicles/${id}`)}
+              disabled={isUpdatingVehicle}
+              className="border-0 bg-black rounded-md"
+            >
+              ביטול
+            </Button>
+          </GradientBorderContainer>
+          <Button 
+            type="submit" 
+            disabled={isUpdatingVehicle} 
+            className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]"
           >
-            ביטול
-          </Button>
-          <Button type="submit" disabled={isUpdatingVehicle}>
             {isUpdatingVehicle ? (
               <>
                 <Loader2 className="ml-2 h-4 w-4 animate-spin" />

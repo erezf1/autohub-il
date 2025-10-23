@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { ArrowRight, Loader2, Flame } from "lucide-react";
+import { Loader2, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate } from "react-router-dom";
 import { useBoosts } from "@/hooks/mobile/useBoosts";
 import { VehicleFilterDrawer } from "@/components/mobile/VehicleFilterDrawer";
 import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from "@/utils/mobile/vehicleFilters";
-import { FilterButton } from "@/components/common/FilterButton";
-import { ActiveFiltersDisplay } from "@/components/common/ActiveFiltersDisplay";
-import { ResultsCount } from "@/components/common/ResultsCount";
-import darkCarImage from "@/assets/dark_car.png";
+import {
+  PageContainer,
+  PageHeader,
+  FilterButton,
+  ActiveFiltersDisplay,
+  ResultsCount,
+  VehicleCard,
+} from "@/components/common";
 
 export const HotCarsScreen = () => {
   const [filters, setFilters] = useState<VehicleFilters>({});
@@ -18,46 +21,93 @@ export const HotCarsScreen = () => {
   const navigate = useNavigate();
   const { boostedVehicles, isLoadingBoosted } = useBoosts();
 
+  // Mock vehicles to show while designing UI or when no boosted vehicles available
+  const mockBoostedVehicles = [
+    {
+      id: 'mock-1',
+      images: [],
+      make: { name_hebrew: 'טויוטה' },
+      model: { name_hebrew: 'קורולה' },
+      year: 2020,
+      kilometers: 95000,
+      transmission: 'automatic',
+      fuel_type: 'gasoline',
+      price: 165000,
+      hot_sale_price: 159000,
+      is_boosted: true,
+      boosted_until: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
+    },
+    {
+      id: 'mock-2',
+      images: [],
+      make: { name_hebrew: 'מאזדה' },
+      model: { name_hebrew: 'מז' },
+      year: 2019,
+      kilometers: 120000,
+      transmission: 'manual',
+      fuel_type: 'diesel',
+      price: 129000,
+      hot_sale_price: null,
+      is_boosted: true,
+      boosted_until: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(),
+    },
+    {
+      id: 'mock-3',
+      images: [],
+      make: { name_hebrew: 'הונדה' },
+      model: { name_hebrew: 'אקורד' },
+      year: 2021,
+      kilometers: 45000,
+      transmission: 'automatic',
+      fuel_type: 'hybrid',
+      price: 235000,
+      hot_sale_price: 225000,
+      is_boosted: true,
+      boosted_until: new Date(Date.now() + 1000 * 60 * 60 * 72).toISOString(),
+    }
+  ];
+
+  const sourceVehicles = (boostedVehicles && boostedVehicles.length > 0) ? boostedVehicles : mockBoostedVehicles;
+
   const filteredResults = applyVehicleFilters(
-    boostedVehicles || [],
-    filters
+    sourceVehicles,
+    filters,
+    ""
   );
 
   const activeFilterCount = getActiveFilterCount(filters);
 
   return (
-    <div className="space-y-4" dir="rtl">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate('/mobile/dashboard')}
-          >
-            <ArrowRight className="h-5 w-5" />
-          </Button>
+    <PageContainer>
+      <PageHeader
+        title={
           <div className="flex items-center gap-2">
             <Flame className="h-6 w-6 text-orange-500" />
-            <h1 className="text-2xl font-bold text-foreground hebrew-text">מכירות חמות</h1>
+            <span className="hebrew-text">מכירות חמות</span>
           </div>
-        </div>
-        <Button 
-          variant="outline"
-          onClick={() => navigate('/mobile/boost-management')}
-          className="hebrew-text"
-        >
-          הבוסטים שלי
-        </Button>
-      </div>
+        }
+        onBack={() => navigate('/mobile/dashboard')}
+        rightAction={
+          <GradientBorderContainer className="rounded-md">
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/mobile/boost-management')}
+              className="border-0"
+            >
+              הבוסטים שלי
+            </Button>
+          </GradientBorderContainer>
+        }
+      />
 
-      {/* Results count and filter button */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 mb-4">
         <ResultsCount count={filteredResults.length} isLoading={isLoadingBoosted} />
-        <FilterButton
-          activeCount={activeFilterCount}
-          onClick={() => setFilterDrawerOpen(true)}
-        />
+        <GradientBorderContainer className="rounded-md">
+          <FilterButton
+            activeCount={activeFilterCount}
+            onClick={() => setFilterDrawerOpen(true)}
+          />
+        </GradientBorderContainer>
       </div>
 
       <ActiveFiltersDisplay
@@ -72,70 +122,26 @@ export const HotCarsScreen = () => {
       ) : (
         <div className="space-y-3">
           {filteredResults.map((car) => {
-            const transmissionLabel = car.transmission === 'automatic' ? 'אוטומט' : 
-                                     car.transmission === 'manual' ? 'ידנית' : 'טיפטרוניק';
-            const fuelLabel = car.fuel_type === 'gasoline' ? 'בנזין' :
-                             car.fuel_type === 'diesel' ? 'דיזל' :
-                             car.fuel_type === 'hybrid' ? 'היברידי' : 'חשמלי';
-
             const originalPrice = parseFloat(car.price.toString());
             const hotSalePrice = car.hot_sale_price ? parseFloat(car.hot_sale_price.toString()) : null;
-            const discount = hotSalePrice ? Math.round(((originalPrice - hotSalePrice) / originalPrice) * 100) : 0;
 
             return (
-              <Card 
+              <VehicleCard
                 key={car.id}
-                className="card-interactive cursor-pointer border-orange-200 dark:border-orange-900"
+                id={car.id}
+                images={car.images}
+                makeName={car.make?.name_hebrew || ''}
+                modelName={car.model?.name_hebrew || ''}
+                year={car.year}
+                kilometers={car.kilometers}
+                transmission={car.transmission}
+                fuelType={car.fuel_type}
+                price={car.price}
+                hotSalePrice={car.hot_sale_price}
+                isBoosted={car.is_boosted}
+                boostedUntil={car.boosted_until}
                 onClick={() => navigate(`/mobile/vehicle/${car.id}`)}
-              >
-                <CardContent className="p-0">
-                  <div className="flex h-32">
-                    <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-r-lg">
-                      <img
-                        src={car.images?.[0] || darkCarImage}
-                        alt={`${car.make?.name_hebrew} ${car.model?.name_hebrew}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <Badge className="absolute top-2 left-2 bg-orange-500 hover:bg-orange-600">
-                        <Flame className="h-3 w-3 ml-1" />
-                        מבצע חם
-                      </Badge>
-                      {discount > 0 && (
-                        <Badge className="absolute bottom-2 left-2 bg-red-500">
-                          {discount}% הנחה
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="flex-1 p-4 flex flex-col justify-between">
-                      <div>
-                        <h3 className="font-semibold text-foreground hebrew-text mb-1">
-                          {car.make?.name_hebrew} {car.model?.name_hebrew} {car.year}
-                        </h3>
-                        <p className="text-sm text-muted-foreground hebrew-text">
-                          {car.kilometers?.toLocaleString()} ק״מ • {transmissionLabel} • {fuelLabel}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {hotSalePrice ? (
-                          <>
-                            <p className="text-lg font-bold text-orange-600 hebrew-text">
-                              {hotSalePrice.toLocaleString()} ₪
-                            </p>
-                            <p className="text-sm text-muted-foreground line-through hebrew-text">
-                              {originalPrice.toLocaleString()} ₪
-                            </p>
-                          </>
-                        ) : (
-                          <p className="text-lg font-bold text-primary hebrew-text">
-                            {originalPrice.toLocaleString()} ₪
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              />
             );
           })}
         </div>
@@ -148,6 +154,6 @@ export const HotCarsScreen = () => {
         currentFilters={filters}
         onApplyFilters={setFilters}
       />
-    </div>
+    </PageContainer>
   );
 };

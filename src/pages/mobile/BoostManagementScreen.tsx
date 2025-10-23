@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { ArrowRight, Flame, Plus, X, Loader2 } from "lucide-react";
+import { Flame, Plus, X, Loader2 } from "lucide-react";
+import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate } from "react-router-dom";
 import { useBoosts } from "@/hooks/mobile/useBoosts";
 import { useProfile } from "@/hooks/mobile/useProfile";
@@ -94,16 +96,15 @@ export const BoostManagementScreen = () => {
   };
 
   return (
-    <div className="space-y-4" dir="rtl">
+    <div className="container max-w-md mx-auto px-4 space-y-6" dir="rtl">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon"
+        <div 
           onClick={() => navigate('/mobile/hot-cars')}
+          className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
         >
-          <ArrowRight className="h-5 w-5" />
-        </Button>
+          <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
+        </div>
         <div className="flex items-center gap-2">
           <Flame className="h-6 w-6 text-orange-500" />
           <h1 className="text-2xl font-bold text-foreground hebrew-text">ניהול בוסטים</h1>
@@ -111,132 +112,142 @@ export const BoostManagementScreen = () => {
       </div>
 
       {/* Boost Credits */}
-      <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground hebrew-text">בוסטים נותרים החודש</p>
-              <p className="text-3xl font-bold text-orange-600">{availableBoosts}</p>
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground hebrew-text">בוסטים נותרים החודש</p>
+                <p className="text-3xl font-bold text-orange-500">{availableBoosts}</p>
+              </div>
+              <Flame className="h-12 w-12 text-orange-500" />
             </div>
-            <Flame className="h-12 w-12 text-orange-500" />
-          </div>
-          <p className="text-sm text-muted-foreground hebrew-text mt-4">
-            הבוסטים מתאפסים בתחילת כל חודש לפי המנוי שלך
-          </p>
-        </CardContent>
-      </Card>
+            <p className="text-sm text-muted-foreground hebrew-text mt-4">
+              הבוסטים מתאפסים בתחילת כל חודש לפי המנוי שלך
+            </p>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Subscription Info */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground hebrew-text">סוג מנוי:</span>
-              <span className="font-semibold hebrew-text">
-                {profile?.subscription_type === 'silver' ? 'כסף (5 בוסטים/חודש)' : 
-                 profile?.subscription_type === 'unlimited' ? 'בלתי מוגבל (10 בוסטים/חודש)' :
-                 'רגיל (ללא בוסטים)'}
-              </span>
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardContent className="p-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground hebrew-text">סוג מנוי:</span>
+                <span className="font-semibold text-white hebrew-text">
+                  {profile?.subscription_type === 'silver' ? 'כסף (5 בוסטים/חודש)' : 
+                   profile?.subscription_type === 'unlimited' ? 'בלתי מוגבל (10 בוסטים/חודש)' :
+                   'רגיל (ללא בוסטים)'}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground hebrew-text">
+                לשדרוג מנוי או הוספת בוסטים, צור קשר עם המנהל
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground hebrew-text">
-              לשדרוג מנוי או הוספת בוסטים, צור קשר עם המנהל
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Active Boosts */}
       {activeBoosted.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="hebrew-text">בוסטים פעילים ({activeBoosted.length})</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {activeBoosted.map((vehicle) => (
-              <div key={vehicle.id} className="flex gap-3 p-3 bg-muted/50 rounded-lg">
-                <img
-                  src={vehicle.images?.[0] || darkCarImage}
-                  alt="vehicle"
-                  className="w-20 h-20 object-cover rounded"
-                />
-                <div className="flex-1">
-                  <h3 className="font-semibold hebrew-text">
-                    {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline" className="text-xs">
-                      {getRemainingTime(vehicle.boosted_until)}
-                    </Badge>
-                    {vehicle.hot_sale_price && (
-                      <span className="text-sm text-orange-600 font-semibold">
-                        {parseFloat(vehicle.hot_sale_price.toString()).toLocaleString()} ₪
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deactivateBoost(vehicle.id)}
-                  disabled={isDeactivating}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Eligible Vehicles */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="hebrew-text">רכבים זמינים לבוסט</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoadingMy ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : eligibleVehicles.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground hebrew-text mb-4">אין רכבים זמינים</p>
-              <Button onClick={() => navigate('/mobile/add-vehicle')}>
-                <Plus className="h-4 w-4 ml-2" />
-                הוסף רכב
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {eligibleVehicles.map((vehicle) => (
-                <div key={vehicle.id} className="flex gap-3 p-3 border rounded-lg">
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-white hebrew-text">בוסטים פעילים ({activeBoosted.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {activeBoosted.map((vehicle) => (
+                <div key={vehicle.id} className="flex gap-3 p-3 bg-muted/50 rounded-lg">
                   <img
                     src={vehicle.images?.[0] || darkCarImage}
                     alt="vehicle"
                     className="w-20 h-20 object-cover rounded"
                   />
                   <div className="flex-1">
-                    <h3 className="font-semibold hebrew-text">
+                    <h3 className="font-semibold text-white hebrew-text">
                       {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
                     </h3>
-                    <p className="text-sm text-muted-foreground hebrew-text mt-1">
-                      {parseFloat(vehicle.price.toString()).toLocaleString()} ₪
-                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-xs hebrew-text">
+                        {getRemainingTime(vehicle.boosted_until)}
+                      </Badge>
+                      {vehicle.hot_sale_price && (
+                        <span className="text-sm text-orange-500 font-semibold hebrew-text">
+                          ₪{parseFloat(vehicle.hot_sale_price.toString()).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <Button
+                    variant="ghost"
                     size="sm"
-                    onClick={() => handleOpenBoostDialog(vehicle)}
-                    disabled={availableBoosts === 0}
+                    onClick={() => deactivateBoost(vehicle.id)}
+                    disabled={isDeactivating}
+                    className="hebrew-text"
                   >
-                    <Flame className="h-4 w-4 ml-2" />
-                    בוסט
+                    <X className="h-4 w-4" />
                   </Button>
                 </div>
               ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
+      )}
+
+      {/* Eligible Vehicles */}
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="text-white hebrew-text">רכבים זמינים לבוסט</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingMy ? (
+              <div className="flex justify-center items-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : eligibleVehicles.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground hebrew-text mb-4">אין רכבים זמינים</p>
+                <Button onClick={() => navigate('/mobile/add-vehicle')} className="hebrew-text">
+                  <Plus className="h-4 w-4 ml-2" />
+                  הוסף רכב
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {eligibleVehicles.map((vehicle) => (
+                  <div key={vehicle.id} className="flex gap-3 p-3 border border-border rounded-lg">
+                    <img
+                      src={vehicle.images?.[0] || darkCarImage}
+                      alt="vehicle"
+                      className="w-20 h-20 object-cover rounded"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-white hebrew-text">
+                        {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
+                      </h3>
+                      <p className="text-sm text-muted-foreground hebrew-text mt-1">
+                        ₪{parseFloat(vehicle.price.toString()).toLocaleString()}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => handleOpenBoostDialog(vehicle)}
+                      disabled={availableBoosts === 0}
+                      className="hebrew-text"
+                    >
+                      <Flame className="h-4 w-4 ml-2" />
+                      בוסט
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Boost Dialog */}
       <Dialog open={boostDialogOpen} onOpenChange={setBoostDialogOpen}>
@@ -274,6 +285,8 @@ export const BoostManagementScreen = () => {
                   value={hotSalePrice}
                   onChange={(e) => setHotSalePrice(e.target.value)}
                   placeholder="הזן מחיר מופחת"
+                  className="text-right hebrew-text"
+                  dir="rtl"
                 />
                 {hotSalePrice && parseFloat(hotSalePrice) < parseFloat(selectedVehicle.price.toString()) && (
                   <p className="text-sm text-success hebrew-text">
@@ -299,7 +312,7 @@ export const BoostManagementScreen = () => {
 
               <div className="flex gap-2">
                 <Button
-                  className="flex-1"
+                  className="flex-1 hebrew-text"
                   onClick={handleActivateBoost}
                   disabled={isActivating}
                 >
@@ -308,6 +321,7 @@ export const BoostManagementScreen = () => {
                 <Button
                   variant="outline"
                   onClick={() => setBoostDialogOpen(false)}
+                  className="hebrew-text"
                 >
                   ביטול
                 </Button>

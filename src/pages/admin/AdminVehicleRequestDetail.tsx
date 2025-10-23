@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { GradientSeparator } from "@/components/ui/gradient-separator";
 
 // Mock request data
 const mockRequestData = {
@@ -120,140 +122,153 @@ const AdminVehicleRequestDetail = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/admin/vehicle-requests')}
-          className="hebrew-text"
-        >
-          <ArrowRight className="h-4 w-4 ml-1" />
-          חזור לרשימת בקשות
-        </Button>
-      </div>
-
+    <div className="space-y-8">
+      {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold hebrew-text">{mockRequestData.title}</h1>
-          <p className="text-lg text-muted-foreground hebrew-text mt-1">בקשה #{mockRequestData.id}</p>
+          <h1 className="text-4xl font-bold text-foreground hebrew-text">{mockRequestData.title}</h1>
+          <p className="text-lg text-muted-foreground hebrew-text mt-2">בקשה #{mockRequestData.id}</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="hebrew-text">
+          <Button 
+            variant="outline" 
+            className="hebrew-text btn-hover-cyan"
+          >
             <Edit className="h-4 w-4 ml-2" />
             עריכת בקשה
           </Button>
-          <Button className="hebrew-text">
+          <Button className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] hebrew-text">
             <MessageSquare className="h-4 w-4 ml-2" />
             יצירת קשר עם מבקש
           </Button>
         </div>
       </div>
 
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/admin/vehicle-requests')}
+          className="hebrew-text btn-hover-cyan"
+        >
+          <ArrowRight className="h-4 w-4 ml-1" />
+          חזור לרשימת בקשות
+        </Button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">סטטוס</p>
-                <div className="mt-2">
-                  {getStatusBadge(mockRequestData.status)}
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground hebrew-text">סטטוס</p>
+                  <div className="mt-2">
+                    {getStatusBadge(mockRequestData.status)}
+                  </div>
                 </div>
+                <CheckCircle className="h-8 w-8 text-success" />
               </div>
-              <CheckCircle className="h-8 w-8 text-success" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">עדיפות</p>
-                <div className="mt-2">
-                  {getPriorityBadge(mockRequestData.priority)}
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground hebrew-text">עדיפות</p>
+                  <div className="mt-2">
+                    {getPriorityBadge(mockRequestData.priority)}
+                  </div>
                 </div>
+                <Clock className="h-8 w-8 text-warning" />
               </div>
-              <Clock className="h-8 w-8 text-warning" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">צפיות</p>
-                <p className="text-2xl font-bold">{mockRequestData.viewsCount}</p>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground hebrew-text">צפיות</p>
+                  <p className="text-2xl font-bold">{mockRequestData.viewsCount}</p>
+                </div>
+                <User className="h-8 w-8 text-blue-500" />
               </div>
-              <User className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">הצעות</p>
-                <p className="text-2xl font-bold">{mockRequestData.offersCount}</p>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground hebrew-text">הצעות</p>
+                  <p className="text-2xl font-bold">{mockRequestData.offersCount}</p>
+                </div>
+                <DollarSign className="h-8 w-8 text-green-500" />
               </div>
-              <DollarSign className="h-8 w-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       </div>
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="details" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3" dir="rtl">
+        <TabsList className="grid w-full grid-cols-3 bg-gray-900" dir="rtl">
           <TabsTrigger value="offers" className="hebrew-text">הצעות ({mockOffers.length})</TabsTrigger>
           <TabsTrigger value="requester" className="hebrew-text">פרטי מבקש</TabsTrigger>
           <TabsTrigger value="details" className="hebrew-text">פרטי הבקשה</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text text-right">פרטי הבקשה המלאים</CardTitle>
-            </CardHeader>
-            <CardContent dir="rtl">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-right" dir="rtl">
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-lg hebrew-text mb-3">תיאור הבקשה</h3>
-                    <p className="text-muted-foreground hebrew-text leading-relaxed">
-                      {mockRequestData.description}
-                    </p>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="hebrew-text text-right text-white">פרטי הבקשה המלאים</CardTitle>
+              </CardHeader>
+              <CardContent dir="rtl">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-right" dir="rtl">
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="font-semibold text-lg hebrew-text mb-3">תיאור הבקשה</h3>
+                      <p className="text-muted-foreground hebrew-text leading-relaxed">
+                        {mockRequestData.description}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-semibold text-lg hebrew-text mb-3">דרישות טכניות</h3>
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground hebrew-text">טווח שנים:</span>
+                            <span className="font-medium">{mockRequestData.yearRange}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground hebrew-text">מקסימום ק"מ:</span>
+                            <span className="font-medium">{mockRequestData.maxKilometers.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground hebrew-text">תיבת הילוכים:</span>
+                            <span className="font-medium hebrew-text">{mockRequestData.transmissionType}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground hebrew-text">סוג דלק:</span>
+                            <span className="font-medium hebrew-text">{mockRequestData.fuelType}</span>
+                          </div>
+                        </div>
+                    </div>
                   </div>
-                  
-                  <div>
-                    <h3 className="font-semibold text-lg hebrew-text mb-3">דרישות טכניות</h3>
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground hebrew-text">טווח שנים:</span>
-                          <span className="font-medium">{mockRequestData.yearRange}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground hebrew-text">מקסימום ק"מ:</span>
-                          <span className="font-medium">{mockRequestData.maxKilometers.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground hebrew-text">תיבת הילוכים:</span>
-                          <span className="font-medium hebrew-text">{mockRequestData.transmissionType}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground hebrew-text">סוג דלק:</span>
-                          <span className="font-medium hebrew-text">{mockRequestData.fuelType}</span>
-                        </div>
-                      </div>
-                  </div>
-                </div>
 
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-lg hebrew-text mb-3">תקציב ומיקום</h3>
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="font-semibold text-lg hebrew-text mb-3">תקציב ומיקום</h3>
                         <div className="space-y-3">
                           <div className="flex justify-between">
                             <span className="text-muted-foreground hebrew-text">תקציב מינימלי:</span>
@@ -268,19 +283,19 @@ const AdminVehicleRequestDetail = () => {
                             <span className="font-medium hebrew-text">{mockRequestData.location}</span>
                           </div>
                         </div>
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold text-lg hebrew-text mb-3">צבעים מועדפים</h3>
-                    <div className="flex gap-2 flex-wrap justify-end">
-                      {mockRequestData.preferredColors.map((color, index) => (
-                        <Badge key={index} variant="outline" className="hebrew-text">{color}</Badge>
-                      ))}
                     </div>
-                  </div>
 
-                  <div>
-                    <h3 className="font-semibold text-lg hebrew-text mb-3">מידע נוסף</h3>
+                    <div>
+                      <h3 className="font-semibold text-lg hebrew-text mb-3">צבעים מועדפים</h3>
+                      <div className="flex gap-2 flex-wrap justify-end">
+                        {mockRequestData.preferredColors.map((color, index) => (
+                          <Badge key={index} variant="outline" className="hebrew-text">{color}</Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold text-lg hebrew-text mb-3">מידע נוסף</h3>
                         <div className="space-y-3">
                           <div className="flex justify-between">
                             <span className="text-muted-foreground hebrew-text">תאריך פרסום:</span>
@@ -295,107 +310,117 @@ const AdminVehicleRequestDetail = () => {
                             <span className="font-medium hebrew-text">{mockRequestData.responseTime}</span>
                           </div>
                         </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
         </TabsContent>
 
         <TabsContent value="requester">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">פרטי המבקש</CardTitle>
-            </CardHeader>
-            <CardContent dir="rtl">
-              <div className="space-y-6 text-right">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-                    <User className="h-8 w-8 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold hebrew-text">{mockRequestData.requester.name}</h3>
-                    <p className="text-muted-foreground hebrew-text">{mockRequestData.requester.business}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-muted-foreground hebrew-text">דירוג:</span>
-                      <span className="font-medium">{mockRequestData.requester.rating}/5</span>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="hebrew-text text-white">פרטי המבקש</CardTitle>
+              </CardHeader>
+              <CardContent dir="rtl">
+                <div className="space-y-6 text-right">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+                      <User className="h-8 w-8 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold hebrew-text">{mockRequestData.requester.name}</h3>
+                      <p className="text-muted-foreground hebrew-text">{mockRequestData.requester.business}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-sm text-muted-foreground hebrew-text">דירוג:</span>
+                        <span className="font-medium">{mockRequestData.requester.rating}/5</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <MessageSquare className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground hebrew-text">דוא"ל</p>
-                        <p className="font-medium">{mockRequestData.requester.email}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-muted-foreground hebrew-text">דוא"ל</p>
+                          <p className="font-medium">{mockRequestData.requester.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <User className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-muted-foreground hebrew-text">טלפון</p>
+                          <p className="font-medium">{mockRequestData.requester.phone}</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <User className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground hebrew-text">טלפון</p>
-                        <p className="font-medium">{mockRequestData.requester.phone}</p>
-                      </div>
+                    <div className="space-y-4">
+                      <Button className="w-full hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
+                        <MessageSquare className="h-4 w-4 ml-2" />
+                        שלח הודעה
+                      </Button>
+                      <Button variant="outline" className="w-full hebrew-text btn-hover-cyan">
+                        <User className="h-4 w-4 ml-2" />
+                        צפה בפרופיל המלא
+                      </Button>
                     </div>
-                  </div>
-                  <div className="space-y-4">
-                    <Button className="w-full hebrew-text">
-                      <MessageSquare className="h-4 w-4 ml-2" />
-                      שלח הודעה
-                    </Button>
-                    <Button variant="outline" className="w-full hebrew-text">
-                      <User className="h-4 w-4 ml-2" />
-                      צפה בפרופיל המלא
-                    </Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
         </TabsContent>
 
         <TabsContent value="offers">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">הצעות שהתקבלו</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right hebrew-text">סוחר</TableHead>
-                    <TableHead className="text-right hebrew-text">רכב</TableHead>
-                    <TableHead className="text-right hebrew-text">מחיר</TableHead>
-                    <TableHead className="text-right hebrew-text">ק"מ</TableHead>
-                    <TableHead className="text-right hebrew-text">צבע</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">תאריך</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockOffers.map((offer) => (
-                    <TableRow key={offer.id}>
-                      <TableCell className="font-medium hebrew-text">{offer.dealer}</TableCell>
-                      <TableCell className="hebrew-text">{offer.vehicle}</TableCell>
-                      <TableCell className="hebrew-text">₪{offer.price.toLocaleString()}</TableCell>
-                      <TableCell>{offer.kilometers.toLocaleString()}</TableCell>
-                      <TableCell className="hebrew-text">{offer.color}</TableCell>
-                      <TableCell>{getOfferStatusBadge(offer.status)}</TableCell>
-                      <TableCell>{new Date(offer.date).toLocaleDateString('he-IL')}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" className="hebrew-text">
-                          צפה בפרטים
-                        </Button>
-                      </TableCell>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="hebrew-text text-white">הצעות שהתקבלו</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right hebrew-text text-base text-white">סוחר</TableHead>
+                      <TableHead className="text-right hebrew-text text-base text-white">רכב</TableHead>
+                      <TableHead className="text-right hebrew-text text-base text-white">מחיר</TableHead>
+                      <TableHead className="text-right hebrew-text text-base text-white">ק"מ</TableHead>
+                      <TableHead className="text-right hebrew-text text-base text-white">צבע</TableHead>
+                      <TableHead className="text-right hebrew-text text-base text-white">סטטוס</TableHead>
+                      <TableHead className="text-right hebrew-text text-base text-white">תאריך</TableHead>
+                      <TableHead className="text-right hebrew-text text-base text-white">פעולות</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {mockOffers.map((offer) => (
+                      <TableRow 
+                        key={offer.id} 
+                        className="h-16 hover:bg-muted/50"
+                      >
+                        <TableCell className="font-medium hebrew-text text-base text-white">
+                          {offer.dealer}
+                        </TableCell>
+                        <TableCell className="hebrew-text text-base text-white">{offer.vehicle}</TableCell>
+                        <TableCell className="hebrew-text text-base text-white">₪{offer.price.toLocaleString()}</TableCell>
+                        <TableCell className="text-base text-white">{offer.kilometers.toLocaleString()}</TableCell>
+                        <TableCell className="hebrew-text text-base text-white">{offer.color}</TableCell>
+                        <TableCell>{getOfferStatusBadge(offer.status)}</TableCell>
+                        <TableCell className="hebrew-text text-base text-white">{new Date(offer.date).toLocaleDateString('he-IL')}</TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm" className="hebrew-text btn-hover-cyan">
+                            צפה בפרטים
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
         </TabsContent>
       </Tabs>
     </div>

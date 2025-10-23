@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { GradientSeparator } from "@/components/ui/gradient-separator";
 const statsData = [
   {
     title: "משתמשים",
@@ -116,128 +118,141 @@ const AdminDashboard = () => {
         {/* Stats Grid - Desktop Optimized */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-8">
           {statsData.map((stat) => (
-            <Card key={stat.title} className="card-interactive cursor-pointer hover:shadow-lg">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center justify-between text-xl">
-                  <span className="hebrew-text">{stat.title}</span>
-                  <stat.icon className="h-6 w-6 text-muted-foreground" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div 
-                    className="text-4xl font-bold text-primary cursor-pointer hover:underline"
-                    onClick={() => handleStatsClick(stat.link)}
-                  >
-                    {stat.total.toLocaleString()}
-                  </div>
-                  
-                  <div className="flex items-center gap-6">
+            <GradientBorderContainer key={stat.title} className="rounded-md">
+              <Card className="bg-black border-0 rounded-md cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center justify-between text-xl">
+                    <span className="hebrew-text text-white">{stat.title}</span>
+                    <stat.icon className="h-6 w-6 text-primary" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
                     <div 
-                      className="flex items-center gap-2 text-sm cursor-pointer hover:underline"
-                      onClick={() => handleStatsClick(stat.link, 'new')}
+                      className="text-4xl font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => handleStatsClick(stat.link)}
                     >
-                      <TrendingUp className="h-4 w-4 text-success" />
-                      <span className="text-success hebrew-text font-medium">{stat.new} חדשים</span>
+                      {stat.total.toLocaleString()}
                     </div>
                     
-                    {stat.pending > 0 && (
+                    <GradientSeparator />
+                    
+                    <div className="flex items-center gap-6">
                       <div 
-                        className="flex items-center gap-2 text-sm cursor-pointer hover:underline"
-                        onClick={() => handleStatsClick(stat.link, 'pending')}
+                        className="flex items-center gap-2 text-sm cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => handleStatsClick(stat.link, 'new')}
                       >
-                        <Clock className="h-4 w-4 text-warning" />
-                        <span className="text-warning hebrew-text font-medium">{stat.pending} ממתינים</span>
+                        <TrendingUp className="h-4 w-4 text-success" />
+                        <span className="text-success hebrew-text font-medium">{stat.new} חדשים</span>
                       </div>
-                    )}
+                      
+                      {stat.pending > 0 && (
+                        <div 
+                          className="flex items-center gap-2 text-sm cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => handleStatsClick(stat.link, 'pending')}
+                        >
+                          <Clock className="h-4 w-4 text-warning" />
+                          <span className="text-warning hebrew-text font-medium">{stat.pending} ממתינים</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </GradientBorderContainer>
           ))}
         </div>
 
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Recent Notifications - Larger Card */}
-          <Card className="xl:col-span-2">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl hebrew-text">התראות אחרונות</CardTitle>
-                <Button variant="outline" className="hebrew-text">
-                  צפה בהכל
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentNotifications.map((notification) => (
-                  <div 
-                    key={notification.id}
-                    className="flex items-center justify-between p-4 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-colors"
-                    onClick={() => handleNotificationClick(notification.link)}
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium hebrew-text">{notification.message}</p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <Badge variant="secondary">
-                          {notification.type === 'pending' && 'ממתין לאישור'}
-                          {notification.type === 'report' && 'דיווח'}
-                          {notification.type === 'auction' && 'מכירה פומבית'}
-                          {notification.type === 'info' && 'מידע'}
-                          {notification.type === 'system' && 'מערכת'}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground hebrew-text">{notification.time}</span>
+          <GradientBorderContainer className="rounded-md xl:col-span-2">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-2xl hebrew-text text-white">התראות אחרונות</CardTitle>
+                  <Button variant="outline" className="hebrew-text btn-hover-cyan">
+                    צפה בהכל
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {recentNotifications.map((notification, index) => (
+                    <div key={notification.id}>
+                      <div 
+                        className="flex items-center justify-between p-4 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-colors"
+                        onClick={() => handleNotificationClick(notification.link)}
+                      >
+                        <div className="flex-1">
+                          <p className="font-medium hebrew-text text-white">{notification.message}</p>
+                          <div className="flex items-center gap-3 mt-2">
+                            <Badge variant="secondary" className="hebrew-text">
+                              {notification.type === 'pending' && 'ממתין לאישור'}
+                              {notification.type === 'report' && 'דיווח'}
+                              {notification.type === 'auction' && 'מכירה פומבית'}
+                              {notification.type === 'info' && 'מידע'}
+                              {notification.type === 'system' && 'מערכת'}
+                            </Badge>
+                            <span className="text-sm text-muted-foreground hebrew-text">{notification.time}</span>
+                          </div>
+                        </div>
                       </div>
+                      {index < recentNotifications.length - 1 && <GradientSeparator className="my-4" />}
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
 
           {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl hebrew-text">פעולות מהירות</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start hebrew-text"
-                  onClick={() => navigate('/admin/users')}
-                >
-                  <Users className="ml-2 h-4 w-4" />
-                  ניהול משתמשים
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start hebrew-text"
-                  onClick={() => navigate('/admin/vehicles')}
-                >
-                  <Car className="ml-2 h-4 w-4" />
-                  הוסף רכב חדש
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start hebrew-text"
-                  onClick={() => navigate('/admin/auctions')}
-                >
-                  <Gavel className="ml-2 h-4 w-4" />
-                  צור מכירה פומבית
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start hebrew-text"
-                  onClick={() => navigate('/admin/reports')}
-                >
-                  <FileBarChart className="ml-2 h-4 w-4" />
-                  צפה בדוחות
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-xl hebrew-text text-white">פעולות מהירות</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start hebrew-text btn-hover-cyan"
+                    onClick={() => navigate('/admin/users')}
+                  >
+                    <Users className="ml-2 h-4 w-4" />
+                    ניהול משתמשים
+                  </Button>
+                  <GradientSeparator />
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start hebrew-text btn-hover-cyan"
+                    onClick={() => navigate('/admin/vehicles')}
+                  >
+                    <Car className="ml-2 h-4 w-4" />
+                    הוסף רכב חדש
+                  </Button>
+                  <GradientSeparator />
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start hebrew-text btn-hover-cyan"
+                    onClick={() => navigate('/admin/auctions')}
+                  >
+                    <Gavel className="ml-2 h-4 w-4" />
+                    צור מכירה פומבית
+                  </Button>
+                  <GradientSeparator />
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start hebrew-text btn-hover-cyan"
+                    onClick={() => navigate('/admin/reports')}
+                  >
+                    <FileBarChart className="ml-2 h-4 w-4" />
+                    צפה בדוחות
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
         </div>
       </div>
   );

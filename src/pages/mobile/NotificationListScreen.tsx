@@ -1,6 +1,7 @@
 import { FileText, Gavel, MessageCircle, Car, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate } from "react-router-dom";
 
 // Mock data for notifications
@@ -70,16 +71,16 @@ const notificationsByDate = {
 const getIconColor = (type: string) => {
   switch (type) {
     case "iso_match":
-      return "text-primary";
+      return "text-blue-400";
     case "auction_bid":
     case "auction_ending":
-      return "text-auction";
+      return "text-orange-400";
     case "message":
-      return "text-accent";
+      return "text-green-400";
     case "car_sold":
-      return "text-success";
+      return "text-emerald-400";
     default:
-      return "text-muted-foreground";
+      return "text-gray-400";
   }
 };
 
@@ -123,47 +124,52 @@ const NotificationListScreen = () => {
             {notifications.map((notification) => {
               const Icon = notification.icon;
               return (
-                <Card 
+                <GradientBorderContainer
                   key={notification.id}
-                  className="card-interactive cursor-pointer"
-                  onClick={() => handleNotificationClick(notification)}
+         
+                  className="rounded-md"
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-3 space-x-reverse">
-                      {/* Icon */}
-                      <div className={`p-2 rounded-full bg-muted ${getIconColor(notification.type)}`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
+                  <Card 
+                    className="card-interactive cursor-pointer bg-black border-0"
+                    onClick={() => handleNotificationClick(notification)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-3 space-x-reverse">
+                        {/* Icon */}
+                        <div className={`p-2 rounded-full bg-gray-800 ${getIconColor(notification.type)}`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
 
-                      {/* Notification Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            {/* Title with unread indicator */}
-                            <div className="flex items-center space-x-2 space-x-reverse mb-1">
-                              <h3 className="font-semibold text-foreground hebrew-text">
-                                {notification.title}
-                              </h3>
-                              {notification.isUnread && (
-                                <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
-                              )}
+                        {/* Notification Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              {/* Title with unread indicator */}
+                              <div className="flex items-center space-x-2 space-x-reverse mb-1">
+                                <h3 className="font-semibold text-white hebrew-text">
+                                  {notification.title}
+                                </h3>
+                                {notification.isUnread && (
+                                  <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0" />
+                                )}
+                              </div>
+                              
+                              {/* Description */}
+                              <p className="text-sm text-gray-300 hebrew-text">
+                                {notification.description}
+                              </p>
                             </div>
-                            
-                            {/* Description */}
-                            <p className="text-sm text-muted-foreground hebrew-text">
-                              {notification.description}
-                            </p>
-                          </div>
 
-                          {/* Timestamp */}
-                          <span className="text-xs text-muted-foreground flex-shrink-0 mr-2">
-                            {notification.timestamp}
-                          </span>
+                            {/* Timestamp */}
+                            <span className="text-xs text-gray-400 flex-shrink-0 mr-2">
+                              {notification.timestamp}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </GradientBorderContainer>
               );
             })}
           </div>

@@ -1,0 +1,13 @@
+[phases.setup]
+nixPkgs = ["nodejs_18"]
+
+[phases.build]
+cmds = ["chmod +x build.sh", "./build.sh", "npm install -g serve"]
+
+[phases.start]
+cmd = "chmod +x start-simple.sh && ./start-simple.sh"
+
+[variables]
+NODE_ENV = "development"
+NIXPACKS_NO_DENO = "1"
+NIXPACKS_PROVIDER = "node"

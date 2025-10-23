@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 
 // Mock auction data
 const mockAuctionData = {
@@ -105,7 +106,7 @@ const AdminAuctionDetail = () => {
         <Button 
           variant="ghost" 
           onClick={() => navigate('/admin/auctions')}
-          className="hebrew-text"
+          className="hebrew-text btn-hover-cyan"
         >
           <ArrowRight className="h-4 w-4 ml-1" />
           חזור לרשימת מכירות פומביות
@@ -114,307 +115,332 @@ const AdminAuctionDetail = () => {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold hebrew-text">{mockAuctionData.title}</h1>
-          <p className="text-lg text-muted-foreground hebrew-text mt-1">מכירה פומבית #{mockAuctionData.id}</p>
+          <h1 className="text-3xl font-bold text-white hebrew-text">{mockAuctionData.title}</h1>
+          <p className="text-lg text-white/70 hebrew-text mt-1">מכירה פומבית #{mockAuctionData.id}</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="hebrew-text">
+          <Button 
+            variant="outline" 
+            className="hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
+          >
             <Edit className="h-4 w-4 ml-2" />
             עריכת מכירה
           </Button>
           <Button variant="destructive" className="hebrew-text">
             ביטול מכירה
           </Button>
-          <Button className="hebrew-text">צפייה כמשתמש</Button>
+          <Button className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] hebrew-text">צפייה כמשתמש</Button>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">הצעה נוכחית</p>
-                <p className="text-2xl font-bold">₪{mockAuctionData.auction.currentBid.toLocaleString()}</p>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-white/70 hebrew-text">הצעה נוכחית</p>
+                  <p className="text-2xl font-bold text-white">₪{mockAuctionData.auction.currentBid.toLocaleString()}</p>
+                </div>
+                <DollarSign className="h-8 w-8 text-success" />
               </div>
-              <DollarSign className="h-8 w-8 text-success" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">זמן נותר</p>
-                <p className={`text-xl font-bold hebrew-text ${getTimeRemainingColor(mockAuctionData.auction.timeRemaining)}`}>
-                  {mockAuctionData.auction.timeRemaining}
-                </p>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-white/70 hebrew-text">זמן נותר</p>
+                  <p className={`text-xl font-bold hebrew-text ${getTimeRemainingColor(mockAuctionData.auction.timeRemaining)}`}>
+                    {mockAuctionData.auction.timeRemaining}
+                  </p>
+                </div>
+                <Clock className="h-8 w-8 text-warning" />
               </div>
-              <Clock className="h-8 w-8 text-warning" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">הצעות</p>
-                <p className="text-2xl font-bold">{mockAuctionData.auction.totalBids}</p>
-                <p className="text-xs text-muted-foreground hebrew-text">{mockAuctionData.auction.uniqueBidders} מציעים</p>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-white/70 hebrew-text">הצעות</p>
+                  <p className="text-2xl font-bold text-white">{mockAuctionData.auction.totalBids}</p>
+                  <p className="text-xs text-white/70 hebrew-text">{mockAuctionData.auction.uniqueBidders} מציעים</p>
+                </div>
+                <Gavel className="h-8 w-8 text-primary" />
               </div>
-              <Gavel className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground hebrew-text">צפיות</p>
-                <p className="text-2xl font-bold">{mockAuctionData.auction.viewsCount}</p>
-                <p className="text-xs text-muted-foreground hebrew-text">{mockAuctionData.auction.watchersCount} עוקבים</p>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-white/70 hebrew-text">צפיות</p>
+                  <p className="text-2xl font-bold text-white">{mockAuctionData.auction.viewsCount}</p>
+                  <p className="text-xs text-white/70 hebrew-text">{mockAuctionData.auction.watchersCount} עוקבים</p>
+                </div>
+                <Eye className="h-8 w-8 text-blue-500" />
               </div>
-              <Eye className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       </div>
 
       {/* Status and Details */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">סטטוס מכירה</p>
-                {getStatusBadge(mockAuctionData.auction.status)}
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-sm text-white/70 hebrew-text">סטטוס מכירה</p>
+                  {getStatusBadge(mockAuctionData.auction.status)}
+                </div>
+                <div>
+                  <p className="text-sm text-white/70 hebrew-text">מחיר מינימלי</p>
+                  <p className="font-medium text-white">₪{mockAuctionData.auction.reservePrice.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-white/70 hebrew-text">מחיר פתיחה</p>
+                  <p className="font-medium text-white">₪{mockAuctionData.auction.startingPrice.toLocaleString()}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">מחיר מינימלי</p>
-                <p className="font-medium">₪{mockAuctionData.auction.reservePrice.toLocaleString()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">מחיר פתיחה</p>
-                <p className="font-medium">₪{mockAuctionData.auction.startingPrice.toLocaleString()}</p>
+              <div className="text-left">
+                <p className="text-sm text-white/70 hebrew-text">זמני מכירה</p>
+                <p className="font-medium text-white">{mockAuctionData.auction.startTime} - {mockAuctionData.auction.endTime}</p>
               </div>
             </div>
-            <div className="text-left">
-              <p className="text-sm text-muted-foreground hebrew-text">זמני מכירה</p>
-              <p className="font-medium">{mockAuctionData.auction.startTime} - {mockAuctionData.auction.endTime}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="vehicle" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4" dir="rtl">
-          <TabsTrigger value="activity" className="hebrew-text">פעילות</TabsTrigger>
-          <TabsTrigger value="bids" className="hebrew-text">הצעות ({mockBids.length})</TabsTrigger>
-          <TabsTrigger value="seller" className="hebrew-text">פרטי מוכר</TabsTrigger>
-          <TabsTrigger value="vehicle" className="hebrew-text">פרטי רכב</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 bg-gray-900" dir="rtl">
+          <TabsTrigger value="activity" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">פעילות</TabsTrigger>
+          <TabsTrigger value="bids" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">הצעות ({mockBids.length})</TabsTrigger>
+          <TabsTrigger value="seller" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">פרטי מוכר</TabsTrigger>
+          <TabsTrigger value="vehicle" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">פרטי רכב</TabsTrigger>
         </TabsList>
 
         <TabsContent value="vehicle">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="hebrew-text text-right">מפרט טכני</CardTitle>
-              </CardHeader>
-              <CardContent dir="rtl">
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4 text-right">
-                    <div>
-                      <p className="text-sm text-muted-foreground hebrew-text">יצרן</p>
-                      <p className="font-medium hebrew-text">{mockAuctionData.vehicle.make}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground hebrew-text">דגם</p>
-                      <p className="font-medium hebrew-text">{mockAuctionData.vehicle.model}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground hebrew-text">שנת ייצור</p>
-                      <p className="font-medium">{mockAuctionData.vehicle.year}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground hebrew-text">קילומטראז'</p>
-                      <p className="font-medium">{mockAuctionData.vehicle.kilometers.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground hebrew-text">סוג דלק</p>
-                      <p className="font-medium hebrew-text">{mockAuctionData.vehicle.fuelType}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
-                      <p className="font-medium hebrew-text">{mockAuctionData.vehicle.transmission}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
-                      <p className="font-medium hebrew-text">{mockAuctionData.vehicle.color}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground hebrew-text">יד</p>
-                      <p className="font-medium hebrew-text">{mockAuctionData.vehicle.hand}</p>
+            <GradientBorderContainer className="rounded-md">
+              <Card className="bg-black border-0 rounded-md">
+                <CardHeader>
+                  <CardTitle className="hebrew-text text-right text-white">מפרט טכני</CardTitle>
+                </CardHeader>
+                <CardContent dir="rtl">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4 text-right">
+                      <div>
+                        <p className="text-sm text-white/70 hebrew-text">יצרן</p>
+                        <p className="font-medium hebrew-text text-white">{mockAuctionData.vehicle.make}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 hebrew-text">דגם</p>
+                        <p className="font-medium hebrew-text text-white">{mockAuctionData.vehicle.model}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 hebrew-text">שנת ייצור</p>
+                        <p className="font-medium text-white">{mockAuctionData.vehicle.year}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 hebrew-text">קילומטראז'</p>
+                        <p className="font-medium text-white">{mockAuctionData.vehicle.kilometers.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 hebrew-text">סוג דלק</p>
+                        <p className="font-medium hebrew-text text-white">{mockAuctionData.vehicle.fuelType}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 hebrew-text">תיבת הילוכים</p>
+                        <p className="font-medium hebrew-text text-white">{mockAuctionData.vehicle.transmission}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 hebrew-text">צבע</p>
+                        <p className="font-medium hebrew-text text-white">{mockAuctionData.vehicle.color}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 hebrew-text">יד</p>
+                        <p className="font-medium hebrew-text text-white">{mockAuctionData.vehicle.hand}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </GradientBorderContainer>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="hebrew-text text-right">תיאור ואבזור</CardTitle>
-              </CardHeader>
-              <CardContent dir="rtl">
-                <div className="space-y-4 text-right">
-                  <div>
-                    <h4 className="font-medium hebrew-text mb-2">תיאור</h4>
-                    <p className="text-sm text-muted-foreground hebrew-text leading-relaxed">
-                      {mockAuctionData.description}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium hebrew-text mb-2">אבזור נוסף</h4>
-                    <div className="flex flex-wrap gap-2 justify-end">
-                      {mockAuctionData.features.map((feature, index) => (
-                        <Badge key={index} variant="outline" className="hebrew-text">{feature}</Badge>
-                      ))}
+            <GradientBorderContainer className="rounded-md">
+              <Card className="bg-black border-0 rounded-md">
+                <CardHeader>
+                  <CardTitle className="hebrew-text text-right text-white">תיאור ואבזור</CardTitle>
+                </CardHeader>
+                <CardContent dir="rtl">
+                  <div className="space-y-4 text-right">
+                    <div>
+                      <h4 className="font-medium hebrew-text mb-2 text-white">תיאור</h4>
+                      <p className="text-sm text-white/70 hebrew-text leading-relaxed">
+                        {mockAuctionData.description}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium hebrew-text mb-2 text-white">אבזור נוסף</h4>
+                      <div className="flex flex-wrap gap-2 justify-end">
+                        {mockAuctionData.features.map((feature, index) => (
+                          <Badge key={index} variant="outline" className="hebrew-text">{feature}</Badge>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </GradientBorderContainer>
           </div>
         </TabsContent>
 
         <TabsContent value="seller">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">פרטי המוכר</CardTitle>
-            </CardHeader>
-            <CardContent dir="rtl">
-              <div className="space-y-6 text-right">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-                    <User className="h-8 w-8 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold hebrew-text">{mockAuctionData.seller.name}</h3>
-                    <p className="text-muted-foreground hebrew-text">{mockAuctionData.seller.business}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-muted-foreground hebrew-text">דירוג:</span>
-                      <span className="font-medium">{mockAuctionData.seller.rating}/5</span>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="hebrew-text text-white">פרטי המוכר</CardTitle>
+              </CardHeader>
+              <CardContent dir="rtl">
+                <div className="space-y-6 text-right">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+                      <User className="h-8 w-8 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold hebrew-text text-white">{mockAuctionData.seller.name}</h3>
+                      <p className="text-white/70 hebrew-text">{mockAuctionData.seller.business}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-sm text-white/70 hebrew-text">דירוג:</span>
+                        <span className="font-medium text-white">{mockAuctionData.seller.rating}/5</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <Clock className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground hebrew-text">דוא"ל</p>
-                        <p className="font-medium">{mockAuctionData.seller.email}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <Clock className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-white/70 hebrew-text">דוא"ל</p>
+                          <p className="font-medium text-white">{mockAuctionData.seller.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <User className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-white/70 hebrew-text">טלפון</p>
+                          <p className="font-medium text-white">{mockAuctionData.seller.phone}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <MapPin className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-white/70 hebrew-text">מיקום</p>
+                          <p className="font-medium hebrew-text text-white">{mockAuctionData.seller.location}</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <User className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground hebrew-text">טלפון</p>
-                        <p className="font-medium">{mockAuctionData.seller.phone}</p>
-                      </div>
+                    <div className="space-y-4">
+                      <Button className="w-full hebrew-text bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee]">
+                        <User className="h-4 w-4 ml-2" />
+                        צפה בפרופיל המלא
+                      </Button>
+                      <GradientBorderContainer className="rounded-md">
+                        <Button variant="ghost" className="w-full hebrew-text border-0 bg-black rounded-md hover:bg-gradient-to-r hover:from-[#5be1fd] hover:to-[#2277ee] hover:text-black">
+                          צפה בכל הרכבים
+                        </Button>
+                      </GradientBorderContainer>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <MapPin className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground hebrew-text">מיקום</p>
-                        <p className="font-medium hebrew-text">{mockAuctionData.seller.location}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <Button className="w-full hebrew-text">
-                      <User className="h-4 w-4 ml-2" />
-                      צפה בפרופיל המלא
-                    </Button>
-                    <Button variant="outline" className="w-full hebrew-text">
-                      צפה בכל הרכבים
-                    </Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
         </TabsContent>
 
         <TabsContent value="bids">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">היסטוריית הצעות</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right hebrew-text">מציע</TableHead>
-                    <TableHead className="text-right hebrew-text">עסק</TableHead>
-                    <TableHead className="text-right hebrew-text">סכום הצעה</TableHead>
-                    <TableHead className="text-right hebrew-text">זמן הצעה</TableHead>
-                    <TableHead className="text-right hebrew-text">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text">פעולות</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockBids.map((bid) => (
-                    <TableRow key={bid.id}>
-                      <TableCell className="font-medium hebrew-text">{bid.bidder}</TableCell>
-                      <TableCell className="hebrew-text">{bid.business}</TableCell>
-                      <TableCell className="font-bold">₪{bid.amount.toLocaleString()}</TableCell>
-                      <TableCell>{bid.time}</TableCell>
-                      <TableCell>{getBidStatusBadge(bid.status)}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" className="hebrew-text">
-                          פרטי מציע
-                        </Button>
-                      </TableCell>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="hebrew-text text-white">היסטוריית הצעות</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right hebrew-text text-white">מציע</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">עסק</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">סכום הצעה</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">זמן הצעה</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">סטטוס</TableHead>
+                      <TableHead className="text-right hebrew-text text-white">פעולות</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {mockBids.map((bid) => (
+                      <TableRow key={bid.id}>
+                        <TableCell className="font-medium hebrew-text text-white">{bid.bidder}</TableCell>
+                        <TableCell className="hebrew-text text-white">{bid.business}</TableCell>
+                        <TableCell className="font-bold text-white">₪{bid.amount.toLocaleString()}</TableCell>
+                        <TableCell className="text-white">{bid.time}</TableCell>
+                        <TableCell>{getBidStatusBadge(bid.status)}</TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm" className="hebrew-text btn-hover-cyan">
+                            פרטי מציע
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
         </TabsContent>
 
         <TabsContent value="activity">
-          <Card>
-            <CardHeader>
-              <CardTitle className="hebrew-text">פעילות אחרונה</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="border-l-2 border-primary pl-4 pb-4">
-                  <p className="font-medium hebrew-text">הצעה חדשה התקבלה</p>
-                  <p className="text-sm text-muted-foreground">דוד כהן הציע ₪89,500 - לפני 2 שעות</p>
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="hebrew-text text-white">פעילות אחרונה</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="border-l-2 border-primary pl-4 pb-4">
+                    <p className="font-medium hebrew-text text-white">הצעה חדשה התקבלה</p>
+                    <p className="text-sm text-white/70">דוד כהן הציע ₪89,500 - לפני 2 שעות</p>
+                  </div>
+                  <div className="border-l-2 border-muted pl-4 pb-4">
+                    <p className="font-medium hebrew-text text-white">הצעה עלתה</p>
+                    <p className="text-sm text-white/70">משה לוי הציע ₪87,000 - לפני 3 שעות</p>
+                  </div>
+                  <div className="border-l-2 border-muted pl-4 pb-4">
+                    <p className="font-medium hebrew-text text-white">צפייה חדשה</p>
+                    <p className="text-sm text-white/70">10 צפיות חדשות - לפני 4 שעות</p>
+                  </div>
+                  <div className="border-l-2 border-muted pl-4 pb-4">
+                    <p className="font-medium hebrew-text text-white">הצעה התקבלה</p>
+                    <p className="text-sm text-white/70">יוסי גרין הציע ₪85,500 - לפני 5 שעות</p>
+                  </div>
                 </div>
-                <div className="border-l-2 border-muted pl-4 pb-4">
-                  <p className="font-medium hebrew-text">הצעה עלתה</p>
-                  <p className="text-sm text-muted-foreground">משה לוי הציע ₪87,000 - לפני 3 שעות</p>
-                </div>
-                <div className="border-l-2 border-muted pl-4 pb-4">
-                  <p className="font-medium hebrew-text">צפייה חדשה</p>
-                  <p className="text-sm text-muted-foreground">10 צפיות חדשות - לפני 4 שעות</p>
-                </div>
-                <div className="border-l-2 border-muted pl-4 pb-4">
-                  <p className="font-medium hebrew-text">הצעה התקבלה</p>
-                  <p className="text-sm text-muted-foreground">יוסי גרין הציע ₪85,500 - לפני 5 שעות</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
         </TabsContent>
       </Tabs>
     </div>

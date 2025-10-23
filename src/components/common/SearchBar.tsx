@@ -17,7 +17,7 @@ export const SearchBar = ({ placeholder, value, onChange, className }: SearchBar
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="pr-10"
+        className="pr-10 border-0"
       />
     </div>
   );

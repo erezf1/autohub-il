@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 
 const AdminVehiclesList = () => {
   const navigate = useNavigate();
@@ -52,81 +53,98 @@ const AdminVehiclesList = () => {
               ניהול כל הרכבים במערכת
             </p>
           </div>
-          <Button size="lg" className="hebrew-text" onClick={() => navigate('/admin/vehicles/create')}>
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] hebrew-text" 
+            onClick={() => navigate('/admin/vehicles/create')}
+          >
             <Plus className="h-4 w-4 ml-2" />
             הוסף רכב חדש
           </Button>
         </div>
 
-        {/* Filter Bar */}
-        <AdminVehicleFilterBar
-          filters={filters}
-          onFiltersChange={setFilters}
-          resultCount={filteredVehicles.length}
-          isLoading={isLoading}
-          showTags={true}
-          showVehicleType={true}
-        />
+        {/* Filters and Search */}
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-8">
+              <div className="flex gap-6">
+                <div className="relative flex-1">
+                  <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="חפש לפי יצרן, דגם או מוכר..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pr-12 h-12 text-base hebrew-text bg-muted text-white"
+                  />
+                </div>
+                <Button variant="outline" size="lg" className="hebrew-text btn-hover-cyan">
+                  סינון מתקדם
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
         {/* Vehicles Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl hebrew-text">רשימת רכבים ({filteredVehicles.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center items-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : filteredVehicles.length === 0 ? (
-              <div className="text-center p-12 text-muted-foreground hebrew-text">
-                לא נמצאו רכבים
-              </div>
-            ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-right hebrew-text text-base">רכב</TableHead>
-                  <TableHead className="text-right hebrew-text text-base">מוכר</TableHead>
-                  <TableHead className="text-right hebrew-text text-base">מחיר</TableHead>
-                  <TableHead className="text-right hebrew-text text-base">בוסט</TableHead>
-                  <TableHead className="text-right hebrew-text text-base">סטטוס</TableHead>
-                  <TableHead className="text-right hebrew-text text-base">צפיות</TableHead>
-                  <TableHead className="text-right hebrew-text text-base">תאריך הוספה</TableHead>
-                  <TableHead className="text-right hebrew-text text-base">פעולות</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredVehicles.map((vehicle) => (
-                  <TableRow key={vehicle.id} className="h-16">
-                    <TableCell>
-                      <div className="flex items-center space-x-3 space-x-reverse">
-                        <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
-                          <Car className="h-6 w-6 text-muted-foreground" />
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-2xl hebrew-text text-white">רשימת רכבים ({filteredVehicles.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="flex justify-center items-center p-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : filteredVehicles.length === 0 ? (
+                <div className="text-center p-12 text-muted-foreground hebrew-text">
+                  לא נמצאו רכבים
+                </div>
+              ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-right hebrew-text text-base text-white">רכב</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">מוכר</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">מחיר</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">בוסט</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">סטטוס</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">צפיות</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">תאריך הוספה</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">פעולות</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredVehicles.map((vehicle) => (
+                    <TableRow key={vehicle.id} className="h-16">
+                      <TableCell>
+                        <div className="flex items-center space-x-3 space-x-reverse">
+                          <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                            <Car className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                          <div>
+                            <div className="font-medium hebrew-text text-base text-white">
+                              {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew}
+                            </div>
+                            <div className="text-sm text-muted-foreground hebrew-text">
+                              {vehicle.year}
+                            </div>
+                          </div>
                         </div>
+                      </TableCell>
+                      <TableCell className="hebrew-text text-base text-white">
+                        {vehicle.owner?.business_name || vehicle.owner?.full_name || 'לא ידוע'}
+                      </TableCell>
+                      <TableCell className="hebrew-text text-base text-white">
                         <div>
-                          <div className="font-medium hebrew-text text-base">
-                            {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew}
-                          </div>
-                          <div className="text-sm text-muted-foreground hebrew-text">
-                            {vehicle.year}
-                          </div>
+                          <div className="font-medium">₪{vehicle.price?.toLocaleString()}</div>
+                          {vehicle.hot_sale_price && (
+                            <div className="text-sm text-orange-600">
+                              מבצע: ₪{vehicle.hot_sale_price.toString()}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hebrew-text text-base">
-                      {vehicle.owner?.business_name || vehicle.owner?.full_name || 'לא ידוע'}
-                    </TableCell>
-                    <TableCell className="hebrew-text text-base">
-                      <div>
-                        <div className="font-medium">₪{vehicle.price?.toLocaleString()}</div>
-                        {vehicle.hot_sale_price && (
-                          <div className="text-sm text-orange-600">
-                            מבצע: ₪{vehicle.hot_sale_price.toString()}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
+                      </TableCell>
                     <TableCell>
                       {vehicle.is_boosted && vehicle.boosted_until && new Date(vehicle.boosted_until) > new Date() ? (
                         <Badge className="bg-orange-500">🔥 פעיל</Badge>
@@ -134,54 +152,55 @@ const AdminVehiclesList = () => {
                         <span className="text-muted-foreground">-</span>
                       )}
                     </TableCell>
-                    <TableCell>{getStatusBadge(vehicle.status)}</TableCell>
-                    <TableCell className="hebrew-text text-base">-</TableCell>
-                    <TableCell className="hebrew-text text-base">
-                      {new Date(vehicle.created_at).toLocaleDateString('he-IL')}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="hebrew-text"
-                          onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
-                        >
-                          <Eye className="h-4 w-4 ml-2" />
-                          צפה
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="hebrew-text"
-                          onClick={() => navigate(`/admin/vehicles/${vehicle.id}/edit`)}
-                        >
-                          <Edit className="h-4 w-4 ml-2" />
-                          ערוך
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-destructive hebrew-text"
-                          onClick={() => {
-                            if (confirm('האם אתה בטוח שברצונך למחוק רכב זה?')) {
-                              // TODO: Implement delete functionality
-                              console.log('Delete vehicle:', vehicle.id);
-                            }
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 ml-2" />
-                          מחק
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            )}
-          </CardContent>
-        </Card>
+                      <TableCell>{getStatusBadge(vehicle.status)}</TableCell>
+                      <TableCell className="hebrew-text text-base text-white">-</TableCell>
+                      <TableCell className="hebrew-text text-base text-white">
+                        {new Date(vehicle.created_at).toLocaleDateString('he-IL')}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="hebrew-text btn-hover-cyan"
+                            onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
+                          >
+                            <Eye className="h-4 w-4 ml-2" />
+                            צפה
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="hebrew-text btn-hover-cyan"
+                            onClick={() => navigate(`/admin/vehicles/${vehicle.id}/edit`)}
+                          >
+                            <Edit className="h-4 w-4 ml-2" />
+                            ערוך
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-destructive hebrew-text hover:bg-destructive/10"
+                            onClick={() => {
+                              if (confirm('האם אתה בטוח שברצונך למחוק רכב זה?')) {
+                                // TODO: Implement delete functionality
+                                console.log('Delete vehicle:', vehicle.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 ml-2" />
+                            מחק
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              )}
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
       </div>
   );
 };

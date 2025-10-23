@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useUsers, useUpdateUserStatus } from "@/hooks/admin/useUsers";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 
 const AdminUsersList = () => {
   const navigate = useNavigate();
@@ -43,63 +44,77 @@ const AdminUsersList = () => {
               ניהול סוחרים ומשתמשי המערכת
             </p>
           </div>
-          <Button size="lg" className="hebrew-text" onClick={() => navigate('/admin/users/create')}>
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] hebrew-text" 
+            onClick={() => navigate('/admin/users/create')}
+          >
             הוסף משתמש חדש
           </Button>
         </div>
 
         {/* Search and Filters */}
-        <Card>
-          <CardContent className="p-8">
-            <div className="flex gap-6">
-              <div className="relative flex-1">
-                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-                <Input
-                  placeholder="חיפוש לפי שם או חברה..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-12 h-12 text-base hebrew-text"
-                />
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-8">
+              <div className="flex gap-6">
+                <div className="relative flex-1">
+                  <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                  <Input
+                    placeholder="חיפוש לפי שם או חברה..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pr-12 h-12 text-base hebrew-text bg-muted text-white"
+                  />
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="lg" className="hebrew-text btn-hover-cyan">
+                      <Filter className="ml-2 h-5 w-5" />
+                      {selectedFilter === "all" ? "כל הסטטוסים" : 
+                       selectedFilter === "active" ? "פעיל" :
+                       selectedFilter === "pending" ? "ממתין" : 
+                       selectedFilter === "suspended" ? "מושעה" :
+                       selectedFilter === "subscription_expired" ? "מנוי פג תוקף" : selectedFilter}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-black border-0 shadow-lg" style={{
+                    background: 'linear-gradient(135deg, #000000 0%, #000000 100%)',
+                    border: '1px solid transparent',
+                    backgroundImage: 'linear-gradient(#000000, #000000), linear-gradient(135deg, #2277ee, #5be1fd)',
+                    backgroundOrigin: 'border-box',
+                    backgroundClip: 'content-box, border-box',
+                    boxShadow: '0 4px 12px rgba(34, 119, 238, 0.15)'
+                  }}>
+                    <DropdownMenuItem onClick={() => setSelectedFilter("all")} className="hebrew-text text-white btn-hover-cyan">
+                      כל הסטטוסים
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedFilter("active")} className="hebrew-text text-white btn-hover-cyan">
+                      פעיל
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedFilter("pending")} className="hebrew-text text-white btn-hover-cyan">
+                      ממתין לאישור
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedFilter("suspended")} className="hebrew-text text-white btn-hover-cyan">
+                      מושעה
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedFilter("subscription_expired")} className="hebrew-text text-white btn-hover-cyan">
+                      מנוי פג תוקף
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="lg" className="hebrew-text">
-                    <Filter className="ml-2 h-5 w-5" />
-                    {selectedFilter === "all" ? "כל הסטטוסים" : 
-                     selectedFilter === "active" ? "פעיל" :
-                     selectedFilter === "pending" ? "ממתין" : 
-                     selectedFilter === "suspended" ? "מושעה" :
-                     selectedFilter === "subscription_expired" ? "מנוי פג תוקף" : selectedFilter}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setSelectedFilter("all")} className="hebrew-text">
-                    כל הסטטוסים
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSelectedFilter("active")} className="hebrew-text">
-                    פעיל
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSelectedFilter("pending")} className="hebrew-text">
-                    ממתין לאישור
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSelectedFilter("suspended")} className="hebrew-text">
-                    מושעה
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSelectedFilter("subscription_expired")} className="hebrew-text">
-                    מנוי פג תוקף
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
         {/* Users Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl hebrew-text">רשימת משתמשים ({users?.length || 0})</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-2xl hebrew-text text-white">רשימת משתמשים ({users?.length || 0})</CardTitle>
+            </CardHeader>
+            <CardContent>
             {isLoading ? (
               <div className="flex justify-center items-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -108,13 +123,13 @@ const AdminUsersList = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right hebrew-text text-base">שם</TableHead>
-                    <TableHead className="text-right hebrew-text text-base">חברה</TableHead>
-                    <TableHead className="text-right hebrew-text text-base">טלפון</TableHead>
-                    <TableHead className="text-right hebrew-text text-base">סוג מנוי</TableHead>
-                    <TableHead className="text-right hebrew-text text-base">בתוקף עד</TableHead>
-                    <TableHead className="text-right hebrew-text text-base">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text text-base">פעולות</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">שם</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">חברה</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">טלפון</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">סוג מנוי</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">בתוקף עד</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">סטטוס</TableHead>
+                    <TableHead className="text-right hebrew-text text-base text-white">פעולות</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -123,19 +138,19 @@ const AdminUsersList = () => {
                       key={user.id} 
                       className="h-16 hover:bg-muted/50"
                     >
-                      <TableCell className="font-medium hebrew-text text-base">
+                      <TableCell className="font-medium hebrew-text text-base text-white">
                         {user.profile?.full_name || 'ללא שם'}
                       </TableCell>
-                      <TableCell className="hebrew-text text-base">
+                      <TableCell className="hebrew-text text-base text-white">
                         {user.profile?.business_name || 'ללא שם עסק'}
                       </TableCell>
-                      <TableCell className="text-base" dir="ltr">{user.phone_number}</TableCell>
-                      <TableCell className="hebrew-text text-base">
+                      <TableCell className="text-base text-white" dir="ltr">{user.phone_number}</TableCell>
+                      <TableCell className="hebrew-text text-base text-white">
                         {user.profile?.subscription_type === 'regular' ? 'רגיל' :
                          user.profile?.subscription_type === 'premium' ? 'פרימיום' :
                          user.profile?.subscription_type === 'vip' ? 'VIP' : 'לא צוין'}
                       </TableCell>
-                      <TableCell className="hebrew-text text-base">
+                      <TableCell className="hebrew-text text-base text-white">
                         {user.profile?.subscription_valid_until 
                           ? new Date(user.profile.subscription_valid_until).toLocaleDateString('he-IL')
                           : 'לא צוין'}
@@ -165,7 +180,7 @@ const AdminUsersList = () => {
                               e.stopPropagation();
                               navigate(`/admin/users/${user.id}`);
                             }}
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 btn-hover-cyan"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -176,7 +191,7 @@ const AdminUsersList = () => {
                               e.stopPropagation();
                               navigate(`/admin/users/${user.id}/edit`);
                             }}
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 btn-hover-cyan"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -188,7 +203,7 @@ const AdminUsersList = () => {
                                 e.stopPropagation();
                                 handleStatusChange(user.id, 'active');
                               }}
-                              className="h-8 w-8 p-0"
+                              className="h-8 w-8 p-0 hover:bg-green-500/10"
                             >
                               <UserCheck className="h-4 w-4 text-green-600" />
                             </Button>
@@ -201,7 +216,7 @@ const AdminUsersList = () => {
                                 e.stopPropagation();
                                 handleStatusChange(user.id, 'suspended');
                               }}
-                              className="h-8 w-8 p-0"
+                              className="h-8 w-8 p-0 hover:bg-red-500/10"
                             >
                               <UserX className="h-4 w-4 text-red-600" />
                             </Button>
@@ -215,6 +230,7 @@ const AdminUsersList = () => {
             )}
           </CardContent>
         </Card>
+        </GradientBorderContainer>
       </div>
   );
 };

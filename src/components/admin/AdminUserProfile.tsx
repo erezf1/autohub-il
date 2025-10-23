@@ -87,26 +87,33 @@ const AdminUserProfile = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex items-center gap-3 pr-2">
+        <Button variant="ghost" className="flex items-center gap-3 pr-2 btn-hover-cyan">
           <div className="text-right hebrew-text">
-            <p className="text-sm font-medium">{displayName}</p>
+            <p className="text-sm font-medium text-white">{displayName}</p>
             <p className="text-xs text-muted-foreground">{roleLabel}</p>
           </div>
-          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-            <User className="h-4 w-4 text-primary-foreground" />
+          <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-r from-[#2277ee] to-[#5be1fd]">
+            <User className="h-4 w-4 text-black" />
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="bg-black border-0 shadow-lg p-0" style={{
+        background: 'linear-gradient(135deg, #000000 0%, #000000 100%)',
+        border: '1px solid transparent',
+        backgroundImage: 'linear-gradient(#000000, #000000), linear-gradient(135deg, #2277ee, #5be1fd)',
+        backgroundOrigin: 'border-box',
+        backgroundClip: 'content-box, border-box',
+        boxShadow: '0 4px 12px rgba(34, 119, 238, 0.15)'
+      }}>
         <DropdownMenuItem 
-          className="hebrew-text text-muted-foreground cursor-not-allowed"
+          className="hebrew-text text-gray-300 cursor-not-allowed"
           disabled
         >
           <User className="ml-2 h-4 w-4" />
           הפרופיל שלי (בקרוב)
         </DropdownMenuItem>
         <DropdownMenuItem 
-          className="hebrew-text text-destructive"
+          className="hebrew-text text-white btn-hover-cyan"
           onClick={handleLogout}
         >
           <LogOut className="ml-2 h-4 w-4" />

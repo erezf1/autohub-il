@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 769 1366.67">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        opacity: .38;
+      }
+
+      .cls-3 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-4 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-1" width="769" height="1366.67"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="927.88" y1="1833.25" x2="-403.32" y2="1833.25" gradientTransform="translate(0 2162.58) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5be1fd"/>
+      <stop offset="1" stop-color="#27e"/>
+    </linearGradient>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g class="cls-2">
+      <g class="cls-4">
+        <path class="cls-3" d="M262.27-336.26c-35.86,0-71.05,2.85-105.37,8.31,11.04-.67,22.16-1.02,33.37-1.02,299.25,0,541.84,242.59,541.84,541.84S489.52,754.71,190.27,754.71-351.57,512.12-351.57,212.87c0-98.55,26.32-190.96,72.3-270.58-78.08,109.06-124.05,242.68-124.05,387.04,0,367.6,298,665.6,665.6,665.6s665.6-298,665.6-665.6S629.87-336.26,262.27-336.26Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

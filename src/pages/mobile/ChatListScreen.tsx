@@ -2,6 +2,7 @@ import { MessageCircle, User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate } from "react-router-dom";
 
 // Mock data for chat list
@@ -59,56 +60,61 @@ const ChatListScreen = () => {
       {/* Chat List */}
       <div className="space-y-3">
         {chatList.map((chat) => (
-          <Card 
-            key={chat.id} 
-            className="card-interactive cursor-pointer"
-            onClick={() => handleChatClick(chat.id)}
+          <GradientBorderContainer
+            key={chat.id}
+
+            className="rounded-md flex-1"
           >
-            <CardContent className="p-4">
-              <div className="flex items-start space-x-3 space-x-reverse">
-                {/* Avatar */}
-                <Avatar className="h-12 w-12 flex-shrink-0">
-                  <AvatarImage src={chat.avatar || ""} />
-                  <AvatarFallback>
-                    <User className="h-6 w-6" />
-                  </AvatarFallback>
-                </Avatar>
+            <Card 
+              className="card-interactive cursor-pointer bg-black border-0"
+              onClick={() => handleChatClick(chat.id)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start space-x-3 space-x-reverse">
+                  {/* Avatar */}
+                  <Avatar className="h-12 w-12 flex-shrink-0">
+                    <AvatarImage src={chat.avatar || ""} />
+                    <AvatarFallback>
+                      <User className="h-6 w-6" />
+                    </AvatarFallback>
+                  </Avatar>
 
-                {/* Chat Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    {/* Other Party Name */}
-                    <h3 className="font-semibold text-foreground hebrew-text truncate">
-                      {chat.otherPartyName}
-                    </h3>
-                    
-                    {/* Timestamp */}
-                    <span className="text-xs text-muted-foreground flex-shrink-0">
-                      {chat.timestamp}
-                    </span>
-                  </div>
+                  {/* Chat Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      {/* Other Party Name */}
+                      <h3 className="font-semibold text-white hebrew-text truncate">
+                        {chat.otherPartyName}
+                      </h3>
+                      
+                      {/* Timestamp */}
+                      <span className="text-xs text-gray-300 flex-shrink-0">
+                        {chat.timestamp}
+                      </span>
+                    </div>
 
-                  {/* Chat Subject */}
-                  <p className="text-sm text-muted-foreground hebrew-text mb-2">
-                    {chat.chatSubject}
-                  </p>
-
-                  {/* Last Message and Unread Badge */}
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-foreground hebrew-text truncate flex-1">
-                      {chat.lastMessage}
+                    {/* Chat Subject */}
+                    <p className="text-sm text-gray-300 hebrew-text mb-2">
+                      {chat.chatSubject}
                     </p>
-                    
-                    {chat.unreadCount > 0 && (
-                      <Badge variant="destructive" className="mr-2 notification-badge">
-                        {chat.unreadCount}
-                      </Badge>
-                    )}
+
+                    {/* Last Message and Unread Badge */}
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-white hebrew-text truncate flex-1">
+                        {chat.lastMessage}
+                      </p>
+                      
+                      {chat.unreadCount > 0 && (
+                        <Badge variant="destructive" className="mr-2 notification-badge">
+                          {chat.unreadCount}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
         ))}
       </div>
     </div>
