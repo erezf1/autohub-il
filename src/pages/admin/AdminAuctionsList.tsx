@@ -3,6 +3,7 @@ import { Gavel, Eye, Edit, Trash2, Plus, Clock, TrendingUp, User } from "lucide-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminVehicleFilterBar } from "@/components/admin";
 import { AdminVehicleFilters, applyAdminAuctionFilters } from "@/utils/admin/vehicleFilters";
@@ -86,6 +87,7 @@ const mockAuctions = [
 const AdminAuctionsList = () => {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<AdminVehicleFilters>({});
+  const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
   const getStatusBadge = (status: string) => {

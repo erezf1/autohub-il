@@ -13,7 +13,6 @@ import {
   ResultsCount,
   LoadingSpinner,
   VehicleCard,
-  FilterButton,
 } from "@/components/common";
 
 const CarSearchScreen = () => {

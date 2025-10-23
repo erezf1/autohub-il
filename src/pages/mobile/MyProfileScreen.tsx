@@ -5,6 +5,16 @@ import { formatPhoneDisplay } from '@/utils/phoneValidation';
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
+import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/mobile/useProfile";
+import { useQuery } from "@tanstack/react-query";
+import { dealerClient } from "@/integrations/supabase/dealerClient";
+import { LoadingSpinner, PageContainer, PageHeader } from "@/components/common";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Edit3, Crown, Award, Calendar, Flame, Gavel, Car, Building, User, Phone, MapPin } from "lucide-react";
 
 const MyProfileScreen = () => {
   const navigate = useNavigate();
@@ -163,7 +173,7 @@ const MyProfileScreen = () => {
                   <Car className="h-5 w-5 text-green-500" />
                 </div>
                 <div className="text-2xl font-bold text-white">
-                  {activeVehiclesCount || 0}/{profile?.vehicles_limit || 0}
+                  {activeVehicles || 0}/{profile?.vehicles_limit || 0}
                 </div>
                 <div className="text-xs text-white hebrew-text">רכבים פעילים</div>
               </div>
@@ -218,7 +228,7 @@ const MyProfileScreen = () => {
               טלפון:
             </Label>
             <span className="text-sm text-foreground hebrew-text">
-              {userData?.phone_number ? formatPhoneDisplay(userData.phone_number) : 'לא הוגדר'}
+              {phoneNumber ? formatPhoneDisplay(phoneNumber) : 'לא הוגדר'}
             </span>
           </div>
 
