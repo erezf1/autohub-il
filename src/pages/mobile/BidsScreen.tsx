@@ -238,9 +238,9 @@ export const BidsScreen: React.FC = () => {
                     </div>
                     <GradientSeparator />
                     {/* Bottom Section */}
-                 <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70">
+                    <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70">
                       <div className="flex items-center gap-1 justify-center">
-                                                <Clock className="w-3 h-" />
+                        <Clock className="w-3 h-" />
 
                         <span className="hebrew-text text-center">{bid.timeRemaining}</span>
                         <span className="hebrew-text text-center pr-2">{bid.bidCount} הצעות</span>
@@ -301,9 +301,25 @@ export const BidsScreen: React.FC = () => {
                             <span className="text-lg font-bold text-green-400 hebrew-text">{auction.currentBid}</span>
                           </div>
                         </div>
+                        {auction.canBid && (
+                          <div className="px-0 pb-0 pt-">
+                            <Button
+                              size="sm"
+                              className="w-20 px-2 py-1 gap-1 text-sm bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/mobile/create-bid-details/${auction.vehicleId}`);
+                              }}
+                            >
+                              <Gavel className="w-3 h-3" />
+                              <span className="text-sm">הגשה</span>
+                            </Button>
+                          </div>
+                        )}
                       </div>
+
                     </div>
-                          <GradientSeparator />
+                    <GradientSeparator />
                     <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70">
                       <div className="flex items-center gap-1 justify-center">
                         <Clock className="w-3 h-3" />
@@ -311,21 +327,7 @@ export const BidsScreen: React.FC = () => {
                       </div>
                       <span className="hebrew-text text-center">{auction.bidCount} הצעות</span>
                     </div>
-                    {auction.canBid && (
-                      <div className="px-4 pb-2 pt-1">
-                        <Button
-                          size="sm"
-                          className="w-full gap-2 bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/mobile/create-bid-details/${auction.vehicleId}`);
-                          }}
-                        >
-                          <Gavel className="w-4 h-4 pr" />
-                          הגש הצעה
-                        </Button>
-                      </div>
-                    )}
+
                   </Card>
                 </GradientBorderContainer>
               ))}

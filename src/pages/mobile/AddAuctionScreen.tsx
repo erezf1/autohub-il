@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { useToast } from "@/hooks/use-toast";
+import darkCarImage from "@/assets/dark_car.png";
 
 // Mock user vehicles data
 const userVehicles = [
@@ -21,21 +22,27 @@ const userVehicles = [
     title: "טויוטה קמרי 2020",
     year: 2020,
     kilometers: 120000,
-    image: "/placeholder.svg"
+    image: "/placeholder.svg",
+    price: 120000,
+    is_boosted: false
   },
   {
     id: "2", 
     title: "BMW X3 2019",
     year: 2019,
     kilometers: 85000,
-    image: "/placeholder.svg"
+    image: "/placeholder.svg",
+    price: 95000,
+    is_boosted: true
   },
   {
     id: "3",
     title: "מרצדס E-Class 2021",
     year: 2021,
     kilometers: 45000,
-    image: "/placeholder.svg"
+    image: "/placeholder.svg",
+    price: 240000,
+    is_boosted: false
   }
 ];
 
@@ -165,6 +172,7 @@ const AddAuctionScreen = () => {
 
       {/* Step 1: Vehicle Selection */}
       {currentStep === 1 && (
+        <>
         <GradientBorderContainer className="rounded-md">
           <Card className="bg-black border-0 rounded-md">
             <CardHeader>
@@ -177,54 +185,74 @@ const AddAuctionScreen = () => {
               <p className="text-muted-foreground hebrew-text">
                 בחר את הרכב שברצונך למכור במכירה פומבית
               </p>
-              
-              <div className="space-y-3">
-                {userVehicles.map((vehicle) => (
-                  <div 
-                    key={vehicle.id}
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      formData.vehicleId === vehicle.id 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-muted hover:border-primary/50'
-                    }`}
-                    onClick={() => updateFormData("vehicleId", vehicle.id)}
-                  >
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                        <Car className="h-8 w-8 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-foreground hebrew-text">
-                          {vehicle.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {vehicle.year} • {vehicle.kilometers.toLocaleString()} ק״מ
-                        </p>
-                      </div>
-                      {formData.vehicleId === vehicle.id && (
-                        <Badge variant="default">נבחר</Badge>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
 
-            {userVehicles.length === 0 && (
-              <div className="text-center py-8">
-                <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground hebrew-text mb-4">
-                  אין לך רכבים רשומים במערכת
-                </p>
-                <GradientBorderContainer className="rounded-md">
-                  <Button onClick={() => navigate("/mobile/add-vehicle")} className="bg-black border-0">
-                    הוסף רכב חדש
-                  </Button>
-                </GradientBorderContainer>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
+        {/* Vehicle list rendered below the selection card */}
+        <div className="space-y-3">
+          {userVehicles.map((vehicle) => {
+            const isSelected = formData.vehicleId === vehicle.id;
+            const gray = '#6b7280';
+            return (
+              <GradientBorderContainer
+                key={vehicle.id}
+                fromColor={isSelected ? undefined : gray}
+                toColor={isSelected ? undefined : gray}
+                className={`rounded-md transition-transform duration-200 ${isSelected ? 'translate-y-[-6px] z-20 shadow-[0_8px_24px_rgba(34,119,238,0.12)] ring-2 ring-[#2277ee]/30' : ''}`}
+              >
+                <Card
+                  className={isSelected ? 'bg-black border-0 rounded-md' : 'bg-black border-0 rounded-md card-interactive cursor-pointer'}
+                  onClick={() => updateFormData('vehicleId', vehicle.id)}
+                >
+                  <CardContent className="p-0">
+                    <div className="flex h-32">
+                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-r-lg">
+                        <img
+                          src={vehicle.image || darkCarImage}
+                          alt={vehicle.title}
+                          className="w-full h-full object-cover"
+                        />
+                        {vehicle.is_boosted && (
+                          <Badge className="absolute top-2 left-2 bg-orange-500">🔥 מבוסט</Badge>
+                        )}
+                      </div>
+
+                      <div className="flex-1 p-4 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-start justify-between mb-1">
+                            <h3 className="font-semibold text-foreground hebrew-text text-sm">{vehicle.title} {vehicle.year}</h3>
+                            {isSelected ? (
+                              <Badge variant="default" className="hebrew-text">נבחר</Badge>
+                            ) : (
+                              <Badge variant="default" className="hebrew-text">זמין</Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground hebrew-text">{vehicle.kilometers?.toLocaleString()} ק״מ • טיפטרוניק • היברידי</p>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <p className="text-base font-bold text-primary hebrew-text">₪{vehicle.price ? parseFloat(vehicle.price.toString()).toLocaleString() : '—'}</p>
+                          <div />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </GradientBorderContainer>
+            )
+          })}
+
+          {userVehicles.length === 0 && (
+            <div className="text-center py-8">
+              <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground hebrew-text mb-4">אין לך רכבים רשומים במערכת</p>
+              <GradientBorderContainer className="rounded-md">
+                <Button onClick={() => navigate('/mobile/add-vehicle')} className="bg-black border-0">הוסף רכב חדש</Button>
+              </GradientBorderContainer>
+            </div>
+          )}
+        </div>
+        </>
       )}
 
       {/* Step 2: Auction Settings */}
@@ -240,7 +268,7 @@ const AddAuctionScreen = () => {
                       <Car className="h-6 w-6 text-muted-foreground" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white hebrew-text">
+                      <h3 className="font-semibold text-white hebrew-text text-sm">
                         {selectedVehicle.title}
                       </h3>
                       <p className="text-sm text-muted-foreground">הרכב הנבחר למכירה</p>

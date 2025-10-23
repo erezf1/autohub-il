@@ -126,8 +126,11 @@ const ISORequestDetailScreen = () => {
               </Badge>
             </div>
           </CardHeader>
+
           <CardContent>
             <div className="space-y-4">
+                                      <GradientSeparator />
+
               <div>
                 <h4 className="font-medium text-white hebrew-text mb-2">תיאור הבקשה</h4>
                 <p className="text-muted-foreground text-sm hebrew-text">{mockISORequest.description}</p>
@@ -135,9 +138,9 @@ const ISORequestDetailScreen = () => {
             
               <GradientSeparator />
 
-              <div>
-                <h4 className="font-medium text-white hebrew-text mb-2">תקציב</h4>
-                <p className="text-primary font-semibold hebrew-text">{mockISORequest.budgetRange}</p>
+              <div className="flex items-center gap-2 justify-start w-full text-right" role="group" aria-label="budget">
+                <h4 className="font-medium text-white hebrew-text m-0">תקציב</h4>
+                <p className="text-primary font-semibold hebrew-text m-0">{mockISORequest.budgetRange}</p>
               </div>
 
               <GradientSeparator />

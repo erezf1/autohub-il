@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
-import { DealerCard } from "@/components/common";
+import { DealerCard, VehicleSpecsCard } from "@/components/common";
 
 // Mock auction data
 const mockAuction = {
@@ -254,58 +254,26 @@ const AuctionDetailScreen = () => {
       </GradientBorderContainer>
 
       {/* Vehicle Details */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="text-xl hebrew-text">מפרט טכני</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-0">
-            <div className="grid grid-cols-2 gap-4 py-3">
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground hebrew-text">שנת ייצור</p>
-                <p className="font-medium text-white">{mockAuction.vehicle.year}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground hebrew-text">קילומטרז׳</p>
-                <p className="font-medium text-white">{mockAuction.vehicle.kilometers.toLocaleString()} ק״מ</p>
-              </div>
-            </div>
-            
-            <GradientSeparator />
-            
-            <div className="grid grid-cols-2 gap-4 py-3">
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
-                <p className="font-medium text-white hebrew-text">{mockAuction.vehicle.transmission}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground hebrew-text">סוג דלק</p>
-                <p className="font-medium text-white hebrew-text">{mockAuction.vehicle.fuelType}</p>
-              </div>
-            </div>
+      {
+        (() => {
+          const specsRows = [
+            {
+              col1: { label: 'שנת ייצור', value: mockAuction.vehicle.year },
+              col2: { label: 'קילומטרז׳', value: mockAuction.vehicle.kilometers.toLocaleString(), unit: 'ק״מ' }
+            },
+            {
+              col1: { label: 'תיבת הילוכים', value: mockAuction.vehicle.transmission },
+              col2: { label: 'סוג דלק', value: mockAuction.vehicle.fuelType }
+            },
+            ...(mockAuction.vehicle.engineSize || mockAuction.vehicle.color ? [{
+              col1: mockAuction.vehicle.engineSize ? { label: 'נפח מנוע', value: mockAuction.vehicle.engineSize } : undefined,
+              col2: mockAuction.vehicle.color ? { label: 'צבע', value: mockAuction.vehicle.color } : undefined
+            }] : [])
+          ].filter(row => row.col1 || row.col2);
 
-            {(mockAuction.vehicle.engineSize || mockAuction.vehicle.color) && (
-              <>
-                <GradientSeparator />
-                <div className="grid grid-cols-2 gap-4 py-3">
-                  {mockAuction.vehicle.engineSize && (
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
-                      <p className="font-medium text-white hebrew-text">{mockAuction.vehicle.engineSize}</p>
-                    </div>
-                  )}
-                  {mockAuction.vehicle.color && (
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
-                      <p className="font-medium text-white hebrew-text">{mockAuction.vehicle.color}</p>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
+          return <VehicleSpecsCard rows={specsRows} />;
+        })()
+      }
 
       {/* Vehicle Description */}
       {mockAuction.vehicle.description && (

@@ -21,8 +21,56 @@ export const HotCarsScreen = () => {
   const navigate = useNavigate();
   const { boostedVehicles, isLoadingBoosted } = useBoosts();
 
+  // Mock vehicles to show while designing UI or when no boosted vehicles available
+  const mockBoostedVehicles = [
+    {
+      id: 'mock-1',
+      images: [],
+      make: { name_hebrew: 'טויוטה' },
+      model: { name_hebrew: 'קורולה' },
+      year: 2020,
+      kilometers: 95000,
+      transmission: 'automatic',
+      fuel_type: 'gasoline',
+      price: 165000,
+      hot_sale_price: 159000,
+      is_boosted: true,
+      boosted_until: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
+    },
+    {
+      id: 'mock-2',
+      images: [],
+      make: { name_hebrew: 'מאזדה' },
+      model: { name_hebrew: 'מז' },
+      year: 2019,
+      kilometers: 120000,
+      transmission: 'manual',
+      fuel_type: 'diesel',
+      price: 129000,
+      hot_sale_price: null,
+      is_boosted: true,
+      boosted_until: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(),
+    },
+    {
+      id: 'mock-3',
+      images: [],
+      make: { name_hebrew: 'הונדה' },
+      model: { name_hebrew: 'אקורד' },
+      year: 2021,
+      kilometers: 45000,
+      transmission: 'automatic',
+      fuel_type: 'hybrid',
+      price: 235000,
+      hot_sale_price: 225000,
+      is_boosted: true,
+      boosted_until: new Date(Date.now() + 1000 * 60 * 60 * 72).toISOString(),
+    }
+  ];
+
+  const sourceVehicles = (boostedVehicles && boostedVehicles.length > 0) ? boostedVehicles : mockBoostedVehicles;
+
   const filteredResults = applyVehicleFilters(
-    boostedVehicles || [],
+    sourceVehicles,
     filters,
     ""
   );

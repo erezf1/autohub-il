@@ -142,14 +142,7 @@ export const RequiredCarsScreen: React.FC = () => {
                   >
                     {/* Row 1: Image + Details */}
                     <div className="flex items-stretch">
-                      {/* Column 1: Request Image */}
-                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
-                        <img
-                          src={request.image}
-                          alt={request.vehicleType}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+
                       
                       {/* Column 2: Two Rows */}
                       <div className="flex-1 flex flex-col">
@@ -243,14 +236,7 @@ export const RequiredCarsScreen: React.FC = () => {
                   >
                     {/* Row 1: Image + Details */}
                     <div className="flex items-stretch">
-                      {/* Column 1: Request Image */}
-                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
-                        <img
-                          src={request.image}
-                          alt={request.vehicleType}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+
                       
                       {/* Column 2: Two Rows */}
                       <div className="flex-1 flex flex-col">
@@ -280,12 +266,13 @@ export const RequiredCarsScreen: React.FC = () => {
                               <span className="text-white/70 hebrew-text text-center text-xs">אין התאמות</span>
                             )}
                           </div>
+                          
                         </div>
                         
-                        <GradientSeparator />
                         
                         {/* Bottom Row: Price Range */}
                         <div className="px-4 py-2">
+                          
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-white/70 hebrew-text">טווח מחיר:</span>
                             <span className="font-medium text-white hebrew-text text-sm">{request.priceRange}</span>

@@ -14,7 +14,7 @@ import darkCarImage from "@/assets/dark_car.png";
 import { useState } from "react";
 import { getVehicleTypeLabel } from "@/constants/vehicleTypes";
 import { useAuth } from "@/contexts/AuthContext";
-import { DealerCard } from "@/components/common";
+import { DealerCard, VehicleSpecsCard } from "@/components/common";
 
 const VehicleDetailScreen = () => {
   const { id } = useParams();
@@ -248,84 +248,30 @@ const VehicleDetailScreen = () => {
       </GradientBorderContainer>
 
       {/* Vehicle Specifications */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="hebrew-text text-white">מפרט טכני</CardTitle>
-          </CardHeader>
-        <CardContent className="space-y-0">
-          {/* Year */}
-          <div className="grid grid-cols-2 gap-4 py-3">
-            <div className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground hebrew-text">שנת ייצור</p>
-              <p className="font-medium text-white">{vehicle.year}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground hebrew-text">קילומטרז׳</p>
-              <p className="font-medium text-white">{vehicle.kilometers?.toLocaleString()} ק״מ</p>
-            </div>
-          </div>
-          
-          <GradientSeparator />
-          
-          {/* Transmission and Fuel */}
-          <div className="grid grid-cols-2 gap-4 py-3">
-            {vehicle.transmission && (
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground hebrew-text">תיבת הילוכים</p>
-                <p className="font-medium text-white hebrew-text">{transmissionLabel}</p>
-              </div>
-            )}
-            {vehicle.fuel_type && (
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground hebrew-text">סוג דלק</p>
-                <p className="font-medium text-white hebrew-text">{fuelLabel}</p>
-              </div>
-            )}
-          </div>
-          
-          {(vehicle.engine_size || vehicle.sub_model) && (
-            <>
-              <GradientSeparator />
-              <div className="grid grid-cols-2 gap-4 py-3">
-                {vehicle.engine_size && (
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground hebrew-text">נפח מנוע</p>
-                    <p className="font-medium text-white hebrew-text">{vehicle.engine_size.toLocaleString()} סמ״ק</p>
-                  </div>
-                )}
-                {vehicle.sub_model && (
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground hebrew-text">סוג</p>
-                    <p className="font-medium text-white hebrew-text">{getVehicleTypeLabel(vehicle.sub_model)}</p>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-          
-          {(vehicle.color || vehicle.previous_owners) && (
-            <>
-              <GradientSeparator />
-              <div className="grid grid-cols-2 gap-4 py-3">
-                {vehicle.color && (
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground hebrew-text">צבע</p>
-                    <p className="font-medium text-white hebrew-text">{vehicle.color}</p>
-                  </div>
-                )}
-                {vehicle.previous_owners && (
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground hebrew-text">בעלים קודמים</p>
-                    <p className="font-medium text-white">{vehicle.previous_owners}</p>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-      </GradientBorderContainer>
+      {
+        (() => {
+          const specsRows = [
+            {
+              col1: { label: 'שנת ייצור', value: vehicle.year },
+              col2: { label: 'קילומטרז׳', value: vehicle.kilometers?.toLocaleString(), unit: 'ק״מ' }
+            },
+            {
+              col1: vehicle.transmission ? { label: 'תיבת הילוכים', value: transmissionLabel } : undefined,
+              col2: vehicle.fuel_type ? { label: 'סוג דלק', value: fuelLabel } : undefined
+            },
+            ...(vehicle.engine_size || vehicle.sub_model ? [{
+              col1: vehicle.engine_size ? { label: 'נפח מנוע', value: vehicle.engine_size.toLocaleString(), unit: 'סמ״ק' } : undefined,
+              col2: vehicle.sub_model ? { label: 'סוג', value: getVehicleTypeLabel(vehicle.sub_model) } : undefined
+            }] : []),
+            ...(vehicle.color || vehicle.previous_owners ? [{
+              col1: vehicle.color ? { label: 'צבע', value: vehicle.color } : undefined,
+              col2: vehicle.previous_owners ? { label: 'בעלים קודמים', value: vehicle.previous_owners } : undefined
+            }] : [])
+          ].filter(row => row.col1 || row.col2);
+
+          return <VehicleSpecsCard rows={specsRows} />;
+        })()
+      }
 
       {/* Description */}
       {vehicle.description && (
