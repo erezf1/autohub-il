@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/mobile/useProfile";
-import logo from "@/assets/logo.svg";
+import logo from "/src/assets/logo.svg";
 import {
   DropdownMenu,
   DropdownMenuContent,

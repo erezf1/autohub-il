@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { formatPhoneDisplay, cleanPhoneNumber } from '@/utils/phoneValidation';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
-import logo from '@/assets/logo.svg';
+import logo from '/src/assets/logo.svg';
 
 export const LoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
