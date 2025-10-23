@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import AdminDesktopSidebar from "./AdminDesktopSidebar";
 import AdminUserProfile from "./AdminUserProfile";
+import logo from '/src/assets/logo.svg';
 
 interface AdminDesktopLayoutProps {
   children: ReactNode;
@@ -23,7 +24,7 @@ const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
           {/* Logo Section */}
           <div className="flex items-center gap-3">
             <img 
-              src="/src/assets/logo.svg" 
+              src={logo}
               alt="AutoHub Admin" 
               className="h-8 w-auto"
             />

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Smartphone, Monitor, Car, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import logo from '/src/assets/logo.svg';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center gap-3 mb-4">
             <img 
-              src="/src/assets/logo.svg" 
+              src={logo}
               alt="Auto Hub" 
               className="w-22 h-20"
             />
