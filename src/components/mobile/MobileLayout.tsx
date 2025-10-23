@@ -1,8 +1,6 @@
 import { ReactNode } from "react";
 import MobileHeader from "./MobileHeader";
 import MobileTabBar from "./MobileTabBar";
-import BgSvg from "@/assets/BG.svg?url";
-import DeskBgSvg from "@/assets/DeskBG.svg?url";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -22,7 +20,7 @@ const MobileLayout = ({ children }: MobileLayoutProps) => {
       <div 
         className="hidden md:block fixed inset-0 pointer-events-none"
         style={{
-          backgroundImage: `url(${DeskBgSvg})`,
+          backgroundImage: `url(/DeskBG.svg)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -34,7 +32,7 @@ const MobileLayout = ({ children }: MobileLayoutProps) => {
       <div 
         className="block md:hidden fixed inset-0 pointer-events-none"
         style={{
-          backgroundImage: `url(${BgSvg})`,
+          backgroundImage: `url(/BG.svg)`,
           backgroundSize: '100vw auto',
           backgroundPosition: 'top center',
           backgroundRepeat: 'no-repeat',
