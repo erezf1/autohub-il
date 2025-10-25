@@ -25,8 +25,8 @@ import AddVehicleScreen from "./pages/mobile/AddVehicleScreen";
 import AddAuctionScreen from "./pages/mobile/AddAuctionScreen";
 import MyProfileScreen from "./pages/mobile/MyProfileScreen";
 import MyVehiclesScreen from "./pages/mobile/MyVehiclesScreen";
-import ISORequestsScreen from "./pages/mobile/ISORequestsScreen";
 import ISORequestDetailScreen from "./pages/mobile/ISORequestDetailScreen";
+import CreateISORequestScreen from "./pages/mobile/CreateISORequestScreen";
 import ChatRequestScreen from "./pages/mobile/ChatRequestScreen";
 import CreateBidSelectCarScreen from "./pages/mobile/CreateBidSelectCarScreen";
 import CreateBidDetailsScreen from "./pages/mobile/CreateBidDetailsScreen";
@@ -144,8 +144,8 @@ const App = () => (
                 <Route path="/add-vehicle" element={<AddVehicleScreen />} />
                 <Route path="/add-auction" element={<AddAuctionScreen />} />
                 <Route path="/profile" element={<MyProfileScreen />} />
-                <Route path="/car-search-requests" element={<ISORequestsScreen />} />
                 <Route path="/required-cars" element={<RequiredCarsScreen />} />
+                <Route path="/create-iso-request" element={<CreateISORequestScreen />} />
                 <Route path="/hot-cars" element={<HotCarsScreen />} />
                 <Route path="/boost-management" element={<BoostManagementScreen />} />
                 <Route path="/bids" element={<BidsScreen />} />

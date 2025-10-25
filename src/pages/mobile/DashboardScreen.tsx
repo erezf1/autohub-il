@@ -107,7 +107,7 @@ const DashboardScreen = () => {
         <GradientBorderContainer
           className="rounded-md flex-1"
         >
-          <Card className="card-interactive border-0 bg-black rounded-md" onClick={() => navigate("/mobile/car-search-requests")}>
+          <Card className="card-interactive border-0 bg-black rounded-md" onClick={() => navigate("/mobile/required-cars")}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-white hebrew-text">
                 חיפושי רכבים

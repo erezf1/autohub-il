@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Plus, Clock, Search } from 'lucide-react';
+import { Plus, Clock, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
 import { GradientSeparator } from '@/components/ui/gradient-separator';
 import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
-import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
-import darkCarImage from "@/assets/dark_car.png";
+import { getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
 import {
   PageContainer,
   PageHeader,
@@ -16,43 +15,8 @@ import {
   ActiveFiltersDisplay,
   ResultsCount,
 } from "@/components/common";
-
-// Mock data for ISO requests
-const mockISORequests = [
-  {
-    id: 1,
-    vehicleType: "טויוטה קמרי",
-    year: "2020-2022",
-    priceRange: "₪80,000 - ₪120,000",
-    status: "active",
-    matchCount: 3,
-    createdDate: "לפני שבוע",
-    requirements: "אוטומט, לא אחרי תאונה",
-    image: darkCarImage
-  },
-  {
-    id: 2,
-    vehicleType: "מרצדס C-Class",
-    year: "2019-2021",
-    priceRange: "₪150,000 - ₪200,000",
-    status: "matches",
-    matchCount: 1,
-    createdDate: "לפני 3 ימים",
-    requirements: "דיזל, צבע כהה",
-    image: darkCarImage
-  },
-  {
-    id: 3,
-    vehicleType: "BMW X3",
-    year: "2018-2020",
-    priceRange: "₪120,000 - ₪180,000",
-    status: "completed",
-    matchCount: 0,
-    createdDate: "לפני חודש",
-    requirements: "4WD, עור",
-    image: darkCarImage
-  }
-];
+import { useISORequests, useMyISORequests } from '@/hooks/mobile/useISORequests';
+import { format } from 'date-fns';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -72,13 +36,40 @@ const getStatusText = (status: string) => {
   }
 };
 
+const formatDate = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) return 'היום';
+    if (diffInDays === 1) return 'אתמול';
+    if (diffInDays < 7) return `לפני ${diffInDays} ימים`;
+    if (diffInDays < 30) return `לפני ${Math.floor(diffInDays / 7)} שבועות`;
+    return `לפני ${Math.floor(diffInDays / 30)} חודשים`;
+  } catch {
+    return dateString;
+  }
+};
+
 export const RequiredCarsScreen = () => {
   const navigate = useNavigate();
   const [showMyRequests, setShowMyRequests] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [filters, setFilters] = useState<VehicleFilters>({});
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  const { data: allRequests = [], isLoading: isLoadingAll } = useISORequests();
+  const { data: myRequests = [], isLoading: isLoadingMy } = useMyISORequests();
 
   const activeFilterCount = getActiveFilterCount(filters);
+  
+  const filteredMyRequests = statusFilter === 'all' 
+    ? myRequests 
+    : myRequests.filter(req => req.status === statusFilter);
+
+  const isLoading = showMyRequests ? isLoadingMy : isLoadingAll;
+  const requests = showMyRequests ? filteredMyRequests : allRequests;
 
   return (
     <PageContainer>
@@ -115,7 +106,7 @@ export const RequiredCarsScreen = () => {
         <>
           {/* All Requests View */}
           <div className="flex items-center justify-between gap-2 mb-4">
-            <ResultsCount count={mockISORequests.length} isLoading={false} />
+            <ResultsCount count={requests.length} isLoading={isLoading} />
             <GradientBorderContainer className="rounded-md">
               <FilterButton
                 activeCount={activeFilterCount}
@@ -129,9 +120,13 @@ export const RequiredCarsScreen = () => {
             onClearAll={() => setFilters({})}
           />
 
-          {/* ISO Requests List */}
-          <div className="space-y-3">
-              {mockISORequests.map((request) => (
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {requests.map((request: any) => (
                 <GradientBorderContainer
                   key={request.id}
                   className="rounded-md flex-1"
@@ -140,46 +135,36 @@ export const RequiredCarsScreen = () => {
                     className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
                     onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
                   >
-                    {/* Row 1: Image + Details */}
                     <div className="flex items-stretch">
-
-                      
-                      {/* Column 2: Two Rows */}
                       <div className="flex-1 flex flex-col">
-                        {/* Top Row: Name/Year/Status + Matches */}
                         <div className="flex items-center justify-between p-4 pb-2">
-                          {/* Left side: Name, Year, Status */}
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-white hebrew-text">
-                              {request.vehicleType}
+                              {request.title}
                             </h3>
                             <p className="text-sm text-white/70 hebrew-text mb-2">
-                              {request.year}
+                              {request.year_from && request.year_to 
+                                ? `${request.year_from}-${request.year_to}` 
+                                : request.year_from || request.year_to || 'כל השנים'}
                             </p>
                             <Badge className={`text-white ${getStatusColor(request.status)} w-fit`}>
                               {getStatusText(request.status)}
                             </Badge>
                           </div>
-                          
-                          {/* Right side: Match Count */}
-                          <div className="flex flex-col items-center space-y-1 pl-4">
-                            {request.matchCount > 0 ? (
-                              <>
-                                <span className="text-white/70 hebrew-text text-center text-xs">התאמות</span>
-                                <span className="text-2xl font-bold text-green-400 hebrew-text text-center">{request.matchCount}</span>
-                              </>
-                            ) : (
-                              <span className="text-white/70 hebrew-text text-center text-xs">אין התאמות</span>
-                            )}
-                          </div>
                         </div>
                         
-                        
-                        {/* Bottom Row: Price Range */}
                         <div className="px-4 py-2">
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-white/70 hebrew-text">טווח מחיר:</span>
-                            <span className="font-medium text-white hebrew-text text-sm">{request.priceRange}</span>
+                            <span className="font-medium text-white hebrew-text text-sm">
+                              {request.price_from && request.price_to 
+                                ? `₪${request.price_from.toLocaleString()} - ₪${request.price_to.toLocaleString()}`
+                                : request.price_from 
+                                ? `מ-₪${request.price_from.toLocaleString()}`
+                                : request.price_to
+                                ? `עד ₪${request.price_to.toLocaleString()}`
+                                : 'לא צוין'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -187,45 +172,69 @@ export const RequiredCarsScreen = () => {
                     
                     <GradientSeparator />
                     
-                    {/* Row 2: Time + Requirements */}
                     <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70 py-2">
                       <div className="flex items-center gap-1 justify-center">
                         <Clock className="w-3 h-3" />
-                        <span className="hebrew-text text-center">{request.createdDate}</span>
+                        <span className="hebrew-text text-center">{formatDate(request.created_at)}</span>
                       </div>
-                      <span className="hebrew-text text-center">{request.requirements}</span>
+                      {request.additional_requirements && (
+                        <span className="hebrew-text text-center line-clamp-1">{request.additional_requirements}</span>
+                      )}
                     </div>
                   </Card>
                 </GradientBorderContainer>
               ))}
+
+              {requests.length === 0 && !isLoading && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground hebrew-text">אין בקשות חיפוש זמינות</p>
+                </div>
+              )}
             </div>
+          )}
         </>
       ) : (
         <>
           {/* My Requests View */}
           <div className="mb-4">
-            <ResultsCount count={mockISORequests.filter(req => req.id <= 2).length} isLoading={false} />
+            <ResultsCount count={requests.length} isLoading={isLoading} />
           </div>
 
           {/* Filter Options */}
           <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-            <Button variant="default" size="sm" className="px-4 whitespace-nowrap">
+            <Button 
+              variant={statusFilter === 'all' ? 'default' : 'outline'} 
+              size="sm" 
+              className="px-4 whitespace-nowrap"
+              onClick={() => setStatusFilter('all')}
+            >
               הכל
             </Button>
-            <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
+            <Button 
+              variant={statusFilter === 'active' ? 'default' : 'outline'} 
+              size="sm" 
+              className="px-4 whitespace-nowrap"
+              onClick={() => setStatusFilter('active')}
+            >
               פעיל
             </Button>
-            <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
-              התאמות
-            </Button>
-            <Button variant="outline" size="sm" className="px-4 whitespace-nowrap">
+            <Button 
+              variant={statusFilter === 'completed' ? 'default' : 'outline'} 
+              size="sm" 
+              className="px-4 whitespace-nowrap"
+              onClick={() => setStatusFilter('completed')}
+            >
               הושלם
             </Button>
           </div>
 
-          {/* My ISO Requests List - filtered to show only user's requests */}
-          <div className="space-y-3">
-            {mockISORequests.filter(req => req.id <= 2).map((request) => (
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {requests.map((request: any) => (
                 <GradientBorderContainer
                   key={request.id}
                   className="rounded-md flex-1"
@@ -234,48 +243,48 @@ export const RequiredCarsScreen = () => {
                     className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
                     onClick={() => navigate(`/mobile/iso-requests/${request.id}`)}
                   >
-                    {/* Row 1: Image + Details */}
                     <div className="flex items-stretch">
-
-                      
-                      {/* Column 2: Two Rows */}
                       <div className="flex-1 flex flex-col">
-                        {/* Top Row: Name/Year/Status + Matches */}
                         <div className="flex items-center justify-between p-4 pb-2">
-                          {/* Left side: Name, Year, Status */}
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-white hebrew-text">
-                              {request.vehicleType}
+                              {request.title}
                             </h3>
                             <p className="text-sm text-white/70 hebrew-text mb-2">
-                              {request.year}
+                              {request.year_from && request.year_to 
+                                ? `${request.year_from}-${request.year_to}` 
+                                : request.year_from || request.year_to || 'כל השנים'}
                             </p>
                             <Badge className={`text-white ${getStatusColor(request.status)} w-fit`}>
                               {getStatusText(request.status)}
                             </Badge>
                           </div>
                           
-                          {/* Right side: Match Count */}
+                          {/* Right side: Offer Count - Only for My Requests */}
                           <div className="flex flex-col items-center space-y-1 pl-4">
-                            {request.matchCount > 0 ? (
+                            {request.offer_count > 0 ? (
                               <>
                                 <span className="text-white/70 hebrew-text text-center text-xs">התאמות</span>
-                                <span className="text-2xl font-bold text-green-400 hebrew-text text-center">{request.matchCount}</span>
+                                <span className="text-2xl font-bold text-green-400 hebrew-text text-center">{request.offer_count}</span>
                               </>
                             ) : (
                               <span className="text-white/70 hebrew-text text-center text-xs">אין התאמות</span>
                             )}
                           </div>
-                          
                         </div>
                         
-                        
-                        {/* Bottom Row: Price Range */}
                         <div className="px-4 py-2">
-                          
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-white/70 hebrew-text">טווח מחיר:</span>
-                            <span className="font-medium text-white hebrew-text text-sm">{request.priceRange}</span>
+                            <span className="font-medium text-white hebrew-text text-sm">
+                              {request.price_from && request.price_to 
+                                ? `₪${request.price_from.toLocaleString()} - ₪${request.price_to.toLocaleString()}`
+                                : request.price_from 
+                                ? `מ-₪${request.price_from.toLocaleString()}`
+                                : request.price_to
+                                ? `עד ₪${request.price_to.toLocaleString()}`
+                                : 'לא צוין'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -283,30 +292,31 @@ export const RequiredCarsScreen = () => {
                     
                     <GradientSeparator />
                     
-                    {/* Row 2: Time + Requirements */}
                     <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70 py-2">
                       <div className="flex items-center gap-1 justify-center">
                         <Clock className="w-3 h-3" />
-                        <span className="hebrew-text text-center">{request.createdDate}</span>
+                        <span className="hebrew-text text-center">{formatDate(request.created_at)}</span>
                       </div>
-                      <span className="hebrew-text text-center">{request.requirements}</span>
+                      {request.additional_requirements && (
+                        <span className="hebrew-text text-center line-clamp-1">{request.additional_requirements}</span>
+                      )}
                     </div>
                   </Card>
                 </GradientBorderContainer>
-            ))}
-          </div>
+              ))}
 
-          {/* Empty State for My Requests */}
-          {mockISORequests.filter(req => req.id <= 2).length === 0 && (
-            <div className="text-center py-12">
-              <Search className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-medium mb-2">אין לך בקשות פעילות</h3>
-              <p className="text-muted-foreground mb-4">
-                צור בקשה חדשה לרכב שאתה מחפש
-              </p>
-              <Button onClick={() => navigate('/mobile/create-iso-request')}>
-                צור בקשה ראשונה
-              </Button>
+              {requests.length === 0 && !isLoading && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground hebrew-text mb-4">
+                    {statusFilter === 'all' 
+                      ? 'אין לך בקשות חיפוש'
+                      : `אין בקשות ${getStatusText(statusFilter)}`}
+                  </p>
+                  <Button onClick={() => navigate('/mobile/create-iso-request')}>
+                    צור בקשה ראשונה
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </>
