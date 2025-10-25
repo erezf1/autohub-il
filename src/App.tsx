@@ -31,7 +31,7 @@ import ChatRequestScreen from "./pages/mobile/ChatRequestScreen";
 import CreateBidSelectCarScreen from "./pages/mobile/CreateBidSelectCarScreen";
 import CreateBidDetailsScreen from "./pages/mobile/CreateBidDetailsScreen";
 import { RequiredCarsScreen } from "./pages/mobile/RequiredCarsScreen";
-import { HotCarsScreen } from "./pages/mobile/HotCarsScreen"; 
+import { HotCarsScreen } from "./pages/mobile/HotCarsScreen";
 import { BidsScreen } from "./pages/mobile/BidsScreen";
 import BoostManagementScreen from "./pages/mobile/BoostManagementScreen";
 import { WelcomeScreen } from "./pages/mobile/WelcomeScreen";
