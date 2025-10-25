@@ -86,6 +86,9 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			fontFamily: {
+				sans: ['Heebo', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+			},
 			keyframes: {
 				'accordion-down': {
 					from: {

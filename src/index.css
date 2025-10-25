@@ -4,6 +4,76 @@
 
 /* Auto-Net Dealers Design System - Professional B2B Automotive Marketplace */
 
+/* ============================================
+   HEEBO FONT FAMILY DEFINITIONS
+   ============================================
+   All font weights are defined with Heebo
+   Font-weight utilities will automatically apply correct weight
+*/
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('/Heebo/Heebo-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('/Heebo/Heebo-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('/Heebo/Heebo-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('/Heebo/Heebo-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('/Heebo/Heebo-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('/Heebo/Heebo-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('/Heebo/Heebo-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('/Heebo/Heebo-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('/Heebo/Heebo-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     /* Core Background & Text - Black Theme */
@@ -134,6 +204,7 @@
 @layer base {
   * {
     @apply border-border;
+    font-family: 'Heebo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
   }
 
   html {
@@ -145,11 +216,13 @@
     position: fixed;
     overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
+    font-family: 'Heebo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
 
   body {
     @apply text-foreground;
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Heebo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 400;
     direction: rtl;
     margin: 0;
     padding: 0;
@@ -162,6 +235,11 @@
     overscroll-behavior: none;
     touch-action: none;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure all text elements use Heebo by default */
+  h1, h2, h3, h4, h5, h6, p, span, a, button, label, input, textarea, select {
+    font-family: 'Heebo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
 
   #root {
@@ -308,5 +386,67 @@
   [dir="ltr"] .space-x-rtl > * + * {
     margin-right: 0;
     margin-left: 0.5rem;
+  }
+
+  /* ============================================
+     FONT WEIGHT UTILITIES
+     ============================================
+     These automatically use Heebo with the correct weight
+     Usage: className="font-thin", "font-light", "font-normal", "font-medium", "font-semibold", "font-bold", "font-extrabold", "font-black"
+  */
+  .font-thin {
+    font-family: 'Heebo';
+    font-weight: 100;
+  }
+
+  .font-extralight {
+    font-family: 'Heebo';
+    font-weight: 200;
+  }
+
+  .font-light {
+    font-family: 'Heebo';
+    font-weight: 300;
+  }
+
+  .font-normal {
+    font-family: 'Heebo';
+    font-weight: 400;
+  }
+
+  .font-medium {
+    font-family: 'Heebo';
+    font-weight: 500;
+  }
+
+  .font-semibold {
+    font-family: 'Heebo';
+    font-weight: 600;
+  }
+
+  .font-bold {
+    font-family: 'Heebo';
+    font-weight: 700;
+  }
+
+  .font-extrabold {
+    font-family: 'Heebo';
+    font-weight: 800;
+  }
+
+  .font-black {
+    font-family: 'Heebo';
+    font-weight: 900;
+  }
+
+  /* Aliases for common weights */
+  .font-regular {
+    font-family: 'Heebo';
+    font-weight: 400;
+  }
+
+  .font-semi {
+    font-family: 'Heebo';
+    font-weight: 600;
   }
 }
