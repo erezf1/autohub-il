@@ -306,33 +306,80 @@ Create new "Vehicles Wanted" requests with detailed specifications.
 #### Purpose
 Manage boost usage and apply 5-day boosts to dealer's own vehicle listings.
 
-#### Layout Requirements
-- **Boost Credits Card**: 
-  - Shows remaining boosts as "X / Total" format (e.g., "7 / 10")
-  - Visual progress bar showing used vs. available boosts
-  - Fetches allocation from `subscription_plans` table via `useProfile` hook
-  - Monthly reset information
-- **Subscription Info**: 
-  - Current plan name (dynamically from `subscription_plans.name_hebrew`)
-  - Monthly boost allocation (dynamically from `subscription_plans.monthly_boosts`)
-  - Contact admin for upgrades
-- **Active Boosts Section**: Currently boosted vehicles with:
-  - Vehicle thumbnail and basic info
-  - Days remaining until expiration
-  - Optional hot sale price display
-  - Deactivate button to cancel boost early (still counts toward limit)
-- **Eligible Vehicles Section**: User's own non-boosted vehicles available for boosting
-- **Boost Activation Dialog**: 
-  - Fixed 5-day duration (no user selection)
-  - Optional hot sale price input (must be lower than original price)
-  - Discount percentage calculation display
-  - Activate/Cancel buttons
+#### Visual Hierarchy & Layout Structure
+The screen is organized to prioritize active boosts and make adding new boosts effortless:
+
+1. **Boost Counter Card** (Compact Header):
+   - Shows remaining boosts: "X / Y בוסטים זמינים" (e.g., "7 / 10")
+   - Visual progress bar indicating usage
+   - Subscription plan name display
+   - Fetches allocation from `subscription_plans` table via `useProfile` hook
+
+2. **Active Boosts Section** (Priority #1):
+   - Title: "הבוסטים הפעילים שלי"
+   - Displays currently boosted vehicles with:
+     - Vehicle thumbnail (80x80px) and details
+     - Time remaining countdown (e.g., "3 ימים נותרים")
+     - Hot sale price badge if applicable (₪XXX,XXX)
+     - Deactivate button (X icon) to cancel boost early
+   - Empty state when no active boosts:
+     - Flame icon (faded)
+     - Message: "אין בוסטים פעילים"
+     - Subtext: "הפעל בוסט כדי להגביר את החשיפה של הרכבים שלך"
+
+3. **Add Boost Button** (Large CTA):
+   - Prominent gradient-bordered button
+   - Icons: Flame + Plus
+   - Text: "הוסף בוסט חדש"
+   - Disabled state when `availableBoosts === 0`
+   - Opens Vehicle Selection Drawer on click
+
+4. **Subscription Info Card** (Bottom):
+   - Compact footer display
+   - Shows: "סוג מנוי: [plan_name]"
+   - Monthly allocation: "(X בוסטים בחודש)"
+   - Contact message: "לשדרוג מנוי, צור קשר עם המנהל"
+
+#### Components & User Flow
+
+**VehicleSelectionDrawer Component** (`src/components/mobile/VehicleSelectionDrawer.tsx`):
+- Opens when user clicks "הוסף בוסט חדש"
+- Displays user's eligible (non-boosted) vehicles
+- Each vehicle card shows:
+  - Thumbnail, make/model, year, current price
+  - "בחר" button
+- Empty state with "הוסף רכב" button if no eligible vehicles
+- On selection: Opens Boost Configuration Dialog
+
+**Boost Configuration Dialog**:
+- Pre-filled with selected vehicle details
+- Shows original price for reference
+- Hot sale price input (optional):
+  - Allows setting promotional price
+  - Can be left as original price (no discount)
+  - Validation ensures positive number
+- Display: "משך הבוסט: 5 ימים" (read-only)
+- Actions:
+  - "הפעל בוסט" button (primary, with Flame icon)
+  - "ביטול" button (secondary)
+- On success: Dialog closes, Active Boosts section updates immediately
 
 #### Boost Counting Logic
 - Uses `get_remaining_boosts(user_id)` RPC function
 - Counts activations (not just currently active boosts)
 - Formula: `remaining = monthly_allocation - boosts_activated_this_month`
 - Resets on 1st of each month
+- Progress bar calculation: `(availableBoosts / totalBoosts) * 100`
+
+#### Technical Implementation
+- **Queries**: 
+  - `useProfile()` - Fetches subscription plan with boost allocation
+  - `myActiveBoostedVehicles` - Active boosts with remaining time
+  - `myVehicles` - Eligible vehicles for new boosts (filtered: not boosted)
+- **Mutations**:
+  - `activateBoost({ vehicleId, hotSalePrice })` - Activates 5-day boost
+  - `deactivateBoost(vehicleId)` - Cancels active boost early
+- **State Management**: React Query with refetch on window focus
 
 ### 14. Subscription Status Screen (`/mobile/subscription`)
 **File**: `src/pages/mobile/SubscriptionStatusScreen.tsx`

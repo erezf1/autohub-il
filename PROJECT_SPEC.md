@@ -115,6 +115,16 @@ Customer support representatives with limited administrative access:
 - **Communication**: Dealers contact via existing chat system for hot car inquiries
 - **Automatic Expiration**: Boosts automatically deactivate after 5 days
 
+**Boost Management Flow**:
+1. Dealer navigates to Boost Management screen from Dashboard or Hot Cars tab
+2. Views active boosts (if any) at top of screen with countdown timers
+3. Clicks prominent "הוסף בוסט חדש" button to activate new boost
+4. Vehicle Selection Drawer opens showing eligible (non-boosted) vehicles
+5. Selects vehicle → Boost Configuration Dialog appears
+6. Optionally sets hot sale price (can keep original price)
+7. Confirms activation → Boost activates immediately for 5 days
+8. Active Boosts section updates in real-time with new boosted vehicle
+
 ### Auction Rules
 - Auction types: Standard, Reserve (minimum price), Buy-Now (instant purchase)
 - Bidding increments and validation
