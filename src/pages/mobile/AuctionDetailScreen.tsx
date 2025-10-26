@@ -11,6 +11,7 @@ import { GradientBorderContainer } from "@/components/ui/gradient-border-contain
 import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { DealerCard, VehicleSpecsCard, LoadingSpinner } from "@/components/common";
 import { useAuctions, usePlaceBid } from "@/hooks/mobile";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Mock auction data
 const mockAuction = {
@@ -80,6 +81,7 @@ const mockAuction = {
 const AuctionDetailScreen = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [bidAmount, setBidAmount] = useState("");
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -169,9 +171,49 @@ const AuctionDetailScreen = () => {
           </h1>
         </div>
         <Badge variant="default" className="hebrew-text">
-          {mockAuction.status}
+          {auction.creator_id === user?.id ? 'המכרז שלך' : mockAuction.status}
         </Badge>
       </div>
+
+      {/* Vehicle Details Card - MOVED TO TOP */}
+      <GradientBorderContainer className="rounded-md">
+        <Card className="bg-black border-0 rounded-md">
+          <CardHeader>
+            <CardTitle className="text-2xl hebrew-text text-center">
+              {make?.name_hebrew} {model?.name_hebrew} {vehicle?.year}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              const specsRows = [];
+              
+              if (vehicle?.kilometers || vehicle?.engine_size) {
+                specsRows.push([
+                  vehicle?.kilometers && { label: "קילומטראז'", value: vehicle.kilometers.toLocaleString() },
+                  vehicle?.engine_size && { label: "נפח מנוע", value: vehicle.engine_size.toString(), unit: "סמ״ק" }
+                ].filter(Boolean));
+              }
+              
+              if (vehicle?.transmission || vehicle?.fuel_type) {
+                specsRows.push([
+                  vehicle?.transmission && { label: "תיבת הילוכים", value: vehicle.transmission },
+                  vehicle?.fuel_type && { label: "סוג דלק", value: vehicle.fuel_type }
+                ].filter(Boolean));
+              }
+              
+              if (vehicle?.previous_owners) {
+                specsRows.push([
+                  { label: "בעלים קודמים", value: vehicle.previous_owners.toString() }
+                ]);
+              }
+              
+              return specsRows.length > 0 ? (
+                <VehicleSpecsCard rows={specsRows} />
+              ) : null;
+            })()}
+          </CardContent>
+        </Card>
+      </GradientBorderContainer>
 
       {/* Vehicle Image */}
       <GradientBorderContainer className="rounded-md">
@@ -245,72 +287,73 @@ const AuctionDetailScreen = () => {
         </Card>
       </GradientBorderContainer>
 
-      {/* Bidding Interface */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="text-xl hebrew-text">הגש הצעה</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex space-x-2 space-x-reverse">
-              <Input
-                type="number"
-                placeholder={`מינימום ₪${suggestedBid.toLocaleString()}`}
-                value={bidAmount}
-                onChange={(e) => setBidAmount(e.target.value)}
-                className="flex-1 text-right hebrew-text"
-                dir="rtl"
-              />
-              <Button 
-                onClick={handlePlaceBid}
-                disabled={!bidAmount || parseInt(bidAmount) <= currentBid || isPlacingBid}
-                className="px-6 hebrew-text"
-              >
-                <Gavel className="h-4 w-4 ml-2" />
-                {isPlacingBid ? 'שולח...' : 'הגש הצעה'}
-              </Button>
-            </div>
-            
-            <Button 
-              variant="outline" 
-              className="w-full hebrew-text"
-              onClick={() => setBidAmount(suggestedBid.toString())}
-            >
-              הצעה מהירה: ₪{suggestedBid.toLocaleString()}
-            </Button>
+      {/* Bidding Interface - Only show if not the creator */}
+      {auction.creator_id !== user?.id ? (
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardHeader>
+              <CardTitle className="text-xl hebrew-text">הגש הצעה</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2" dir="rtl">
+                <Input
+                  type="number"
+                  value={bidAmount}
+                  onChange={(e) => setBidAmount(e.target.value)}
+                  placeholder="הכנס סכום הצעה"
+                  className="flex-1 bg-black border border-white/20 text-right hebrew-text"
+                  dir="rtl"
+                />
+                <Button 
+                  onClick={handlePlaceBid}
+                  disabled={isPlacingBid || !bidAmount}
+                  className="hebrew-text"
+                >
+                  {isPlacingBid ? "שולח..." : "הגש הצעה"}
+                </Button>
+              </div>
+              
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground hebrew-text">
+                  הצעה מוצעת
+                </span>
+                <span className="text-white font-bold hebrew-text">
+                  ₪{suggestedBid?.toLocaleString()}
+                </span>
+              </div>
 
-            {!hasReserveMet && auction.reserve_price && (
-              <div className="p-3 bg-warning/10 rounded-lg border border-warning/20">
-                <p className="text-sm text-warning hebrew-text">
-                  מחיר השמירה עדיין לא הושג (₪{auction.reserve_price.toLocaleString()})
+              <Button 
+                variant="outline" 
+                className="w-full hebrew-text"
+                onClick={() => setBidAmount(suggestedBid?.toString() || "")}
+              >
+                הצע {suggestedBid?.toLocaleString()} ₪
+              </Button>
+
+              <div className="pt-2 space-y-2 text-xs text-muted-foreground hebrew-text">
+                <div className="flex items-center justify-between">
+                  <span>מחיר מינימום</span>
+                  <span>₪{currentBid?.toLocaleString()}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
+      ) : (
+        <GradientBorderContainer className="rounded-md">
+          <Card className="bg-black border-0 rounded-md">
+            <CardContent className="p-6">
+              <div className="text-center space-y-2">
+                <Gavel className="h-12 w-12 text-muted-foreground mx-auto" />
+                <p className="text-muted-foreground hebrew-text">
+                  זהו המכרז שלך. המתינו להצעות מסוחרים אחרים.
                 </p>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
+            </CardContent>
+          </Card>
+        </GradientBorderContainer>
+      )}
 
-      {/* Vehicle Details */}
-      {
-        (() => {
-          const specsRows = [
-            {
-              col1: { label: 'שנת ייצור', value: vehicle?.year },
-              col2: { label: 'קילומטרז׳', value: vehicle?.kilometers?.toLocaleString(), unit: 'ק״מ' }
-            },
-            {
-              col1: { label: 'תיבת הילוכים', value: vehicle?.transmission || 'לא צוין' },
-              col2: { label: 'סוג דלק', value: vehicle?.fuel_type || 'לא צוין' }
-            },
-            ...(vehicle?.engine_size || vehicle?.color ? [{
-              col1: vehicle?.engine_size ? { label: 'נפח מנוע', value: vehicle.engine_size } : undefined,
-              col2: vehicle?.color ? { label: 'צבע', value: vehicle.color } : undefined
-            }] : [])
-          ].filter(row => row.col1 || row.col2);
-
-          return <VehicleSpecsCard rows={specsRows} />;
-        })()
-      }
 
       {/* Vehicle Description */}
       {vehicle?.description && (

@@ -65,7 +65,6 @@ interface AuctionForm {
   startDate: string;
   description: string;
   terms: string[];
-  isPrivate: boolean;
   allowInspection: boolean;
 }
 
@@ -81,12 +80,11 @@ const AddAuctionScreen = () => {
     vehicleId: "",
     startingPrice: "",
     reservePrice: "",
-    duration: "",
+    duration: "3",
     startTime: "",
     startDate: "",
     description: "",
     terms: [],
-    isPrivate: false,
     allowInspection: true
   });
 
@@ -302,14 +300,14 @@ const AddAuctionScreen = () => {
                 <div>
                   <Label className="text-white hebrew-text">מחיר פתיחה (₪) *</Label>
                   <GradientBorderContainer className="rounded-md">
-                    <Input
-                      type="number"
-                      placeholder="500000"
-                      value={formData.startingPrice}
-                      onChange={(e) => updateFormData("startingPrice", e.target.value)}
-                      className="bg-black border-0 text-right hebrew-text"
-                      dir="rtl"
-                    />
+                  <Input
+                    type="number"
+                    placeholder="500000"
+                    value={formData.startingPrice}
+                    onChange={(e) => updateFormData("startingPrice", e.target.value)}
+                    className="bg-black border-0 text-right hebrew-text placeholder:text-muted-foreground placeholder:opacity-50"
+                    dir="rtl"
+                  />
                   </GradientBorderContainer>
                   <p className="text-xs text-muted-foreground hebrew-text mt-1">
                     המחיר הנמוך ביותר שממנו תתחיל המכירה
@@ -321,14 +319,14 @@ const AddAuctionScreen = () => {
                 <div>
                   <Label className="text-white hebrew-text">מחיר שמירה (₪)</Label>
                   <GradientBorderContainer className="rounded-md">
-                    <Input
-                      type="number"
-                      placeholder="700000"
-                      value={formData.reservePrice}
-                      onChange={(e) => updateFormData("reservePrice", e.target.value)}
-                      className="bg-black border-0 text-right hebrew-text"
-                      dir="rtl"
-                    />
+                  <Input
+                    type="number"
+                    placeholder="700000"
+                    value={formData.reservePrice}
+                    onChange={(e) => updateFormData("reservePrice", e.target.value)}
+                    className="bg-black border-0 text-right hebrew-text placeholder:text-muted-foreground placeholder:opacity-50"
+                    dir="rtl"
+                  />
                   </GradientBorderContainer>
                   <p className="text-xs text-muted-foreground hebrew-text mt-1">
                     המחיר המינימלי שתקבל עבור הרכב (אופציונלי)
@@ -378,9 +376,13 @@ const AddAuctionScreen = () => {
                 <div>
                   <Label className="text-white hebrew-text">משך המכירה *</Label>
                   <GradientBorderContainer className="rounded-md">
-                    <Select onValueChange={(value) => updateFormData("duration", value)}>
+                    <Select 
+                      defaultValue="3"
+                      value={formData.duration}
+                      onValueChange={(value) => updateFormData("duration", value)}
+                    >
                       <SelectTrigger className="bg-black border-0">
-                        <SelectValue placeholder="בחר משך זמן" />
+                        <SelectValue placeholder="3 ימים" />
                       </SelectTrigger>
                       <SelectContent>
                         {auctionDurations.map(duration => (
@@ -440,17 +442,6 @@ const AddAuctionScreen = () => {
                   </Label>
                 </div>
 
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <Checkbox
-                    id="isPrivate"
-                    checked={formData.isPrivate}
-                    onCheckedChange={(checked) => updateFormData("isPrivate", !!checked)}
-                  />
-                  <Label htmlFor="isPrivate" className="text-white hebrew-text">
-                    מכירה פרטית (רק למוזמנים)
-                  </Label>
-                </div>
-
                 <GradientSeparator />
 
                 <div className="p-4 bg-muted/10 rounded-lg">
@@ -469,8 +460,8 @@ const AddAuctionScreen = () => {
       )}
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between gap-4">
-        {currentStep > 1 && (
+      {currentStep > 1 && (
+        <div className="flex justify-between gap-4">
           <GradientBorderContainer className="rounded-md">
             <Button 
               variant="outline" 
@@ -480,18 +471,18 @@ const AddAuctionScreen = () => {
               חזור
             </Button>
           </GradientBorderContainer>
-        )}
-        <GradientBorderContainer className="rounded-md flex-1">
-          <Button 
-            onClick={handleNext}
-            disabled={!canProceed()}
-            className="bg-black border-0 w-full hebrew-text"
-          >
-            {currentStep < 3 ? 'המשך' : 'צור מכירה פומבית'}
-            <ChevronLeft className="mr-2 h-4 w-4" />
-          </Button>
-        </GradientBorderContainer>
-      </div>
+          <GradientBorderContainer className="rounded-md flex-1">
+            <Button 
+              onClick={handleNext}
+              disabled={!canProceed()}
+              className="bg-black border-0 w-full hebrew-text"
+            >
+              {currentStep < 3 ? 'המשך' : 'צור מכירה פומבית'}
+              <ChevronLeft className="mr-2 h-4 w-4" />
+            </Button>
+          </GradientBorderContainer>
+        </div>
+      )}
     </div>
   );
 };
