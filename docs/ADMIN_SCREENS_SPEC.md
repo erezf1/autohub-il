@@ -347,22 +347,45 @@ Generate and view system analytics and reports.
 System configuration and administrative settings.
 
 ### Layout Requirements
-- **Settings Categories**: System, Users, Auctions, Notifications
+- **Settings Categories**: Vehicle Categories, Report Reasons, System Settings, Subscription Settings
 - **Configuration Forms**: Various system parameters
 - **Save/Cancel Actions**: Form submission controls
 
-### Settings Categories
-- **System Settings**: Site configuration, maintenance mode
-- **User Settings**: Registration requirements, verification
-- **Auction Settings**: Default parameters, rules
-- **Notification Settings**: Email templates, SMS configuration
+### Settings Categories Tabs
+1. **קטגוריות רכב (Vehicle Categories)**: Manage vehicle type categories and subcategories
+2. **סיבות דיווח (Report Reasons)**: Manage user report reasons
+3. **הגדרות מערכת (System Settings)**: Site configuration, maintenance mode
+4. **הגדרות מינויים (Subscription Settings)**: Configure subscription plan limits
+
+### Subscription Settings Tab Structure
+- **Three Subscription Plans**:
+  - **Regular Plan (רגיל)**: Free tier configuration
+    - Max vehicles limit
+    - Monthly boosts (typically 0)
+    - Monthly auctions (typically 0)
+  - **Gold Plan (זהב)**: Mid-tier paid subscription
+    - Max vehicles limit (default: 25)
+    - Monthly boosts (default: 5)
+    - Monthly auctions (default: 3)
+    - Price display (₪299/חודש)
+  - **VIP Plan (VIP)**: Premium tier subscription
+    - Max vehicles limit (default: 100)
+    - Monthly boosts (default: 15)
+    - Monthly auctions (default: 10)
+    - Price display (₪799/חודש)
 
 ### Components Needed
 - Tabbed settings interface
-- Form inputs with validation
-- Toggle switches for features
-- Save confirmation dialogs
-- Settings backup/restore options
+- Plan configuration cards with gradient borders
+- Number inputs for limits (max_vehicles, monthly_boosts, monthly_auctions)
+- Individual save buttons per plan
+- Real-time updates from `useSubscriptionPlans` hook
+- Update mutation using `useUpdateSubscriptionPlan` hook
+
+### Data Management
+- Fetches plans from `subscription_plans` table
+- Updates persist to database via admin edge functions
+- RLS policies ensure only admins can modify plans
 
 ## 8. Notifications (`/admin/notifications`)
 **File**: `src/pages/admin/AdminNotifications.tsx`

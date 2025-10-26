@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Settings, Save, Plus, Edit, Trash2, AlertTriangle } from "lucide-react";
+import { useSubscriptionPlans, useUpdateSubscriptionPlan } from "@/hooks/admin/useSubscriptionPlans";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,11 @@ const systemSettings = {
 const AdminSettings = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
+  
+  const { data: subscriptionPlans, isLoading: plansLoading } = useSubscriptionPlans();
+  const updatePlanMutation = useUpdateSubscriptionPlan();
+
+  const [planUpdates, setPlanUpdates] = useState<Record<string, any>>({});
 
   return (
     <div className="space-y-8">
@@ -76,7 +82,7 @@ const AdminSettings = () => {
             <TabsTrigger value="categories" className="hebrew-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">קטגוריות רכב</TabsTrigger>
             <TabsTrigger value="reports" className="hebrew-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">סיבות דיווח</TabsTrigger>
             <TabsTrigger value="system" className="hebrew-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">הגדרות מערכת</TabsTrigger>
-            <TabsTrigger value="users" className="hebrew-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">הגדרות משתמשים</TabsTrigger>
+            <TabsTrigger value="users" className="hebrew-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">הגדרות מינויים</TabsTrigger>
           </TabsList>
 
           {/* Vehicle Categories Tab */}
@@ -342,64 +348,193 @@ const AdminSettings = () => {
           </div>
         </TabsContent>
 
-        {/* User Settings Tab */}
+        {/* Subscription Settings Tab */}
         <TabsContent value="users">
-          <GradientBorderContainer className="rounded-md">
-            <Card className="bg-black border-0 rounded-md">
-              <CardHeader>
-                <CardTitle className="text-white hebrew-text">הגדרות משתמשים</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label className="text-white hebrew-text">מספר רכבים מקסימלי למשתמש רגיל</Label>
-                    <GradientBorderContainer className="rounded-md">
-                      <Input type="number" defaultValue="10" className="hebrew-text border-0 bg-black rounded-md" />
-                    </GradientBorderContainer>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-white hebrew-text">מספר רכבים מקסימלי למשתמש פרימיום</Label>
-                    <GradientBorderContainer className="rounded-md">
-                      <Input type="number" defaultValue="50" className="hebrew-text border-0 bg-black rounded-md" />
-                    </GradientBorderContainer>
-                  </div>
-                </div>
+          <div className="space-y-6">
+            {plansLoading ? (
+              <div className="text-center text-white hebrew-text py-8">טוען...</div>
+            ) : (
+              <>
+                {/* Regular Plan */}
+                {subscriptionPlans?.find(p => p.id === 'regular') && (
+                  <GradientBorderContainer className="rounded-md">
+                    <Card className="bg-black border-0 rounded-md">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-white hebrew-text">מינוי רגיל</CardTitle>
+                          <Badge variant="outline" className="hebrew-text">חינם</Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-white hebrew-text">מספר רכבים מקסימלי</Label>
+                            <GradientBorderContainer className="rounded-md">
+                              <Input 
+                                type="number" 
+                                value={planUpdates['regular']?.max_vehicles ?? subscriptionPlans.find(p => p.id === 'regular')?.max_vehicles ?? 0}
+                                onChange={(e) => setPlanUpdates({...planUpdates, regular: {...planUpdates['regular'], max_vehicles: parseInt(e.target.value)}})}
+                                className="hebrew-text border-0 bg-black rounded-md"
+                              />
+                            </GradientBorderContainer>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-white hebrew-text">בוסטים חודשיים</Label>
+                            <GradientBorderContainer className="rounded-md">
+                              <Input 
+                                type="number" 
+                                value={planUpdates['regular']?.monthly_boosts ?? subscriptionPlans.find(p => p.id === 'regular')?.monthly_boosts ?? 0}
+                                onChange={(e) => setPlanUpdates({...planUpdates, regular: {...planUpdates['regular'], monthly_boosts: parseInt(e.target.value)}})}
+                                className="hebrew-text border-0 bg-black rounded-md"
+                              />
+                            </GradientBorderContainer>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-white hebrew-text">הצעות מחיר חודשיות</Label>
+                            <GradientBorderContainer className="rounded-md">
+                              <Input 
+                                type="number" 
+                                value={planUpdates['regular']?.monthly_auctions ?? subscriptionPlans.find(p => p.id === 'regular')?.monthly_auctions ?? 0}
+                                onChange={(e) => setPlanUpdates({...planUpdates, regular: {...planUpdates['regular'], monthly_auctions: parseInt(e.target.value)}})}
+                                className="hebrew-text border-0 bg-black rounded-md"
+                              />
+                            </GradientBorderContainer>
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => updatePlanMutation.mutate({ planId: 'regular', updates: planUpdates['regular'] })}
+                          disabled={!planUpdates['regular'] || updatePlanMutation.isPending}
+                          className="hebrew-text w-full"
+                        >
+                          שמור שינויים
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </GradientBorderContainer>
+                )}
 
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label className="text-white hebrew-text">מספר מכירות פומביות מקסימלי בו-זמנית</Label>
-                    <GradientBorderContainer className="rounded-md">
-                      <Input type="number" defaultValue="5" className="hebrew-text border-0 bg-black rounded-md" />
-                    </GradientBorderContainer>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-white hebrew-text">ימי שמירת נתונים לאחר מחיקת משתמש</Label>
-                    <GradientBorderContainer className="rounded-md">
-                      <Input type="number" defaultValue="30" className="hebrew-text border-0 bg-black rounded-md" />
-                    </GradientBorderContainer>
-                  </div>
-                </div>
+                {/* Gold Plan */}
+                {subscriptionPlans?.find(p => p.id === 'gold') && (
+                  <GradientBorderContainer className="rounded-md">
+                    <Card className="bg-black border-0 rounded-md">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-white hebrew-text">מינוי זהב</CardTitle>
+                          <Badge className="bg-yellow-600 text-white hebrew-text">
+                            ₪{subscriptionPlans.find(p => p.id === 'gold')?.price_monthly}/חודש
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-white hebrew-text">מספר רכבים מקסימלי</Label>
+                            <GradientBorderContainer className="rounded-md">
+                              <Input 
+                                type="number" 
+                                value={planUpdates['gold']?.max_vehicles ?? subscriptionPlans.find(p => p.id === 'gold')?.max_vehicles ?? 0}
+                                onChange={(e) => setPlanUpdates({...planUpdates, gold: {...planUpdates['gold'], max_vehicles: parseInt(e.target.value)}})}
+                                className="hebrew-text border-0 bg-black rounded-md"
+                              />
+                            </GradientBorderContainer>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-white hebrew-text">בוסטים חודשיים</Label>
+                            <GradientBorderContainer className="rounded-md">
+                              <Input 
+                                type="number" 
+                                value={planUpdates['gold']?.monthly_boosts ?? subscriptionPlans.find(p => p.id === 'gold')?.monthly_boosts ?? 0}
+                                onChange={(e) => setPlanUpdates({...planUpdates, gold: {...planUpdates['gold'], monthly_boosts: parseInt(e.target.value)}})}
+                                className="hebrew-text border-0 bg-black rounded-md"
+                              />
+                            </GradientBorderContainer>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-white hebrew-text">הצעות מחיר חודשיות</Label>
+                            <GradientBorderContainer className="rounded-md">
+                              <Input 
+                                type="number" 
+                                value={planUpdates['gold']?.monthly_auctions ?? subscriptionPlans.find(p => p.id === 'gold')?.monthly_auctions ?? 0}
+                                onChange={(e) => setPlanUpdates({...planUpdates, gold: {...planUpdates['gold'], monthly_auctions: parseInt(e.target.value)}})}
+                                className="hebrew-text border-0 bg-black rounded-md"
+                              />
+                            </GradientBorderContainer>
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => updatePlanMutation.mutate({ planId: 'gold', updates: planUpdates['gold'] })}
+                          disabled={!planUpdates['gold'] || updatePlanMutation.isPending}
+                          className="hebrew-text w-full"
+                        >
+                          שמור שינויים
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </GradientBorderContainer>
+                )}
 
-                <div className="space-y-4">
-                  <Label className="text-white hebrew-text">הגדרות דירוג סוחרים</Label>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="text-sm text-white hebrew-text">משקל מכירות (0-1)</Label>
-                      <GradientBorderContainer className="rounded-md">
-                        <Input type="number" step="0.1" defaultValue="0.4" className="hebrew-text border-0 bg-black rounded-md" />
-                      </GradientBorderContainer>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm text-white hebrew-text">משקל דירוג (0-1)</Label>
-                      <GradientBorderContainer className="rounded-md">
-                        <Input type="number" step="0.1" defaultValue="0.6" className="hebrew-text border-0 bg-black rounded-md" />
-                      </GradientBorderContainer>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </GradientBorderContainer>
+                {/* VIP Plan */}
+                {subscriptionPlans?.find(p => p.id === 'vip') && (
+                  <GradientBorderContainer className="rounded-md">
+                    <Card className="bg-black border-0 rounded-md">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-white hebrew-text">מינוי VIP</CardTitle>
+                          <Badge className="bg-purple-600 text-white hebrew-text">
+                            ₪{subscriptionPlans.find(p => p.id === 'vip')?.price_monthly}/חודש
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-white hebrew-text">מספר רכבים מקסימלי</Label>
+                            <GradientBorderContainer className="rounded-md">
+                              <Input 
+                                type="number" 
+                                value={planUpdates['vip']?.max_vehicles ?? subscriptionPlans.find(p => p.id === 'vip')?.max_vehicles ?? 0}
+                                onChange={(e) => setPlanUpdates({...planUpdates, vip: {...planUpdates['vip'], max_vehicles: parseInt(e.target.value)}})}
+                                className="hebrew-text border-0 bg-black rounded-md"
+                              />
+                            </GradientBorderContainer>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-white hebrew-text">בוסטים חודשיים</Label>
+                            <GradientBorderContainer className="rounded-md">
+                              <Input 
+                                type="number" 
+                                value={planUpdates['vip']?.monthly_boosts ?? subscriptionPlans.find(p => p.id === 'vip')?.monthly_boosts ?? 0}
+                                onChange={(e) => setPlanUpdates({...planUpdates, vip: {...planUpdates['vip'], monthly_boosts: parseInt(e.target.value)}})}
+                                className="hebrew-text border-0 bg-black rounded-md"
+                              />
+                            </GradientBorderContainer>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-white hebrew-text">הצעות מחיר חודשיות</Label>
+                            <GradientBorderContainer className="rounded-md">
+                              <Input 
+                                type="number" 
+                                value={planUpdates['vip']?.monthly_auctions ?? subscriptionPlans.find(p => p.id === 'vip')?.monthly_auctions ?? 0}
+                                onChange={(e) => setPlanUpdates({...planUpdates, vip: {...planUpdates['vip'], monthly_auctions: parseInt(e.target.value)}})}
+                                className="hebrew-text border-0 bg-black rounded-md"
+                              />
+                            </GradientBorderContainer>
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => updatePlanMutation.mutate({ planId: 'vip', updates: planUpdates['vip'] })}
+                          disabled={!planUpdates['vip'] || updatePlanMutation.isPending}
+                          className="hebrew-text w-full"
+                        >
+                          שמור שינויים
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </GradientBorderContainer>
+                )}
+              </>
+            )}
+          </div>
         </TabsContent>
         </Tabs>
       </div>

@@ -239,7 +239,7 @@ const AdminEditUser = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="regular" className="hebrew-text">רגיל</SelectItem>
-                      <SelectItem value="premium" className="hebrew-text">פרימיום</SelectItem>
+                      <SelectItem value="gold" className="hebrew-text">זהב</SelectItem>
                       <SelectItem value="vip" className="hebrew-text">VIP</SelectItem>
                     </SelectContent>
                   </Select>

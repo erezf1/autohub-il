@@ -491,6 +491,45 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          max_vehicles: number
+          monthly_auctions: number
+          monthly_boosts: number
+          name_english: string
+          name_hebrew: string
+          price_monthly: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          is_active?: boolean | null
+          max_vehicles: number
+          monthly_auctions: number
+          monthly_boosts: number
+          name_english: string
+          name_hebrew: string
+          price_monthly?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_vehicles?: number
+          monthly_auctions?: number
+          monthly_boosts?: number
+          name_english?: string
+          name_hebrew?: string
+          price_monthly?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       support_ticket_messages: {
         Row: {
           created_at: string | null
@@ -1012,10 +1051,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cleanup_expired_boosts: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_expired_boosts: { Args: never; Returns: undefined }
       create_admin_notification: {
         Args: {
           p_assigned_to?: string
@@ -1040,14 +1076,8 @@ export type Database = {
         }
         Returns: string
       }
-      get_admin_unread_notifications_count: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      get_remaining_boosts: {
-        Args: { user_id: string }
-        Returns: number
-      }
+      get_admin_unread_notifications_count: { Args: never; Returns: number }
+      get_remaining_boosts: { Args: { user_id: string }; Returns: number }
       get_user_unread_messages_count: {
         Args: { user_id: string }
         Returns: number
@@ -1063,10 +1093,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "dealer" | "admin" | "support"

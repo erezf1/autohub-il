@@ -7,6 +7,34 @@ This document defines the complete Supabase database schema for Auto-Hub, includ
 
 ### 1. Lookup Tables (Constant Values)
 
+#### 1.0 Subscription Plans Table
+```sql
+CREATE TABLE public.subscription_plans (
+  id TEXT PRIMARY KEY CHECK (id IN ('regular', 'gold', 'vip')),
+  name_hebrew TEXT NOT NULL,
+  name_english TEXT NOT NULL,
+  max_vehicles INTEGER NOT NULL,
+  monthly_boosts INTEGER NOT NULL,
+  monthly_auctions INTEGER NOT NULL,
+  price_monthly DECIMAL(10,2),
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Insert default plans
+INSERT INTO public.subscription_plans (id, name_hebrew, name_english, max_vehicles, monthly_boosts, monthly_auctions, price_monthly) VALUES
+('regular', 'רגיל', 'Regular', 10, 0, 0, 0),
+('gold', 'זהב', 'Gold', 25, 5, 3, 299),
+('vip', 'VIP', 'VIP', 100, 15, 10, 799);
+```
+
+**Purpose**: Define subscription plan tiers with their associated limits and pricing.
+
+**RLS Policies**:
+- Authenticated users can view all active plans
+- Only admins can create/update/delete plans
+
 #### 1.1 Vehicle Makes Table
 ```sql
 CREATE TABLE public.vehicle_makes (
@@ -153,7 +181,7 @@ CREATE TABLE public.user_profiles (
   tenure INTEGER DEFAULT 0, -- Years in business
   avg_response_time INTEGER, -- In minutes
   rating_tier TEXT DEFAULT 'bronze' CHECK (rating_tier IN ('bronze', 'silver', 'gold', 'platinum')),
-  subscription_type TEXT DEFAULT 'regular' CHECK (subscription_type IN ('regular', 'silver', 'unlimited')),
+  subscription_type TEXT DEFAULT 'regular' CHECK (subscription_type IN ('regular', 'gold', 'vip')),
   subscription_valid_until DATE,
   available_boosts INTEGER DEFAULT 0,
   available_auctions INTEGER DEFAULT 0,

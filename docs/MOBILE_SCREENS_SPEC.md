@@ -158,7 +158,7 @@ Display boosted vehicles ("Hot Sales") with 5-day priority placement. Shows ONLY
 - **Optional Hot Sale Price**: Dealers can set special reduced pricing
 - **Visibility**: Excludes current user's own boosted vehicles (managed via "My Boosts")
 - **Communication**: Dealers use existing chat system to contact about hot cars
-- **Monthly Allocation**: Silver plan (5 boosts/month), Unlimited plan (10 boosts/month)
+- **Monthly Allocation**: Gold plan (5 boosts/month), VIP plan (15 boosts/month)
 
 #### Layout Requirements
 - **Header**: Title with flame icon, "My Boosts" button to access own boost management
@@ -215,7 +215,7 @@ Comprehensive profile management with subscription and business information.
 - Logout functionality
 
 #### Enhanced Features from PRD
-- Display subscription plan (Regular/Silver/Unlimited)
+- Display subscription plan (Regular/Gold/VIP)
 - Show remaining vehicles, boosts, and auctions
 - Rating tier visualization
 - Years in business (tenure)

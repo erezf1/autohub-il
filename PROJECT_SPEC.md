@@ -35,7 +35,7 @@ Customer support representatives with limited administrative access:
 
 ### User Entity
 **Core Properties**: ID (UUID), phone_number, password_hash, user_role (dealer/admin/support), status (pending/active/suspended/rejected)
-**Profile Properties**: full_name, business_name, location, trade_license, tenure, rating_tier, subscription_type, available_boosts, vehicles_limit
+**Profile Properties**: full_name, business_name, location, trade_license, tenure, rating_tier, subscription_type (regular/gold/vip), subscription_valid_until, available_boosts, available_auctions, vehicles_limit
 **Relationships**: 1:Many with vehicles, auctions, ISO requests, chat conversations, notifications
 **Operations**: Registration, profile updates, status changes, subscription management
 
@@ -90,13 +90,14 @@ Customer support representatives with limited administrative access:
 **Vehicle Models**: Per-make vehicle models with Hebrew/English names
 **Vehicle Tags**: Categorized tags (condition, category, feature) with colors
 **Locations**: Israeli cities and regions for location-based features
+**Subscription Plans**: Plan definitions (regular/gold/vip) with max_vehicles, monthly_boosts, monthly_auctions, price_monthly
 
 ## Business Rules & Logic
 
 ### Subscription Plans & Limits
-- **Regular Plan**: Up to 10 vehicles, basic features
-- **Silver Plan**: Up to 20 vehicles, 5 boosts per month, 2 auctions per month
-- **Unlimited Plan**: Unlimited vehicles, 10 boosts per month, 5 auctions per month
+- **Regular Plan**: Up to 10 vehicles, 0 boosts per month, 0 auctions per month
+- **Gold Plan**: Up to 25 vehicles, 5 boosts per month, 3 auctions per month
+- **VIP Plan**: Up to 100 vehicles, 15 boosts per month, 10 auctions per month
 
 ### Boost System ("Hot Cars")
 - **Boost Duration**: Fixed 5-day priority placement in Hot Cars section

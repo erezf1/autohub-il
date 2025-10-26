@@ -62,8 +62,8 @@ const MyProfileScreen = () => {
 
   const getSubscriptionLabel = (type: string) => {
     switch(type) {
-      case 'silver': return 'כסף';
-      case 'unlimited': return 'בלתי מוגבל';
+      case 'gold': return 'זהב';
+      case 'vip': return 'VIP';
       case 'regular': 
       default: return 'רגיל';
     }

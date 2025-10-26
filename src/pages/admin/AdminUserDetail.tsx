@@ -85,12 +85,13 @@ const AdminUserDetail = () => {
 
   const getPlanBadge = (plan: string) => {
     switch (plan) {
-      case 'premium':
-        return <Badge className="bg-primary text-primary-foreground">פרימיום</Badge>;
+      case 'gold':
+        return <Badge className="bg-yellow-600 text-white">זהב</Badge>;
+      case 'vip':
+        return <Badge className="bg-purple-600 text-white">VIP</Badge>;
       case 'regular':
-        return <Badge variant="outline">רגיל</Badge>;
       default:
-        return <Badge variant="secondary">{plan}</Badge>;
+        return <Badge variant="outline">רגיל</Badge>;
     }
   };
 
@@ -265,6 +266,14 @@ const AdminUserDetail = () => {
                         ? new Date(user.profile.subscription_valid_until).toLocaleDateString('he-IL')
                         : 'לא צוין'}
                     </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/70 hebrew-text mb-1 text-right">גבולות מינוי</p>
+                    <div className="text-sm text-white hebrew-text space-y-1">
+                      <div>רכבים: {vehicles?.filter(v => v.status === 'available').length || 0} / {user.profile?.vehicles_limit || 0}</div>
+                      <div>בוסטים: {user.profile?.available_boosts || 0} נותרו</div>
+                      <div>מכרזים: {user.profile?.available_auctions || 0} נותרו</div>
+                    </div>
                   </div>
                   <div>
                     <p className="text-sm text-white/70 hebrew-text mb-1 text-right">דירוג</p>
