@@ -179,20 +179,122 @@ Display boosted vehicles ("Hot Sales") with 5-day priority placement. Shows ONLY
 ### 9. Bids Screen (`/mobile/bids`)
 **File**: `src/pages/mobile/BidsScreen.tsx`
 
-#### Purpose
-Manage auction participation and bidding activities.
+**Purpose**: 
+Display auctions where the dealer is participating or can participate in.
 
-#### Layout Requirements
-- **Filter Tabs**: My Bids, My Auctions, Active Auctions
-- **Bid Management**: Create new bids and track existing ones
-- **Real-time Updates**: Live bid updates and notifications
+**Layout**:
+- Header: "מכרזים פעילים"
+- Two tabs: "ההצעות שלי" (My Bids) and "כל המכרזים" (All Auctions)
+- Vehicle cards showing auction details and current bid
+- Click to view auction detail
 
-#### Components Needed
-- Auction cards with bid status
-- Bid creation flow (select car -> set bid details)
-- Bid history and status tracking
-- Real-time countdown and updates
-- "Create New Bid" button leading to car selection
+**Features**:
+- Real-time bid updates
+- Countdown timers
+- Status badges (winning/outbid)
+- Filter by vehicle type
+
+---
+
+### 9A. Auction Detail Screen (`/mobile/auction/:id`)
+**File**: `src/pages/mobile/AuctionDetailScreen.tsx`
+
+**Purpose**: 
+Display detailed auction information with different layouts for auction owners vs. bidders.
+
+#### Layout for Auction Owner (Creator View)
+When `auction.creator_id === user?.id`:
+
+1. **Header**: 
+   - Back button (left)
+   - Title: "מכירה פומבית"
+   - Badge: "המכרז שלך" (right)
+
+2. **Info Card**: 
+   - Icon: Gavel
+   - Message: "זהו המכרז שלך. המתינו להצעות מסוחרים אחרים."
+
+3. **Auction Summary Card**:
+   - Vehicle make/model/year title
+   - Current highest bid amount: `₪XXX,XXX`
+   - Countdown timer: `HH:MM:SS` (hours:minutes:seconds)
+   - Number of bids received (real count from bid history)
+   - No mock data for watchers/views
+
+4. **Bid History Card**:
+   - Title: "היסטוריית הצעות"
+   - List of all bids with:
+     - Ranking number (1st highlighted in yellow)
+     - Anonymized dealer name
+     - Bid amount
+     - Timestamp
+     - "מוביל" badge on highest bid
+   - Empty state: "עדיין אין הצעות"
+
+5. **Vehicle Details & Image Card**:
+   - Title: "פרטי הרכב"
+   - Vehicle image at top
+   - Technical specifications (VehicleSpecsCard):
+     - Year, KM
+     - Transmission, Fuel type
+     - Color, Engine size
+   - Description (if provided)
+
+#### Layout for Bidders (Non-Creator View)
+When `auction.creator_id !== user?.id`:
+
+1. **Header**: Same as owner view, but badge shows "פעיל"
+
+2. **Vehicle Details & Image Card**: (Same as owner view Card #5)
+
+3. **Auction Summary Card**: (Same as owner view Card #3)
+   - Shows "מצב המכרז" as title
+   - Shows "הצעה נוכחית" instead of "הצעה הגבוהה ביותר"
+
+4. **Bidding Interface Card**:
+   - Title: "הגש הצעה"
+   - Input field for bid amount
+   - Placeholder: "מינימום ₪XXX,XXX"
+   - Helper text: Minimum increment requirement (₪1,000)
+   - Submit button: "הגש הצעה" with gavel icon
+   - Loading state during submission
+
+5. **Bid History Card**: (Same as owner view Card #4)
+
+6. **Seller Info Card** (Simplified):
+   - Title: "פרטי המוכר"
+   - Seller avatar
+   - Seller name
+   - Rating with stars
+   - No additional details or contact options
+
+#### Removed Elements
+The following cards/elements have been removed to simplify the screen:
+- "Vehicle Condition & History" card (no real data available)
+- `DealerCard` component (redundant with simplified Seller Info)
+- Separate "Vehicle Description" card (consolidated into Vehicle Details card)
+- Mock data for watchers and views (not in database schema)
+
+#### Real-time Features
+- Countdown timer updates every second via `useEffect`
+- Bid history can be refreshed with Supabase Realtime (future enhancement)
+- Outbid notifications trigger when new higher bid is placed
+
+#### Data Sources
+- Vehicle data: `vehicles` table joined with `vehicle_makes` and `vehicle_models`
+- Auction data: `auctions` table
+- Bid history: `auction_bids` table with anonymized dealer names
+- Current user: `useAuth()` hook
+
+#### Testing Checklist
+- ✅ View own auction - verify 4 cards total (info + 3 main cards)
+- ✅ View other's auction - verify 5 cards total
+- ✅ Verify countdown timer works correctly
+- ✅ Verify bid history shows real data with anonymized names
+- ✅ Verify real bid count (not mock data)
+- ✅ Verify bidding interface only shows for non-owners
+- ✅ Test navigation from BidsScreen to detail screen
+- ✅ Test bid submission and validation
 
 ### 10. My Profile Screen (`/mobile/profile`)
 **File**: `src/pages/mobile/MyProfileScreen.tsx`

@@ -1,81 +1,27 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Car, Gavel, Clock, Users, Eye, TrendingUp } from "lucide-react";
-import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
+import { Car, Gavel, Users, Star, Loader2, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
-import { DealerCard, VehicleSpecsCard, LoadingSpinner } from "@/components/common";
+import { VehicleSpecsCard, LoadingSpinner } from "@/components/common";
 import { useAuctions, usePlaceBid } from "@/hooks/mobile";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Mock auction data
 const mockAuction = {
   id: "789",
-  title: "פורשה 911 2019",
-  currentBid: 750000,
-  startingPrice: 650000,
-  reservePrice: 800000,
-  hasReserveMet: false,
-  timeRemaining: {
-    days: 0,
-    hours: 2,
-    minutes: 35,
-    seconds: 42
-  },
-  totalBids: 28,
-  watchers: 156,
-  views: 2341,
-  vehicle: {
-    year: 2019,
-    kilometers: 35000,
-    transmission: "ידנית",
-    fuelType: "בנזין",
-    engineSize: "3.0L",
-    color: "כחול מטאלי",
-    description: "פורשה 911 במצב יוצא דופן. רכב אספנות שמור במוסך מקורה. כל הטיפולים במוסך מורשה."
-  },
-  bidHistory: [
-    {
-      id: 1,
-      bidder: "ד***ן כ***",
-      amount: 750000,
-      timestamp: "לפני דקה",
-      isWinning: true
-    },
-    {
-      id: 2,
-      bidder: "מ***ה ל***",
-      amount: 740000,
-      timestamp: "לפני 3 דקות",
-      isWinning: false
-    },
-    {
-      id: 3,
-      bidder: "א***ל ר***",
-      amount: 730000,
-      timestamp: "לפני 8 דקות",
-      isWinning: false
-    },
-    {
-      id: 4,
-      bidder: "י***ב ק***",
-      amount: 720000,
-      timestamp: "לפני 12 דקות",
-      isWinning: false
-    }
-  ],
   seller: {
     name: "יוסי אברהם",
     rating: 4.9,
     auctionsCount: 12
   },
-  status: "פעיל",
-  endTime: new Date(Date.now() + 2 * 60 * 60 * 1000 + 35 * 60 * 1000) // 2:35 from now
+  status: "פעיל"
 };
 
 const AuctionDetailScreen = () => {
@@ -88,8 +34,14 @@ const AuctionDetailScreen = () => {
   // Fetch auction data
   const { useAuctionById, useAuctionBidHistory } = useAuctions();
   const { data: auction, isLoading } = useAuctionById(id);
-  const { data: bidHistory = [] } = useAuctionBidHistory(id);
-  const { mutate: placeBidMutation, isPending: isPlacingBid } = usePlaceBid();
+  const { data: bidHistory = [], isLoading: bidHistoryLoading } = useAuctionBidHistory(id);
+  const placeBidMutation = usePlaceBid();
+  
+  // Helper function to anonymize names
+  const anonymizeName = (name: string) => {
+    if (!name || name.length < 2) return 'משתמש';
+    return `${name.charAt(0)}***${name.charAt(name.length - 1)}`;
+  };
 
   // Countdown timer
   useEffect(() => {
@@ -115,7 +67,7 @@ const AuctionDetailScreen = () => {
     return () => clearInterval(timer);
   }, [auction?.auction_end_time]);
 
-  const handleBackClick = () => {
+  const handleBack = () => {
     navigate("/mobile/bids");
   };
 
@@ -129,7 +81,7 @@ const AuctionDetailScreen = () => {
       return;
     }
 
-    placeBidMutation({
+    placeBidMutation.mutate({
       auctionId: auction.id,
       bidAmount: bidValue
     }, {
@@ -150,331 +102,414 @@ const AuctionDetailScreen = () => {
   const vehicle = auction.vehicle;
   const make = vehicle?.make;
   const model = vehicle?.model;
-  const seller = auction.creator;
   const currentBid = auction.current_highest_bid || auction.starting_price;
-  const suggestedBid = currentBid + 10000;
-  const hasReserveMet = auction.reserve_price ? currentBid >= auction.reserve_price : true;
+  const isOwner = auction.creator_id === user?.id;
 
   return (
     <div className="container max-w-md mx-auto px-4 space-y-6" dir="rtl">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div 
-            onClick={handleBackClick}
-            className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
-          >
-            <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground hebrew-text">
-            מכירה פומבית
-          </h1>
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleBack}
+          className="text-white"
+        >
+          <ChevronRight className="h-6 w-6" />
+        </Button>
+        <h1 className="text-xl font-bold text-white hebrew-text">מכירה פומבית</h1>
         <Badge variant="default" className="hebrew-text">
-          {auction.creator_id === user?.id ? 'המכרז שלך' : mockAuction.status}
+          {isOwner ? 'המכרז שלך' : 'פעיל'}
         </Badge>
       </div>
 
-      {/* Vehicle Details Card - MOVED TO TOP */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="text-2xl hebrew-text text-center">
-              {make?.name_hebrew} {model?.name_hebrew} {vehicle?.year}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {(() => {
-              const specsRows = [];
-              
-              if (vehicle?.kilometers || vehicle?.engine_size) {
-                specsRows.push([
-                  vehicle?.kilometers && { label: "קילומטראז'", value: vehicle.kilometers.toLocaleString() },
-                  vehicle?.engine_size && { label: "נפח מנוע", value: vehicle.engine_size.toString(), unit: "סמ״ק" }
-                ].filter(Boolean));
-              }
-              
-              if (vehicle?.transmission || vehicle?.fuel_type) {
-                specsRows.push([
-                  vehicle?.transmission && { label: "תיבת הילוכים", value: vehicle.transmission },
-                  vehicle?.fuel_type && { label: "סוג דלק", value: vehicle.fuel_type }
-                ].filter(Boolean));
-              }
-              
-              if (vehicle?.previous_owners) {
-                specsRows.push([
-                  { label: "בעלים קודמים", value: vehicle.previous_owners.toString() }
-                ]);
-              }
-              
-              return specsRows.length > 0 ? (
-                <VehicleSpecsCard rows={specsRows} />
-              ) : null;
-            })()}
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
+      {isOwner ? (
+        <>
+          {/* Info Message for Own Auction */}
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardContent className="p-6">
+                <div className="text-center space-y-2">
+                  <Gavel className="h-12 w-12 text-muted-foreground mx-auto" />
+                  <p className="text-muted-foreground hebrew-text">
+                    זהו המכרז שלך. המתינו להצעות מסוחרים אחרים.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
 
-      {/* Vehicle Image */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardContent className="p-0">
-            <div className="relative h-48 bg-muted rounded-lg flex items-center justify-center">
-              <Car className="h-16 w-16 text-muted-foreground" />
-              <Badge variant="destructive" className="absolute top-2 right-2 hebrew-text">
-                מכירה פומבית
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
+          {/* Auction Summary Card */}
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-2xl hebrew-text text-center">
+                  {make?.name_hebrew} {model?.name_hebrew} {vehicle?.year}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Current Highest Bid */}
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-muted-foreground hebrew-text">הצעה הגבוהה ביותר</p>
+                  <p className="text-3xl font-bold text-white hebrew-text">
+                    ₪{currentBid.toLocaleString()}
+                  </p>
+                </div>
 
-      {/* Auction Status */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardContent className="p-6">
-            <div className="text-center space-y-4">
-            <h2 className="text-2xl font-bold text-foreground hebrew-text">
-                {make?.name_hebrew} {model?.name_hebrew} {vehicle?.year}
-              </h2>
-              
-              <div className="text-3xl font-bold text-primary">
-                ₪{currentBid.toLocaleString()}
-              </div>
-              <p className="text-sm text-muted-foreground hebrew-text">
-                הצעה נוכחית
-              </p>
+                <GradientSeparator />
 
-              <div className="flex justify-center items-center space-x-4 space-x-reverse mt-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">
-                    {String(timeLeft.hours).padStart(2, '0')}
+                {/* Countdown Timer */}
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-muted-foreground hebrew-text">זמן נותר</p>
+                  <div className="flex items-center justify-center gap-2" dir="ltr">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">{String(timeLeft.hours).padStart(2, '0')}</div>
+                      <div className="text-xs text-muted-foreground">שעות</div>
+                    </div>
+                    <span className="text-2xl font-bold text-white">:</span>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">{String(timeLeft.minutes).padStart(2, '0')}</div>
+                      <div className="text-xs text-muted-foreground">דקות</div>
+                    </div>
+                    <span className="text-2xl font-bold text-white">:</span>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">{String(timeLeft.seconds).padStart(2, '0')}</div>
+                      <div className="text-xs text-muted-foreground">שניות</div>
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground hebrew-text">שעות</div>
                 </div>
-                <div className="text-muted-foreground">:</div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">
-                    {String(timeLeft.minutes).padStart(2, '0')}
+
+                <GradientSeparator />
+
+                {/* Bid Count */}
+                <div className="flex justify-center gap-6">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground hebrew-text">הצעות</span>
+                    </div>
+                    <p className="text-xl font-bold text-white">{bidHistory?.length || 0}</p>
                   </div>
-                  <div className="text-xs text-muted-foreground hebrew-text">דקות</div>
                 </div>
-                <div className="text-muted-foreground">:</div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">
-                    {String(timeLeft.seconds).padStart(2, '0')}
-                  </div>
-                  <div className="text-xs text-muted-foreground hebrew-text">שניות</div>
-                </div>
-              </div>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
 
-              <div className="flex justify-center items-center space-x-6 space-x-reverse mt-4 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-1 space-x-reverse">
-                  <Gavel className="h-4 w-4" />
-                  <span className="hebrew-text">{mockAuction.totalBids} הצעות</span>
-                </div>
-                <div className="flex items-center space-x-1 space-x-reverse">
-                  <Users className="h-4 w-4" />
-                  <span className="hebrew-text">{mockAuction.watchers} עוקבים</span>
-                </div>
-                <div className="flex items-center space-x-1 space-x-reverse">
-                  <Eye className="h-4 w-4" />
-                  <span className="hebrew-text">{mockAuction.views} צפיות</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
-
-      {/* Bidding Interface - Only show if not the creator */}
-      {auction.creator_id !== user?.id ? (
-        <GradientBorderContainer className="rounded-md">
-          <Card className="bg-black border-0 rounded-md">
-            <CardHeader>
-              <CardTitle className="text-xl hebrew-text">הגש הצעה</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2" dir="rtl">
-                <Input
-                  type="number"
-                  value={bidAmount}
-                  onChange={(e) => setBidAmount(e.target.value)}
-                  placeholder="הכנס סכום הצעה"
-                  className="flex-1 bg-black border border-white/20 text-right hebrew-text"
-                  dir="rtl"
-                />
-                <Button 
-                  onClick={handlePlaceBid}
-                  disabled={isPlacingBid || !bidAmount}
-                  className="hebrew-text"
-                >
-                  {isPlacingBid ? "שולח..." : "הגש הצעה"}
-                </Button>
-              </div>
-              
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground hebrew-text">
-                  הצעה מוצעת
-                </span>
-                <span className="text-white font-bold hebrew-text">
-                  ₪{suggestedBid?.toLocaleString()}
-                </span>
-              </div>
-
-              <Button 
-                variant="outline" 
-                className="w-full hebrew-text"
-                onClick={() => setBidAmount(suggestedBid?.toString() || "")}
-              >
-                הצע {suggestedBid?.toLocaleString()} ₪
-              </Button>
-
-              <div className="pt-2 space-y-2 text-xs text-muted-foreground hebrew-text">
-                <div className="flex items-center justify-between">
-                  <span>מחיר מינימום</span>
-                  <span>₪{currentBid?.toLocaleString()}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </GradientBorderContainer>
-      ) : (
-        <GradientBorderContainer className="rounded-md">
-          <Card className="bg-black border-0 rounded-md">
-            <CardContent className="p-6">
-              <div className="text-center space-y-2">
-                <Gavel className="h-12 w-12 text-muted-foreground mx-auto" />
-                <p className="text-muted-foreground hebrew-text">
-                  זהו המכרז שלך. המתינו להצעות מסוחרים אחרים.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </GradientBorderContainer>
-      )}
-
-
-      {/* Vehicle Description */}
-      {vehicle?.description && (
-        <GradientBorderContainer className="rounded-md">
-          <Card className="bg-black border-0 rounded-md">
-            <CardHeader>
-              <CardTitle className="hebrew-text text-white">תיאור</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-white hebrew-text leading-relaxed">
-                {vehicle?.description}
-              </p>
-            </CardContent>
-          </Card>
-        </GradientBorderContainer>
-      )}
-
-      {/* Bid History */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 space-x-reverse hebrew-text text-xl">
-              <TrendingUp className="h-5 w-5" />
-              <span>היסטוריית הצעות</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {bidHistory.length > 0 ? bidHistory.map((bid: any, index: number) => (
-                <div key={bid.id}>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-2 space-x-reverse">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-                          {bid.bidderName?.charAt(0) || 'ס'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-foreground text-sm hebrew-text">{bid.bidderName}</p>
-                        <p className="text-xs text-muted-foreground hebrew-text">
-                          {new Date(bid.created_at).toLocaleString('he-IL')}
-                        </p>
+          {/* Bid History */}
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-xl hebrew-text">היסטוריית הצעות</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {bidHistoryLoading ? (
+                  <LoadingSpinner />
+                ) : bidHistory && bidHistory.length > 0 ? (
+                  <div className="space-y-3">
+                    {bidHistory.map((bid: any, index: number) => (
+                      <div key={bid.id} className="flex items-center justify-between p-3 bg-card/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+                            ${index === 0 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-muted text-muted-foreground'}`}>
+                            {index + 1}
+                          </div>
+                          <div>
+                            <p className="text-white font-medium hebrew-text">{anonymizeName(bid.dealer_name || 'משתמש')}</p>
+                            <p className="text-xs text-muted-foreground hebrew-text">
+                              {new Date(bid.created_at).toLocaleString('he-IL')}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-left">
+                          <p className="text-white font-bold hebrew-text">₪{bid.bid_amount.toLocaleString()}</p>
+                          {index === 0 && (
+                            <Badge variant="default" className="text-xs hebrew-text">
+                              מוביל
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-left">
-                      <p className={`font-bold ${bid.isWinning ? 'text-primary' : 'text-foreground'}`}>
-                        ₪{bid.bid_amount.toLocaleString()}
-                      </p>
-                      {bid.isWinning && (
-                        <Badge variant="default" className="text-xs hebrew-text">
-                          מוביל
-                        </Badge>
-                      )}
-                    </div>
+                    ))}
                   </div>
-                  {index < bidHistory.length - 1 && (
-                    <GradientSeparator className="mt-4" />
+                ) : (
+                  <p className="text-center text-muted-foreground hebrew-text">עדיין אין הצעות</p>
+                )}
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
+
+          {/* Vehicle Details & Image Combined */}
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-xl hebrew-text text-center">פרטי הרכב</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Vehicle Image */}
+                <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
+                  {vehicle?.images?.[0] ? (
+                    <img 
+                      src={vehicle.images[0]} 
+                      alt={`${make?.name_hebrew} ${model?.name_hebrew}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Car className="h-16 w-16 text-muted-foreground" />
+                    </div>
                   )}
                 </div>
-              )) : (
-                <p className="text-center text-muted-foreground hebrew-text py-4">
-                  אין הצעות עדיין
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
 
-      {/* Seller Info */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="text-xl hebrew-text">פרטי המוכר</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-3 space-x-reverse">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  {seller?.business_name?.charAt(0) || seller?.full_name?.charAt(0) || 'ס'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-semibold text-foreground hebrew-text">
-                  {seller?.business_name || seller?.full_name || 'סוחר'}
-                </h3>
-                <p className="text-sm text-muted-foreground hebrew-text">
-                  {seller?.rating_tier || 'רגיל'} • {seller?.tenure || 0} חודשים במערכת
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
+                <GradientSeparator />
 
-      {/* Vehicle Condition & History */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="hebrew-text text-white">מצב ורקע הרכב</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">מצב כללי</p>
-                <p className="font-medium text-white hebrew-text">
-                  מצוין
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
+                {/* Technical Specs */}
+                <VehicleSpecsCard rows={[
+                  { col1: { label: "שנה", value: vehicle?.year }, col2: { label: "ק״מ", value: vehicle?.kilometers?.toLocaleString() } },
+                  { col1: { label: "גיר", value: vehicle?.transmission }, col2: { label: "דלק", value: vehicle?.fuel_type } },
+                  { col1: { label: "צבע", value: vehicle?.color }, col2: { label: "מנוע", value: vehicle?.engine_size, unit: "סמ״ק" } }
+                ]} />
 
-      {/* Dealer Card */}
-      <DealerCard
-        dealerId={seller?.id || ''}
-        isRevealed={true}
-        showChatButton={true}
-        showPhoneButton={true}
-      />
+                {/* Description */}
+                {vehicle?.description && (
+                  <>
+                    <GradientSeparator />
+                    <div>
+                      <h3 className="text-sm font-semibold text-white hebrew-text mb-2">תיאור</h3>
+                      <p className="text-muted-foreground hebrew-text text-sm">{vehicle.description}</p>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
+        </>
+      ) : (
+        <>
+          {/* Vehicle Details & Image Combined */}
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-2xl hebrew-text text-center">
+                  {make?.name_hebrew} {model?.name_hebrew} {vehicle?.year}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Vehicle Image */}
+                <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
+                  {vehicle?.images?.[0] ? (
+                    <img 
+                      src={vehicle.images[0]} 
+                      alt={`${make?.name_hebrew} ${model?.name_hebrew}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Car className="h-16 w-16 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+
+                <GradientSeparator />
+
+                {/* Technical Specs */}
+                <VehicleSpecsCard rows={[
+                  { col1: { label: "שנה", value: vehicle?.year }, col2: { label: "ק״מ", value: vehicle?.kilometers?.toLocaleString() } },
+                  { col1: { label: "גיר", value: vehicle?.transmission }, col2: { label: "דלק", value: vehicle?.fuel_type } },
+                  { col1: { label: "צבע", value: vehicle?.color }, col2: { label: "מנוע", value: vehicle?.engine_size, unit: "סמ״ק" } }
+                ]} />
+
+                {/* Description */}
+                {vehicle?.description && (
+                  <>
+                    <GradientSeparator />
+                    <div>
+                      <h3 className="text-sm font-semibold text-white hebrew-text mb-2">תיאור</h3>
+                      <p className="text-muted-foreground hebrew-text text-sm">{vehicle.description}</p>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
+
+          {/* Auction Summary Card */}
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-xl hebrew-text">מצב המכרז</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Current Highest Bid */}
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-muted-foreground hebrew-text">הצעה נוכחית</p>
+                  <p className="text-3xl font-bold text-white hebrew-text">
+                    ₪{currentBid.toLocaleString()}
+                  </p>
+                </div>
+
+                <GradientSeparator />
+
+                {/* Countdown Timer */}
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-muted-foreground hebrew-text">זמן נותר</p>
+                  <div className="flex items-center justify-center gap-2" dir="ltr">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">{String(timeLeft.hours).padStart(2, '0')}</div>
+                      <div className="text-xs text-muted-foreground">שעות</div>
+                    </div>
+                    <span className="text-2xl font-bold text-white">:</span>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">{String(timeLeft.minutes).padStart(2, '0')}</div>
+                      <div className="text-xs text-muted-foreground">דקות</div>
+                    </div>
+                    <span className="text-2xl font-bold text-white">:</span>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">{String(timeLeft.seconds).padStart(2, '0')}</div>
+                      <div className="text-xs text-muted-foreground">שניות</div>
+                    </div>
+                  </div>
+                </div>
+
+                <GradientSeparator />
+
+                {/* Stats */}
+                <div className="flex justify-center gap-6">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground hebrew-text">הצעות</span>
+                    </div>
+                    <p className="text-xl font-bold text-white">{bidHistory?.length || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
+
+          {/* Bidding Interface */}
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-xl hebrew-text">הגש הצעה</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bidAmount" className="text-white hebrew-text">
+                    סכום ההצעה (₪)
+                  </Label>
+                  <Input
+                    id="bidAmount"
+                    type="number"
+                    placeholder={`מינימום ₪${(currentBid + 1000).toLocaleString()}`}
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                    className="bg-muted border-0 text-right hebrew-text"
+                    dir="rtl"
+                  />
+                  <p className="text-xs text-muted-foreground hebrew-text">
+                    ההצעה הבאה חייבת להיות גבוהה מ-₪{currentBid.toLocaleString()} לפחות ב-₪1,000
+                  </p>
+                </div>
+
+                <Button
+                  className="w-full hebrew-text"
+                  size="lg"
+                  onClick={handlePlaceBid}
+                  disabled={placeBidMutation.isPending}
+                >
+                  {placeBidMutation.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin ml-2" />
+                  ) : (
+                    <Gavel className="h-5 w-5 ml-2" />
+                  )}
+                  הגש הצעה
+                </Button>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
+
+          {/* Bid History */}
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-xl hebrew-text">היסטוריית הצעות</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {bidHistoryLoading ? (
+                  <LoadingSpinner />
+                ) : bidHistory && bidHistory.length > 0 ? (
+                  <div className="space-y-3">
+                    {bidHistory.map((bid: any, index: number) => (
+                      <div key={bid.id} className="flex items-center justify-between p-3 bg-card/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+                            ${index === 0 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-muted text-muted-foreground'}`}>
+                            {index + 1}
+                          </div>
+                          <div>
+                            <p className="text-white font-medium hebrew-text">{anonymizeName(bid.dealer_name || 'משתמש')}</p>
+                            <p className="text-xs text-muted-foreground hebrew-text">
+                              {new Date(bid.created_at).toLocaleString('he-IL')}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-left">
+                          <p className="text-white font-bold hebrew-text">₪{bid.bid_amount.toLocaleString()}</p>
+                          {index === 0 && (
+                            <Badge variant="default" className="text-xs hebrew-text">
+                              מוביל
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground hebrew-text">עדיין אין הצעות</p>
+                )}
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
+
+          {/* Seller Info - Simplified */}
+          <GradientBorderContainer className="rounded-md">
+            <Card className="bg-black border-0 rounded-md">
+              <CardHeader>
+                <CardTitle className="text-xl hebrew-text">פרטי המוכר</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-start gap-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {mockAuction.seller.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <h3 className="text-white font-semibold hebrew-text">{mockAuction.seller.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < Math.floor(mockAuction.seller.rating)
+                                ? 'fill-yellow-500 text-yellow-500'
+                                : 'fill-muted text-muted'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-muted-foreground hebrew-text">
+                        ({mockAuction.seller.rating.toFixed(1)})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
+        </>
+      )}
     </div>
   );
 };
