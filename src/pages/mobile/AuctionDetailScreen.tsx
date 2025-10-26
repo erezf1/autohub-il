@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
-import { DealerCard, VehicleSpecsCard } from "@/components/common";
+import { DealerCard, VehicleSpecsCard, LoadingSpinner } from "@/components/common";
+import { useAuctions, usePlaceBid } from "@/hooks/mobile";
 
 // Mock auction data
 const mockAuction = {
@@ -80,13 +81,21 @@ const AuctionDetailScreen = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [bidAmount, setBidAmount] = useState("");
-  const [timeLeft, setTimeLeft] = useState(mockAuction.timeRemaining);
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  // Fetch auction data
+  const { useAuctionById, useAuctionBidHistory } = useAuctions();
+  const { data: auction, isLoading } = useAuctionById(id);
+  const { data: bidHistory = [] } = useAuctionBidHistory(id);
+  const { mutate: placeBidMutation, isPending: isPlacingBid } = usePlaceBid();
 
   // Countdown timer
   useEffect(() => {
+    if (!auction?.auction_end_time) return;
+
     const timer = setInterval(() => {
       const now = new Date().getTime();
-      const endTime = mockAuction.endTime.getTime();
+      const endTime = new Date(auction.auction_end_time).getTime();
       const distance = endTime - now;
 
       if (distance > 0) {
@@ -96,25 +105,53 @@ const AuctionDetailScreen = () => {
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
         setTimeLeft({ days, hours, minutes, seconds });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [auction?.auction_end_time]);
 
   const handleBackClick = () => {
-    navigate("/mobile/auctions");
+    navigate("/mobile/bids");
   };
 
   const handlePlaceBid = () => {
-    if (bidAmount && parseInt(bidAmount) > mockAuction.currentBid) {
-      // In real app, place bid via API
-      console.log("Placing bid:", bidAmount);
-      setBidAmount("");
+    if (!auction || !bidAmount) return;
+    
+    const currentHighest = auction.current_highest_bid || auction.starting_price;
+    const bidValue = parseInt(bidAmount);
+    
+    if (bidValue <= currentHighest) {
+      return;
     }
+
+    placeBidMutation({
+      auctionId: auction.id,
+      bidAmount: bidValue
+    }, {
+      onSuccess: () => {
+        setBidAmount("");
+      }
+    });
   };
 
-  const suggestedBid = mockAuction.currentBid + 10000;
+  if (isLoading || !auction) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  const vehicle = auction.vehicle;
+  const make = vehicle?.make;
+  const model = vehicle?.model;
+  const seller = auction.creator;
+  const currentBid = auction.current_highest_bid || auction.starting_price;
+  const suggestedBid = currentBid + 10000;
+  const hasReserveMet = auction.reserve_price ? currentBid >= auction.reserve_price : true;
 
   return (
     <div className="container max-w-md mx-auto px-4 space-y-6" dir="rtl">
@@ -155,12 +192,12 @@ const AuctionDetailScreen = () => {
         <Card className="bg-black border-0 rounded-md">
           <CardContent className="p-6">
             <div className="text-center space-y-4">
-              <h2 className="text-2xl font-bold text-foreground hebrew-text">
-                {mockAuction.title}
+            <h2 className="text-2xl font-bold text-foreground hebrew-text">
+                {make?.name_hebrew} {model?.name_hebrew} {vehicle?.year}
               </h2>
               
               <div className="text-3xl font-bold text-primary">
-                ₪{mockAuction.currentBid.toLocaleString()}
+                ₪{currentBid.toLocaleString()}
               </div>
               <p className="text-sm text-muted-foreground hebrew-text">
                 הצעה נוכחית
@@ -226,11 +263,11 @@ const AuctionDetailScreen = () => {
               />
               <Button 
                 onClick={handlePlaceBid}
-                disabled={!bidAmount || parseInt(bidAmount) <= mockAuction.currentBid}
+                disabled={!bidAmount || parseInt(bidAmount) <= currentBid || isPlacingBid}
                 className="px-6 hebrew-text"
               >
                 <Gavel className="h-4 w-4 ml-2" />
-                הגש הצעה
+                {isPlacingBid ? 'שולח...' : 'הגש הצעה'}
               </Button>
             </div>
             
@@ -242,10 +279,10 @@ const AuctionDetailScreen = () => {
               הצעה מהירה: ₪{suggestedBid.toLocaleString()}
             </Button>
 
-            {!mockAuction.hasReserveMet && (
+            {!hasReserveMet && auction.reserve_price && (
               <div className="p-3 bg-warning/10 rounded-lg border border-warning/20">
                 <p className="text-sm text-warning hebrew-text">
-                  מחיר השמירה עדיין לא הושג (₪{mockAuction.reservePrice.toLocaleString()})
+                  מחיר השמירה עדיין לא הושג (₪{auction.reserve_price.toLocaleString()})
                 </p>
               </div>
             )}
@@ -258,16 +295,16 @@ const AuctionDetailScreen = () => {
         (() => {
           const specsRows = [
             {
-              col1: { label: 'שנת ייצור', value: mockAuction.vehicle.year },
-              col2: { label: 'קילומטרז׳', value: mockAuction.vehicle.kilometers.toLocaleString(), unit: 'ק״מ' }
+              col1: { label: 'שנת ייצור', value: vehicle?.year },
+              col2: { label: 'קילומטרז׳', value: vehicle?.kilometers?.toLocaleString(), unit: 'ק״מ' }
             },
             {
-              col1: { label: 'תיבת הילוכים', value: mockAuction.vehicle.transmission },
-              col2: { label: 'סוג דלק', value: mockAuction.vehicle.fuelType }
+              col1: { label: 'תיבת הילוכים', value: vehicle?.transmission || 'לא צוין' },
+              col2: { label: 'סוג דלק', value: vehicle?.fuel_type || 'לא צוין' }
             },
-            ...(mockAuction.vehicle.engineSize || mockAuction.vehicle.color ? [{
-              col1: mockAuction.vehicle.engineSize ? { label: 'נפח מנוע', value: mockAuction.vehicle.engineSize } : undefined,
-              col2: mockAuction.vehicle.color ? { label: 'צבע', value: mockAuction.vehicle.color } : undefined
+            ...(vehicle?.engine_size || vehicle?.color ? [{
+              col1: vehicle?.engine_size ? { label: 'נפח מנוע', value: vehicle.engine_size } : undefined,
+              col2: vehicle?.color ? { label: 'צבע', value: vehicle.color } : undefined
             }] : [])
           ].filter(row => row.col1 || row.col2);
 
@@ -276,7 +313,7 @@ const AuctionDetailScreen = () => {
       }
 
       {/* Vehicle Description */}
-      {mockAuction.vehicle.description && (
+      {vehicle?.description && (
         <GradientBorderContainer className="rounded-md">
           <Card className="bg-black border-0 rounded-md">
             <CardHeader>
@@ -284,7 +321,7 @@ const AuctionDetailScreen = () => {
             </CardHeader>
             <CardContent>
               <p className="text-white hebrew-text leading-relaxed">
-                {mockAuction.vehicle.description}
+                {vehicle?.description}
               </p>
             </CardContent>
           </Card>
@@ -302,23 +339,25 @@ const AuctionDetailScreen = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {mockAuction.bidHistory.map((bid, index) => (
+              {bidHistory.length > 0 ? bidHistory.map((bid: any, index: number) => (
                 <div key={bid.id}>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2 space-x-reverse">
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-                          {bid.bidder.charAt(0)}
+                          {bid.bidderName?.charAt(0) || 'ס'}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium text-foreground text-sm hebrew-text">{bid.bidder}</p>
-                        <p className="text-xs text-muted-foreground hebrew-text">{bid.timestamp}</p>
+                        <p className="font-medium text-foreground text-sm hebrew-text">{bid.bidderName}</p>
+                        <p className="text-xs text-muted-foreground hebrew-text">
+                          {new Date(bid.created_at).toLocaleString('he-IL')}
+                        </p>
                       </div>
                     </div>
                     <div className="text-left">
                       <p className={`font-bold ${bid.isWinning ? 'text-primary' : 'text-foreground'}`}>
-                        ₪{bid.amount.toLocaleString()}
+                        ₪{bid.bid_amount.toLocaleString()}
                       </p>
                       {bid.isWinning && (
                         <Badge variant="default" className="text-xs hebrew-text">
@@ -327,11 +366,15 @@ const AuctionDetailScreen = () => {
                       )}
                     </div>
                   </div>
-                  {index < mockAuction.bidHistory.length - 1 && (
+                  {index < bidHistory.length - 1 && (
                     <GradientSeparator className="mt-4" />
                   )}
                 </div>
-              ))}
+              )) : (
+                <p className="text-center text-muted-foreground hebrew-text py-4">
+                  אין הצעות עדיין
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -347,15 +390,15 @@ const AuctionDetailScreen = () => {
             <div className="flex items-center space-x-3 space-x-reverse">
               <Avatar className="h-10 w-10">
                 <AvatarFallback className="bg-primary text-primary-foreground">
-                  {mockAuction.seller.name.charAt(0)}
+                  {seller?.business_name?.charAt(0) || seller?.full_name?.charAt(0) || 'ס'}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <h3 className="font-semibold text-foreground hebrew-text">
-                  {mockAuction.seller.name}
+                  {seller?.business_name || seller?.full_name || 'סוחר'}
                 </h3>
                 <p className="text-sm text-muted-foreground hebrew-text">
-                  דירוג: {mockAuction.seller.rating} ⭐ • {mockAuction.seller.auctionsCount} מכירות
+                  {seller?.rating_tier || 'רגיל'} • {seller?.tenure || 0} חודשים במערכת
                 </p>
               </div>
             </div>
@@ -384,7 +427,7 @@ const AuctionDetailScreen = () => {
 
       {/* Dealer Card */}
       <DealerCard
-        dealerId={mockAuction.seller.name}
+        dealerId={seller?.id || ''}
         isRevealed={true}
         showChatButton={true}
         showPhoneButton={true}

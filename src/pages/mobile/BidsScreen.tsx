@@ -16,6 +16,7 @@ import {
   ResultsCount,
 } from "@/components/common";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
+import { useAllActiveAuctions, useMyBids, useMyAuctions } from '@/hooks/mobile';
 
 
 // Mock data for bids and auctions
@@ -116,13 +117,35 @@ export const BidsScreen: React.FC = () => {
   const [showMyAuctions, setShowMyAuctions] = useState(false);
   const [filters, setFilters] = useState<VehicleFilters>({});
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  
+  // Fetch real auction data
+  const { data: activeAuctions = [], isLoading: isLoadingAuctions } = useAllActiveAuctions();
+  const { data: myBids = [], isLoading: isLoadingBids } = useMyBids();
+  const { data: myAuctions = [], isLoading: isLoadingMyAuctions } = useMyAuctions();
 
   const filteredActiveAuctions = applyVehicleFilters(
-    mockActiveAuctions,
+    activeAuctions as any[],
     filters
   );
 
   const activeFilterCount = getActiveFilterCount(filters);
+
+  // Helper function to format time remaining
+  const formatTimeRemaining = (endTime: string) => {
+    const now = new Date().getTime();
+    const end = new Date(endTime).getTime();
+    const distance = end - now;
+
+    if (distance <= 0) return 'הסתיים';
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) return `${days} ימים ו-${hours} שעות`;
+    if (hours > 0) return `${hours} שעות ו-${minutes} דקות`;
+    return `${minutes} דקות`;
+  };
 
   return (
     <PageContainer>
@@ -164,7 +187,7 @@ export const BidsScreen: React.FC = () => {
         <>
           {/* All Auctions View */}
           <div className="flex items-center justify-between gap-2 mb-4">
-            <ResultsCount count={filteredActiveAuctions.length + mockMyBids.length} isLoading={false} />
+            <ResultsCount count={filteredActiveAuctions.length + myBids.length} isLoading={isLoadingAuctions || isLoadingBids} />
             <GradientBorderContainer className="rounded-md">
               <FilterButton
                 activeCount={activeFilterCount}
@@ -182,22 +205,28 @@ export const BidsScreen: React.FC = () => {
           <div>
             <h3 className="font-medium mb-3 text-white text-right hebrew-text">ההצעות שלי</h3>
             <div className="space-y-3">
-              {mockMyBids.map((bid) => (
+              {myBids.map((bid) => {
+                const auction = bid.auction;
+                const vehicle = auction?.vehicle;
+                const make = vehicle?.make;
+                const model = vehicle?.model;
+                
+                return (
                 <GradientBorderContainer
                   key={bid.id}
                   className="rounded-md flex-1"
                 >
                   <Card
                     className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
-                    onClick={() => navigate(`/mobile/auction/${bid.vehicleId}`)}
+                    onClick={() => navigate(`/mobile/auction/${auction?.id}`)}
                   >
                     <div className="flex items-stretch">
 
                       {/* Bid Image - Right Side, Full Height Square */}
                       <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
                         <img
-                          src={bid.image}
-                          alt={`${bid.make} ${bid.model}`}
+                          src={vehicle?.images?.[0] || darkCarImage}
+                          alt={`${make?.name_hebrew} ${model?.name_hebrew}`}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -205,10 +234,10 @@ export const BidsScreen: React.FC = () => {
                       <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
                         <div className="mb-2">
                           <h3 className="font-semibold text-white hebrew-text">
-                            {bid.make} {bid.model}
+                            {make?.name_hebrew} {model?.name_hebrew}
                           </h3>
                           <p className="text-sm text-white/70 hebrew-text">
-                            {bid.year}
+                            {vehicle?.year}
                           </p>
                         </div>
 
@@ -223,14 +252,14 @@ export const BidsScreen: React.FC = () => {
                             <span className="text-white/70 hebrew-text text-center">ההצעה שלי</span>
 
 
-                            <span className="font-medium text-white hebrew-text text-center">{bid.myBid}</span>
+                            <span className="font-medium text-white hebrew-text text-center">₪{bid.bid_amount.toLocaleString()}</span>
                           </div>
                         </div>
                         <GradientSeparator />
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex flex-col items-center space-y-1">
                             <span className="text-white/70 hebrew-text text-center">הצעה גבוהה</span>
-                            <span className="font-medium text-green-400 hebrew-text text-center">{bid.currentHighest}</span>
+                            <span className="font-medium text-green-400 hebrew-text text-center">₪{auction?.current_highest_bid?.toLocaleString() || 0}</span>
 
                           </div>
                         </div>
@@ -242,13 +271,13 @@ export const BidsScreen: React.FC = () => {
                       <div className="flex items-center gap-1 justify-center">
                         <Clock className="w-3 h-" />
 
-                        <span className="hebrew-text text-center">{bid.timeRemaining}</span>
-                        <span className="hebrew-text text-center pr-2">{bid.bidCount} הצעות</span>
+                        <span className="hebrew-text text-center">{formatTimeRemaining(auction?.auction_end_time || '')}</span>
+                        <span className="hebrew-text text-center pr-2">{auction?.bid_count || 0} הצעות</span>
                       </div>
                     </div>
                   </Card>
                 </GradientBorderContainer>
-              ))}
+              )})}
             </div>
           </div>
 
@@ -256,22 +285,27 @@ export const BidsScreen: React.FC = () => {
           <div>
             <h3 className="font-medium mb-3 text-right text-white hebrew-text">כל המכרזים ({filteredActiveAuctions.length})</h3>
             <div className="space-y-3">
-              {filteredActiveAuctions.map((auction) => (
+              {filteredActiveAuctions.map((auction: any) => {
+                const vehicle = auction.vehicle;
+                const make = vehicle?.make;
+                const model = vehicle?.model;
+                
+                return (
                 <GradientBorderContainer
                   key={auction.id}
                   className="rounded-md flex-1"
                 >
                   <Card
                     className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
-                    onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
+                    onClick={() => navigate(`/mobile/auction/${auction.id}`)}
                   >
 
                     <div className="flex items-stretch">
                       {/* Auction Image - Right Side, Full Height Square */}
                       <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-muted">
                         <img
-                          src={auction.image}
-                          alt={`${auction.make} ${auction.model}`}
+                          src={vehicle?.images?.[0] || darkCarImage}
+                          alt={`${make?.name_hebrew} ${model?.name_hebrew}`}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -279,10 +313,10 @@ export const BidsScreen: React.FC = () => {
                       <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
                         <div className="mb-2">
                           <h3 className="font-semibold text-white hebrew-text">
-                            {auction.make} {auction.model}
+                            {make?.name_hebrew} {model?.name_hebrew}
                           </h3>
                           <p className="text-sm text-white/70 hebrew-text">
-                            {auction.year}
+                            {vehicle?.year}
                           </p>
                         </div>
 
@@ -298,24 +332,22 @@ export const BidsScreen: React.FC = () => {
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex flex-col items-end space-y-1">
                             <span className="text-white/70 hebrew-text">הצעה נוכחית</span>
-                            <span className="text-lg font-bold text-green-400 hebrew-text">{auction.currentBid}</span>
+                            <span className="text-lg font-bold text-green-400 hebrew-text">₪{auction.current_highest_bid?.toLocaleString() || auction.starting_price.toLocaleString()}</span>
                           </div>
                         </div>
-                        {auction.canBid && (
-                          <div className="px-0 pb-0 pt-">
-                            <Button
-                              size="sm"
-                              className="w-20 px-2 py-1 gap-1 text-sm bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/mobile/create-bid-details/${auction.vehicleId}`);
-                              }}
-                            >
-                              <Gavel className="w-3 h-3" />
-                              <span className="text-sm">הגשה</span>
-                            </Button>
-                          </div>
-                        )}
+                        <div className="px-0 pb-0 pt-">
+                          <Button
+                            size="sm"
+                            className="w-20 px-2 py-1 gap-1 text-sm bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/mobile/auction/${auction.id}`);
+                            }}
+                          >
+                            <Gavel className="w-3 h-3" />
+                            <span className="text-sm">הגשה</span>
+                          </Button>
+                        </div>
                       </div>
 
                     </div>
@@ -323,14 +355,14 @@ export const BidsScreen: React.FC = () => {
                     <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70">
                       <div className="flex items-center gap-1 justify-center">
                         <Clock className="w-3 h-3" />
-                        <span className="hebrew-text text-center">{auction.timeRemaining}</span>
+                        <span className="hebrew-text text-center">{formatTimeRemaining(auction.auction_end_time)}</span>
                       </div>
-                      <span className="hebrew-text text-center">{auction.bidCount} הצעות</span>
+                      <span className="hebrew-text text-center">{auction.bid_count || 0} הצעות</span>
                     </div>
 
                   </Card>
                 </GradientBorderContainer>
-              ))}
+              )})}
             </div>
           </div>
         </>
@@ -338,21 +370,26 @@ export const BidsScreen: React.FC = () => {
         <>
           {/* My Auctions View */}
           <div className="space-y-3">
-            {mockMyAuctions.map((auction) => (
+            {myAuctions.map((auction: any) => {
+              const vehicle = auction.vehicle;
+              const make = vehicle?.make;
+              const model = vehicle?.model;
+              
+              return (
               <GradientBorderContainer
                 key={auction.id}
                 className="rounded-md flex-1"
               >
                 <Card
                   className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-black rounded-md overflow-hidden"
-                  onClick={() => navigate(`/mobile/auction/${auction.vehicleId}`)}
+                  onClick={() => navigate(`/mobile/auction/${auction.id}`)}
                 >
                   <div className="flex items-stretch">
                     {/* Auction Image - Right Side, Full Height Square */}
                     <div className="w-24 h-24 bg-muted flex-shrink-0">
                       <img
-                        src={auction.image}
-                        alt={`${auction.make} ${auction.model}`}
+                        src={vehicle?.images?.[0] || darkCarImage}
+                        alt={`${make?.name_hebrew} ${model?.name_hebrew}`}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -360,10 +397,10 @@ export const BidsScreen: React.FC = () => {
                     <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
                       <div className="mb-2">
                         <h3 className="font-semibold text-white hebrew-text">
-                          {auction.make} {auction.model}
+                          {make?.name_hebrew} {model?.name_hebrew}
                         </h3>
                         <p className="text-sm text-white/70 hebrew-text">
-                          {auction.year}
+                          {vehicle?.year}
                         </p>
                       </div>
 
@@ -374,11 +411,11 @@ export const BidsScreen: React.FC = () => {
                     {/* Price Column - Left Side, Vertically Centered */}
                     <div className="flex flex-col justify-center p-4 space-y-2">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-white hebrew-text">{auction.startingPrice}</span>
+                        <span className="font-medium text-white hebrew-text">₪{auction.starting_price.toLocaleString()}</span>
                         <span className="text-white/70 hebrew-text">:מחיר פתיחה</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-green-400 hebrew-text">{auction.currentBid}</span>
+                        <span className="font-medium text-green-400 hebrew-text">₪{auction.current_highest_bid?.toLocaleString() || auction.starting_price.toLocaleString()}</span>
                         <span className="text-white/70 hebrew-text">:הצעה נוכחית</span>
                       </div>
                     </div>
@@ -387,17 +424,17 @@ export const BidsScreen: React.FC = () => {
                   {/* Bottom Section */}
                   <div className="px-4 pb-4">
                     <div className="flex items-center justify-between text-sm text-white/70">
-                      <span className="hebrew-text">{auction.timeRemaining}</span>
-                      <span className="hebrew-text">{auction.bidCount} הצעות</span>
+                      <span className="hebrew-text">{formatTimeRemaining(auction.auction_end_time)}</span>
+                      <span className="hebrew-text">{auction.bid_count || 0} הצעות</span>
                     </div>
                   </div>
                 </Card>
               </GradientBorderContainer>
-            ))}
+            )})}
           </div>
 
           {/* Empty State for My Auctions */}
-          {mockMyAuctions.length === 0 && (
+          {myAuctions.length === 0 && (
             <div className="text-center py-12">
               <Gavel className="w-16 w-16 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-lg font-medium mb-2">אין לך מכרזים פעילים</h3>

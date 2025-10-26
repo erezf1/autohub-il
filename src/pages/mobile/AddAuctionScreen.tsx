@@ -14,6 +14,7 @@ import { GradientBorderContainer } from "@/components/ui/gradient-border-contain
 import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { useToast } from "@/hooks/use-toast";
 import darkCarImage from "@/assets/dark_car.png";
+import { useVehicles, useCreateAuction } from "@/hooks/mobile";
 
 // Mock user vehicles data
 const userVehicles = [
@@ -72,6 +73,10 @@ const AddAuctionScreen = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
+  
+  // Fetch user's vehicles
+  const { myVehicles = [] } = useVehicles();
+  const { mutate: createAuction, isPending: isCreating } = useCreateAuction();
   const [formData, setFormData] = useState<AuctionForm>({
     vehicleId: "",
     startingPrice: "",
@@ -85,7 +90,7 @@ const AddAuctionScreen = () => {
     allowInspection: true
   });
 
-  const selectedVehicle = userVehicles.find(v => v.id === formData.vehicleId);
+  const selectedVehicle = myVehicles.find(v => v.id === formData.vehicleId);
 
   const handleBackClick = () => {
     if (currentStep > 1) {
@@ -104,13 +109,17 @@ const AddAuctionScreen = () => {
   };
 
   const handleSubmit = () => {
-    // In real app, submit to API
-    console.log("Creating auction:", formData);
-    toast({
-      title: "המכירה הפומבית נוצרה בהצלחה!",
-      description: "המכירה הפומבית שלך פעילה ומוכנה לקבלת הצעות.",
+    createAuction({
+      vehicleId: formData.vehicleId,
+      startingPrice: parseFloat(formData.startingPrice),
+      reservePrice: formData.reservePrice ? parseFloat(formData.reservePrice) : undefined,
+      durationDays: parseInt(formData.duration),
+      description: formData.description
+    }, {
+      onSuccess: () => {
+        navigate("/mobile/bids");
+      }
     });
-    navigate("/mobile/auctions");
   };
 
   const updateFormData = (field: keyof AuctionForm, value: string | string[] | boolean) => {
@@ -191,7 +200,7 @@ const AddAuctionScreen = () => {
 
         {/* Vehicle list rendered below the selection card */}
         <div className="space-y-3">
-          {userVehicles.map((vehicle) => {
+          {myVehicles.map((vehicle: any) => {
             const isSelected = formData.vehicleId === vehicle.id;
             const gray = '#6b7280';
             return (
@@ -219,9 +228,11 @@ const AddAuctionScreen = () => {
                       </div>
 
                       <div className="flex-1 p-4 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-start justify-between mb-1">
-                            <h3 className="font-semibold text-foreground hebrew-text text-sm">{vehicle.title} {vehicle.year}</h3>
+                          <div>
+                            <div className="flex items-start justify-between mb-1">
+                              <h3 className="font-semibold text-foreground hebrew-text text-sm">
+                                {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
+                              </h3>
                             {isSelected ? (
                               <Badge variant="default" className="hebrew-text">נבחר</Badge>
                             ) : (
@@ -242,7 +253,7 @@ const AddAuctionScreen = () => {
             )
           })}
 
-          {userVehicles.length === 0 && (
+          {myVehicles.length === 0 && (
             <div className="text-center py-8">
               <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground hebrew-text mb-4">אין לך רכבים רשומים במערכת</p>
@@ -267,10 +278,10 @@ const AddAuctionScreen = () => {
                     <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
                       <Car className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-white hebrew-text text-sm">
-                        {selectedVehicle.title}
-                      </h3>
+                        <div>
+                          <h3 className="font-semibold text-white hebrew-text text-sm">
+                            {selectedVehicle.make?.name_hebrew} {selectedVehicle.model?.name_hebrew}
+                          </h3>
                       <p className="text-sm text-muted-foreground">הרכב הנבחר למכירה</p>
                     </div>
                   </div>
