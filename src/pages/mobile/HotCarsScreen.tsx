@@ -21,53 +21,7 @@ export const HotCarsScreen = () => {
   const navigate = useNavigate();
   const { boostedVehicles, isLoadingBoosted } = useBoosts();
 
-  // Mock vehicles to show while designing UI or when no boosted vehicles available
-  const mockBoostedVehicles = [
-    {
-      id: 'mock-1',
-      images: [],
-      make: { name_hebrew: 'טויוטה' },
-      model: { name_hebrew: 'קורולה' },
-      year: 2020,
-      kilometers: 95000,
-      transmission: 'automatic',
-      fuel_type: 'gasoline',
-      price: 165000,
-      hot_sale_price: 159000,
-      is_boosted: true,
-      boosted_until: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
-    },
-    {
-      id: 'mock-2',
-      images: [],
-      make: { name_hebrew: 'מאזדה' },
-      model: { name_hebrew: 'מז' },
-      year: 2019,
-      kilometers: 120000,
-      transmission: 'manual',
-      fuel_type: 'diesel',
-      price: 129000,
-      hot_sale_price: null,
-      is_boosted: true,
-      boosted_until: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(),
-    },
-    {
-      id: 'mock-3',
-      images: [],
-      make: { name_hebrew: 'הונדה' },
-      model: { name_hebrew: 'אקורד' },
-      year: 2021,
-      kilometers: 45000,
-      transmission: 'automatic',
-      fuel_type: 'hybrid',
-      price: 235000,
-      hot_sale_price: 225000,
-      is_boosted: true,
-      boosted_until: new Date(Date.now() + 1000 * 60 * 60 * 72).toISOString(),
-    }
-  ];
-
-  const sourceVehicles = (boostedVehicles && boostedVehicles.length > 0) ? boostedVehicles : mockBoostedVehicles;
+  const sourceVehicles = boostedVehicles || [];
 
   const filteredResults = applyVehicleFilters(
     sourceVehicles,
@@ -118,6 +72,16 @@ export const HotCarsScreen = () => {
       {isLoadingBoosted ? (
         <div className="flex justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : filteredResults.length === 0 ? (
+        <div className="text-center py-12 space-y-4">
+          <Flame className="h-16 w-16 text-orange-500/30 mx-auto" />
+          <div className="space-y-2">
+            <p className="text-foreground hebrew-text font-medium">אין מכירות חמות כרגע</p>
+            <p className="text-sm text-muted-foreground hebrew-text">
+              כאשר סוחרים אחרים יפעילו בוסטים, תוכל לראות אותם כאן
+            </p>
+          </div>
         </div>
       ) : (
         <div className="space-y-3">

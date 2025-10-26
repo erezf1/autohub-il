@@ -13,6 +13,7 @@ export function useBoosts() {
   // Fetch boosted vehicles (EXCLUDING current user's own vehicles)
   const { data: boostedVehicles, isLoading: isLoadingBoosted } = useQuery({
     queryKey: ['boosted-vehicles'],
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
@@ -35,9 +36,35 @@ export function useBoosts() {
     },
   });
 
-  // Fetch user's boostable vehicles
+  // Fetch user's active boosted vehicles
+  const { data: myActiveBoostedVehicles, isLoading: isLoadingActive } = useQuery({
+    queryKey: ['my-active-boosts'],
+    refetchOnWindowFocus: true,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('vehicle_listings')
+        .select(`
+          *,
+          make:vehicle_makes(id, name_hebrew, name_english),
+          model:vehicle_models(id, name_hebrew, name_english)
+        `)
+        .eq('owner_id', user.id)
+        .eq('is_boosted', true)
+        .gte('boosted_until', new Date().toISOString())
+        .order('boosted_until', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Fetch user's boostable vehicles (not currently boosted)
   const { data: myVehicles, isLoading: isLoadingMy } = useQuery({
     queryKey: ['my-boostable-vehicles'],
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -51,6 +78,7 @@ export function useBoosts() {
         `)
         .eq('owner_id', user.id)
         .eq('status', 'available')
+        .or('is_boosted.is.null,is_boosted.eq.false,boosted_until.lt.' + new Date().toISOString())
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -101,6 +129,7 @@ export function useBoosts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['boosted-vehicles'] });
       queryClient.invalidateQueries({ queryKey: ['my-boostable-vehicles'] });
+      queryClient.invalidateQueries({ queryKey: ['my-active-boosts'] });
       queryClient.invalidateQueries({ queryKey: ['user-remaining-boosts'] });
       queryClient.invalidateQueries({ queryKey: ['my-vehicles'] });
       
@@ -140,6 +169,8 @@ export function useBoosts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['boosted-vehicles'] });
       queryClient.invalidateQueries({ queryKey: ['my-boostable-vehicles'] });
+      queryClient.invalidateQueries({ queryKey: ['my-active-boosts'] });
+      queryClient.invalidateQueries({ queryKey: ['user-remaining-boosts'] });
       queryClient.invalidateQueries({ queryKey: ['my-vehicles'] });
       
       toast({
@@ -157,15 +188,17 @@ export function useBoosts() {
   });
 
   return {
-    boostedVehicles,
-    isLoadingBoosted,
-    myVehicles,
-    isLoadingMy,
+    boostedVehicles: boostedVehicles || [],
+    myActiveBoostedVehicles: myActiveBoostedVehicles || [],
+    myVehicles: myVehicles || [],
     availableBoosts: remainingBoosts || 0,
+    isLoadingBoosted,
+    isLoadingActive,
+    isLoadingMy,
     isLoadingBoosts,
     activateBoost: activateBoost.mutate,
-    isActivating: activateBoost.isPending,
     deactivateBoost: deactivateBoost.mutate,
+    isActivating: activateBoost.isPending,
     isDeactivating: deactivateBoost.isPending,
   };
 }

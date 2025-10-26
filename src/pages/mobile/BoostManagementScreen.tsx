@@ -1,339 +1,315 @@
 import { useState } from "react";
-import { Flame, Plus, X, Loader2 } from "lucide-react";
-import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
+import { Flame, X, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate } from "react-router-dom";
 import { useBoosts } from "@/hooks/mobile/useBoosts";
 import { useProfile } from "@/hooks/mobile/useProfile";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { PageContainer, PageHeader } from "@/components/common";
+import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import darkCarImage from "@/assets/dark_car.png";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { VehicleSelectionDrawer } from "@/components/mobile/VehicleSelectionDrawer";
+
+interface Vehicle {
+  id: string;
+  make?: { name_hebrew: string };
+  model?: { name_hebrew: string };
+  year: number;
+  price: number;
+  hot_sale_price?: number | null;
+  boosted_until?: string | null;
+  images?: string[];
+}
 
 export const BoostManagementScreen = () => {
   const navigate = useNavigate();
+  const { profile } = useProfile();
   const { 
+    myActiveBoostedVehicles,
     myVehicles, 
-    isLoadingMy, 
     availableBoosts, 
+    isLoadingActive,
+    isLoadingMy,
     activateBoost, 
-    isActivating,
     deactivateBoost,
+    isActivating,
     isDeactivating 
   } = useBoosts();
-  const { profile } = useProfile();
 
+  const [vehicleSelectionDrawerOpen, setVehicleSelectionDrawerOpen] = useState(false);
   const [boostDialogOpen, setBoostDialogOpen] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
-  const [hotSalePrice, setHotSalePrice] = useState("");
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [hotSalePrice, setHotSalePrice] = useState<string>("");
 
-  const activeBoosted = myVehicles?.filter(v => v.is_boosted && v.boosted_until && new Date(v.boosted_until) > new Date()) || [];
-  const eligibleVehicles = myVehicles?.filter(v => !v.is_boosted || !v.boosted_until || new Date(v.boosted_until) <= new Date()) || [];
-
-  const handleOpenBoostDialog = (vehicle: any) => {
+  const handleSelectVehicle = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
     setHotSalePrice(vehicle.price.toString());
     setBoostDialogOpen(true);
   };
 
   const handleActivateBoost = () => {
-    if (availableBoosts <= 0) {
-      toast({
-        title: "אין בוסטים זמינים",
-        description: "השתמשת בכל הבוסטים שלך החודש. צור קשר עם המנהל לשדרוג מנוי",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (!selectedVehicle) return;
 
-    const hotPrice = parseFloat(hotSalePrice);
+    if (availableBoosts <= 0) {
+      toast.error("אין בוסטים זמינים", {
+        description: "שדרג את המנוי שלך כדי לקבל יותר בוסטים"
+      });
+      return;
+    }
+
+    const price = parseFloat(hotSalePrice);
+    if (isNaN(price) || price <= 0) {
+      toast.error("מחיר לא תקין");
+      return;
+    }
+
     const originalPrice = parseFloat(selectedVehicle.price.toString());
+    const priceToUse = price === originalPrice ? null : price;
 
-    if (isNaN(hotPrice) || hotPrice <= 0) {
-      toast({
-        title: "שגיאה",
-        description: "אנא הזן מחיר תקין",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (hotPrice >= originalPrice) {
-      toast({
-        title: "שגיאה",
-        description: "מחיר המבצע חייב להיות נמוך ממחיר המקורי",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    activateBoost({
-      vehicleId: selectedVehicle.id,
-      hotSalePrice: hotPrice,
-    });
-
-    setBoostDialogOpen(false);
+    activateBoost(
+      { vehicleId: selectedVehicle.id, hotSalePrice: priceToUse },
+      {
+        onSuccess: () => {
+          setBoostDialogOpen(false);
+          setSelectedVehicle(null);
+          setHotSalePrice("");
+        }
+      }
+    );
   };
 
-  const getRemainingTime = (boostedUntil: string) => {
+  const getRemainingTime = (boostedUntil?: string | null) => {
+    if (!boostedUntil) return "";
+    
     const now = new Date();
     const end = new Date(boostedUntil);
-    const diffTime = Math.abs(end.getTime() - now.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffMs = end.getTime() - now.getTime();
     
-    if (diffDays === 0) return "מסתיים היום";
-    if (diffDays === 1) return "יום אחד נותר";
-    return `${diffDays} ימים נותרים`;
+    if (diffMs <= 0) return "פג תוקף";
+    
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (diffDays > 0) {
+      return `${diffDays} ${diffDays === 1 ? 'יום' : 'ימים'} נותרים`;
+    }
+    return `${diffHours} ${diffHours === 1 ? 'שעה' : 'שעות'} נותרות`;
   };
 
-  return (
-    <div className="container max-w-md mx-auto px-4 space-y-6" dir="rtl">
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <div 
-          onClick={() => navigate('/mobile/hot-cars')}
-          className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200"
-        >
-          <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Flame className="h-6 w-6 text-orange-500" />
-          <h1 className="text-2xl font-bold text-foreground hebrew-text">ניהול בוסטים</h1>
-        </div>
-      </div>
+  const totalBoosts = profile?.plan?.monthly_boosts || 0;
+  const boostProgress = totalBoosts > 0 ? (availableBoosts / totalBoosts) * 100 : 0;
 
-      {/* Boost Credits */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-sm text-muted-foreground hebrew-text">בוסטים החודש</p>
-                <p className="text-3xl font-bold text-orange-500">
-                  {availableBoosts} / {profile?.plan?.monthly_boosts || 0}
+  return (
+    <PageContainer>
+      <PageHeader
+        title="ניהול בוסטים"
+        onBack={() => navigate('/mobile/dashboard')}
+      />
+
+      {/* Boost Counter Card */}
+      <GradientBorderContainer className="rounded-lg mb-6">
+        <div className="p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Flame className={`h-8 w-8 ${availableBoosts > 0 ? 'text-orange-500 animate-pulse' : 'text-orange-500/30'}`} />
+              <div className="text-right">
+                <p className="text-3xl font-bold hebrew-text">
+                  {availableBoosts} / {totalBoosts}
                 </p>
+                <p className="text-sm text-muted-foreground hebrew-text">בוסטים זמינים</p>
               </div>
-              <Flame className="h-12 w-12 text-orange-500" />
             </div>
-            
-            {/* Progress Bar */}
-            <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
-              <div 
-                className="bg-gradient-to-r from-orange-500 to-orange-300 h-2 rounded-full transition-all"
-                style={{ 
-                  width: `${((profile?.plan?.monthly_boosts || 0) - availableBoosts) / (profile?.plan?.monthly_boosts || 1) * 100}%` 
-                }}
-              />
-            </div>
-            
-            <p className="text-sm text-muted-foreground hebrew-text">
-              הבוסטים מתאפסים בתחילת כל חודש
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+          <Progress value={boostProgress} className="h-2" />
+          <p className="text-sm text-muted-foreground hebrew-text text-center">
+            מנוי: {profile?.plan?.name_hebrew || 'רגיל'}
+          </p>
+        </div>
       </GradientBorderContainer>
 
-      {/* Subscription Info */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardContent className="p-4">
+      {/* Active Boosts Section */}
+      <div className="mb-6">
+        <h2 className="text-xl font-bold hebrew-text mb-4">הבוסטים הפעילים שלי</h2>
+        
+        {isLoadingActive ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : myActiveBoostedVehicles.length === 0 ? (
+          <div className="text-center py-12 space-y-4">
+            <Flame className="h-16 w-16 text-orange-500/30 mx-auto" />
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground hebrew-text">סוג מנוי:</span>
-                <span className="font-semibold text-white hebrew-text">
-                  {profile?.plan?.name_hebrew || 'רגיל'} 
-                  ({profile?.plan?.monthly_boosts || 0} בוסטים/חודש)
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground hebrew-text">
-                לשדרוג מנוי או הוספת בוסטים, צור קשר עם המנהל
+              <p className="text-foreground hebrew-text font-medium">אין בוסטים פעילים</p>
+              <p className="text-sm text-muted-foreground hebrew-text">
+                הפעל בוסט כדי להגביר את החשיפה של הרכבים שלך
               </p>
             </div>
-          </CardContent>
-        </Card>
-      </GradientBorderContainer>
-
-      {/* Active Boosts */}
-      {activeBoosted.length > 0 && (
-        <GradientBorderContainer className="rounded-md">
-          <Card className="bg-black border-0 rounded-md">
-            <CardHeader>
-              <CardTitle className="text-white hebrew-text">בוסטים פעילים ({activeBoosted.length})</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {activeBoosted.map((vehicle) => (
-                <div key={vehicle.id} className="flex gap-3 p-3 bg-muted/50 rounded-lg">
-                  <img
-                    src={vehicle.images?.[0] || darkCarImage}
-                    alt="vehicle"
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-white hebrew-text">
-                      {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline" className="text-xs hebrew-text">
-                        {getRemainingTime(vehicle.boosted_until)}
-                      </Badge>
-                      {vehicle.hot_sale_price && (
-                        <span className="text-sm text-orange-500 font-semibold hebrew-text">
-                          ₪{parseFloat(vehicle.hot_sale_price.toString()).toLocaleString()}
-                        </span>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {myActiveBoostedVehicles.map((vehicle) => (
+              <GradientBorderContainer key={vehicle.id} className="rounded-lg">
+                <div className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-20 h-20 rounded-md bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {vehicle.images && vehicle.images.length > 0 ? (
+                        <img
+                          src={vehicle.images[0]}
+                          alt={`${vehicle.make?.name_hebrew} ${vehicle.model?.name_hebrew}`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Flame className="h-8 w-8 text-orange-500" />
                       )}
                     </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => deactivateBoost(vehicle.id)}
-                    disabled={isDeactivating}
-                    className="hebrew-text"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </GradientBorderContainer>
-      )}
-
-      {/* Eligible Vehicles */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="text-white hebrew-text">רכבים זמינים לבוסט</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoadingMy ? (
-              <div className="flex justify-center items-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : eligibleVehicles.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground hebrew-text mb-4">אין רכבים זמינים</p>
-                <Button onClick={() => navigate('/mobile/add-vehicle')} className="hebrew-text">
-                  <Plus className="h-4 w-4 ml-2" />
-                  הוסף רכב
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {eligibleVehicles.map((vehicle) => (
-                  <div key={vehicle.id} className="flex gap-3 p-3 border border-border rounded-lg">
-                    <img
-                      src={vehicle.images?.[0] || darkCarImage}
-                      alt="vehicle"
-                      className="w-20 h-20 object-cover rounded"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-white hebrew-text">
-                        {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
+                    <div className="flex-1 text-right">
+                      <h3 className="font-semibold hebrew-text">
+                        {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew}
                       </h3>
-                      <p className="text-sm text-muted-foreground hebrew-text mt-1">
-                        ₪{parseFloat(vehicle.price.toString()).toLocaleString()}
+                      <p className="text-sm text-muted-foreground hebrew-text">
+                        שנת {vehicle.year}
                       </p>
+                      <p className="text-sm text-orange-500 hebrew-text font-medium mt-1">
+                        {getRemainingTime(vehicle.boosted_until)}
+                      </p>
+                      {vehicle.hot_sale_price && (
+                        <p className="text-lg font-bold text-primary hebrew-text">
+                          ₪{vehicle.hot_sale_price.toLocaleString()}
+                        </p>
+                      )}
                     </div>
                     <Button
-                      size="sm"
-                      onClick={() => handleOpenBoostDialog(vehicle)}
-                      disabled={availableBoosts === 0}
-                      className="hebrew-text"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deactivateBoost(vehicle.id)}
+                      disabled={isDeactivating}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
-                      <Flame className="h-4 w-4 ml-2" />
-                      בוסט
+                      <X className="h-5 w-5" />
                     </Button>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                </div>
+              </GradientBorderContainer>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add Boost Button */}
+      <GradientBorderContainer className="rounded-lg mb-6">
+        <Button 
+          size="lg"
+          className="w-full h-16 text-lg hebrew-text"
+          onClick={() => setVehicleSelectionDrawerOpen(true)}
+          disabled={availableBoosts === 0}
+        >
+          <Flame className="h-6 w-6 ml-2" />
+          <Plus className="h-6 w-6 ml-1" />
+          הוסף בוסט חדש
+        </Button>
       </GradientBorderContainer>
 
-      {/* Boost Dialog */}
+      {/* Subscription Info Card */}
+      <GradientBorderContainer className="rounded-lg">
+        <div className="p-4 text-center space-y-2">
+          <p className="text-sm hebrew-text">
+            <span className="font-semibold">סוג מנוי:</span> {profile?.plan?.name_hebrew || 'רגיל'}
+          </p>
+          <p className="text-sm text-muted-foreground hebrew-text">
+            ({totalBoosts} בוסטים בחודש)
+          </p>
+          <p className="text-xs text-muted-foreground hebrew-text mt-2">
+            לשדרוג מנוי, צור קשר עם המנהל
+          </p>
+        </div>
+      </GradientBorderContainer>
+
+      {/* Vehicle Selection Drawer */}
+      <VehicleSelectionDrawer
+        open={vehicleSelectionDrawerOpen}
+        onOpenChange={setVehicleSelectionDrawerOpen}
+        vehicles={myVehicles}
+        onSelectVehicle={handleSelectVehicle}
+        isLoading={isLoadingMy}
+      />
+
+      {/* Boost Configuration Dialog */}
       <Dialog open={boostDialogOpen} onOpenChange={setBoostDialogOpen}>
-        <DialogContent dir="rtl">
+        <DialogContent className="sm:max-w-md" dir="rtl">
           <DialogHeader>
-            <DialogTitle className="hebrew-text">הפעל בוסט</DialogTitle>
-            <DialogDescription className="hebrew-text">
-              הגדר מחיר מיוחד ומשך זמן למכירה החמה
-            </DialogDescription>
+            <DialogTitle className="hebrew-text text-right">הפעלת בוסט</DialogTitle>
           </DialogHeader>
           
           {selectedVehicle && (
-            <div className="space-y-4">
-              <div className="flex gap-3 p-3 bg-muted/50 rounded-lg">
-                <img
-                  src={selectedVehicle.images?.[0] || darkCarImage}
-                  alt="vehicle"
-                  className="w-20 h-20 object-cover rounded"
-                />
-                <div>
-                  <h3 className="font-semibold hebrew-text">
-                    {selectedVehicle.make?.name_hebrew} {selectedVehicle.model?.name_hebrew} {selectedVehicle.year}
-                  </h3>
-                  <p className="text-sm text-muted-foreground hebrew-text">
-                    מחיר מקורי: {parseFloat(selectedVehicle.price.toString()).toLocaleString()} ₪
-                  </p>
-                </div>
+            <div className="space-y-4 py-4">
+              <div className="text-right space-y-2">
+                <p className="font-semibold hebrew-text">
+                  {selectedVehicle.make?.name_hebrew} {selectedVehicle.model?.name_hebrew}
+                </p>
+                <p className="text-sm text-muted-foreground hebrew-text">
+                  מחיר מקורי: ₪{selectedVehicle.price.toLocaleString()}
+                </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="hot-price" className="hebrew-text">מחיר למבצע החם</Label>
+                <Label htmlFor="hot-sale-price" className="text-right hebrew-text">
+                  מחיר מבצע (אופציונלי)
+                </Label>
                 <Input
-                  id="hot-price"
+                  id="hot-sale-price"
                   type="number"
                   value={hotSalePrice}
                   onChange={(e) => setHotSalePrice(e.target.value)}
-                  placeholder="הזן מחיר מופחת"
+                  placeholder="הזן מחיר מבצע"
                   className="text-right hebrew-text"
                   dir="rtl"
                 />
-                {hotSalePrice && parseFloat(hotSalePrice) < parseFloat(selectedVehicle.price.toString()) && (
-                  <p className="text-sm text-success hebrew-text">
-                    הנחה: {Math.round(((parseFloat(selectedVehicle.price.toString()) - parseFloat(hotSalePrice)) / parseFloat(selectedVehicle.price.toString())) * 100)}%
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground hebrew-text text-right">
+                  השאר כמו המחיר המקורי אם אין הנחה
+                </p>
               </div>
 
-              <div className="space-y-2">
-                <Label className="hebrew-text">משך הבוסט</Label>
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-sm text-white hebrew-text font-semibold">5 ימים</p>
-                  <p className="text-xs text-muted-foreground hebrew-text">משך קבוע לכל הבוסטים</p>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  className="flex-1 hebrew-text"
-                  onClick={handleActivateBoost}
-                  disabled={isActivating}
-                >
-                  {isActivating ? <Loader2 className="h-4 w-4 animate-spin" /> : "הפעל בוסט"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setBoostDialogOpen(false)}
-                  className="hebrew-text"
-                >
-                  ביטול
-                </Button>
+              <div className="bg-muted p-3 rounded-md">
+                <p className="text-sm text-muted-foreground hebrew-text text-right">
+                  ⏱️ משך הבוסט: 5 ימים
+                </p>
               </div>
             </div>
           )}
+
+          <DialogFooter className="flex-row-reverse gap-2">
+            <Button
+              onClick={handleActivateBoost}
+              disabled={isActivating || !hotSalePrice}
+              className="flex-1 hebrew-text"
+            >
+              {isActivating ? (
+                <>
+                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                  מפעיל...
+                </>
+              ) : (
+                <>
+                  <Flame className="h-4 w-4 ml-2" />
+                  הפעל בוסט
+                </>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setBoostDialogOpen(false)}
+              disabled={isActivating}
+              className="flex-1 hebrew-text"
+            >
+              ביטול
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 };
 
