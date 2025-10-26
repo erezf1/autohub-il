@@ -15,6 +15,7 @@ import { useState } from "react";
 import { getVehicleTypeLabel } from "@/constants/vehicleTypes";
 import { useAuth } from "@/contexts/AuthContext";
 import { DealerCard, VehicleSpecsCard } from "@/components/common";
+import { useConversationForEntity } from "@/hooks/mobile";
 
 const VehicleDetailScreen = () => {
   const { id } = useParams();
@@ -64,6 +65,13 @@ const VehicleDetailScreen = () => {
     enabled: !!vehicle?.owner_id,
   });
 
+  // Check if conversation exists for this vehicle
+  const { data: existingConversationId } = useConversationForEntity({
+    otherUserId: vehicle?.owner_id,
+    entityType: 'vehicle',
+    entityId: id
+  });
+
   const handleBackClick = () => {
     navigate(-1);
   };
@@ -72,6 +80,13 @@ const VehicleDetailScreen = () => {
     if (!vehicle?.owner_id || !id) return;
     
     try {
+      // If conversation exists, navigate directly
+      if (existingConversationId) {
+        navigate(`/mobile/chat/${existingConversationId}`);
+        return;
+      }
+
+      // Otherwise create new conversation
       const { openOrCreateChat } = await import('@/utils/mobile/chatHelpers');
       const conversationId = await openOrCreateChat({
         otherUserId: vehicle.owner_id,
@@ -409,6 +424,7 @@ const VehicleDetailScreen = () => {
             showChatButton={true}
             showPhoneButton={true}
             onChatClick={handleContactSeller}
+            chatButtonLabel={existingConversationId ? 'חזרה לצ׳אט' : 'שלח הודעה'}
           />
         )
       )}

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
 
@@ -22,7 +22,7 @@ export const useChatMessages = (conversationId: string) => {
   const query = useQuery({
     queryKey: ['chat-messages', conversationId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('chat_messages')
         .select(`
           id,
@@ -40,7 +40,7 @@ export const useChatMessages = (conversationId: string) => {
 
       // Fetch sender profiles separately
       const senderIds = [...new Set(data.map(m => m.sender_id))];
-      const { data: profiles } = await supabase
+      const { data: profiles } = await dealerClient
         .from('user_profiles')
         .select('id, business_name, profile_picture_url')
         .in('id', senderIds);
@@ -69,7 +69,7 @@ export const useChatMessages = (conversationId: string) => {
   useEffect(() => {
     if (!conversationId) return;
 
-    const channel = supabase
+    const channel = dealerClient
       .channel(`chat-messages-${conversationId}`)
       .on(
         'postgres_changes',
@@ -86,7 +86,7 @@ export const useChatMessages = (conversationId: string) => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      dealerClient.removeChannel(channel);
     };
   }, [conversationId, queryClient]);
 
@@ -95,7 +95,7 @@ export const useChatMessages = (conversationId: string) => {
     if (!conversationId || !user?.id) return;
 
     const markAsRead = async () => {
-      await supabase
+      await dealerClient
         .from('chat_messages')
         .update({ is_read: true, read_at: new Date().toISOString() })
         .eq('conversation_id', conversationId)
@@ -123,7 +123,7 @@ export const useSendMessage = () => {
       messageContent: string; 
       messageType?: 'text' | 'image' | 'voice' 
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('chat_messages')
         .insert({
           conversation_id: conversationId,

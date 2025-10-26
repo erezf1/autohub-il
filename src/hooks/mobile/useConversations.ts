@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface ConversationParticipant {
@@ -35,7 +35,7 @@ export const useConversations = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('chat_conversations')
         .select(`
           id,
@@ -60,7 +60,7 @@ export const useConversations = () => {
 
       // Get unread counts for each conversation
       const conversationIds = data.map(c => c.id);
-      const { data: unreadData } = await supabase
+      const { data: unreadData } = await dealerClient
         .from('chat_messages')
         .select('conversation_id, is_read')
         .in('conversation_id', conversationIds)
@@ -74,7 +74,7 @@ export const useConversations = () => {
 
       // Fetch participant profiles separately
       const participantIds = [...new Set(data.flatMap(c => [c.participant_1_id, c.participant_2_id]))];
-      const { data: profiles } = await supabase
+      const { data: profiles } = await dealerClient
         .from('user_profiles')
         .select('id, business_name, profile_picture_url')
         .in('id', participantIds);
@@ -147,7 +147,7 @@ export const useConversation = (conversationId: string) => {
   return useQuery({
     queryKey: ['conversation', conversationId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('chat_conversations')
         .select(`
           id,
@@ -173,7 +173,7 @@ export const useConversation = (conversationId: string) => {
       const otherPartyId = isParticipant1 ? data.participant_2_id : data.participant_1_id;
 
       // Fetch other party's profile separately
-      const { data: profileData } = await supabase
+      const { data: profileData } = await dealerClient
         .from('user_profiles')
         .select('id, business_name, profile_picture_url')
         .eq('id', otherPartyId)
@@ -182,7 +182,7 @@ export const useConversation = (conversationId: string) => {
       // Fetch phone number if details are revealed
       let phoneNumber = null;
       if (data.is_details_revealed) {
-        const { data: userData } = await supabase
+        const { data: userData } = await dealerClient
           .from('users')
           .select('phone_number')
           .eq('id', otherPartyId)
@@ -213,7 +213,7 @@ export const useRequestReveal = () => {
 
   return useMutation({
     mutationFn: async (conversationId: string) => {
-      const { error } = await supabase
+      const { error } = await dealerClient
         .from('chat_conversations')
         .update({
           details_reveal_requested_by: user?.id,
@@ -236,7 +236,7 @@ export const useApproveReveal = () => {
 
   return useMutation({
     mutationFn: async (conversationId: string) => {
-      const { error } = await supabase
+      const { error } = await dealerClient
         .from('chat_conversations')
         .update({
           is_details_revealed: true,
@@ -258,7 +258,7 @@ export const useRejectReveal = () => {
 
   return useMutation({
     mutationFn: async (conversationId: string) => {
-      const { error } = await supabase
+      const { error } = await dealerClient
         .from('chat_conversations')
         .update({
           details_reveal_requested_by: null,

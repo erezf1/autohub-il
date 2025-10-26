@@ -18,6 +18,7 @@ interface DealerCardProps {
   className?: string;
   entityType?: 'vehicle' | 'auction' | 'iso_request';
   entityId?: string;
+  chatButtonLabel?: string;
 }
 
 export const DealerCard: React.FC<DealerCardProps> = ({
@@ -29,7 +30,8 @@ export const DealerCard: React.FC<DealerCardProps> = ({
   onPhoneClick,
   className = '',
   entityType,
-  entityId
+  entityId,
+  chatButtonLabel = 'שלח הודעה'
 }) => {
   const { data: dealer, isLoading } = useQuery({
     queryKey: ['dealer-profile', dealerId, isRevealed],
@@ -158,7 +160,7 @@ export const DealerCard: React.FC<DealerCardProps> = ({
                 className="bg-black border-0 w-full gap-2"
               >
                 <MessageCircle className="h-4 w-4" />
-                שלח הודעה
+                {chatButtonLabel}
               </Button>
             </GradientBorderContainer>
           )}

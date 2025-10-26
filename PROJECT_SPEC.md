@@ -68,10 +68,13 @@ Customer support representatives with limited administrative access:
 **Operations**: Submit offers, accept/reject offers, expiration handling
 
 ### Chat System Entities
-**Conversations**: ID, participant_1_id, participant_2_id, vehicle_id, is_details_revealed, details_revealed_by
+**Conversations**: ID, participant_1_id, participant_2_id, vehicle_id, auction_id, iso_request_id, is_details_revealed, details_revealed_by
 **Messages**: ID, conversation_id, sender_id, message_content, message_type, is_read, read_at
+**Entity-Based**: Each conversation is tied to one entity (vehicle, auction, or ISO request)
+**Uniqueness Rule**: One conversation per (user pair + entity) - no duplicates
 **Relationships**: Users have many conversations, conversations have many messages
 **Operations**: Create conversations, send messages, reveal contact details, mark as read
+**Backend Client**: All operations use `dealerClient` for auth session consistency
 
 ### Notification Entities
 **User Notifications**: For mobile dealers (registration_approved, auction_outbid, iso_match, message_received, etc.)
@@ -145,6 +148,10 @@ Customer support representatives with limited administrative access:
 ### Communication Rules
 - Anonymous initial chat with contact reveal option
 - One-way contact reveal (first revealer pays/gets benefits)
+- **Smart Button Labels**: Buttons dynamically show "חזרה לצ'אט" (Return to chat) if conversation exists, or "שלח הודעה" (Send message) if no conversation exists
+- **Conversation Uniqueness**: One conversation per (user pair + entity) to prevent duplicates
+- **Entity-Based Conversations**: All chats linked to specific vehicle, auction, or ISO request
+- Real-time messaging with read receipts
 - Message read receipts and real-time updates
 
 ## Technical Requirements

@@ -37,3 +37,4 @@ export {
   useSendMessage
 } from './useChatMessages';
 export { useCreateConversation } from './useCreateConversation';
+export { useConversationForEntity } from './useConversationForEntity';

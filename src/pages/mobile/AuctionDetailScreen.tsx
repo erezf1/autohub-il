@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { VehicleSpecsCard, LoadingSpinner } from "@/components/common";
-import { useAuctions, usePlaceBid } from "@/hooks/mobile";
+import { useAuctions, usePlaceBid, useConversationForEntity } from "@/hooks/mobile";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Mock auction data
@@ -37,6 +37,13 @@ const AuctionDetailScreen = () => {
   const { data: auction, isLoading } = useAuctionById(id);
   const { data: bidHistory = [], isLoading: bidHistoryLoading } = useAuctionBidHistory(id);
   const placeBidMutation = usePlaceBid();
+  
+  // Check if conversation exists for this auction
+  const { data: existingConversationId } = useConversationForEntity({
+    otherUserId: auction?.creator_id,
+    entityType: 'auction',
+    entityId: id
+  });
   
   // Helper function to anonymize names
   const anonymizeName = (name: string) => {
@@ -96,6 +103,13 @@ const AuctionDetailScreen = () => {
     if (!auction || !auction.creator_id || !id) return;
     
     try {
+      // If conversation exists, navigate directly
+      if (existingConversationId) {
+        navigate(`/mobile/chat/${existingConversationId}`);
+        return;
+      }
+
+      // Otherwise create new conversation
       const conversationId = await openOrCreateChat({
         otherUserId: auction.creator_id,
         entityType: 'auction',

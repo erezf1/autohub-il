@@ -65,3 +65,40 @@ export const openOrCreateChat = async (params: OpenChatParams): Promise<string> 
     throw error;
   }
 };
+
+/**
+ * Finds an existing conversation ID for a specific entity and user pair
+ * Returns null if no conversation exists
+ */
+export const findConversationIdForEntity = async (params: OpenChatParams): Promise<string | null> => {
+  const { otherUserId, entityType, entityId } = params;
+
+  try {
+    // Get current user
+    const { data: { user }, error: userError } = await dealerClient.auth.getUser();
+    if (userError || !user) throw new Error('User not authenticated');
+
+    // Determine which field to check based on entity type
+    const entityField = entityType === 'vehicle' ? 'vehicle_id' : 
+                       entityType === 'auction' ? 'auction_id' : 'iso_request_id';
+
+    // Check if conversation exists (both participant orderings)
+    const { data: existingConversations, error: fetchError } = await dealerClient
+      .from('chat_conversations')
+      .select('id')
+      .eq(entityField, entityId)
+      .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`);
+
+    if (fetchError) throw fetchError;
+
+    // Return conversation ID if exists, null otherwise
+    if (existingConversations && existingConversations.length > 0) {
+      return existingConversations[0].id;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error finding conversation:', error);
+    return null;
+  }
+};

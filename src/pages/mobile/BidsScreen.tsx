@@ -17,7 +17,7 @@ import {
   ResultsCount,
 } from "@/components/common";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
-import { useAllActiveAuctions, useMyBids, useMyAuctions } from '@/hooks/mobile';
+import { useAllActiveAuctions, useMyBids, useMyAuctions, useConversations } from '@/hooks/mobile';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 
@@ -125,6 +125,27 @@ export const BidsScreen: React.FC = () => {
   const { data: myBids = [], isLoading: isLoadingBids } = useMyBids();
   const { data: myAuctions = [], isLoading: isLoadingMyAuctions } = useMyAuctions();
 
+  // Fetch all conversations to build Set for O(1) lookup
+  const { data: conversations = [] } = useConversations();
+
+  // Build Set of existing conversations for quick lookup
+  const conversationKeys = new Set(
+    conversations.map(conv => `${conv.entity.type}|${conv.entity.id}|${conv.otherParty.id}`)
+  );
+
+  // Helper to check if conversation exists
+  const hasConversation = (entityType: string, entityId: string, otherUserId: string) => {
+    return conversationKeys.has(`${entityType}|${entityId}|${otherUserId}`);
+  };
+
+  // Helper to get conversation ID
+  const getConversationId = (entityType: string, entityId: string, otherUserId: string) => {
+    const conv = conversations.find(
+      c => c.entity.type === entityType && c.entity.id === entityId && c.otherParty.id === otherUserId
+    );
+    return conv?.id || null;
+  };
+
   // Extract auction IDs from myBids to exclude them from active auctions
   const myBidAuctionIds = new Set(myBids.map(bid => bid.auction?.id).filter(Boolean));
 
@@ -161,12 +182,21 @@ export const BidsScreen: React.FC = () => {
   const handleMessageSeller = async (auctionId: string, creatorId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const conversationId = await openOrCreateChat({
-        otherUserId: creatorId,
-        entityType: 'auction',
-        entityId: auctionId
-      });
-      navigate(`/mobile/chat/${conversationId}`);
+      // Check if conversation exists
+      const existingConvId = getConversationId('auction', auctionId, creatorId);
+      
+      if (existingConvId) {
+        // Navigate to existing conversation
+        navigate(`/mobile/chat/${existingConvId}`);
+      } else {
+        // Create new conversation
+        const conversationId = await openOrCreateChat({
+          otherUserId: creatorId,
+          entityType: 'auction',
+          entityId: auctionId
+        });
+        navigate(`/mobile/chat/${conversationId}`);
+      }
     } catch (error) {
       console.error('Error opening chat:', error);
     }
@@ -378,7 +408,7 @@ export const BidsScreen: React.FC = () => {
                             onClick={(e) => handleMessageSeller(auction.id, auction.creator_id, e)}
                           >
                             <MessageCircle className="w-3 h-3" />
-                            <span>הודעה</span>
+                            <span>{hasConversation('auction', auction.id, auction.creator_id) ? 'חזרה לצ׳אט' : 'הודעה'}</span>
                           </Button>
                           <Button
                             size="sm"
