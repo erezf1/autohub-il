@@ -65,7 +65,12 @@ export const useVehicles = () => {
         .select(`
           *,
           make:vehicle_makes(id, name_hebrew, name_english),
-          model:vehicle_models(id, name_hebrew, name_english)
+          model:vehicle_models(id, name_hebrew, name_english),
+          auctions!vehicle_listings_id_fkey(
+            id,
+            status,
+            auction_end_time
+          )
         `)
         .eq('owner_id', user.id)
         .order('created_at', { ascending: false });

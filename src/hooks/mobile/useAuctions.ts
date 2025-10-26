@@ -65,13 +65,6 @@ export function useAuctions() {
             *,
             make:vehicle_makes(id, name_hebrew, name_english),
             model:vehicle_models(id, name_hebrew, name_english)
-          ),
-          creator:user_profiles!auctions_creator_id_fkey(
-            id,
-            business_name,
-            full_name,
-            rating_tier,
-            tenure
           )
         `)
         .in('status', ['scheduled', 'active'])

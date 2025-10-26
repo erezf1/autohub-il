@@ -81,8 +81,49 @@ const MyVehiclesScreen = () => {
               const fuelLabel = vehicle.fuel_type === 'gasoline' ? 'בנזין' :
                                vehicle.fuel_type === 'diesel' ? 'דיזל' :
                                vehicle.fuel_type === 'hybrid' ? 'היברידי' : 'חשמלי';
-              const statusLabel = vehicle.status === 'available' ? 'זמין' : 
-                                 vehicle.status === 'sold' ? 'נמכר' : 'לא פעיל';
+              
+              // Determine vehicle status badge based on priority
+              const getVehicleStatusBadge = () => {
+                // Priority 1: Check if vehicle is in an active auction
+                const activeAuction = vehicle.auctions?.find(
+                  (auction: any) => auction.status === 'active' || auction.status === 'scheduled'
+                );
+                
+                if (activeAuction) {
+                  return {
+                    label: 'במכרז',
+                    variant: 'default' as const,
+                    className: 'bg-blue-500 text-white'
+                  };
+                }
+                
+                // Priority 2: Check if vehicle is promoted (hot sale OR boosted)
+                if (vehicle.hot_sale_price || vehicle.is_boosted) {
+                  return {
+                    label: '🔥 מקודם',
+                    variant: 'default' as const,
+                    className: 'bg-orange-500 text-white'
+                  };
+                }
+                
+                // Priority 3: Default available status
+                if (vehicle.status === 'available') {
+                  return {
+                    label: 'זמין',
+                    variant: 'default' as const,
+                    className: 'bg-green-500 text-white'
+                  };
+                }
+                
+                // Other statuses
+                return {
+                  label: vehicle.status === 'sold' ? 'נמכר' : 'לא פעיל',
+                  variant: 'secondary' as const,
+                  className: ''
+                };
+              };
+
+              const statusBadge = getVehicleStatusBadge();
               
               return (
                 <GradientBorderContainer key={vehicle.id} className="rounded-md">
@@ -98,11 +139,6 @@ const MyVehiclesScreen = () => {
                             alt={`${vehicle.make?.name_hebrew} ${vehicle.model?.name_hebrew}`}
                             className="w-full h-full object-cover"
                           />
-                          {vehicle.is_boosted && (
-                            <Badge className="absolute top-2 left-2 bg-orange-500">
-                              🔥 מבוסט
-                            </Badge>
-                          )}
                         </div>
 
                         <div className="flex-1 p-4 flex flex-col justify-between">
@@ -112,10 +148,10 @@ const MyVehiclesScreen = () => {
                                 {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
                               </h3>
                               <Badge 
-                                variant={vehicle.status === 'available' ? 'default' : 'secondary'}
-                                className="hebrew-text"
+                                variant={statusBadge.variant}
+                                className={`hebrew-text ${statusBadge.className}`}
                               >
-                                {statusLabel}
+                                {statusBadge.label}
                               </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground hebrew-text">
