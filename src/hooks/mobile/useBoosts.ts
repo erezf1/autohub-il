@@ -89,14 +89,18 @@ export function useBoosts() {
   // Fetch remaining boosts via RPC function
   const { data: remainingBoosts, isLoading: isLoadingBoosts } = useQuery({
     queryKey: ['user-remaining-boosts'],
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) return 0;
 
       const { data, error } = await supabase
         .rpc('get_remaining_boosts', { user_id: user.id });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching remaining boosts:', error);
+        return 0;
+      }
       return data as number;
     },
   });
