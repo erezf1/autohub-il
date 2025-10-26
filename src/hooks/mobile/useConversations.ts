@@ -164,9 +164,10 @@ export const useConversation = (conversationId: string) => {
           iso_requests(id, title)
         `)
         .eq('id', conversationId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('Conversation not found');
 
       const isParticipant1 = data.participant_1_id === user?.id;
       const otherPartyId = isParticipant1 ? data.participant_2_id : data.participant_1_id;

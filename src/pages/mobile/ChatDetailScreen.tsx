@@ -19,7 +19,7 @@ const ChatDetailScreen = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const { data: conversation, isLoading: loadingConversation } = useConversation(chatId!);
+  const { data: conversation, isLoading: loadingConversation, error: conversationError } = useConversation(chatId!);
   const { data: messages, isLoading: loadingMessages } = useChatMessages(chatId!);
   const sendMessageMutation = useSendMessage();
   const requestRevealMutation = useRequestReveal();
@@ -54,8 +54,8 @@ const ChatDetailScreen = () => {
   const handleApproveReveal = () => {
     if (chatId) {
       approveRevealMutation.mutate(chatId, {
-        onSuccess: () => toast.success("פרטי הקשר נחשפו"),
-        onError: () => toast.error("אישור חשיפת הפרטים נכשל")
+        onSuccess: () => toast.success("הבקשה אושרה והפרטים נחשפו"),
+        onError: () => toast.error("אישור הבקשה נכשל")
       });
     }
   };
@@ -63,20 +63,31 @@ const ChatDetailScreen = () => {
   const handleRejectReveal = () => {
     if (chatId) {
       rejectRevealMutation.mutate(chatId, {
-        onSuccess: () => toast.info("הבקשה נדחתה"),
+        onSuccess: () => toast.success("הבקשה נדחתה"),
         onError: () => toast.error("דחיית הבקשה נכשלה")
       });
     }
   };
 
-  if (loadingConversation || loadingMessages) {
-    return <LoadingSpinner />;
+  if (loadingConversation) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
-  if (!conversation) {
+  if (conversationError || !conversation) {
     return (
-      <div className="text-center text-muted-foreground hebrew-text py-8">
-        שיחה לא נמצאה
+      <div className="container max-w-md mx-auto px-4 py-8" dir="rtl">
+        <Card className="bg-black border-0">
+          <CardContent className="p-6 text-center">
+            <p className="text-white hebrew-text mb-4">השיחה לא נמצאה</p>
+            <Button onClick={handleBackClick} variant="outline">
+              חזרה לרשימת שיחות
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
