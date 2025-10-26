@@ -76,13 +76,20 @@ const AddAuctionScreen = () => {
   // Fetch user's vehicles
   const { myVehicles = [] } = useVehicles();
   const { mutate: createAuction, isPending: isCreating } = useCreateAuction();
+  // Set default start time and date
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const defaultDate = tomorrow.toISOString().split('T')[0];
+  const defaultTime = "10:00";
+
   const [formData, setFormData] = useState<AuctionForm>({
     vehicleId: "",
     startingPrice: "",
     reservePrice: "",
     duration: "3",
-    startTime: "",
-    startDate: "",
+    startTime: defaultTime,
+    startDate: defaultDate,
     description: "",
     terms: [],
     allowInspection: true
@@ -132,7 +139,7 @@ const AddAuctionScreen = () => {
       case 1:
         return formData.vehicleId;
       case 2:
-        return formData.startingPrice && formData.duration && formData.startDate && formData.startTime;
+        return formData.startingPrice && formData.duration;
       case 3:
         return formData.description;
       default:
@@ -140,12 +147,6 @@ const AddAuctionScreen = () => {
     }
   };
 
-  // Set default start time and date
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const defaultDate = tomorrow.toISOString().split('T')[0];
-  const defaultTime = "10:00";
 
   return (
     <div className="container max-w-md mx-auto px-4 space-y-6" dir="rtl">
@@ -210,7 +211,10 @@ const AddAuctionScreen = () => {
               >
                 <Card
                   className={isSelected ? 'bg-black border-0 rounded-md' : 'bg-black border-0 rounded-md card-interactive cursor-pointer'}
-                  onClick={() => updateFormData('vehicleId', vehicle.id)}
+                  onClick={() => {
+                    updateFormData('vehicleId', vehicle.id);
+                    setCurrentStep(2);
+                  }}
                 >
                   <CardContent className="p-0">
                     <div className="flex h-32">

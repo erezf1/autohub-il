@@ -17,6 +17,7 @@ import {
 } from "@/components/common";
 import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { useAllActiveAuctions, useMyBids, useMyAuctions } from '@/hooks/mobile';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 
 // Mock data for bids and auctions
@@ -284,8 +285,19 @@ export const BidsScreen: React.FC = () => {
           {/* All Other Auctions */}
           <div>
             <h3 className="font-medium mb-3 text-right text-white hebrew-text">כל המכרזים ({filteredActiveAuctions.length})</h3>
-            <div className="space-y-3">
-              {filteredActiveAuctions.map((auction: any) => {
+            {isLoadingAuctions ? (
+              <LoadingSpinner />
+            ) : filteredActiveAuctions.length === 0 ? (
+              <div className="text-center py-12">
+                <Gavel className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-white/70 hebrew-text text-lg mb-2">אין מכרזים פעילים</p>
+                <p className="text-white/50 hebrew-text text-sm">
+                  כרגע אין מכרזים פעילים מסוחרים אחרים
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredActiveAuctions.map((auction: any) => {
                 const vehicle = auction.vehicle;
                 const make = vehicle?.make;
                 const model = vehicle?.model;
@@ -363,7 +375,8 @@ export const BidsScreen: React.FC = () => {
                   </Card>
                 </GradientBorderContainer>
               )})}
-            </div>
+              </div>
+            )}
           </div>
         </>
       ) : (
