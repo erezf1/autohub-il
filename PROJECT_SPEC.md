@@ -98,10 +98,14 @@ Customer support representatives with limited administrative access:
 - **Silver Plan**: Up to 20 vehicles, 5 boosts per month, 2 auctions per month
 - **Unlimited Plan**: Unlimited vehicles, 10 boosts per month, 5 auctions per month
 
-### Boost System
-- Boost duration: 3 days of priority placement
-- Boost limits based on subscription plan
-- Automatic expiration and notification system
+### Boost System ("Hot Cars")
+- **Boost Duration**: Fixed 5-day priority placement in Hot Cars section
+- **Optional Hot Sale Price**: Dealers can set special pricing for boosted vehicles
+- **Boost Allocation**: Based on subscription plan (Silver: 5/month, Unlimited: 10/month)
+- **Monthly Reset**: Boost limits refresh at beginning of each month
+- **Visibility**: Users see only other dealers' boosted vehicles (not their own)
+- **Communication**: Dealers contact via existing chat system for hot car inquiries
+- **Automatic Expiration**: Boosts automatically deactivate after 5 days
 
 ### Auction Rules
 - Auction types: Standard, Reserve (minimum price), Buy-Now (instant purchase)

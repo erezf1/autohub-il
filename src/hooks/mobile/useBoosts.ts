@@ -4,17 +4,19 @@ import { toast } from '@/hooks/use-toast';
 
 export interface BoostInput {
   vehicleId: string;
-  hotSalePrice: number;
-  durationDays: number;
+  hotSalePrice?: number | null;
 }
 
 export function useBoosts() {
   const queryClient = useQueryClient();
 
-  // Fetch boosted vehicles
+  // Fetch boosted vehicles (EXCLUDING current user's own vehicles)
   const { data: boostedVehicles, isLoading: isLoadingBoosted } = useQuery({
     queryKey: ['boosted-vehicles'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
       const { data, error } = await supabase
         .from('vehicle_listings')
         .select(`
@@ -25,6 +27,7 @@ export function useBoosts() {
         .eq('is_boosted', true)
         .gte('boosted_until', new Date().toISOString())
         .eq('status', 'available')
+        .neq('owner_id', user.id)
         .order('boosted_until', { ascending: false });
 
       if (error) throw error;
@@ -70,15 +73,15 @@ export function useBoosts() {
     },
   });
 
-  // Activate boost mutation
+  // Activate boost mutation (FIXED 5-DAY DURATION)
   const activateBoost = useMutation({
-    mutationFn: async ({ vehicleId, hotSalePrice, durationDays }: BoostInput) => {
+    mutationFn: async ({ vehicleId, hotSalePrice }: BoostInput) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Calculate boost end time
+      // Calculate boost end time - FIXED 5 DAYS
       const boostedUntil = new Date();
-      boostedUntil.setDate(boostedUntil.getDate() + durationDays);
+      boostedUntil.setDate(boostedUntil.getDate() + 5);
 
       // Update vehicle
       const { error: updateError } = await supabase
@@ -86,7 +89,7 @@ export function useBoosts() {
         .update({
           is_boosted: true,
           boosted_until: boostedUntil.toISOString(),
-          hot_sale_price: hotSalePrice,
+          hot_sale_price: hotSalePrice || null,
         })
         .eq('id', vehicleId)
         .eq('owner_id', user.id);

@@ -145,15 +145,22 @@ const VehicleDetailScreen = () => {
               alt={`${vehicle.make?.name_hebrew} ${vehicle.model?.name_hebrew}`}
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-2 right-2 flex gap-2">
+            
+            {/* Hot Car Badge Overlay - Prominent Display */}
+            {vehicle.is_boosted && vehicle.boosted_until && new Date(vehicle.boosted_until) > new Date() && (
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-2 right-2 flex items-center gap-2 bg-orange-500/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg">
+                  <Flame className="h-5 w-5 text-white animate-pulse" />
+                  <span className="font-bold text-white hebrew-text text-lg">מכירה חמה!</span>
+                </div>
+              </div>
+            )}
+            
+            {/* Status Badge */}
+            <div className="absolute top-2 left-2">
               <Badge variant="secondary" className="hebrew-text">
                 {statusLabel}
               </Badge>
-              {vehicle.is_boosted && (
-                <Badge className="bg-orange-500 text-white hebrew-text">
-                  מבוסט
-                </Badge>
-              )}
             </div>
             
             {images.length > 1 && (

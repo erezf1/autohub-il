@@ -31,7 +31,6 @@ export const BoostManagementScreen = () => {
   const [boostDialogOpen, setBoostDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [hotSalePrice, setHotSalePrice] = useState("");
-  const [durationDays, setDurationDays] = useState("7");
 
   const activeBoosted = myVehicles?.filter(v => v.is_boosted && v.boosted_until && new Date(v.boosted_until) > new Date()) || [];
   const eligibleVehicles = myVehicles?.filter(v => !v.is_boosted || !v.boosted_until || new Date(v.boosted_until) <= new Date()) || [];
@@ -78,7 +77,6 @@ export const BoostManagementScreen = () => {
     activateBoost({
       vehicleId: selectedVehicle.id,
       hotSalePrice: hotPrice,
-      durationDays: parseInt(durationDays),
     });
 
     setBoostDialogOpen(false);
@@ -296,18 +294,11 @@ export const BoostManagementScreen = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="duration" className="hebrew-text">משך הבוסט</Label>
-                <Select value={durationDays} onValueChange={setDurationDays}>
-                  <SelectTrigger id="duration">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="3">3 ימים</SelectItem>
-                    <SelectItem value="7">שבוע</SelectItem>
-                    <SelectItem value="14">שבועיים</SelectItem>
-                    <SelectItem value="30">חודש</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label className="hebrew-text">משך הבוסט</Label>
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-white hebrew-text font-semibold">5 ימים</p>
+                  <p className="text-xs text-muted-foreground hebrew-text">משך קבוע לכל הבוסטים</p>
+                </div>
               </div>
 
               <div className="flex gap-2">

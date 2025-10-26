@@ -151,18 +151,30 @@ Manage "Vehicles Wanted" requests - dealer's specific vehicle requirements.
 **File**: `src/pages/mobile/HotCarsScreen.tsx`
 
 #### Purpose
-Display boosted vehicles with priority placement.
+Display boosted vehicles ("Hot Sales") with 5-day priority placement. Shows ONLY other dealers' boosted vehicles.
+
+#### Boost System Rules
+- **Fixed Duration**: All boosts are exactly 5 days
+- **Optional Hot Sale Price**: Dealers can set special reduced pricing
+- **Visibility**: Excludes current user's own boosted vehicles (managed via "My Boosts")
+- **Communication**: Dealers use existing chat system to contact about hot cars
+- **Monthly Allocation**: Silver plan (5 boosts/month), Unlimited plan (10 boosts/month)
 
 #### Layout Requirements
-- **Boosted Indicator**: Clear visual indication of boost status
-- **Time Remaining**: Countdown for boost expiration
-- **Enhanced Cards**: Premium styling for boosted listings
+- **Header**: Title with flame icon, "My Boosts" button to access own boost management
+- **Filter Support**: Standard vehicle filtering applies to hot cars
+- **Boosted Indicator**: Flame icon and "מכירה חמה!" badge on cards
+- **Hot Sale Price Display**: Shows both original and discounted price if applicable
+- **Time Remaining**: Days remaining until boost expires
+- **Enhanced Cards**: Premium styling with hot sale price highlighting
 
 #### Components Needed
-- Boosted vehicle cards with special styling
-- Boost countdown timers
-- Filter by boost remaining time
-- "Boost My Vehicle" call-to-action
+- Vehicle cards with special "Hot Car" styling
+- Flame icon indicators for boosted status
+- Hot sale price display with original price strikethrough
+- Days remaining countdown
+- Navigation to individual vehicle detail screens
+- Contact seller via chat button (uses existing chat system)
 
 ### 9. Bids Screen (`/mobile/bids`)
 **File**: `src/pages/mobile/BidsScreen.tsx`
@@ -292,12 +304,22 @@ Create new "Vehicles Wanted" requests with detailed specifications.
 **File**: `src/pages/mobile/BoostManagementScreen.tsx`
 
 #### Purpose
-Manage boost usage and apply boosts to vehicle listings.
+Manage boost usage and apply 5-day boosts to dealer's own vehicle listings.
 
 #### Layout Requirements
-- **Available Boosts**: Current boost count from subscription
-- **Active Boosts**: Currently boosted vehicles with timers
-- **Boost Application**: Select vehicles to boost
+- **Boost Credits Card**: Shows remaining boosts for current month with flame icon
+- **Subscription Info**: Display plan type and monthly boost allocation
+- **Active Boosts Section**: Currently boosted vehicles with:
+  - Vehicle thumbnail and basic info
+  - Days remaining until expiration
+  - Optional hot sale price display
+  - Deactivate button to cancel boost early
+- **Eligible Vehicles Section**: User's own non-boosted vehicles available for boosting
+- **Boost Activation Dialog**: 
+  - Fixed 5-day duration (no user selection)
+  - Optional hot sale price input (must be lower than original price)
+  - Discount percentage calculation display
+  - Activate/Cancel buttons
 
 ### 14. Subscription Status Screen (`/mobile/subscription`)
 **File**: `src/pages/mobile/SubscriptionStatusScreen.tsx`
