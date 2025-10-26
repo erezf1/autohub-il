@@ -60,14 +60,15 @@ export const BoostManagementScreen = () => {
       return;
     }
 
-    const price = parseFloat(hotSalePrice);
-    if (isNaN(price) || price <= 0) {
+    const originalPrice = Number(selectedVehicle.price);
+    const enteredPrice = hotSalePrice.trim() === '' ? null : Number(hotSalePrice);
+
+    if (enteredPrice !== null && (isNaN(enteredPrice) || enteredPrice <= 0)) {
       toast.error("מחיר לא תקין");
       return;
     }
 
-    const originalPrice = parseFloat(selectedVehicle.price.toString());
-    const priceToUse = price === originalPrice ? null : price;
+    const priceToUse = (enteredPrice === null || enteredPrice === originalPrice) ? null : enteredPrice;
 
     activateBoost(
       { vehicleId: selectedVehicle.id, hotSalePrice: priceToUse },
@@ -113,7 +114,6 @@ export const BoostManagementScreen = () => {
               onClick={() => setVehicleSelectionDrawerOpen(true)}
               variant="outline"
               className="border-0"
-              disabled={availableBoosts === 0}
             >
               <Flame className="w-4 h-4 ml-2" />
               <Plus className="w-4 h-4 ml-1" />
@@ -265,7 +265,7 @@ export const BoostManagementScreen = () => {
           <DialogFooter className="flex-row-reverse gap-2">
             <Button
               onClick={handleActivateBoost}
-              disabled={isActivating || !hotSalePrice}
+              disabled={isActivating}
               className="flex-1 hebrew-text"
             >
               {isActivating ? (

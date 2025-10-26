@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { dealerClient } from '@/integrations/supabase/dealerClient';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 export interface BoostInput {
@@ -9,16 +10,17 @@ export interface BoostInput {
 
 export function useBoosts() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Fetch boosted vehicles (EXCLUDING current user's own vehicles)
   const { data: boostedVehicles, isLoading: isLoadingBoosted } = useQuery({
     queryKey: ['boosted-vehicles'],
+    enabled: !!user,
     refetchOnWindowFocus: true,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_listings')
         .select(`
           *,
@@ -39,12 +41,12 @@ export function useBoosts() {
   // Fetch user's active boosted vehicles
   const { data: myActiveBoostedVehicles, isLoading: isLoadingActive } = useQuery({
     queryKey: ['my-active-boosts'],
+    enabled: !!user,
     refetchOnWindowFocus: true,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_listings')
         .select(`
           *,
@@ -64,12 +66,12 @@ export function useBoosts() {
   // Fetch user's boostable vehicles (not currently boosted)
   const { data: myVehicles, isLoading: isLoadingMy } = useQuery({
     queryKey: ['my-boostable-vehicles'],
+    enabled: !!user,
     refetchOnWindowFocus: true,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .from('vehicle_listings')
         .select(`
           *,
@@ -89,12 +91,12 @@ export function useBoosts() {
   // Fetch remaining boosts via RPC function
   const { data: remainingBoosts, isLoading: isLoadingBoosts } = useQuery({
     queryKey: ['user-remaining-boosts'],
+    enabled: !!user,
     refetchOnWindowFocus: true,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return 0;
 
-      const { data, error } = await supabase
+      const { data, error } = await dealerClient
         .rpc('get_remaining_boosts', { user_id: user.id });
 
       if (error) {
@@ -108,7 +110,6 @@ export function useBoosts() {
   // Activate boost mutation (FIXED 5-DAY DURATION)
   const activateBoost = useMutation({
     mutationFn: async ({ vehicleId, hotSalePrice }: BoostInput) => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       // Calculate boost end time - FIXED 5 DAYS
@@ -116,7 +117,7 @@ export function useBoosts() {
       boostedUntil.setDate(boostedUntil.getDate() + 5);
 
       // Update vehicle
-      const { error: updateError } = await supabase
+      const { error: updateError } = await dealerClient
         .from('vehicle_listings')
         .update({
           is_boosted: true,
@@ -154,10 +155,9 @@ export function useBoosts() {
   // Deactivate boost mutation
   const deactivateBoost = useMutation({
     mutationFn: async (vehicleId: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
+      const { error } = await dealerClient
         .from('vehicle_listings')
         .update({
           is_boosted: false,
