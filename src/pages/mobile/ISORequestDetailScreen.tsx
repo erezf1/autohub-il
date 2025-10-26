@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Clock, MapPin, CheckCircle, Loader2 } from "lucide-react";
+import { Clock, MapPin, CheckCircle, Loader2, Eye } from "lucide-react";
 import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -113,6 +113,10 @@ const ISORequestDetailScreen = () => {
 
   const handleRejectOffer = async (offerId: string) => {
     await updateOfferStatus.mutateAsync({ offerId, status: "rejected" });
+  };
+
+  const handleViewVehicle = (vehicleId: string) => {
+    navigate(`/mobile/vehicle/${vehicleId}`);
   };
 
   if (isLoadingRequest) {
@@ -261,9 +265,13 @@ const ISORequestDetailScreen = () => {
                             <h5 className="font-medium text-white hebrew-text">
                               {offer.user_profiles?.business_name || offer.user_profiles?.full_name}
                             </h5>
-                            <p className="text-sm text-muted-foreground hebrew-text">
+                            <div 
+                              onClick={() => handleViewVehicle(offer.vehicle_listings?.id)}
+                              className="text-sm text-muted-foreground hebrew-text cursor-pointer hover:text-primary transition-colors flex items-center gap-1"
+                            >
+                              <Eye className="h-3 w-3" />
                               {offer.vehicle_listings?.vehicle_makes?.name_hebrew} {offer.vehicle_listings?.vehicle_models?.name_hebrew}
-                            </p>
+                            </div>
                           </div>
                           <Badge variant={getStatusColor(offer.status)} className="hebrew-text">
                             {getStatusText(offer.status)}
@@ -287,6 +295,16 @@ const ISORequestDetailScreen = () => {
                             {offer.message}
                           </p>
                         )}
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleViewVehicle(offer.vehicle_listings?.id)}
+                          className="w-full mb-3 hebrew-text"
+                        >
+                          <Eye className="h-4 w-4 ml-2" />
+                          צפה ברכב
+                        </Button>
 
                         {offer.status === 'pending' && (
                           <div className="flex gap-2">
@@ -331,7 +349,20 @@ const ISORequestDetailScreen = () => {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-white hebrew-text mb-2 block">בחר רכב *</label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm text-white hebrew-text">בחר רכב *</label>
+                    {selectedVehicleId && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleViewVehicle(selectedVehicleId)}
+                        className="text-xs text-primary hover:text-primary/80 h-auto p-1"
+                      >
+                        <Eye className="h-3 w-3 ml-1" />
+                        צפה בפרטים
+                      </Button>
+                    )}
+                  </div>
                   <GradientBorderContainer className="rounded-md">
                     <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
                       <SelectTrigger className="bg-black border-0 text-white">
