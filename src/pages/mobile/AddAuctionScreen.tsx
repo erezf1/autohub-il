@@ -199,7 +199,13 @@ const AddAuctionScreen = () => {
 
         {/* Vehicle list rendered below the selection card */}
         <div className="space-y-3">
-          {myVehicles.map((vehicle: any) => {
+          {myVehicles.filter((vehicle: any) => {
+            // Filter out vehicles that already have active or scheduled auctions
+            const hasActiveAuction = vehicle.auctions?.some(
+              (auction: any) => auction.status === 'active' || auction.status === 'scheduled'
+            );
+            return !hasActiveAuction;
+          }).map((vehicle: any) => {
             const isSelected = formData.vehicleId === vehicle.id;
             const gray = '#6b7280';
             return (

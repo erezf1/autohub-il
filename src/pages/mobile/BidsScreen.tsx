@@ -124,8 +124,17 @@ export const BidsScreen: React.FC = () => {
   const { data: myBids = [], isLoading: isLoadingBids } = useMyBids();
   const { data: myAuctions = [], isLoading: isLoadingMyAuctions } = useMyAuctions();
 
+  // Extract auction IDs from myBids to exclude them from active auctions
+  const myBidAuctionIds = new Set(myBids.map(bid => bid.auction?.id).filter(Boolean));
+
+  // Filter out auctions where user has already bid
+  const auctionsWithoutMyBids = activeAuctions.filter(
+    auction => !myBidAuctionIds.has(auction.id)
+  );
+
+  // Apply vehicle filters on the filtered list
   const filteredActiveAuctions = applyVehicleFilters(
-    activeAuctions as any[],
+    auctionsWithoutMyBids as any[],
     filters
   );
 

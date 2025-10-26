@@ -66,7 +66,7 @@ export const useVehicles = () => {
           *,
           make:vehicle_makes(id, name_hebrew, name_english),
           model:vehicle_models(id, name_hebrew, name_english),
-          auctions!vehicle_listings_id_fkey(
+          auctions(
             id,
             status,
             auction_end_time
