@@ -13,8 +13,7 @@ import { LoadingSpinner, PageContainer, PageHeader } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Edit3, Crown, Award, Calendar, Flame, Gavel, Car, Building, User, Phone, MapPin } from "lucide-react";
+import { Edit3, Crown, Calendar, Flame, Gavel, Car, Building, User, Phone, MapPin } from "lucide-react";
 
 const MyProfileScreen = () => {
   const navigate = useNavigate();
@@ -54,6 +53,40 @@ const MyProfileScreen = () => {
     enabled: !!user?.id,
   });
 
+  // Fetch remaining boosts
+  const { data: remainingBoosts } = useQuery({
+    queryKey: ['user-remaining-boosts', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { data, error } = await dealerClient
+        .rpc('get_remaining_boosts', { user_id: user.id });
+      
+      if (error) throw error;
+      return data || 0;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch auctions created this month
+  const { data: auctionsThisMonth } = useQuery({
+    queryKey: ['auctions-this-month', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      
+      const { count } = await dealerClient
+        .from('auctions')
+        .select('*', { count: 'exact', head: true })
+        .eq('creator_id', user.id)
+        .gte('created_at', startOfMonth.toISOString());
+      
+      return count || 0;
+    },
+    enabled: !!user?.id,
+  });
+
   const isLoading = profileLoading || phoneLoading;
 
   if (isLoading || !profile) {
@@ -69,23 +102,14 @@ const MyProfileScreen = () => {
     }
   };
 
-  const getRatingTierLabel = (tier: string) => {
-    switch(tier) {
-      case 'gold': return 'זהב';
-      case 'silver': return 'כסף';
-      case 'bronze': 
-      default: return 'ברונזה';
-    }
-  };
-
-  const getRatingTierColor = (tier: string) => {
-    switch(tier) {
-      case 'gold': return 'text-yellow-600';
-      case 'silver': return 'text-gray-600';
-      case 'bronze': 
-      default: return 'text-orange-700';
-    }
-  };
+  // Calculate usage stats
+  const monthlyBoosts = profile?.plan?.monthly_boosts || 0;
+  const usedBoosts = monthlyBoosts - (remainingBoosts || 0);
+  
+  const monthlyAuctions = profile?.plan?.monthly_auctions || 0;
+  const usedAuctions = auctionsThisMonth || 0;
+  
+  const maxVehicles = profile?.plan?.max_vehicles || profile?.vehicles_limit || 0;
 
   return (
     <div className="space-y-6">
@@ -121,22 +145,16 @@ const MyProfileScreen = () => {
       >
         <Card className="bg-black border-0 rounded-md">
           <CardContent className="p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium hebrew-text text-white">
-                  סוג מנוי
-                </Label>
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <Crown className="h-5 w-5 text-primary" />
-                  <span className="text-lg font-bold text-white hebrew-text">
-                    {getSubscriptionLabel(profile?.subscription_type || 'regular')}
-                  </span>
-                </div>
+            <div className="space-y-1">
+              <Label className="text-sm font-medium hebrew-text text-white">
+                סוג מנוי
+              </Label>
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Crown className="h-5 w-5 text-primary" />
+                <span className="text-lg font-bold text-white hebrew-text">
+                  {getSubscriptionLabel(profile?.subscription_type || 'regular')}
+                </span>
               </div>
-              <Badge variant="outline" className={`${getRatingTierColor(profile?.rating_tier || 'bronze')} border-current`}>
-                <Award className="h-3 w-3 ml-1" />
-                {getRatingTierLabel(profile?.rating_tier || 'bronze')}
-              </Badge>
             </div>
 
             {profile?.subscription_valid_until && (
@@ -158,14 +176,18 @@ const MyProfileScreen = () => {
                 <div className="flex items-center justify-center">
                   <Flame className="h-5 w-5 text-orange-500" />
                 </div>
-                <div className="text-2xl font-bold text-white">{profile?.available_boosts || 0}</div>
+                <div className="text-2xl font-bold text-white">
+                  {usedBoosts}/{monthlyBoosts}
+                </div>
                 <div className="text-xs text-white hebrew-text">בוסטים</div>
               </div>
               <div className="text-center space-y-1">
                 <div className="flex items-center justify-center">
                   <Gavel className="h-5 w-5 text-blue-500" />
                 </div>
-                <div className="text-2xl font-bold text-white">{profile?.available_auctions || 0}</div>
+                <div className="text-2xl font-bold text-white">
+                  {usedAuctions}/{monthlyAuctions}
+                </div>
                 <div className="text-xs text-white hebrew-text">מכרזים</div>
               </div>
               <div className="text-center space-y-1">
@@ -173,7 +195,7 @@ const MyProfileScreen = () => {
                   <Car className="h-5 w-5 text-green-500" />
                 </div>
                 <div className="text-2xl font-bold text-white">
-                  {activeVehicles || 0}/{profile?.vehicles_limit || 0}
+                  {activeVehicles || 0}/{maxVehicles}
                 </div>
                 <div className="text-xs text-white hebrew-text">רכבים פעילים</div>
               </div>
