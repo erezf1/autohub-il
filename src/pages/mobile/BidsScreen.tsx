@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Gavel, Clock, Plus } from 'lucide-react';
+import { Gavel, Clock, Plus, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { openOrCreateChat } from '@/utils/mobile/chatHelpers';
 import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
 import { applyVehicleFilters, getActiveFilterCount, VehicleFilters } from '@/utils/mobile/vehicleFilters';
 import darkCarImage from "@/assets/dark_car.png";
@@ -155,6 +156,20 @@ export const BidsScreen: React.FC = () => {
     if (days > 0) return `${days} ימים ו-${hours} שעות`;
     if (hours > 0) return `${hours} שעות ו-${minutes} דקות`;
     return `${minutes} דקות`;
+  };
+
+  const handleMessageSeller = async (auctionId: string, creatorId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const conversationId = await openOrCreateChat({
+        otherUserId: creatorId,
+        entityType: 'auction',
+        entityId: auctionId
+      });
+      navigate(`/mobile/chat/${conversationId}`);
+    } catch (error) {
+      console.error('Error opening chat:', error);
+    }
   };
 
   return (
@@ -348,25 +363,33 @@ export const BidsScreen: React.FC = () => {
 
                       </div>
                       {/* Price Column - Left Side, Vertically Centered */}
-                      <div className="flex flex-col justify-center p-4">
-
+                      <div className="flex flex-col justify-center p-4 space-y-2">
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex flex-col items-end space-y-1">
                             <span className="text-white/70 hebrew-text">הצעה נוכחית</span>
                             <span className="text-lg font-bold text-green-400 hebrew-text">₪{auction.current_highest_bid?.toLocaleString() || auction.starting_price.toLocaleString()}</span>
                           </div>
                         </div>
-                        <div className="px-0 pb-0 pt-">
+                        <div className="flex gap-2">
                           <Button
                             size="sm"
-                            className="w-20 px-2 py-1 gap-1 text-sm bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
+                            variant="outline"
+                            className="flex-1 gap-1 text-xs"
+                            onClick={(e) => handleMessageSeller(auction.id, auction.creator_id, e)}
+                          >
+                            <MessageCircle className="w-3 h-3" />
+                            <span>הודעה</span>
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="flex-1 gap-1 text-xs bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black hover:from-[#5be1fd] hover:to-[#2277ee] border-0"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/mobile/auction/${auction.id}`);
                             }}
                           >
                             <Gavel className="w-3 h-3" />
-                            <span className="text-sm">הגשה</span>
+                            <span>הגשה</span>
                           </Button>
                         </div>
                       </div>

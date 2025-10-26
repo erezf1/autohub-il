@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Car, Gavel, Users, Star, Loader2, ChevronRight } from "lucide-react";
+import { Car, Gavel, Users, Star, Loader2, ChevronRight, MessageCircle } from "lucide-react";
+import { openOrCreateChat } from '@/utils/mobile/chatHelpers';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -89,6 +90,21 @@ const AuctionDetailScreen = () => {
         setBidAmount("");
       }
     });
+  };
+
+  const handleMessageSeller = async () => {
+    if (!auction || !auction.creator_id || !id) return;
+    
+    try {
+      const conversationId = await openOrCreateChat({
+        otherUserId: auction.creator_id,
+        entityType: 'auction',
+        entityId: id
+      });
+      navigate(`/mobile/chat/${conversationId}`);
+    } catch (error) {
+      console.error('Error opening chat:', error);
+    }
   };
 
   if (isLoading || !auction) {
@@ -393,6 +409,15 @@ const AuctionDetailScreen = () => {
                 <CardTitle className="text-xl hebrew-text">הגש הצעה</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <Button
+                  variant="outline"
+                  onClick={handleMessageSeller}
+                  className="w-full gap-2"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  שלח הודעה למוכר
+                </Button>
+                
                 <div className="space-y-2">
                   <Label htmlFor="bidAmount" className="text-white hebrew-text">
                     סכום ההצעה (₪)

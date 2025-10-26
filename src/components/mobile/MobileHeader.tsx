@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/mobile/useProfile";
+import { useConversations } from "@/hooks/mobile";
 import logo from "/src/assets/logo.svg";
 import {
   DropdownMenu,
@@ -19,6 +20,10 @@ const MobileHeader = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { profile } = useProfile();
+  const { data: conversations = [] } = useConversations();
+  
+  // Calculate total unread messages
+  const unreadCount = conversations.reduce((total, conv) => total + (conv.unreadCount || 0), 0);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-black border-b border-border shadow-sm">
@@ -42,9 +47,11 @@ const MobileHeader = () => {
           {/* Chat Icon with Badge */}
           <div className="relative cursor-pointer" onClick={() => navigate("/mobile/chats")}>
             <MessageCircle className="h-6 w-6 text-muted-foreground icon-hover-cyan transition-colors" />
-            <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs rounded-full p-0 flex items-center justify-center bg-gradient-to-r from-[#5be1fd] to-[#2277ee] text-black border-0">
-              3
-            </Badge>
+            {unreadCount > 0 && (
+              <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs rounded-full p-0 flex items-center justify-center bg-gradient-to-r from-[#5be1fd] to-[#2277ee] text-black border-0">
+                {unreadCount}
+              </Badge>
+            )}
           </div>
 
           {/* Notifications Icon with Badge */}

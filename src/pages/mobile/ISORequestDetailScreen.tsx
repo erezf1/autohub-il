@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Clock, MapPin, CheckCircle, Loader2, Eye } from "lucide-react";
+import { Clock, MapPin, CheckCircle, Loader2, Eye, MessageCircle } from "lucide-react";
+import { openOrCreateChat } from '@/utils/mobile/chatHelpers';
 import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -88,6 +89,21 @@ const ISORequestDetailScreen = () => {
 
   const handleBackClick = () => {
     navigate("/mobile/required-cars");
+  };
+
+  const handleMessageUser = async (userId: string) => {
+    if (!id) return;
+    
+    try {
+      const conversationId = await openOrCreateChat({
+        otherUserId: userId,
+        entityType: 'iso_request',
+        entityId: id
+      });
+      navigate(`/mobile/chat/${conversationId}`);
+    } catch (error) {
+      console.error('Error opening chat:', error);
+    }
   };
 
   const handleSubmitOffer = async () => {
@@ -307,22 +323,36 @@ const ISORequestDetailScreen = () => {
                         </Button>
 
                         {offer.status === 'pending' && (
-                          <div className="flex gap-2">
+                          <div className="space-y-2">
                             <Button
                               size="sm"
-                              onClick={() => handleAcceptOffer(offer.id)}
-                              className="flex-1 bg-green-600 hover:bg-green-700"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMessageUser(offer.offerer_id);
+                              }}
+                              className="w-full gap-1"
                             >
-                              אשר
+                              <MessageCircle className="w-4 h-4" />
+                              שלח הודעה
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleRejectOffer(offer.id)}
-                              className="flex-1"
-                            >
-                              דחה
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => handleAcceptOffer(offer.id)}
+                                className="flex-1 bg-green-600 hover:bg-green-700"
+                              >
+                                אשר
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleRejectOffer(offer.id)}
+                                className="flex-1"
+                              >
+                                דחה
+                              </Button>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -344,7 +374,18 @@ const ISORequestDetailScreen = () => {
         <GradientBorderContainer className="rounded-lg">
           <Card className="bg-black border-0 rounded-lg">
             <CardHeader>
-              <CardTitle className="text-white hebrew-text">הגש הצעה</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-white hebrew-text">הגש הצעה</CardTitle>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleMessageUser(request.requester_id)}
+                  className="gap-1"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  שאל שאלה
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

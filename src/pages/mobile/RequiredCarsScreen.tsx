@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Plus, Clock, Loader2 } from 'lucide-react';
+import { Plus, Clock, Loader2, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { openOrCreateChat } from '@/utils/mobile/chatHelpers';
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
 import { GradientSeparator } from '@/components/ui/gradient-separator';
 import { VehicleFilterDrawer } from '@/components/mobile/VehicleFilterDrawer';
@@ -49,6 +50,20 @@ const formatDate = (dateString: string) => {
     return `לפני ${Math.floor(diffInDays / 30)} חודשים`;
   } catch {
     return dateString;
+  }
+};
+
+const handleMessageRequester = async (requestId: string, requesterId: string, navigate: any, e: React.MouseEvent) => {
+  e.stopPropagation();
+  try {
+    const conversationId = await openOrCreateChat({
+      otherUserId: requesterId,
+      entityType: 'iso_request',
+      entityId: requestId
+    });
+    navigate(`/mobile/chat/${conversationId}`);
+  } catch (error) {
+    console.error('Error opening chat:', error);
   }
 };
 
@@ -172,14 +187,20 @@ export const RequiredCarsScreen = () => {
                     
                     <GradientSeparator />
                     
-                    <div className="flex w-full items-center justify-center gap-4 mt-0 text-sm text-white/70 py-2">
-                      <div className="flex items-center gap-1 justify-center">
+                    <div className="flex w-full items-center justify-between gap-4 px-4 py-2 text-sm text-white/70">
+                      <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        <span className="hebrew-text text-center">{formatDate(request.created_at)}</span>
+                        <span className="hebrew-text">{formatDate(request.created_at)}</span>
                       </div>
-                      {request.additional_requirements && (
-                        <span className="hebrew-text text-center line-clamp-1">{request.additional_requirements}</span>
-                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => handleMessageRequester(request.id, request.requester_id, navigate, e)}
+                        className="gap-1 h-8 text-xs"
+                      >
+                        <MessageCircle className="w-3 h-3" />
+                        הודעה
+                      </Button>
                     </div>
                   </Card>
                 </GradientBorderContainer>

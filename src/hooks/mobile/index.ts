@@ -36,3 +36,4 @@ export {
   useChatMessages,
   useSendMessage
 } from './useChatMessages';
+export { useCreateConversation } from './useCreateConversation';

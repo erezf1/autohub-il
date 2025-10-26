@@ -68,9 +68,19 @@ const VehicleDetailScreen = () => {
     navigate(-1);
   };
 
-  const handleContactSeller = () => {
-    if (vehicle?.owner_id) {
-      navigate(`/mobile/chat/new?vehicle=${id}&seller=${ownerProfile?.business_name || ownerProfile?.full_name}`);
+  const handleContactSeller = async () => {
+    if (!vehicle?.owner_id || !id) return;
+    
+    try {
+      const { openOrCreateChat } = await import('@/utils/mobile/chatHelpers');
+      const conversationId = await openOrCreateChat({
+        otherUserId: vehicle.owner_id,
+        entityType: 'vehicle',
+        entityId: id
+      });
+      navigate(`/mobile/chat/${conversationId}`);
+    } catch (error) {
+      console.error('Error opening chat:', error);
     }
   };
 

@@ -16,6 +16,8 @@ interface DealerCardProps {
   onChatClick?: () => void;
   onPhoneClick?: () => void;
   className?: string;
+  entityType?: 'vehicle' | 'auction' | 'iso_request';
+  entityId?: string;
 }
 
 export const DealerCard: React.FC<DealerCardProps> = ({
@@ -25,7 +27,9 @@ export const DealerCard: React.FC<DealerCardProps> = ({
   showPhoneButton = true,
   onChatClick,
   onPhoneClick,
-  className = ''
+  className = '',
+  entityType,
+  entityId
 }) => {
   const { data: dealer, isLoading } = useQuery({
     queryKey: ['dealer-profile', dealerId, isRevealed],
