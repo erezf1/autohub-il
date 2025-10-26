@@ -102,8 +102,15 @@ Customer support representatives with limited administrative access:
 ### Boost System ("Hot Cars")
 - **Boost Duration**: Fixed 5-day priority placement in Hot Cars section
 - **Optional Hot Sale Price**: Dealers can set special pricing for boosted vehicles
-- **Boost Allocation**: Based on subscription plan (Silver: 5/month, Unlimited: 10/month)
-- **Monthly Reset**: Boost limits refresh at beginning of each month
+- **Boost Allocation**: Based on subscription plan (stored in `subscription_plans` table)
+  - **Regular**: 0 boosts/month
+  - **Gold**: 10 boosts/month  
+  - **VIP**: 99 boosts/month
+- **Boost Counting Logic**: 
+  - Uses `get_remaining_boosts(user_id)` RPC function
+  - Counts boost activations (not just currently active boosts)
+  - Formula: `remaining = monthly_allocation - boosts_activated_this_month`
+- **Monthly Reset**: Boost limits refresh at beginning of each month (1st)
 - **Visibility**: Users see only other dealers' boosted vehicles (not their own)
 - **Communication**: Dealers contact via existing chat system for hot car inquiries
 - **Automatic Expiration**: Boosts automatically deactivate after 5 days

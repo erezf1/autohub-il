@@ -307,19 +307,32 @@ Create new "Vehicles Wanted" requests with detailed specifications.
 Manage boost usage and apply 5-day boosts to dealer's own vehicle listings.
 
 #### Layout Requirements
-- **Boost Credits Card**: Shows remaining boosts for current month with flame icon
-- **Subscription Info**: Display plan type and monthly boost allocation
+- **Boost Credits Card**: 
+  - Shows remaining boosts as "X / Total" format (e.g., "7 / 10")
+  - Visual progress bar showing used vs. available boosts
+  - Fetches allocation from `subscription_plans` table via `useProfile` hook
+  - Monthly reset information
+- **Subscription Info**: 
+  - Current plan name (dynamically from `subscription_plans.name_hebrew`)
+  - Monthly boost allocation (dynamically from `subscription_plans.monthly_boosts`)
+  - Contact admin for upgrades
 - **Active Boosts Section**: Currently boosted vehicles with:
   - Vehicle thumbnail and basic info
   - Days remaining until expiration
   - Optional hot sale price display
-  - Deactivate button to cancel boost early
+  - Deactivate button to cancel boost early (still counts toward limit)
 - **Eligible Vehicles Section**: User's own non-boosted vehicles available for boosting
 - **Boost Activation Dialog**: 
   - Fixed 5-day duration (no user selection)
   - Optional hot sale price input (must be lower than original price)
   - Discount percentage calculation display
   - Activate/Cancel buttons
+
+#### Boost Counting Logic
+- Uses `get_remaining_boosts(user_id)` RPC function
+- Counts activations (not just currently active boosts)
+- Formula: `remaining = monthly_allocation - boosts_activated_this_month`
+- Resets on 1st of each month
 
 ### 14. Subscription Status Screen (`/mobile/subscription`)
 **File**: `src/pages/mobile/SubscriptionStatusScreen.tsx`

@@ -771,6 +771,13 @@ export type Database = {
             referencedRelation: "locations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_profiles_subscription_type_fkey"
+            columns: ["subscription_type"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {

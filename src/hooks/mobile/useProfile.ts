@@ -14,7 +14,16 @@ export const useProfile = () => {
         .from('user_profiles')
         .select(`
           *,
-          location:locations(id, name_hebrew, name_english)
+          location:locations(id, name_hebrew, name_english),
+          plan:subscription_plans!user_profiles_subscription_type_fkey(
+            id,
+            name_hebrew,
+            name_english,
+            monthly_boosts,
+            monthly_auctions,
+            max_vehicles,
+            price_monthly
+          )
         `)
         .eq('id', user.id)
         .single();

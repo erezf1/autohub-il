@@ -113,15 +113,28 @@ export const BoostManagementScreen = () => {
       <GradientBorderContainer className="rounded-md">
         <Card className="bg-black border-0 rounded-md">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-sm text-muted-foreground hebrew-text">בוסטים נותרים החודש</p>
-                <p className="text-3xl font-bold text-orange-500">{availableBoosts}</p>
+                <p className="text-sm text-muted-foreground hebrew-text">בוסטים החודש</p>
+                <p className="text-3xl font-bold text-orange-500">
+                  {availableBoosts} / {profile?.plan?.monthly_boosts || 0}
+                </p>
               </div>
               <Flame className="h-12 w-12 text-orange-500" />
             </div>
-            <p className="text-sm text-muted-foreground hebrew-text mt-4">
-              הבוסטים מתאפסים בתחילת כל חודש לפי המנוי שלך
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+              <div 
+                className="bg-gradient-to-r from-orange-500 to-orange-300 h-2 rounded-full transition-all"
+                style={{ 
+                  width: `${((profile?.plan?.monthly_boosts || 0) - availableBoosts) / (profile?.plan?.monthly_boosts || 1) * 100}%` 
+                }}
+              />
+            </div>
+            
+            <p className="text-sm text-muted-foreground hebrew-text">
+              הבוסטים מתאפסים בתחילת כל חודש
             </p>
           </CardContent>
         </Card>
@@ -135,9 +148,8 @@ export const BoostManagementScreen = () => {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground hebrew-text">סוג מנוי:</span>
                 <span className="font-semibold text-white hebrew-text">
-                  {profile?.subscription_type === 'silver' ? 'כסף (5 בוסטים/חודש)' : 
-                   profile?.subscription_type === 'unlimited' ? 'בלתי מוגבל (10 בוסטים/חודש)' :
-                   'רגיל (ללא בוסטים)'}
+                  {profile?.plan?.name_hebrew || 'רגיל'} 
+                  ({profile?.plan?.monthly_boosts || 0} בוסטים/חודש)
                 </span>
               </div>
               <p className="text-xs text-muted-foreground hebrew-text">
