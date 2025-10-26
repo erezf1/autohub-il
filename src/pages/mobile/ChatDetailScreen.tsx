@@ -15,7 +15,7 @@ import { toast } from "sonner";
 
 const ChatDetailScreen = () => {
   const [newMessage, setNewMessage] = useState("");
-  const { chatId } = useParams();
+  const { id: chatId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
 

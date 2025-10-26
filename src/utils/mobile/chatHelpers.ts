@@ -18,6 +18,8 @@ export const openOrCreateChat = async (params: OpenChatParams): Promise<string> 
     const { data: { user }, error: userError } = await dealerClient.auth.getUser();
     if (userError || !user) throw new Error('User not authenticated');
 
+    console.debug('[Chat] Opening/creating chat:', { entityType, entityId, otherUserId, currentUserId: user.id });
+
     // Determine which field to check based on entity type
     const entityField = entityType === 'vehicle' ? 'vehicle_id' : 
                        entityType === 'auction' ? 'auction_id' : 'iso_request_id';
@@ -34,6 +36,7 @@ export const openOrCreateChat = async (params: OpenChatParams): Promise<string> 
 
     // If conversation exists, return its ID
     if (existingConversations && existingConversations.length > 0) {
+      console.debug('[Chat] Found existing conversation:', existingConversations[0].id);
       return existingConversations[0].id;
     }
 
@@ -55,6 +58,7 @@ export const openOrCreateChat = async (params: OpenChatParams): Promise<string> 
     if (createError) throw createError;
     if (!newConversation) throw new Error('Failed to create conversation');
 
+    console.debug('[Chat] Created new conversation:', newConversation.id);
     return newConversation.id;
   } catch (error) {
     console.error('Error opening/creating chat:', error);
