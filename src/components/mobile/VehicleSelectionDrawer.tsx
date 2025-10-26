@@ -1,6 +1,7 @@
-import { Car, Loader2 } from "lucide-react";
+import { Car, Loader2, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import {
   Drawer,
@@ -24,6 +25,9 @@ interface VehicleSelectionDrawerProps {
   vehicles: Vehicle[];
   onSelectVehicle: (vehicle: Vehicle) => void;
   isLoading: boolean;
+  availableBoosts: number;
+  totalBoosts: number;
+  planName: string;
 }
 
 export const VehicleSelectionDrawer = ({
@@ -32,8 +36,12 @@ export const VehicleSelectionDrawer = ({
   vehicles,
   onSelectVehicle,
   isLoading,
+  availableBoosts,
+  totalBoosts,
+  planName,
 }: VehicleSelectionDrawerProps) => {
   const navigate = useNavigate();
+  const boostProgress = totalBoosts > 0 ? (availableBoosts / totalBoosts) * 100 : 0;
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -43,6 +51,27 @@ export const VehicleSelectionDrawer = ({
         </DrawerHeader>
 
         <div className="px-4 pb-6 max-h-[70vh] overflow-y-auto">
+          {/* Boost Counter Card */}
+          <GradientBorderContainer className="rounded-lg mb-6">
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Flame className={`h-8 w-8 ${availableBoosts > 0 ? 'text-orange-500 animate-pulse' : 'text-orange-500/30'}`} />
+                  <div className="text-right">
+                    <p className="text-3xl font-bold hebrew-text">
+                      {availableBoosts} / {totalBoosts}
+                    </p>
+                    <p className="text-sm text-muted-foreground hebrew-text">בוסטים זמינים</p>
+                  </div>
+                </div>
+              </div>
+              <Progress value={boostProgress} className="h-2" />
+              <p className="text-sm text-muted-foreground hebrew-text text-center">
+                מנוי: {planName}
+              </p>
+            </div>
+          </GradientBorderContainer>
+
           {isLoading ? (
             <div className="flex justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />

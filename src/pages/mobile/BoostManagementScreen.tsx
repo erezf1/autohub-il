@@ -105,30 +105,23 @@ export const BoostManagementScreen = () => {
   return (
     <PageContainer>
       <PageHeader
-        title="ניהול בוסטים"
+        title="הבוסטים שלי"
         onBack={() => navigate('/mobile/dashboard')}
+        rightAction={
+          <GradientBorderContainer className="rounded-md">
+            <Button
+              onClick={() => setVehicleSelectionDrawerOpen(true)}
+              variant="outline"
+              className="border-0"
+              disabled={availableBoosts === 0}
+            >
+              <Flame className="w-4 h-4 ml-2" />
+              <Plus className="w-4 h-4 ml-1" />
+              בוסט חדש
+            </Button>
+          </GradientBorderContainer>
+        }
       />
-
-      {/* Boost Counter Card */}
-      <GradientBorderContainer className="rounded-lg mb-6">
-        <div className="p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Flame className={`h-8 w-8 ${availableBoosts > 0 ? 'text-orange-500 animate-pulse' : 'text-orange-500/30'}`} />
-              <div className="text-right">
-                <p className="text-3xl font-bold hebrew-text">
-                  {availableBoosts} / {totalBoosts}
-                </p>
-                <p className="text-sm text-muted-foreground hebrew-text">בוסטים זמינים</p>
-              </div>
-            </div>
-          </div>
-          <Progress value={boostProgress} className="h-2" />
-          <p className="text-sm text-muted-foreground hebrew-text text-center">
-            מנוי: {profile?.plan?.name_hebrew || 'רגיל'}
-          </p>
-        </div>
-      </GradientBorderContainer>
 
       {/* Active Boosts Section */}
       <div className="mb-6">
@@ -198,20 +191,6 @@ export const BoostManagementScreen = () => {
         )}
       </div>
 
-      {/* Add Boost Button */}
-      <GradientBorderContainer className="rounded-lg mb-6">
-        <Button 
-          size="lg"
-          className="w-full h-16 text-lg hebrew-text"
-          onClick={() => setVehicleSelectionDrawerOpen(true)}
-          disabled={availableBoosts === 0}
-        >
-          <Flame className="h-6 w-6 ml-2" />
-          <Plus className="h-6 w-6 ml-1" />
-          הוסף בוסט חדש
-        </Button>
-      </GradientBorderContainer>
-
       {/* Subscription Info Card */}
       <GradientBorderContainer className="rounded-lg">
         <div className="p-4 text-center space-y-2">
@@ -234,6 +213,9 @@ export const BoostManagementScreen = () => {
         vehicles={myVehicles}
         onSelectVehicle={handleSelectVehicle}
         isLoading={isLoadingMy}
+        availableBoosts={availableBoosts}
+        totalBoosts={totalBoosts}
+        planName={profile?.plan?.name_hebrew || 'רגיל'}
       />
 
       {/* Boost Configuration Dialog */}
