@@ -25,3 +25,14 @@ export {
   useCreateAuction,
   usePlaceBid
 } from './useAuctions';
+export {
+  useConversations,
+  useConversation,
+  useRequestReveal,
+  useApproveReveal,
+  useRejectReveal
+} from './useConversations';
+export {
+  useChatMessages,
+  useSendMessage
+} from './useChatMessages';

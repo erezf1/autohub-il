@@ -1,56 +1,36 @@
-import { MessageCircle, User } from "lucide-react";
+import { User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate } from "react-router-dom";
-
-// Mock data for chat list
-const chatList = [
-  {
-    id: 1,
-    otherPartyName: "סוחר #345",
-    chatSubject: "נושא: המכירה שלך: 342",
-    lastMessage: "האם הרכב עדיין זמין למכירה?",
-    timestamp: "10:45",
-    unreadCount: 2,
-    avatar: null
-  },
-  {
-    id: 2,
-    otherPartyName: "אוטו-דיל",
-    chatSubject: "נושא: הבקשה שלך: 6449",
-    lastMessage: "יש לי רכב שמתאים בדיוק למה שאתה מחפש",
-    timestamp: "אתמול",
-    unreadCount: 0,
-    avatar: null
-  },
-  {
-    id: 3,
-    otherPartyName: "סוחר #127",
-    chatSubject: "נושא: מכירה פומבית: אאודי A6",
-    lastMessage: "מה הבעיה המכנית שאתה מזכיר?",
-    timestamp: "אתמול",
-    unreadCount: 5,
-    avatar: null
-  },
-  {
-    id: 4,
-    otherPartyName: "רכב-טק",
-    chatSubject: "נושא: המכירה שלך: 891",
-    lastMessage: "אני מעוניין לראות את הרכב היום",
-    timestamp: "03/01",
-    unreadCount: 1,
-    avatar: null
-  }
-];
+import { useConversations } from "@/hooks/mobile/useConversations";
+import { LoadingSpinner } from "@/components/common";
+import { format, isToday, isYesterday } from "date-fns";
+import { he } from "date-fns/locale";
 
 const ChatListScreen = () => {
   const navigate = useNavigate();
+  const { data: conversations, isLoading } = useConversations();
 
-  const handleChatClick = (chatId: number) => {
+  const handleChatClick = (chatId: string) => {
     navigate(`/mobile/chat/${chatId}`);
   };
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    if (isToday(date)) {
+      return format(date, 'HH:mm');
+    } else if (isYesterday(date)) {
+      return 'אתמול';
+    } else {
+      return format(date, 'dd/MM', { locale: he });
+    }
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="space-y-4">
@@ -59,63 +39,69 @@ const ChatListScreen = () => {
       
       {/* Chat List */}
       <div className="space-y-3">
-        {chatList.map((chat) => (
-          <GradientBorderContainer
-            key={chat.id}
-
-            className="rounded-md flex-1"
-          >
-            <Card 
-              className="card-interactive cursor-pointer bg-black border-0"
-              onClick={() => handleChatClick(chat.id)}
+        {conversations?.length === 0 ? (
+          <p className="text-center text-muted-foreground hebrew-text py-8">
+            אין שיחות פעילות
+          </p>
+        ) : (
+          conversations?.map((chat) => (
+            <GradientBorderContainer
+              key={chat.id}
+              className="rounded-md flex-1"
             >
-              <CardContent className="p-4">
-                <div className="flex items-start space-x-3 space-x-reverse">
-                  {/* Avatar */}
-                  <Avatar className="h-12 w-12 flex-shrink-0">
-                    <AvatarImage src={chat.avatar || ""} />
-                    <AvatarFallback>
-                      <User className="h-6 w-6" />
-                    </AvatarFallback>
-                  </Avatar>
+              <Card 
+                className="card-interactive cursor-pointer bg-black border-0"
+                onClick={() => handleChatClick(chat.id)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-3 space-x-reverse">
+                    {/* Avatar */}
+                    <Avatar className="h-12 w-12 flex-shrink-0">
+                      <AvatarImage src={chat.otherParty.profile_picture_url || ""} />
+                      <AvatarFallback>
+                        <User className="h-6 w-6" />
+                      </AvatarFallback>
+                    </Avatar>
 
-                  {/* Chat Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      {/* Other Party Name */}
-                      <h3 className="font-semibold text-white hebrew-text truncate">
-                        {chat.otherPartyName}
-                      </h3>
-                      
-                      {/* Timestamp */}
-                      <span className="text-xs text-gray-300 flex-shrink-0">
-                        {chat.timestamp}
-                      </span>
-                    </div>
+                    {/* Chat Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        {/* Other Party Name */}
+                        <h3 className="font-semibold text-white hebrew-text truncate">
+                          {chat.otherParty.business_name}
+                        </h3>
+                        
+                        {/* Timestamp */}
+                        <span className="text-xs text-gray-300 flex-shrink-0">
+                          {formatTimestamp(chat.lastMessageAt)}
+                        </span>
+                      </div>
 
-                    {/* Chat Subject */}
-                    <p className="text-sm text-gray-300 hebrew-text mb-2">
-                      {chat.chatSubject}
-                    </p>
-
-                    {/* Last Message and Unread Badge */}
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-white hebrew-text truncate flex-1">
-                        {chat.lastMessage}
+                      {/* Chat Subject */}
+                      <p className="text-sm text-gray-300 hebrew-text mb-2">
+                        נושא: {chat.entity.title}
+                        {chat.entity.subtitle && ` - ${chat.entity.subtitle}`}
                       </p>
-                      
-                      {chat.unreadCount > 0 && (
-                        <Badge variant="destructive" className="mr-2 notification-badge">
-                          {chat.unreadCount}
-                        </Badge>
-                      )}
+
+                      {/* Last Message and Unread Badge */}
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-white hebrew-text truncate flex-1">
+                          {chat.lastMessage || 'אין הודעות'}
+                        </p>
+                        
+                        {chat.unreadCount > 0 && (
+                          <Badge variant="destructive" className="mr-2 notification-badge">
+                            {chat.unreadCount}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </GradientBorderContainer>
-        ))}
+                </CardContent>
+              </Card>
+            </GradientBorderContainer>
+          ))
+        )}
       </div>
     </div>
   );

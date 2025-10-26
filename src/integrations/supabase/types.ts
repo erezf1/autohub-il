@@ -184,9 +184,12 @@ export type Database = {
       }
       chat_conversations: {
         Row: {
+          auction_id: string | null
           created_at: string | null
+          details_reveal_approved_by: string | null
+          details_reveal_requested_at: string | null
+          details_reveal_requested_by: string | null
           details_revealed_at: string | null
-          details_revealed_by: string | null
           id: string
           is_details_revealed: boolean | null
           iso_request_id: string | null
@@ -197,9 +200,12 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          auction_id?: string | null
           created_at?: string | null
+          details_reveal_approved_by?: string | null
+          details_reveal_requested_at?: string | null
+          details_reveal_requested_by?: string | null
           details_revealed_at?: string | null
-          details_revealed_by?: string | null
           id?: string
           is_details_revealed?: boolean | null
           iso_request_id?: string | null
@@ -210,9 +216,12 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          auction_id?: string | null
           created_at?: string | null
+          details_reveal_approved_by?: string | null
+          details_reveal_requested_at?: string | null
+          details_reveal_requested_by?: string | null
           details_revealed_at?: string | null
-          details_revealed_by?: string | null
           id?: string
           is_details_revealed?: boolean | null
           iso_request_id?: string | null
@@ -224,8 +233,22 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "chat_conversations_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_conversations_details_reveal_requested_by_fkey"
+            columns: ["details_reveal_requested_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "chat_conversations_details_revealed_by_fkey"
-            columns: ["details_revealed_by"]
+            columns: ["details_reveal_approved_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]

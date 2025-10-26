@@ -1,112 +1,40 @@
+import { ArrowRight, Send, User, Info, Check, X } from "lucide-react";
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Send, Paperclip, Phone, User } from "lucide-react";
-import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { useNavigate, useParams } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
-
-// Mock data for chat messages
-const mockMessages = [
-  {
-    id: 1,
-    senderId: "other",
-    senderName: "דוד כהן",
-    message: "שלום, אני מעוניין ברכב הטויוטה קמרי שלך",
-    timestamp: "14:30",
-    isRead: true
-  },
-  {
-    id: 2,
-    senderId: "me",
-    senderName: "אני",
-    message: "שלום! כן, הרכב זמין. איזה מידע נוסף אתה צריך?",
-    timestamp: "14:35",
-    isRead: true
-  },
-  {
-    id: 3,
-    senderId: "other",
-    senderName: "דוד כהן",
-    message: "כמה קילומטרים יש על הרכב? ומה מצב המנוע?",
-    timestamp: "14:40",
-    isRead: true
-  },
-  {
-    id: 4,
-    senderId: "me",
-    senderName: "אני",
-    message: "120,000 ק״מ בדיוק, מנוע חדש החלפתי לפני 6 חודשים. יש לי את כל הטיפולים מהסוכנות",
-    timestamp: "14:42",
-    isRead: true
-  },
-  {
-    id: 5,
-    senderId: "other",
-    senderName: "דוד כהן",
-    message: "נשמע מעולה! אפשר לקבוע פגישה לראות את הרכב?",
-    timestamp: "14:45",
-    isRead: true
-  }, 
-  {
-    id: 6,
-    senderId: "me",
-    senderName: "אני",
-    message: "בוודאי! מתי נוח לך להיפגש?",
-    timestamp: "14:47",
-    isRead: true
-  },
-  {
-    id: 7,
-    senderId: "other",
-    senderName: "דוד כהן",
-    message: "מה דעתך על מחר בשעה 17:00?",
-    timestamp: "14:50",
-    isRead: true
-
-  },
-  {
-    id: 8,
-    senderId: "me",
-    senderName: "אני",
-    message: "מחר בשעה 17:00 מצוין. נתראה אז!",
-    timestamp: "14:52",
-    isRead: true
-  },
-  {
-    id: 9,
-    senderId: "other",
-    senderName: "דוד כהן",
-    message: "תודה רבה! להתראות מחר.",
-    timestamp: "14:55",
-    isRead: false
-  }
-
-];
-
-// Mock chat info
-const mockChatInfo = {
-  id: "123",
-  otherPartyName: "דוד כהן",
-  otherPartyPhone: "050-1234567",
-  chatSubject: "טויוטה קמרי 2020",
-  vehicleId: "456",
-  isOnline: true
-};
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useChatMessages, useSendMessage } from "@/hooks/mobile/useChatMessages";
+import { useConversation, useRequestReveal, useApproveReveal, useRejectReveal } from "@/hooks/mobile/useConversations";
+import { LoadingSpinner } from "@/components/common";
+import { useAuth } from "@/contexts/AuthContext";
+import { format } from "date-fns";
+import { toast } from "sonner";
 
 const ChatDetailScreen = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
   const [newMessage, setNewMessage] = useState("");
+  const { chatId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { data: conversation, isLoading: loadingConversation } = useConversation(chatId!);
+  const { data: messages, isLoading: loadingMessages } = useChatMessages(chatId!);
+  const sendMessageMutation = useSendMessage();
+  const requestRevealMutation = useRequestReveal();
+  const approveRevealMutation = useApproveReveal();
+  const rejectRevealMutation = useRejectReveal();
 
   const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      // In real app, send message via API
-      console.log("Sending message:", newMessage);
-      setNewMessage("");
+    if (newMessage.trim() && chatId) {
+      sendMessageMutation.mutate(
+        { conversationId: chatId, messageContent: newMessage.trim() },
+        {
+          onSuccess: () => setNewMessage(""),
+          onError: () => toast.error("שליחת ההודעה נכשלה")
+        }
+      );
     }
   };
 
@@ -114,125 +42,249 @@ const ChatDetailScreen = () => {
     navigate("/mobile/chats");
   };
 
+  const handleRequestReveal = () => {
+    if (chatId) {
+      requestRevealMutation.mutate(chatId, {
+        onSuccess: () => toast.success("בקשה לחשיפת פרטים נשלחה"),
+        onError: () => toast.error("שליחת הבקשה נכשלה")
+      });
+    }
+  };
+
+  const handleApproveReveal = () => {
+    if (chatId) {
+      approveRevealMutation.mutate(chatId, {
+        onSuccess: () => toast.success("פרטי הקשר נחשפו"),
+        onError: () => toast.error("אישור חשיפת הפרטים נכשל")
+      });
+    }
+  };
+
+  const handleRejectReveal = () => {
+    if (chatId) {
+      rejectRevealMutation.mutate(chatId, {
+        onSuccess: () => toast.info("הבקשה נדחתה"),
+        onError: () => toast.error("דחיית הבקשה נכשלה")
+      });
+    }
+  };
+
+  if (loadingConversation || loadingMessages) {
+    return <LoadingSpinner />;
+  }
+
+  if (!conversation) {
+    return (
+      <div className="text-center text-muted-foreground hebrew-text py-8">
+        שיחה לא נמצאה
+      </div>
+    );
+  }
+
+  const showRevealRequest = conversation.details_reveal_requested_by && 
+    conversation.details_reveal_requested_by !== user?.id &&
+    !conversation.is_details_revealed;
+
+  const canRequestReveal = !conversation.details_reveal_requested_by && 
+    !conversation.is_details_revealed;
+
   return (
-    <div className="fixed inset-0 top-16 left-0 right-0 bottom-16 flex flex-col" dir="rtl">
-      <div className="container max-w-md mx-auto px-4 h-full flex flex-col">
-        {/* Chat Header - Fixed */}
-        <div className="flex-shrink-0 pt-4 pb-4">
-          <GradientBorderContainer className="rounded-md">
-            <Card className="bg-black border-0">
-              <CardHeader className="pb-3">
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <div 
-                    onClick={handleBackClick}
-                    className="h-6 w-6 cursor-pointer flex items-center justify-center transition-all duration-200 flex-shrink-0"
-                  >
-                    <SuperArrowsIcon className="h-full w-full hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] transition-all duration-200" />
-                  </div>
-                  
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {mockChatInfo.otherPartyName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
+    <div className="flex flex-col h-[calc(100vh-8rem)]">
+      {/* Chat Header */}
+      <div className="bg-card border-b border-border p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3 space-x-reverse flex-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBackClick}
+              className="flex-shrink-0"
+            >
+              <ArrowRight className="h-5 w-5" />
+            </Button>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-2 space-x-reverse">
-                      <h2 className="font-semibold text-white hebrew-text">
-                        {mockChatInfo.otherPartyName}
-                      </h2>
-                      {mockChatInfo.isOnline && (
-                        <Badge variant="secondary" className="text-xs bg-success text-success-foreground">
-                          מקוון
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-300 hebrew-text">
-                      {mockChatInfo.chatSubject}
-                    </p>
-                  </div>
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={conversation.otherParty.profile_picture_url || ""} />
+              <AvatarFallback>
+                <User className="h-5 w-5" />
+              </AvatarFallback>
+            </Avatar>
 
-                  <Button variant="outline" size="icon" className="border-gray-600 text-white hover:bg-gray-800">
-                    <Phone className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-            </Card>
-          </GradientBorderContainer>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-semibold text-foreground hebrew-text truncate">
+                {conversation.otherParty.displayName}
+              </h2>
+              <p className="text-xs text-muted-foreground hebrew-text truncate">
+                נושא: {conversation.vehicle_listings ? 
+                  `${conversation.vehicle_listings.make?.name_hebrew} ${conversation.vehicle_listings.model?.name_hebrew}` :
+                  conversation.auctions ?
+                  `מכרז - ${conversation.auctions.vehicle.make?.name_hebrew}` :
+                  conversation.iso_requests?.title || 'שיחה'
+                }
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Messages Container - Scrollable Only */}
-        <div className="flex-1 overflow-y-auto space-y-3 px-1">
-          {mockMessages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.senderId === "me" ? "justify-start" : "justify-end"
-              }`}
-            >
-              <div
-                className={`max-w-[75%] p-3 rounded-lg ${
-                  message.senderId === "me"
-                    ? "bg-black border border-gray-700 text-white ml-auto"
-                    : "bg-gray-800 border border-gray-600 text-white mr-auto"
-                }`}
-              >
-                <p className="text-sm hebrew-text mb-1">
-                  {message.message}
-                </p>
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`text-xs ${
-                      message.senderId === "me"
-                        ? "text-gray-300"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    {message.timestamp}
+        {/* Reveal Details UI */}
+        {showRevealRequest && (
+          <Card className="mt-3 bg-amber-500/10 border-amber-500/20">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Info className="h-4 w-4 text-amber-500" />
+                  <span className="text-sm hebrew-text text-foreground">
+                    {conversation.otherParty.displayName} מבקש לחשוף פרטי קשר
                   </span>
-                  {message.senderId === "me" && (
-                    <div className="flex space-x-1">
-                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                    </div>
-                  )}
+                </div>
+                <div className="flex space-x-2 space-x-reverse">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleRejectReveal}
+                    className="h-8"
+                  >
+                    <X className="h-4 w-4 ml-1" />
+                    דחה
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleApproveReveal}
+                    className="h-8"
+                  >
+                    <Check className="h-4 w-4 ml-1" />
+                    אשר
+                  </Button>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Message Input - Fixed at bottom */}
-        <div className="flex-shrink-0 pt-4 pb-4">
-          <GradientBorderContainer className="rounded-md">
-            <Card className="bg-black border-0">
-              <CardContent className="p-3">
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <Button variant="outline" size="icon" className="border-gray-600 text-white hover:bg-gray-800">
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
-                  
-                  <Input
-                    placeholder="הקלד הודעה..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                    className="flex-1 hebrew-text bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
-                    dir="rtl"
-                  />
-                  
-                  <Button 
-                    onClick={handleSendMessage}
-                    disabled={!newMessage.trim()}
-                    size="icon"
-                    className="hebrew-text"
+        {canRequestReveal && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRequestReveal}
+            className="mt-3 w-full hebrew-text"
+          >
+            <Info className="h-4 w-4 ml-2" />
+            בקש לחשוף פרטי קשר
+          </Button>
+        )}
+
+        {conversation.is_details_revealed && (
+          <Card className="mt-3 bg-green-500/10 border-green-500/20">
+            <CardContent className="p-3">
+              <p className="text-sm text-green-600 hebrew-text text-center">
+                פרטי הקשר נחשפו - {conversation.otherParty.business_name}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Messages Area */}
+      <ScrollArea className="flex-1 p-4">
+        <div className="space-y-4">
+          {messages?.length === 0 ? (
+            <p className="text-center text-muted-foreground hebrew-text py-8">
+              אין הודעות בשיחה
+            </p>
+          ) : (
+            messages?.map((message) => {
+              const isOwnMessage = message.senderId === user?.id;
+
+              return (
+                <div
+                  key={message.id}
+                  className={`flex ${isOwnMessage ? "justify-start" : "justify-end"}`}
+                >
+                  <div
+                    className={`flex items-start space-x-2 space-x-reverse max-w-[75%] ${
+                      isOwnMessage ? "" : "flex-row-reverse space-x-reverse"
+                    }`}
                   >
-                    <Send className="h-4 w-4" />
-                  </Button>
+                    <Avatar className="h-8 w-8 flex-shrink-0">
+                      <AvatarImage src={message.senderAvatar || ""} />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div>
+                      <Card
+                        className={`${
+                          isOwnMessage
+                            ? "bg-primary/10 border-primary/20"
+                            : "bg-secondary/50 border-secondary"
+                        }`}
+                      >
+                        <CardContent className="p-3">
+                          {message.messageType === 'text' ? (
+                            <p
+                              className={`text-sm hebrew-text ${
+                                isOwnMessage ? "text-primary" : "text-foreground"
+                              }`}
+                            >
+                              {message.messageContent}
+                            </p>
+                          ) : message.messageType === 'image' ? (
+                            <img 
+                              src={message.messageContent} 
+                              alt="תמונה" 
+                              className="max-w-full rounded"
+                            />
+                          ) : (
+                            <p className="text-sm hebrew-text text-muted-foreground">
+                              הודעת {message.messageType === 'voice' ? 'קול' : 'מערכת'}
+                            </p>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      <div
+                        className={`flex items-center mt-1 space-x-1 ${
+                          isOwnMessage ? "justify-start" : "justify-end"
+                        }`}
+                      >
+                        <span className="text-xs text-muted-foreground">
+                          {format(new Date(message.createdAt), 'HH:mm')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </GradientBorderContainer>
+              );
+            })
+          )}
+        </div>
+      </ScrollArea>
+
+      {/* Message Input */}
+      <div className="p-4 bg-card border-t border-border">
+        <div className="flex items-center space-x-2 space-x-reverse">
+          <Input
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="הקלד הודעה..."
+            className="flex-1 hebrew-text"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+          />
+
+          <Button
+            onClick={handleSendMessage}
+            size="icon"
+            className="flex-shrink-0"
+            disabled={!newMessage.trim() || sendMessageMutation.isPending}
+          >
+            <Send className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </div>
