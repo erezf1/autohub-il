@@ -44,6 +44,8 @@ export const useConversations = () => {
 
   return useQuery({
     queryKey: ['conversations', user?.id],
+    refetchOnMount: 'always',
+    staleTime: 0,
     queryFn: async () => {
       if (!user?.id) return [];
 

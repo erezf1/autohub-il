@@ -1,7 +1,6 @@
 import { ArrowRight, Send, User, Info, Check, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,14 +18,6 @@ const ChatDetailScreen = () => {
   const { id: chatId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const queryClient = useQueryClient();
-
-  // Invalidate conversations when leaving the screen
-  useEffect(() => {
-    return () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
-    };
-  }, [queryClient]);
 
   const { data: conversation, isLoading: loadingConversation, error: conversationError } = useConversation(chatId!);
   const { data: messages, isLoading: loadingMessages } = useChatMessages(chatId!);

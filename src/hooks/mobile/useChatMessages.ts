@@ -103,7 +103,17 @@ export const useChatMessages = (conversationId: string) => {
         .eq('is_read', false);
 
       if (!error) {
-        // Invalidate conversations to update unread counts in chat list
+        // Optimistically update the conversations cache
+        queryClient.setQueryData(['conversations', user.id], (oldData: any) => {
+          if (!oldData) return oldData;
+          return oldData.map((conv: any) => 
+            conv.id === conversationId 
+              ? { ...conv, unreadCount: 0 }
+              : conv
+          );
+        });
+        
+        // Then invalidate to ensure consistency
         queryClient.invalidateQueries({ queryKey: ['conversations'] });
       }
     };

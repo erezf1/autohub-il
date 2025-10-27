@@ -322,11 +322,13 @@ The chat list displays the most recent message for each conversation.
 
 **Caching Strategy**:
 - Conversations list is cached with React Query
+- Cache is configured with `refetchOnMount: 'always'` and `staleTime: 0` to ensure fresh data
+- Optimistic updates provide instant UI feedback when marking messages as read
 - Cache invalidates when:
   - User sends a message (immediate update)
-  - User views a chat (marks messages as read, triggers update)
-  - User navigates back from chat detail (cleanup effect)
+  - User views a chat (marks messages as read, optimistically updates unread count to 0, then refetches)
 - Real-time subscription updates messages within open chat
+- No cleanup invalidation needed as mark-as-read handles cache updates directly
 
 ## Real-time Updates
 
