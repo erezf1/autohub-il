@@ -505,6 +505,39 @@ Anonymous chat interface with mutual detail-reveal mechanism.
 - **Reveal Request**: Button to request dealer information
 - **Chat Interface**: Standard messaging with privacy protection
 
+### 15A. Chat List Screen (`/mobile/chats`)
+**File**: `src/pages/mobile/ChatListScreen.tsx`
+
+#### Purpose
+Display all active conversations with dealers for vehicles, auctions, and ISO requests.
+
+#### Layout Requirements (RTL)
+- List of conversation cards sorted by most recent message
+- Each card shows:
+  - **No avatar/profile picture** (text-focused, clean interface)
+  - Dealer name (anonymous: "סוחר #12345" or revealed business name)
+  - Timestamp (right-aligned, HH:mm format for today, "אתמול" for yesterday, dd/MM for older)
+  - Entity subject (vehicle/auction/ISO request title and details)
+  - Last message with sender prefix ("אתה:" for current user, "סוחר:" for other party)
+  - Unread badge (red notification badge with count if unread messages exist)
+
+#### Behavior
+- **Tapping card**: Opens ChatDetailScreen for that conversation
+- **Auto-refresh**: List automatically refreshes when returning from chat detail view
+- **Current state**: Always shows current read/unread status and latest message
+- **Empty state**: "אין שיחות פעילות" when no conversations exist
+
+#### Anonymous Dealer Display
+- Format: "סוחר #XXXXX" where XXXXX is a unique 5-digit number per conversation
+- Same dealer gets different numbers in different conversations for privacy
+- Number is consistent within each specific conversation
+
+#### Technical Notes
+- Uses `useConversations()` hook to fetch all conversations
+- Real-time updates via React Query cache invalidation
+- Sender prefix added to last message for context
+- No profile pictures to maintain clean, text-focused design
+
 ### 16. Notifications Screen (`/mobile/notifications`)
 **File**: `src/pages/mobile/NotificationListScreen.tsx`
 

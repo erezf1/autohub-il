@@ -75,6 +75,13 @@ Customer support representatives with limited administrative access:
 **Relationships**: Users have many conversations, conversations have many messages
 **Operations**: Create conversations, send messages, reveal contact details, mark as read
 **Backend Client**: All operations use `dealerClient` for auth session consistency
+**Anonymous Display Rules**:
+  - Dealer anonymity until details revealed: "סוחר #XXXXX" (5 random digits)
+  - Different number per conversation (even for same dealer)
+  - Consistent within each conversation
+  - Last message shows sender prefix: "אתה:" or "סוחר:"
+  - Chat list has no profile pictures (text-focused interface)
+  - Auto-refresh on navigation to show current state
 
 ### Notification Entities
 **User Notifications**: For mobile dealers (registration_approved, auction_outbid, iso_match, message_received, etc.)

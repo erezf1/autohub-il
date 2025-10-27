@@ -1,7 +1,5 @@
-import { User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
 import { useNavigate } from "react-router-dom";
 import { useConversations } from "@/hooks/mobile/useConversations";
@@ -54,15 +52,7 @@ const ChatListScreen = () => {
                 onClick={() => handleChatClick(chat.id)}
               >
                 <CardContent className="p-4">
-                  <div className="flex items-start space-x-3 space-x-reverse">
-                    {/* Avatar */}
-                    <Avatar className="h-12 w-12 flex-shrink-0">
-                      <AvatarImage src={chat.otherParty.profile_picture_url || ""} />
-                      <AvatarFallback>
-                        <User className="h-6 w-6" />
-                      </AvatarFallback>
-                    </Avatar>
-
+                  <div className="flex items-start">
                     {/* Chat Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">

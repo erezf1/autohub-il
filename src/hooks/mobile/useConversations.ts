@@ -2,6 +2,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
 import { useAuth } from '@/contexts/AuthContext';
 
+// Helper function to generate anonymous dealer number per conversation
+const generateAnonymousNumber = (conversationId: string, userId: string): string => {
+  const combined = conversationId + userId;
+  let hash = 0;
+  for (let i = 0; i < combined.length; i++) {
+    hash = ((hash << 5) - hash) + combined.charCodeAt(i);
+    hash = hash & hash;
+  }
+  const fiveDigit = Math.abs(hash % 90000) + 10000;
+  return fiveDigit.toString();
+};
+
 export interface ConversationParticipant {
   id: string;
   business_name: string;
@@ -51,7 +63,7 @@ export const useConversations = () => {
           vehicle_listings(id, make:vehicle_makes(name_hebrew), model:vehicle_models(name_hebrew), year),
           auctions(id, vehicle:vehicle_listings(id, make:vehicle_makes(name_hebrew), model:vehicle_models(name_hebrew), year)),
           iso_requests(id, title),
-          chat_messages(message_content, created_at)
+          chat_messages(message_content, created_at, sender_id)
         `)
         .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`)
         .order('last_message_at', { ascending: false });
@@ -120,15 +132,20 @@ export const useConversations = () => {
           ? conv.chat_messages[0] 
           : null;
 
+        const lastMessageContent = lastMsg?.message_content || '';
+        const lastMessageSender = lastMsg?.sender_id;
+        const senderPrefix = !lastMessageContent ? '' :
+          lastMessageSender === user.id ? 'אתה: ' : 'סוחר: ';
+
         return {
           id: conv.id,
           otherParty: {
             id: otherPartyId,
-            business_name: conv.is_details_revealed ? otherParty?.business_name || 'משתמש' : `סוחר #${otherPartyId.slice(0, 6)}`,
+            business_name: conv.is_details_revealed ? otherParty?.business_name || 'משתמש' : `סוחר #${generateAnonymousNumber(conv.id, otherPartyId)}`,
             profile_picture_url: otherParty?.profile_picture_url || null
           },
           entity,
-          lastMessage: lastMsg?.message_content || '',
+          lastMessage: senderPrefix + lastMessageContent,
           lastMessageAt: conv.last_message_at || '',
           unreadCount: unreadCounts[conv.id] || 0,
           isDetailsRevealed: conv.is_details_revealed || false,
@@ -199,7 +216,7 @@ export const useConversation = (conversationId: string) => {
           phone_number: phoneNumber,
           displayName: data.is_details_revealed 
             ? profileData?.business_name || 'משתמש'
-            : `סוחר #${otherPartyId.slice(0, 6)}`
+            : `סוחר #${generateAnonymousNumber(data.id, otherPartyId)}`
         }
       };
     },

@@ -204,6 +204,61 @@ vehicles.map(vehicle => (
 
 **Performance:** This approach avoids N queries for N items. All lookups are O(1) from the pre-built Set.
 
+## Anonymous Dealer Naming
+
+When details are not revealed, dealers are shown with anonymous identifiers to maintain privacy:
+
+**Format**: `סוחר #XXXXX` where XXXXX is a 5-digit number
+
+**Key Features**:
+- **Unique per conversation**: The same dealer will have different numbers in different conversations (e.g., "סוחר #12345" for one vehicle chat, "סוחר #67890" for another)
+- **Consistent within conversation**: The number remains the same throughout a specific chat
+- **Deterministic generation**: Uses a hash of `conversationId + userId` to ensure the same number appears for a given conversation-dealer pair
+- **Implementation**: Simple character code hash modulo to 5-digit range (10000-99999)
+
+This ensures:
+- Privacy protection until details are revealed
+- Ability to distinguish between different anonymous conversations
+- No database storage needed (pure client-side logic)
+
+## Last Message Display Format
+
+In the chat list, the last message includes a sender prefix to help users quickly identify who sent it:
+
+| Sender | Prefix | Example |
+|--------|--------|---------|
+| Current user | אתה: | אתה: היי, מעוניין ברכב |
+| Other party | סוחר: | סוחר: בטח, בוא נדבר |
+| No messages | (empty) | אין הודעות |
+
+**Implementation Notes**:
+- Prefix is added in `useConversations` hook when fetching conversations
+- Uses `sender_id` from `chat_messages` to determine sender
+- RTL-appropriate (prefix before message content in Hebrew)
+
+## Chat List Refresh Behavior
+
+The conversation list automatically refreshes to reflect the latest state when users navigate back from viewing a conversation:
+
+**Auto-refresh triggers**:
+- Returning from chat detail screen to chat list
+- After sending a new message
+- After marking messages as read
+
+**What updates**:
+- Unread message counts (badges)
+- Last message content and sender
+- Timestamp of last message
+- Read/unread status
+
+**Implementation**:
+- React Query cache invalidation on screen navigation
+- `useEffect` cleanup function in `ChatDetailScreen` invalidates `['conversations']` query
+- `useSendMessage` mutation invalidates queries on success
+- `useChatMessages` marks messages as read when conversation is viewed
+
+This ensures users always see current information without manual refresh.
+
 ## RTL (Hebrew) Labels
 
 All chat-related UI uses right-to-left Hebrew text:
