@@ -62,13 +62,33 @@ export const useConversations = () => {
           last_message_at,
           vehicle_listings(id, make:vehicle_makes(name_hebrew), model:vehicle_models(name_hebrew), year),
           auctions(id, vehicle:vehicle_listings(id, make:vehicle_makes(name_hebrew), model:vehicle_models(name_hebrew), year)),
-          iso_requests(id, title),
-          chat_messages(message_content, created_at, sender_id)
+          iso_requests(id, title)
         `)
         .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`)
         .order('last_message_at', { ascending: false });
 
       if (error) throw error;
+
+      // Fetch latest message for each conversation separately
+      const latestMessagesPromises = data.map(async (conv) => {
+        const { data: latestMessage } = await dealerClient
+          .from('chat_messages')
+          .select('message_content, sender_id, created_at')
+          .eq('conversation_id', conv.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        return { conversationId: conv.id, message: latestMessage };
+      });
+
+      const latestMessagesResults = await Promise.all(latestMessagesPromises);
+      const latestMessagesMap = latestMessagesResults.reduce((acc, result) => {
+        if (result.message) {
+          acc[result.conversationId] = result.message;
+        }
+        return acc;
+      }, {} as Record<string, { message_content: string; sender_id: string; created_at: string }>);
 
       // Get unread counts for each conversation
       const conversationIds = data.map(c => c.id);
@@ -128,9 +148,7 @@ export const useConversations = () => {
           entity = { type: 'vehicle', id: '', title: 'שיחה' };
         }
 
-        const lastMsg = Array.isArray(conv.chat_messages) && conv.chat_messages.length > 0 
-          ? conv.chat_messages[0] 
-          : null;
+        const lastMsg = latestMessagesMap[conv.id];
 
         const lastMessageContent = lastMsg?.message_content || '';
         const lastMessageSender = lastMsg?.sender_id;

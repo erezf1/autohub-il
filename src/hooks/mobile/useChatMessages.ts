@@ -95,16 +95,21 @@ export const useChatMessages = (conversationId: string) => {
     if (!conversationId || !user?.id) return;
 
     const markAsRead = async () => {
-      await dealerClient
+      const { error } = await dealerClient
         .from('chat_messages')
         .update({ is_read: true, read_at: new Date().toISOString() })
         .eq('conversation_id', conversationId)
         .neq('sender_id', user.id)
         .eq('is_read', false);
+
+      if (!error) {
+        // Invalidate conversations to update unread counts in chat list
+        queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      }
     };
 
     markAsRead();
-  }, [conversationId, user?.id]);
+  }, [conversationId, user?.id, queryClient]);
 
   return query;
 };

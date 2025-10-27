@@ -307,9 +307,30 @@ Key fields:
 - `is_read`: BOOLEAN
 - `created_at`: TIMESTAMP
 
+## Last Message Retrieval
+
+The chat list displays the most recent message for each conversation.
+
+**Implementation Details**:
+- Latest message is fetched separately per conversation using:
+  - Order by `created_at DESC`
+  - Limit to 1 message
+  - Includes `sender_id` for prefix determination
+- Conversations are sorted by `last_message_at` timestamp
+- Database trigger ensures `last_message_at` updates on new messages
+- All queries are parallelized using `Promise.all()` for optimal performance
+
+**Caching Strategy**:
+- Conversations list is cached with React Query
+- Cache invalidates when:
+  - User sends a message (immediate update)
+  - User views a chat (marks messages as read, triggers update)
+  - User navigates back from chat detail (cleanup effect)
+- Real-time subscription updates messages within open chat
+
 ## Real-time Updates
 
-Conversations use Supabase real-time subscriptions:
+Conversations use Supabase real-time subscriptions to automatically update:
 
 ```typescript
 const channel = dealerClient
@@ -324,6 +345,12 @@ const channel = dealerClient
   })
   .subscribe();
 ```
+
+**What updates automatically**:
+- New messages appear immediately in open conversations
+- Message read status updates
+- Chat list reflects latest messages and unread counts without manual refresh
+- Unread counts update immediately when opening a conversation
 
 ## Common Patterns & Best Practices
 
