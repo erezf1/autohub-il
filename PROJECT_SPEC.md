@@ -105,15 +105,15 @@ Customer support representatives with limited administrative access:
 ## Business Rules & Logic
 
 ### Subscription Plans & Limits
-- **Regular Plan**: Up to 10 vehicles, 0 boosts per month, 0 auctions per month
-- **Gold Plan**: Up to 25 vehicles, 5 boosts per month, 3 auctions per month
-- **VIP Plan**: Up to 100 vehicles, 15 boosts per month, 10 auctions per month
+- **Regular Plan**: Up to 10 vehicles, 5 boosts per month, 5 auctions per month
+- **Gold Plan**: Up to 25 vehicles, 10 boosts per month, 10 auctions per month
+- **VIP Plan**: Up to 100 vehicles, 99 boosts per month, 99 auctions per month
 
 ### Boost System ("Hot Cars")
 - **Boost Duration**: Fixed 5-day priority placement in Hot Cars section
 - **Optional Hot Sale Price**: Dealers can set special pricing for boosted vehicles
 - **Boost Allocation**: Based on subscription plan (stored in `subscription_plans` table)
-  - **Regular**: 0 boosts/month
+  - **Regular**: 5 boosts/month
   - **Gold**: 10 boosts/month  
   - **VIP**: 99 boosts/month
 - **Boost Counting Logic**: 

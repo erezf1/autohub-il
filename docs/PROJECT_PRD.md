@@ -21,7 +21,7 @@ Car dealers and dealership managers in Israel who hold a valid "סחר תו" (Tr
 
 ## 2.1. User Registration and Approval
 
-- Dealer: Downloads the app and initiates registration with a phone number and OTP.
+- Dealer: Downloads the app and initiates registration with a phone number and 6-digit password.
 - Dealer: Fills out a profile and uploads a trade license. Account status becomes "Pending Approval."
 - System: Notifies admins of the new registration.
 - Admin: Verifies the dealer's details and trade license.
@@ -37,7 +37,7 @@ Car dealers and dealership managers in Israel who hold a valid "סחר תו" (Tr
 ## 2.3. Using a "Boost"
 
 - Dealer: Selects a listing and taps "Boost."
-- System: Verifies available boosts, activates the boost for 3 days, decrements the user's count, and prioritizes the listing. The boost is automatically removed after 3 days.
+- System: Verifies available boosts, activates the boost for 5 days, decrements the user's count, and prioritizes the listing. The boost is automatically removed after 5 days.
 
 ## 2.4. Creating an Auction
 
@@ -149,10 +149,10 @@ This section details the core entities of the system and defines the viewing and
 # 5. Business Rules & Logic
 
 - **Subscription Plans:**
-  - Regular: Up to 10 vehicles.
-  - Silver: Up to 20 vehicles, 5 boosts, 2 auctions per month.
-  - Unlimited: Unlimited vehicles, 10 boosts, 5 auctions per month.
-- **Boost Logic:** A boost is active for 3 days and grants priority placement.
+  - Regular: Up to 10 vehicles, 5 boosts, 5 auctions per month.
+  - Gold: Up to 25 vehicles, 10 boosts, 10 auctions per month.
+  - VIP: Up to 100 vehicles, 99 boosts, 99 auctions per month.
+- **Boost Logic:** A boost is active for 5 days and grants priority placement.
 - **Search Categories:** Quick search will include: "עד ₪50,000", "אחרי תאונה", "רכבי יוקרה", "אופנועים".
 
 # 6. System Processes
@@ -178,7 +178,7 @@ A background process will periodically calculate and update dealer ratings based
 
 - **Platforms:** Cross-platform mobile app (iOS/Android) and a web admin panel.
 - **Authentication:** 
-  - Mobile Users: Passwordless login via OTP
+  - Mobile Users: Phone number + 6-digit password authentication
   - Admin Users: Phone number + 6-digit password with separate session storage
   - Separate auth clients: `supabase` client for mobile, `adminClient` for admin panel
 - **Real-time:** Chat and auctions must use real-time technology (e.g., WebSockets).

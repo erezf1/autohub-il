@@ -24,9 +24,9 @@ CREATE TABLE public.subscription_plans (
 
 -- Insert default plans
 INSERT INTO public.subscription_plans (id, name_hebrew, name_english, max_vehicles, monthly_boosts, monthly_auctions, price_monthly) VALUES
-('regular', 'רגיל', 'Regular', 10, 0, 0, 0),
-('gold', 'זהב', 'Gold', 25, 5, 3, 299),
-('vip', 'VIP', 'VIP', 100, 15, 10, 799);
+('regular', 'רגיל', 'Regular', 10, 5, 5, 0),
+('gold', 'זהב', 'Gold', 25, 10, 10, 299),
+('vip', 'VIP', 'VIP', 100, 99, 99, 799);
 ```
 
 **Purpose**: Define subscription plan tiers with their associated limits and pricing.
@@ -160,11 +160,11 @@ INSERT INTO public.locations (name_hebrew, name_english, region) VALUES
 #### 2.1 Authentication & User Management
 ```sql
 -- Users table (extends Supabase auth.users)
+-- Note: Password is handled by Supabase auth.users table
+-- Note: User roles are handled by separate user_roles table with app_role enum
 CREATE TABLE public.users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   phone_number TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL, -- 6-digit password hash
-  user_role TEXT DEFAULT 'dealer' CHECK (user_role IN ('dealer', 'admin', 'support')),
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'suspended', 'rejected')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -183,8 +183,8 @@ CREATE TABLE public.user_profiles (
   rating_tier TEXT DEFAULT 'bronze' CHECK (rating_tier IN ('bronze', 'silver', 'gold', 'platinum')),
   subscription_type TEXT DEFAULT 'regular' CHECK (subscription_type IN ('regular', 'gold', 'vip')),
   subscription_valid_until DATE,
-  available_boosts INTEGER DEFAULT 0,
-  available_auctions INTEGER DEFAULT 0,
+  available_boosts INTEGER DEFAULT 0, -- DEPRECATED: Use get_remaining_boosts() RPC function
+  available_auctions INTEGER DEFAULT 0, -- DEPRECATED: Use subscription_plans monthly_auctions
   vehicles_limit INTEGER DEFAULT 10,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -215,6 +215,7 @@ CREATE TABLE public.vehicle_listings (
   status TEXT DEFAULT 'available' CHECK (status IN ('available', 'sold', 'removed', 'pending')),
   is_boosted BOOLEAN DEFAULT FALSE,
   boosted_until TIMESTAMP WITH TIME ZONE,
+  hot_sale_price DECIMAL(10,2), -- Optional discounted price during boost period
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -311,9 +312,12 @@ CREATE TABLE public.chat_conversations (
   participant_2_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   vehicle_id UUID REFERENCES public.vehicle_listings(id), -- Optional: related vehicle
   iso_request_id UUID REFERENCES public.iso_requests(id), -- Optional: related ISO request
+  auction_id UUID REFERENCES public.auctions(id), -- Optional: related auction
   is_details_revealed BOOLEAN DEFAULT FALSE,
-  details_revealed_by UUID REFERENCES public.users(id), -- Who revealed details first
-  details_revealed_at TIMESTAMP WITH TIME ZONE,
+  details_reveal_requested_by UUID REFERENCES public.users(id), -- Who requested reveal
+  details_reveal_approved_by UUID REFERENCES public.users(id), -- Who approved reveal
+  details_reveal_requested_at TIMESTAMP WITH TIME ZONE, -- When reveal was requested
+  details_revealed_at TIMESTAMP WITH TIME ZONE, -- When reveal was completed
   last_message_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -745,6 +749,16 @@ CREATE POLICY "Users see own notifications" ON public.user_notifications
 -- Users can mark their notifications as read
 CREATE POLICY "Users update own notifications" ON public.user_notifications
   FOR UPDATE USING (recipient_id = auth.uid());
+
+-- Users can mark received chat messages as read (not their own messages)
+CREATE POLICY "Participants mark received messages read" ON public.chat_messages
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM public.chat_conversations c 
+      WHERE c.id = chat_messages.conversation_id 
+      AND (c.participant_1_id = auth.uid() OR c.participant_2_id = auth.uid())
+    ) AND sender_id != auth.uid()
+  );
 ```
 
 ### 3. Admin Access Policies
