@@ -307,6 +307,13 @@ Key fields:
 - `is_read`: BOOLEAN
 - `created_at`: TIMESTAMP
 
+**Mark as Read RLS Policy:**
+The `"Participants mark received messages read"` policy allows conversation participants to update `is_read` status only for messages they received (not sent). This ensures:
+- Recipients can mark messages as read when viewing a conversation
+- Users cannot modify their own sent messages' read status
+- Only conversation participants have access (via JOIN to `chat_conversations`)
+- Frontend automatically marks messages as read when opening a chat
+
 ## Last Message Retrieval
 
 The chat list displays the most recent message for each conversation.
@@ -391,6 +398,34 @@ const channel = dealerClient
 **Cause:** Not checking conversation state or hardcoding label  
 **Fix:** Use the conversation detection patterns documented above
 
+## Admin Reset Feature
+
+For testing purposes, administrators can reset all chat data in the system:
+
+**Edge Function:** `admin-reset-chats`
+- Verifies admin/support role via `user_roles` table
+- Deletes all conversations from `chat_conversations`
+- Messages are automatically deleted via `ON DELETE CASCADE` foreign key
+- Returns count of deleted conversations
+- Logs all operations for audit trail
+
+**Admin UI Access:**
+- Available in Admin Settings → System Settings tab
+- Red "איפוס שיחות" (Reset Chats) button under "פעולות מסוכנות" (Dangerous Operations)
+- Confirmation dialog warns about irreversible deletion
+- Shows success toast with deletion count on completion
+
+**Use Cases:**
+- Fresh testing environment setup
+- Clearing test data between development cycles
+- Database maintenance (with proper backups)
+
+**Security:**
+- Requires admin or support role
+- JWT token validation via `adminClient`
+- Confirmation modal prevents accidental execution
+- Comprehensive server-side logging
+
 ## Testing Checklist
 
 - [ ] VehicleDetailScreen: Label changes correctly; navigation works for both states
@@ -401,4 +436,6 @@ const channel = dealerClient
 - [ ] ChatDetailScreen: Route param works; messages load; send/receive works
 - [ ] Real-time updates: New messages appear without refresh
 - [ ] No duplicate conversations: Clicking multiple times doesn't create duplicates
-- [ ] Unread badge: Updates correctly in header
+- [ ] Unread badge: Updates correctly after viewing chat and returning to list
+- [ ] Mark as read: Opening a chat immediately clears unread count in list
+- [ ] Admin reset: "איפוס שיחות" button successfully deletes all conversations and messages

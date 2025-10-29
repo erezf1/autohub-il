@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Settings, Save, Plus, Edit, Trash2, AlertTriangle } from "lucide-react";
 import { useSubscriptionPlans, useUpdateSubscriptionPlan } from "@/hooks/admin/useSubscriptionPlans";
+import { adminClient } from "@/integrations/supabase/adminClient";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +26,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -55,11 +68,38 @@ const systemSettings = {
 const AdminSettings = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [isResettingChats, setIsResettingChats] = useState(false);
   
   const { data: subscriptionPlans, isLoading: plansLoading } = useSubscriptionPlans();
   const updatePlanMutation = useUpdateSubscriptionPlan();
+  const { toast } = useToast();
 
   const [planUpdates, setPlanUpdates] = useState<Record<string, any>>({});
+
+  const handleResetChats = async () => {
+    setIsResettingChats(true);
+    try {
+      const { data, error } = await adminClient.functions.invoke('admin-reset-chats', {
+        body: { confirm: true }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "הצלחה",
+        description: data.message || "כל השיחות וההודעות נמחקו בהצלחה",
+      });
+    } catch (error: any) {
+      console.error('[AdminSettings] Reset chats error:', error);
+      toast({
+        variant: "destructive",
+        title: "שגיאה",
+        description: error.message || "נכשל במחיקת השיחות",
+      });
+    } finally {
+      setIsResettingChats(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -341,6 +381,57 @@ const AdminSettings = () => {
                       </div>
                     </div>
                     <Switch checked={systemSettings.maintenanceMode} />
+                  </div>
+                </CardContent>
+              </Card>
+            </GradientBorderContainer>
+
+            <GradientBorderContainer className="rounded-md">
+              <Card className="bg-black border-0 rounded-md border-destructive">
+                <CardHeader>
+                  <CardTitle className="text-white hebrew-text flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-destructive" />
+                    פעולות מסוכנות
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-white hebrew-text">איפוס כל שיחות והודעות</Label>
+                      <p className="text-sm text-muted-foreground hebrew-text">
+                        מחיקה מוחלטת של כל השיחות וההודעות במערכת - לבדיקות בלבד
+                      </p>
+                    </div>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="destructive" 
+                          className="hebrew-text"
+                          disabled={isResettingChats}
+                        >
+                          <Trash2 className="h-4 w-4 ml-2" />
+                          איפוס שיחות
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent dir="rtl">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="hebrew-text">האם אתה בטוח?</AlertDialogTitle>
+                          <AlertDialogDescription className="hebrew-text">
+                            פעולה מסוכנת – תמחק את כל השיחות וההודעות במערכת לצורכי בדיקות.
+                            פעולה זו לא ניתנת לביטול!
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="hebrew-text">ביטול</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={handleResetChats}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 hebrew-text"
+                          >
+                            מחק הכל
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </CardContent>
               </Card>

@@ -102,20 +102,23 @@ export const useChatMessages = (conversationId: string) => {
         .neq('sender_id', user.id)
         .eq('is_read', false);
 
-      if (!error) {
-        // Optimistically update the conversations cache
-        queryClient.setQueryData(['conversations', user.id], (oldData: any) => {
-          if (!oldData) return oldData;
-          return oldData.map((conv: any) => 
-            conv.id === conversationId 
-              ? { ...conv, unreadCount: 0 }
-              : conv
-          );
-        });
-        
-        // Then invalidate to ensure consistency
-        queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      if (error) {
+        console.warn('[useChatMessages] Failed to mark messages as read:', error);
       }
+
+      // Always update cache optimistically and invalidate, even if update failed
+      // This ensures UI stays in sync with actual state
+      queryClient.setQueryData(['conversations', user.id], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.map((conv: any) => 
+          conv.id === conversationId 
+            ? { ...conv, unreadCount: 0 }
+            : conv
+        );
+      });
+      
+      // Then invalidate to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
     };
 
     markAsRead();
