@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminClient } from '@/integrations/supabase/adminClient';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export const useUsers = (searchTerm?: string, statusFilter?: string) => {
@@ -260,8 +259,8 @@ export const useCreateUser = () => {
 
       const email = `${cleanedPhone}@autohub.local`;
 
-      // Use supabase.functions.invoke instead of fetch
-      const { data: result, error } = await supabase.functions.invoke('admin-create-user', {
+      // Use adminClient.functions.invoke to send admin JWT token
+      const { data: result, error } = await adminClient.functions.invoke('admin-create-user', {
         body: {
           email,
           password,
