@@ -1,713 +1,618 @@
-# Mobile Screens Specification - Auto-Hub
+# Mobile Screens Specification
 
-## Overview
-This document specifies all mobile screens for the Auto-Hub application based on PROJECT_PRD.md. The mobile app is designed for licensed car dealers with RTL (Hebrew) interface support and secure authentication.
+This document describes all mobile screens in the Auto-Hub B2B dealer platform as actually implemented.
 
-## Screen Navigation Flow
-```
-MobileLayout (RTL)
-├── MobileHeader (Logo, Notifications, Subscription Status)
-├── Main Content Area
-└── MobileTabBar (Bottom Navigation: Car Search, Required Cars, Hot Cars, Bids, My Profile)
-```
+## Table of Contents
+1. [Authentication & Onboarding](#authentication--onboarding)
+2. [Main Application Screens](#main-application-screens)
+3. [Supporting Screens](#supporting-screens)
+4. [Navigation Components](#navigation-components)
+5. [Common Components & Patterns](#common-components--patterns)
+6. [Business Rules & Constraints](#business-rules--constraints)
+7. [Complete Route Table](#complete-route-table)
+8. [Obsolete Screens](#obsolete-screens)
 
-## Authentication & Onboarding Flow
-New users must complete registration and approval process before accessing main application.
+---
 
-## Authentication & Onboarding Screens
+## Authentication & Onboarding
 
-### 1. Login Screen (`/mobile/login`)
-**File**: `src/pages/mobile/LoginScreen.tsx`
+### 1. WelcomeScreen
+**Route**: `/mobile/welcome`  
+**Purpose**: First screen introducing Auto-Hub B2B platform  
+**Auth**: Public
 
-#### Purpose
-Initial authentication screen for new and returning users.
+**Layout**: Fixed full-screen with gradient background
 
-#### Layout Requirements
-- **Phone Input**: RTL support with Israeli format (+972)
-- **OTP Button**: Send verification code
-- **Branding**: Auto-Hub logo and welcome message
+**Components**:
+- Auto-Hub logo and branding
+- Three feature cards (Car Database, Security/Trust, Professional Community)
+- "הרשמה חדשה" button → `/mobile/register`
+- "התחברות" button → `/mobile/login`
+- Terms of service link (non-functional)
 
-#### Components Needed
-- Phone number input with validation
-- OTP send button
-- Terms and conditions link
-- Loading states for OTP sending
+**Business Rules**: Licensed dealers only
 
-### 2. OTP Verification Screen (`/mobile/verify-otp`)
-**File**: `src/pages/mobile/OTPVerificationScreen.tsx`
+---
 
-#### Purpose
-Verify phone number with OTP code.
+### 2. LoginScreen
+**Route**: `/mobile/login`  
+**Purpose**: Authentication with phone + 6-digit password  
+**Auth**: Public
 
-#### Layout Requirements
-- **OTP Input**: 6-digit code entry
-- **Resend Options**: Timer and resend functionality
-- **Navigation**: Back to login
+**Form Fields**:
+- Phone (XXX-XXX-XXXX format, 10 digits starting with 05)
+- Password (6 digits, masked)
+- Login button
+- Forgot password link (non-functional)
+- New registration button
 
-### 3. Onboarding Profile Screen (`/mobile/onboarding/profile`)
-**File**: `src/pages/mobile/OnboardingProfileScreen.tsx`
+**Functionality**:
+- Validates phone format
+- Calls `signIn` from AuthContext
+- Routes based on status: pending → `/mobile/pending-approval`, active → `/mobile/dashboard`
+- Shows loading state and error toasts
 
-#### Purpose
-Collect dealer profile information during registration.
+---
 
-#### Layout Requirements
-- **Form Fields**: Full name, business name, location (RTL)
-- **Progress Indicator**: Step 1 of 2
-- **Navigation**: Continue to license upload
+### 3. RegisterScreen
+**Route**: `/mobile/register`  
+**Purpose**: Complete dealer registration  
+**Auth**: Public
 
-### 4. Onboarding License Screen (`/mobile/onboarding/license`)
-**File**: `src/pages/mobile/OnboardingLicenseScreen.tsx`
+**Required Fields**:
+- Phone (05X-XXX-XXXX)
+- Full name
+- Business name
+- Location (dropdown)
+- Trade license file (PDF/image, max 10MB) → `dealer-documents` bucket
+- Password (6 digits)
+- Confirm password
 
-#### Purpose
-Upload and verify trade license document.
+**Optional Fields**:
+- Profile picture (JPG/PNG, max 5MB) → `profile-pictures` bucket
+- Business description (max 500 chars)
 
-#### Layout Requirements
-- **File Upload**: Camera and gallery options
-- **Preview**: Show selected license image
-- **Submission**: Submit for admin approval
+**Functionality**:
+- Uploads files to Supabase storage
+- Creates user in auth.users and profile in user_profiles with status='pending'
+- Navigates to `/mobile/pending-approval` on success
 
-### 5. Pending Approval Screen (`/mobile/pending-approval`)
-**File**: `src/pages/mobile/PendingApprovalScreen.tsx`
+---
 
-#### Purpose
-Display waiting state during admin approval process.
+### 4. PendingApprovalScreen
+**Route**: `/mobile/pending-approval`  
+**Purpose**: Show registration pending admin approval  
+**Auth**: Authenticated (status='pending')
 
-#### Layout Requirements
-- **Status Message**: RTL explanation of approval process
-- **Contact Info**: Support contact for questions
-- **Logout Option**: Return to login screen
+**Components**:
+- Status message with timeline (1-2 business days)
+- Profile details (name, business, location, description)
+- "View Trade License" button (creates signed URL)
+- Help contacts (non-functional)
+- "Back to Login" button
+
+**Functionality**:
+- Fetches user_profiles with location join
+- Creates signed URL for trade license viewing
+- Shows loading skeleton during fetch
+
+---
 
 ## Main Application Screens
 
-### 6. Car Search Screen (`/mobile/search` or `/mobile/car-search`)
-**File**: `src/pages/mobile/CarSearchScreen.tsx`
+### 5. DashboardScreen
+**Route**: `/mobile/dashboard`  
+**Auth**: Protected
 
-#### Purpose
-Browse and search available vehicles from OTHER dealers in the marketplace. **EXCLUDES user's own vehicles.**
+**Components**:
+- Welcome message with user name and business
+- Four navigation cards with stats:
+  - Chats (unread count) → `/mobile/chats`
+  - Auctions (my bids) → `/mobile/bids`
+  - Car Searches (ISO requests) → `/mobile/required-cars`
+  - My Vehicles (active count) → `/mobile/my-vehicles`
 
-#### Search Behavior
-- **CRITICAL**: Search results automatically exclude the current user's own vehicles
-- Query implementation: `.neq('owner_id', userId)` in `useVehicles()` hook
-- User's own vehicles are accessible only through "My Vehicles" screen (`/mobile/my-vehicles`)
-- Displays only vehicles owned by other dealers
-
-#### Layout Requirements
-- **Header**: Page title with back button and "My Vehicles" link
-- **Search Bar**: Real-time search with RTL placeholder "חפש לפי יצרן, דגם או שנה..."
-- **Filter Button**: Icon button with active filter count badge
-- **Active Filters Display**: Shows applied filter count with "Clear All" button
-- **Results Counter**: Hebrew text showing number of matching vehicles
-- **Vehicle Cards**: Scrollable list with comprehensive vehicle information
-
-#### Components Needed
-- Search input with icon (right-aligned for RTL)
-- Full-width filter drawer (see VehicleFilterDrawer specifications below)
-- Vehicle result cards displaying:
-  - Vehicle image with boosted badge
-  - Make, model, year (Hebrew)
-  - Kilometers, transmission type, fuel type
-  - Price in ILS (₪)
-  - Click to navigate to vehicle detail
-- Active filter badges with count
-- "Clear All" button that resets all filters
-- Loading states
-
-#### VehicleFilterDrawer Specifications
-- **Component**: `src/components/mobile/VehicleFilterDrawer.tsx`
-- **Width**: Full mobile screen width (`w-full`)
-- **Max Height**: 90vh for scrollable content
-- **RTL Support**: `dir="rtl"` for proper Hebrew layout
-- **Filter Categories**:
-  - Make (יצרן): Dropdown with "הכל" option
-  - Model (דגם): Dependent on make selection
-  - Year Range (שנת ייצור): From/To inputs
-  - Price Range (מחיר): From/To inputs
-  - Tags (תגיות): Interactive badge selection
-- **Clear All Button**: 
-  - Resets all filters to empty state
-  - Immediately applies changes via `onApplyFilters({})`
-  - Auto-closes drawer via `onOpenChange(false)`
-  - Returns user to search screen in one action
-- **Apply Button**: Closes drawer and applies selected filters
-
-### 7. Required Cars Screen (`/mobile/required-cars`)
-**File**: `src/pages/mobile/RequiredCarsScreen.tsx`
-
-#### Purpose
-Manage "Vehicles Wanted" requests - dealer's specific vehicle requirements.
-
-#### Layout Requirements
-- **My Requests List**: Current ISO requests with status
-- **Create Button**: Add new vehicle requirement
-- **Filter Tabs**: Active, Completed, Expired requests
-
-#### Components Needed
-- ISO request cards with specifications
-- Status indicators (Active, Matches Found, Completed)
-- Create new ISO request button
-- Request detail navigation
-
-### 8. Hot Cars Screen (`/mobile/hot-cars`)
-**File**: `src/pages/mobile/HotCarsScreen.tsx`
-
-#### Purpose
-Display boosted vehicles ("Hot Sales") with 5-day priority placement. Shows ONLY other dealers' boosted vehicles.
-
-#### Boost System Rules
-- **Fixed Duration**: All boosts are exactly 5 days
-- **Optional Hot Sale Price**: Dealers can set special reduced pricing
-- **Visibility**: Excludes current user's own boosted vehicles (managed via "My Boosts")
-- **Communication**: Dealers use existing chat system to contact about hot cars
-- **Monthly Allocation**: Gold plan (5 boosts/month), VIP plan (15 boosts/month)
-
-#### Layout Requirements
-- **Header**: Title with flame icon, "My Boosts" button to access own boost management
-- **Filter Support**: Standard vehicle filtering applies to hot cars
-- **Boosted Indicator**: Flame icon and "מכירה חמה!" badge on cards
-- **Hot Sale Price Display**: Shows both original and discounted price if applicable
-- **Time Remaining**: Days remaining until boost expires
-- **Enhanced Cards**: Premium styling with hot sale price highlighting
-
-#### Components Needed
-- Vehicle cards with special "Hot Car" styling
-- Flame icon indicators for boosted status
-- Hot sale price display with original price strikethrough
-- Days remaining countdown
-- Navigation to individual vehicle detail screens
-- Contact seller via chat button (uses existing chat system)
-
-### 9. Bids Screen (`/mobile/bids`)
-**File**: `src/pages/mobile/BidsScreen.tsx`
-
-**Purpose**: 
-Display auctions where the dealer is participating or can participate in.
-
-**Layout**:
-- Header: "מכרזים פעילים"
-- Two tabs: "ההצעות שלי" (My Bids) and "כל המכרזים" (All Auctions)
-- Vehicle cards showing auction details and current bid
-- Click to view auction detail
-
-**Features**:
-- Real-time bid updates
-- Countdown timers
-- Status badges (winning/outbid)
-- Filter by vehicle type
+**Functionality**:
+- Checks user status (redirects if not active)
+- Real-time stats from useDashboardStats and useProfile hooks
 
 ---
 
-### 9A. Auction Detail Screen (`/mobile/auction/:id`)
-**File**: `src/pages/mobile/AuctionDetailScreen.tsx`
+### 6. CarSearchScreen
+**Route**: `/mobile/search`  
+**Tab**: 1 - "מאגר הרכבים"
 
-**Purpose**: 
-Display detailed auction information with different layouts for auction owners vs. bidders.
+**Components**:
+- "הרכבים שלי" button in header
+- Results count, filter button with badge
+- Active filters display
+- Vehicle cards list (VehicleCard component)
 
-#### Layout for Auction Owner (Creator View)
-When `auction.creator_id === user?.id`:
+**Functionality**:
+- Fetches all vehicles (including user's own)
+- Boosted vehicles appear first (sorted by is_boosted and boosted_until)
+- Filtering via VehicleFilterDrawer
+- Click vehicle → `/mobile/vehicle/{id}`
 
-1. **Header**: 
-   - Back button (left)
-   - Title: "מכירה פומבית"
-   - Badge: "המכרז שלך" (right)
+---
 
-2. **Info Card**: 
-   - Icon: Gavel
-   - Message: "זהו המכרז שלך. המתינו להצעות מסוחרים אחרים."
+### 7. RequiredCarsScreen
+**Route**: `/mobile/required-cars`  
+**Tab**: 2 - "חיפוש רכבים"
 
-3. **Auction Summary Card**:
-   - Vehicle make/model/year title
-   - Current highest bid amount: `₪XXX,XXX`
-   - Countdown timer: `HH:MM:SS` (hours:minutes:seconds)
-   - Number of bids received (real count from bid history)
-   - No mock data for watchers/views
+**Tabs**:
+1. "כל הבקשות" - All ISO requests (excludes own)
+2. "הבקשות שלי" - User's own requests
 
-4. **Bid History Card**:
-   - Title: "היסטוריית הצעות"
-   - List of all bids with:
-     - Ranking number (1st highlighted in yellow)
-     - Anonymized dealer name
-     - Bid amount
-     - Timestamp
-     - "מוביל" badge on highest bid
-   - Empty state: "עדיין אין הצעות"
+**Components (All Requests)**:
+- Search bar, filter button, results count
+- Request cards showing: title, make/model/year range, price range, location, requester (anonymous), created date
+- Click → `/mobile/iso-requests/{id}`
 
-5. **Vehicle Details & Image Card**:
-   - Title: "פרטי הרכב"
-   - Vehicle image at top
-   - Technical specifications (VehicleSpecsCard):
-     - Year, KM
-     - Transmission, Fuel type
-     - Color, Engine size
-   - Description (if provided)
+**Components (My Requests)**:
+- "בקשה חדשה +" button → `/mobile/iso-requests/create`
+- Request cards with offer count badges
 
-#### Layout for Bidders (Non-Creator View)
-When `auction.creator_id !== user?.id`:
+**Business Rules**: User's own requests excluded from "All Requests" tab
 
-1. **Header**: Same as owner view, but badge shows "פעיל"
+---
 
-2. **Vehicle Details & Image Card**: (Same as owner view Card #5)
+### 8. ISORequestDetailScreen
+**Route**: `/mobile/iso-requests/:id`
 
-3. **Auction Summary Card**: (Same as owner view Card #3)
-   - Shows "מצב המכרז" as title
-   - Shows "הצעה נוכחית" instead of "הצעה הגבוהה ביותר"
+**Components**:
+- Request header (title, status badge)
+- Requester info (anonymous until reveal)
+- Specifications (make, model, year range, price range, location, description)
+- My Offer section (if user made offer): vehicle details, status, edit/cancel buttons
+- Other Offers (if requester): list with accept/reject buttons
+- Action buttons: "Create Offer" or "Edit/Delete Request"
 
-4. **Bidding Interface Card**:
-   - Title: "הגש הצעה"
-   - Input field for bid amount
-   - Placeholder: "מינימום ₪XXX,XXX"
-   - Helper text: Minimum increment requirement (₪1,000)
-   - Submit button: "הגש הצעה" with gavel icon
-   - Loading state during submission
+**Functionality**:
+- Offer creation, update, status changes
+- Contact reveal flow on offer acceptance
+- Uses useISORequestById and useOffersByRequestId hooks
 
-5. **Bid History Card**: (Same as owner view Card #4)
+---
 
-6. **Seller Info Card** (Simplified):
-   - Title: "פרטי המוכר"
-   - Seller avatar
-   - Seller name
-   - Rating with stars
-   - No additional details or contact options
+### 9. CreateISORequestScreen
+**Route**: `/mobile/iso-requests/create`
 
-#### Removed Elements
-The following cards/elements have been removed to simplify the screen:
-- "Vehicle Condition & History" card (no real data available)
-- `DealerCard` component (redundant with simplified Seller Info)
-- Separate "Vehicle Description" card (consolidated into Vehicle Details card)
-- Mock data for watchers and views (not in database schema)
+**Form Fields**:
+- Title (required, max 100 chars)
+- Description (required, max 500 chars)
+- Make, Model (dropdowns, model filtered by make)
+- Year range (from/to, 1990-2025)
+- Price range (from/to, ₪)
+- Location (optional)
 
-#### Real-time Features
-- Countdown timer updates every second via `useEffect`
-- Bid history can be refreshed with Supabase Realtime (future enhancement)
-- Outbid notifications trigger when new higher bid is placed
+**Validation**: year_to >= year_from, price_to >= price_from
 
-#### Data Sources
-- Vehicle data: `vehicles` table joined with `vehicle_makes` and `vehicle_models`
-- Auction data: `auctions` table
-- Bid history: `auction_bids` table with anonymized dealer names
-- Current user: `useAuth()` hook
+**Functionality**:
+- react-hook-form with zodResolver
+- Model resets when make changes
+- Success → `/mobile/required-cars`
 
-#### Testing Checklist
-- ✅ View own auction - verify 4 cards total (info + 3 main cards)
-- ✅ View other's auction - verify 5 cards total
-- ✅ Verify countdown timer works correctly
-- ✅ Verify bid history shows real data with anonymized names
-- ✅ Verify real bid count (not mock data)
-- ✅ Verify bidding interface only shows for non-owners
-- ✅ Test navigation from BidsScreen to detail screen
-- ✅ Test bid submission and validation
+---
 
-### 10. My Profile Screen (`/mobile/profile`)
-**File**: `src/pages/mobile/MyProfileScreen.tsx`
+### 10. HotCarsScreen
+**Route**: `/mobile/hot-cars`  
+**Tab**: 3 - "רכבים חמים"
 
-#### Purpose
-Comprehensive profile management with subscription and business information.
+**Components**:
+- "הבוסטים שלי" button → `/mobile/boost-management`
+- Filter section
+- Vehicle cards (boosted only) with "Hot Sale" badges
 
-#### Layout Requirements
-- **Profile Header**: Business name, rating tier, tenure display
-- **Subscription Section**: Plan type, vehicles remaining, boosts available
-- **Business Information**: Contact details, trade license status
-- **Settings**: Preferences and account management
+**Functionality**:
+- Uses useBoosts hook
+- Shows only vehicles with is_boosted=true and valid boosted_until
+- Hot sale price displayed prominently if set (strikethrough regular price)
 
-#### Components Needed
-- Profile information display with subscription details
-- Subscription usage indicators (vehicles used/remaining)
-- Available boosts and auctions count
-- Business rating and tenure display
-- Settings and preferences management
-- Logout functionality
+**Business Rules**: Boost duration 5 days, hot sale price optional and must be < regular price
 
-#### Enhanced Features from PRD
-- Display subscription plan (Regular/Gold/VIP)
-- Show remaining vehicles, boosts, and auctions
-- Rating tier visualization
-- Years in business (tenure)
-- Trade license verification status
+---
+
+### 11. BidsScreen
+**Route**: `/mobile/bids`  
+**Tab**: 4 - "מכרזים"
+
+**Tabs**:
+1. "כל המכרזים" - All active auctions
+2. "ההצעות שלי" - User's bids with status (winning/outbid)
+3. "המכרזים שלי" - User's created auctions
+
+**Components**:
+- "Create Auction +" button (tab 1)
+- Auction cards: vehicle info, current bid, bid count, time remaining, "Hot" badge
+- Click → `/mobile/auctions/{id}`
+
+**Functionality**: Real-time bid updates via subscriptions
+
+---
+
+### 12. AuctionDetailScreen
+**Route**: `/mobile/auctions/:id`
+
+**Components**:
+- Vehicle info with image carousel
+- Current highest bid, minimum next bid, bid count, time remaining countdown
+- Seller info (dealer card)
+- Bid history list (all bids with amounts, bidders, timestamps)
+- Bid placement section (if not own auction): amount input, validation, "Place Bid" button
+- Auction management (if own): edit/close buttons
+
+**Functionality**:
+- Real-time bid updates
+- Validates bid >= minimum (current + increment)
+- Countdown timer updates every second
+- Winner revealed at auction end
+
+---
+
+### 13. MyProfileScreen
+**Route**: `/mobile/profile`  
+**Tab**: 5 - "הפרופיל שלי"
+
+**Components**:
+- Profile header (avatar, name, business name)
+- Subscription section: plan name, status, expiration, usage stats (vehicles X/Y, boosts X/Y, auctions X/Y), upgrade button
+- Statistics (active vehicles, member since, rating)
+- Profile details (name, business, phone, location, description)
+- "Edit Profile" button → `/mobile/profile-edit`
+- "Logout" button
+
+**Data Sources**: useProfile hook
+
+---
 
 ## Supporting Screens
 
-### 11. My Vehicles Screen (`/mobile/my-vehicles`)
-**File**: `src/pages/mobile/MyVehiclesScreen.tsx`
-
-#### Purpose
-Manage dealer's personal vehicle inventory separately from marketplace search.
-
-#### Layout Requirements
-- **Vehicle List**: Dealer's own vehicle listings
-- **Management Actions**: Edit, boost, create auction, remove
-- **Add Vehicle**: Quick access to add new vehicles
-- **Status Indicators**: Available, sold, boosted status
-
-### Add/Edit Vehicle Screens
-**Files**: `src/pages/mobile/AddVehicleScreen.tsx`, `src/pages/mobile/EditVehicleScreen.tsx`
-
-#### Shared Field Specifications
-
-**Vehicle Type Field**
-- **Field Name**: "סוג" (Type)
-- **Input Type**: Dropdown/Select with 7 predefined categories
-- **Options** (from `src/constants/vehicleTypes.ts`):
-  - מיקרו (micro)
-  - מיני (mini)
-  - משפחתי (family)
-  - מנהלים (executive)
-  - SUV (suv)
-  - יוקרתי (luxury)
-  - ספורט (sport)
-- **Required**: Optional
-- **RTL Support**: Hebrew labels with proper text alignment
-- **Search/Filter**: Vehicle type is filterable in search screens using these categories
-
-**Engine Size Field**
-- **Field Name**: "נפח מנוע" (Engine Size)
-- **Input Type**: Numeric input
-- **Unit**: Cubic centimeters (סמ"ק / cc)
-- **Placeholder**: "1600 סמ״ק"
-- **Validation**: Accepts any positive number (no upper limit)
-- **Database**: Stored as NUMERIC type to support values like 5000cc, 10000cc
-- **Required**: Optional
-
-**Tags Field (Edit Vehicle Screen Only)**
-- **Field Name**: "תגיות" (Tags)
-- **Location**: Separate Card after description field, before images section
-- **Input Type**: Interactive badge selection
-- **Data Source**: `vehicle_tags` table via `useVehicleTags()` hook
-- **Display**: 
-  - Color-coded badges from database (`tag.color` field or default #6B7280)
-  - Selected tags show filled badge with tag color
-  - Unselected tags show outline badge
-  - Flex-wrap layout for multi-row display
-- **Interaction**: Click/tap to toggle selection
-- **State Management**: 
-  - Component state: `selectedTagIds: number[]`
-  - Loads existing tags on mount from `vehicle_listing_tags` table
-  - Updates local state array on toggle
-- **Database Operations**:
-  - On save: Deletes all existing tags for vehicle, then inserts new selection
-  - Uses `vehicle_listing_tags` junction table
-- **RTL Support**: Proper Hebrew text in badges
-
-#### Edit Vehicle Screen Specific Features
-- **Model Dropdown Fix**: Uses `key={`model-${selectedMakeId}`}` to force re-render when make changes
-- **Tags Section**: Full Card component with interactive badge selection
-- **Pre-populated Data**: Loads vehicle data and existing tags on mount via separate useEffect hooks
-
-### 12. Create ISO Request Screen (`/mobile/create-iso-request`)
-**File**: `src/pages/mobile/CreateISORequestScreen.tsx`
-
-#### Purpose
-Create new "Vehicles Wanted" requests with detailed specifications.
-
-#### Layout Requirements
-- **Vehicle Specifications**: Make, model, year, price range
-- **Requirements Form**: Detailed requirements and preferences
-- **Submission**: Create and publish request
-
-### 13. Boost Management Screen (`/mobile/boost-management`)
-**File**: `src/pages/mobile/BoostManagementScreen.tsx`
-
-#### Purpose
-Manage boost usage and apply 5-day boosts to dealer's own vehicle listings.
-
-#### Visual Hierarchy & Layout Structure
-The screen is organized to prioritize active boosts and make adding new boosts effortless:
-
-1. **Boost Counter Card** (Compact Header):
-   - Shows remaining boosts: "X / Y בוסטים זמינים" (e.g., "7 / 10")
-   - Visual progress bar indicating usage
-   - Subscription plan name display
-   - Fetches allocation from `subscription_plans` table via `useProfile` hook
-
-2. **Active Boosts Section** (Priority #1):
-   - Title: "הבוסטים הפעילים שלי"
-   - Displays currently boosted vehicles with:
-     - Vehicle thumbnail (80x80px) and details
-     - Time remaining countdown (e.g., "3 ימים נותרים")
-     - Hot sale price badge if applicable (₪XXX,XXX)
-     - Deactivate button (X icon) to cancel boost early
-   - Empty state when no active boosts:
-     - Flame icon (faded)
-     - Message: "אין בוסטים פעילים"
-     - Subtext: "הפעל בוסט כדי להגביר את החשיפה של הרכבים שלך"
-
-3. **Add Boost Button** (Large CTA):
-   - Prominent gradient-bordered button
-   - Icons: Flame + Plus
-   - Text: "הוסף בוסט חדש"
-   - Disabled state when `availableBoosts === 0`
-   - Opens Vehicle Selection Drawer on click
-
-4. **Subscription Info Card** (Bottom):
-   - Compact footer display
-   - Shows: "סוג מנוי: [plan_name]"
-   - Monthly allocation: "(X בוסטים בחודש)"
-   - Contact message: "לשדרוג מנוי, צור קשר עם המנהל"
-
-#### Components & User Flow
-
-**VehicleSelectionDrawer Component** (`src/components/mobile/VehicleSelectionDrawer.tsx`):
-- Opens when user clicks "הוסף בוסט חדש"
-- Displays user's eligible (non-boosted) vehicles
-- Each vehicle card shows:
-  - Thumbnail, make/model, year, current price
-  - "בחר" button
-- Empty state with "הוסף רכב" button if no eligible vehicles
-- On selection: Opens Boost Configuration Dialog
-
-**Boost Configuration Dialog**:
-- Pre-filled with selected vehicle details
-- Shows original price for reference
-- Hot sale price input (optional):
-  - Allows setting promotional price
-  - Can be left as original price (no discount)
-  - Validation ensures positive number
-- Display: "משך הבוסט: 5 ימים" (read-only)
-- Actions:
-  - "הפעל בוסט" button (primary, with Flame icon)
-  - "ביטול" button (secondary)
-- On success: Dialog closes, Active Boosts section updates immediately
-
-#### Boost Counting Logic
-- Uses `get_remaining_boosts(user_id)` RPC function
-- Counts activations (not just currently active boosts)
-- Formula: `remaining = monthly_allocation - boosts_activated_this_month`
-- Resets on 1st of each month
-- Progress bar calculation: `(availableBoosts / totalBoosts) * 100`
-
-#### Technical Implementation
-- **Queries**: 
-  - `useProfile()` - Fetches subscription plan with boost allocation
-  - `myActiveBoostedVehicles` - Active boosts with remaining time
-  - `myVehicles` - Eligible vehicles for new boosts (filtered: not boosted)
-- **Mutations**:
-  - `activateBoost({ vehicleId, hotSalePrice })` - Activates 5-day boost
-  - `deactivateBoost(vehicleId)` - Cancels active boost early
-- **State Management**: React Query with refetch on window focus
-
-### 14. Subscription Status Screen (`/mobile/subscription`)
-**File**: `src/pages/mobile/SubscriptionStatusScreen.tsx`
-
-#### Purpose
-Display comprehensive subscription information and usage tracking.
-
-#### Layout Requirements
-- **Plan Overview**: Current plan type and validity
-- **Usage Tracking**: Vehicles, boosts, auctions used/remaining
-- **Renewal Information**: Expiration date and renewal process
-
-### 15. Chat Request Screen (`/mobile/chat-request/:chatId`)
-**File**: `src/pages/mobile/ChatRequestScreen.tsx`
-
-#### Purpose
-Anonymous chat interface with mutual detail-reveal mechanism.
-
-#### Layout Requirements
-- **Anonymous Interface**: No personal details shown initially
-- **Reveal Request**: Button to request dealer information
-- **Chat Interface**: Standard messaging with privacy protection
-
-### 15A. Chat List Screen (`/mobile/chats`)
-**File**: `src/pages/mobile/ChatListScreen.tsx`
-
-#### Purpose
-Display all active conversations with dealers for vehicles, auctions, and ISO requests.
-
-#### Layout Requirements (RTL)
-- List of conversation cards sorted by most recent message
-- Each card shows:
-  - **No avatar/profile picture** (text-focused, clean interface)
-  - Dealer name (anonymous: "סוחר #12345" or revealed business name)
-  - Timestamp (right-aligned, HH:mm format for today, "אתמול" for yesterday, dd/MM for older)
-  - Entity subject (vehicle/auction/ISO request title and details)
-  - Last message with sender prefix ("אתה:" for current user, "סוחר:" for other party)
-  - Unread badge (red notification badge with count if unread messages exist)
-
-#### Behavior
-- **Tapping card**: Opens ChatDetailScreen for that conversation
-- **Auto-refresh**: List automatically refreshes when returning from chat detail view
-- **Current state**: Always shows current read/unread status and latest message
-- **Empty state**: "אין שיחות פעילות" when no conversations exist
-
-#### Anonymous Dealer Display
-- Format: "סוחר #XXXXX" where XXXXX is a unique 5-digit number per conversation
-- Same dealer gets different numbers in different conversations for privacy
-- Number is consistent within each specific conversation
-
-#### Technical Notes
-- Uses `useConversations()` hook to fetch all conversations
-- Real-time updates via React Query cache invalidation
-- Sender prefix added to last message for context
-- No profile pictures to maintain clean, text-focused design
-
-### 16. Notifications Screen (`/mobile/notifications`)
-**File**: `src/pages/mobile/NotificationListScreen.tsx`
-
-#### Purpose
-Display all system notifications with enhanced categorization per PRD requirements.
-
-#### Components Needed
-- Enhanced notification types per PRD:
-  - Registration approval confirmation
-  - Vehicle Wanted matches found
-  - Auction bid updates (outbid notifications)
-  - New bids on user's auctions
-  - Subscription expiring warnings
-  - Admin warnings/suspensions
-  - Support ticket responses
-
-### 17. Vehicle Detail Screen (`/mobile/vehicle/:id`)
-**File**: `src/pages/mobile/VehicleDetailScreen.tsx`
-
-#### Purpose
-Display comprehensive vehicle information for other users' listings with seller contact options.
-
-#### Layout Requirements
-- RTL mobile interface with proper Hebrew text alignment
-- Fixed header with back navigation
-- Image carousel with navigation dots and status badge
-- Scrollable content area with organized card sections
-
-#### Components
-1. **Vehicle Images Carousel:**
-   - Full-width image display with navigation arrows (RTL layout)
-   - Image indicator dots at bottom
-   - Status badge overlay (זמין/נמכר)
-
-2. **Vehicle Title & Price Card:**
-   - Large title: Make Model Year in Hebrew
-   - Prominent price display with "ניתן למשא ומתן" subtitle
-   - Quick stats icons: Year, Kilometers
-
-3. **Technical Specifications Card (מפרט טכני):**
-   - Grid layout (2 columns) displaying:
-     - שנת ייצור, קילומטרז׳
-     - תיבת הילוכים (אוטומט/ידנית/טיפטרוניק)
-     - סוג דלק (בנזין/דיזל/היברידי/חשמלי)
-     - נפח מנוע displayed as "XXX סמ״ק"
-     - סוג, צבע, בעלים קודמים (if provided)
-
-4. **Description Card (תיאור):**
-   - Displayed only if description exists
-   - Full-width text block with RTL text flow
-
-5. **Tags Card (תגיות):**
-   - Displayed only if vehicle has tags
-   - Color-coded badges matching database tag colors
-   - Flex wrap layout showing Hebrew tag names
-
-6. **Vehicle Condition & History Card (מצב ורקע הרכב):**
-   - תאונה חמורה (Severe crash): כן/לא
-   - בעלים קודמים (Previous owners count)
-   - Test result file viewer button (if file exists)
-
-7. **Seller Information Card (פרטי המוכר):**
-   - Avatar with seller initial
-   - Business/full name display
-   - "שלח הודעה" button - navigates to chat
-
-#### Data Fetching
-- Fetch vehicle with joined `vehicle_makes`, `vehicle_models`
-- Fetch `vehicle_listing_tags` with nested `vehicle_tags` for color-coded display
-- Fetch owner profile for seller information display
-
-## 7. Profile Screen (`/mobile/profile`)
-**File**: `src/pages/mobile/MyProfileScreen.tsx`
-
-### Purpose
-User profile management and account settings.
-
-### Layout Requirements
-- **Profile Header**: User avatar, name, and basic info
-- **Settings Sections**: Grouped configuration options
-- **Action Buttons**: Logout, support contact
-
-### Components Needed
-- Profile information display
-- Settings menu items
-- Language/theme preferences
-- Notification settings toggle
-- Support and help links
-
-## 8. Not Found Screen (`/mobile/*`)
-**File**: `src/pages/mobile/NotFound.tsx`
-
-### Purpose
-Handle invalid mobile routes with user-friendly message.
-
-### Layout Requirements
-- **Error Message**: RTL Hebrew text
-- **Navigation Options**: Return to home or main sections
-- **Consistent Styling**: Match app theme
-
-## Common Mobile Layout Components
-
-### MobileHeader
-- **Logo**: Auto-Hub branding
-- **Title**: Current page title in Hebrew
-- **Actions**: Notification and chat icons with badges
-
-### MobileTabBar (Updated per PRD Requirements)
-- **Navigation Tabs**: 
-  - חיפוש רכבים (Car Search) - Browse marketplace vehicles
-  - רכבים מבוקשים (Required Cars) - Manage ISO requests  
-  - רכבים חמים (Hot Cars) - Boosted vehicle listings
-  - הצעות מחיר (Bids) - Auction participation and management
-  - הפרופיל שלי (My Profile) - Account and subscription management
-- **Active State**: Visual indication of current screen
-- **Badge Support**: Unread counts and notification indicators
-- **Subscription Awareness**: Indicate available boosts/auctions in relevant tabs
-
-## RTL (Hebrew) Design Guidelines
-
-### Text Direction
-- All text flows right-to-left
-- Icons positioned on the left side of text
-- Navigation flows from right to left
-- Numbers and English text maintain LTR within RTL context
-
-### Layout Considerations
-- Margins and padding mirror standard LTR layouts
-- Button placement favors right side for primary actions
-- Form fields align to the right
-- Lists and cards maintain RTL text flow
-
-### Accessibility
-- Screen reader support for RTL content
-- Proper aria labels in Hebrew
-- Color contrast compliance
-- Touch targets meet minimum size requirements
-
-## PRD Compliance Checklist
-
-### ✅ Implemented Features
-- RTL Hebrew interface support
-- Basic authentication and profile management
-- Vehicle search and listing capabilities
-- Auction participation system
-- Chat system foundation
-- Notification system
-
-### 🔄 Enhanced Features (Per PRD)
-- **Authentication**: OTP-based passwordless login
-- **Subscription Management**: Plan tracking and usage limits
-- **Boost System**: 3-day priority placement for listings
-- **Anonymous Chat**: Mutual detail-reveal mechanism
-- **Rating System**: Dealer rating tiers and tenure display
-- **ISO Requests**: Enhanced vehicle wanted system with matching
-
-### 📊 Data Model Alignment
-All screens now align with PRD entity specifications:
-- User profiles with business names and rating tiers
-- Vehicle listings with boost status and enhanced specifications
-- Subscription plans with usage tracking
-- Auction system with proper bid management
-- ISO request system with matching capabilities
-
-### 🎯 Business Rules Integration
-- Subscription limits enforcement (vehicles, boosts, auctions)
-- Boost 3-day activation cycle
-- Quick search categories: "עד ₪50,000", "אחרי תאונה", "רכבי יוקרה", "אופנועים"
-- Anonymous communication with reveal mechanism
-- Trade license verification requirement
+### 14. MyVehiclesScreen
+**Route**: `/mobile/my-vehicles`
+
+**Components**:
+- "Add Vehicle +" button → `/mobile/add-vehicle`
+- Subscription info card (plan, count/limit, warning if at limit)
+- Vehicle cards with: details, status, boost status, edit/delete/boost buttons
+
+**Functionality**:
+- Check subscription limit before adding
+- Delete with confirmation
+- Click → `/mobile/vehicle/{id}`
 
 ---
-*This specification aligns with PROJECT_PRD.md and should be referenced for all mobile screen development and updates.*
+
+### 15. AddVehicleScreen
+**Route**: `/mobile/add-vehicle` or `/add-car`
+
+**4-Step Wizard**:
+
+**Step 1 - Basic**: Make, model, year (required), vehicle type, color (optional)
+
+**Step 2 - Technical**: Kilometers (required), transmission, fuel type, engine size, previous owners (optional)
+
+**Step 3 - Pricing**: Price (required), condition description (optional)
+
+**Step 4 - Description & Media**: Description (required, min 10 chars), images (multi-upload, max 5MB each), tags (checkboxes), crash history, test file (max 10MB)
+
+**Functionality**:
+- Step validation, back button preserves data
+- Images → `vehicle-images` bucket, test → `vehicle-documents` bucket
+- Tags saved to vehicle_listing_tags junction
+- Success → `/mobile/dashboard`
+
+---
+
+### 16. EditVehicleScreen
+**Route**: `/mobile/vehicle/:id/edit`
+
+**Layout**: Single form (all fields visible)
+
+**Sections**: Basic info, technical details, pricing, description & media (same fields as add)
+
+**Image Management**:
+- Display existing images with remove buttons
+- Upload additional images
+
+**Functionality**:
+- Loads vehicle data and pre-fills
+- Updates tags (deletes old, inserts new)
+- Success → `/mobile/my-vehicles`
+
+**Authorization**: Verifies user owns vehicle
+
+---
+
+### 17. VehicleDetailScreen
+**Route**: `/mobile/vehicle/:id`
+
+**Components**:
+- Image carousel with status badge, Hot Sale badge (if applicable)
+- Title & pricing: make/model/year, boost expiration (if boosted), hot sale price (prominent if set, strikethrough regular price), regular price
+- Vehicle specs card (VehicleSpecsCard)
+- Description
+- Tags (if any)
+- Condition & history (crash indicator, owners, test file view button)
+- Actions:
+  - If own: "Edit Vehicle", "Boost" buttons
+  - If other's: dealer card, "Send Message" button (or "Back to Chat"), phone button (requires reveal)
+
+**Functionality**:
+- Checks conversation existence via useConversationForEntity
+- Opens/creates chat via openOrCreateChat helper
+- Contact reveal via chat flow
+
+---
+
+### 18. BoostManagementScreen
+**Route**: `/mobile/boost-management`
+
+**Sections**:
+1. Active Boosts: list with vehicle info, remaining time, deactivate button
+2. Subscription Info: plan, boosts remaining, limits, upgrade button
+3. Boost New Vehicle: select button → VehicleSelectionDrawer (excludes boosted)
+4. Configuration Dialog: hot sale price input (optional, validates < regular price), "Activate Boost" button
+
+**Functionality**:
+- Deactivate: sets is_boosted=false, clears boosted_until and hot_sale_price
+- Activate: sets is_boosted=true, boosted_until=now()+5days, hot_sale_price (if provided), decrements boost count
+- Validates hot sale price < regular price
+
+**Business Rules**: Boost duration 5 days, subscription limits enforced (Regular: 5, Gold: 10, VIP: 99 boosts/month)
+
+---
+
+### 19. ChatListScreen
+**Route**: `/mobile/chats`
+
+**Components**:
+- Conversation cards: other party avatar/name, subject context, last message preview, unread badge, timestamp
+
+**Timestamp Formatting**: "היום" (today), "אתמול" (yesterday), date (older)
+
+**Functionality**: Click → `/mobile/chat/{id}`
+
+---
+
+### 20. ChatDetailScreen
+**Route**: `/mobile/chat/:id`
+
+**Components**:
+- Header: back button, other party info, subject
+- Contact reveal section (conditional):
+  - If not revealed: "Request Contact Details" button (requester) or Approve/Reject buttons (dealer)
+  - If revealed: contact info card (name, phone, email, business)
+- Messages area: text/image/system messages, own vs other styling, sender info, timestamps
+- Input area: text input, send button (disabled if empty)
+
+**Functionality**:
+- Send via useSendMessage mutation
+- Enter key sends (Shift+Enter new line)
+- Auto-scroll to latest
+- Real-time updates via Supabase Realtime
+- Reveal flow: useRequestReveal, useApproveReveal, useRejectReveal mutations
+
+---
+
+### 21. ProfileEditScreen
+**Route**: `/mobile/profile-edit`
+
+**Form Fields**:
+- Phone (read-only display)
+- Full name, business name, location (required)
+- Business description (optional, max 500 chars)
+- Profile picture upload (optional, max 5MB, JPG/PNG)
+
+**Functionality**:
+- Loads current profile and pre-fills
+- Image upload → `profile-pictures` bucket
+- Success → `/mobile/profile`
+
+---
+
+### 22. NotificationListScreen
+**Route**: `/mobile/notifications`
+
+**Components**:
+- "Mark All as Read" button
+- Notification cards: icon (by type), text, timestamp, read/unread indicator (blue dot)
+
+**Notification Types**: New message, auction bid, ISO offer, auction outbid, subscription expiration, vehicle status
+
+**Functionality**:
+- Mark individual/all as read
+- Click → navigate to relevant entity
+- Real-time updates via subscription
+
+---
+
+### 23. ChatRequestScreen (Mock)
+**Route**: `/mobile/chat-request/:id`  
+**Status**: ⚠️ Mock implementation
+
+**Components**:
+- Context card
+- Dealer preview (hardcoded mock data: name, rating, stats, specialties, online status)
+- Privacy notice
+- "Request Contact Details" button
+
+**Functionality (mock)**: Shows toast, delays, navigates to `/mobile/chats` - NOT connected to real reveal flow
+
+---
+
+## Navigation Components
+
+### MobileTabBar
+**Location**: Fixed bottom
+
+**5 Tabs**:
+1. Search ("מאגר הרכבים") → `/mobile/search` - Search-tab.svg
+2. Required Cars ("חיפוש רכבים") → `/mobile/required-cars` - Star-tab.svg
+3. Hot Cars ("רכבים חמים") → `/mobile/hot-cars` - Hot-tab.svg
+4. Bids ("מכרזים") → `/mobile/bids` - Bid-tab.svg
+5. Profile ("הפרופיל שלי") → `/mobile/profile` - Profile-tab.svg
+
+**Behavior**: Active tab highlighted, RTL layout, touch-optimized
+
+---
+
+### MobileHeader
+**Location**: Fixed top
+
+**Components**:
+- Logo (right in RTL) → `/mobile/dashboard`
+- Notification badge (unread count if > 0)
+- Notification bell → `/mobile/notifications`
+- User avatar → `/mobile/profile`
+
+---
+
+### MobileLayout
+**Structure**: MobileHeader (fixed top) + Scrollable content + MobileTabBar (fixed bottom)
+
+**Features**: Background (BG.svg), touch-optimized scrolling, RTL direction
+
+---
+
+## Common Components & Patterns
+
+### Shared Components
+
+**VehicleCard**: Vehicle display in lists - image, make/model/year, price (hot sale if boosted), boost badge, status, specs preview
+
+**DealerCard**: Dealer info - avatar, business name, verification badge, rating, location, contact buttons (if revealed)
+
+**AnonymousDealerCard**: Before reveal - generic avatar, "Dealer" placeholder, location, pending message
+
+**VehicleSpecsCard**: Specs grid - year, km, transmission, fuel, engine, type, color, owners
+
+**VehicleFilterDrawer**: Bottom sheet filters - make, model, year/price/km ranges, transmission, fuel, location, tags, "Clear All", "Apply" buttons
+
+**VehicleSelectionDrawer**: Select from user's vehicles - compact cards, excludes used, search/filter
+
+**FilterButton**: Opens drawer with badge count
+
+**ActiveFiltersDisplay**: Filter chips with remove buttons, "Clear All"
+
+**ResultsCount**: Shows count "X רכבים נמצאו"
+
+**LoadingSpinner**: Centered spinner with accessible text
+
+---
+
+### RTL Implementation
+
+**Container**: `<div dir="rtl">`  
+**Text**: `.hebrew-text` class  
+**Icons**: LEFT side of text  
+**Spacing**: `space-x-reverse`, `mr-*` for left margins  
+**Forms**: Right-aligned text, labels on right  
+**Navigation**: Slide from/to right
+
+---
+
+## Business Rules & Constraints
+
+### Authentication
+- Password: 6 digits only
+- Phone: Israeli format (05X-XXXXXXX), cannot change after registration
+- Status flow: pending → approval → active
+- Status routing: pending → pending screen, active → full access
+
+### Vehicle Listings
+**Subscription Limits**: Regular: 10 vehicles, Gold: 25, VIP: 100
+
+**Boost**: Duration 5 days, Monthly limits (Regular: 5, Gold: 10, VIP: 99), Hot sale price optional (must be < regular)
+
+**Display**: Boosted first in all lists, own vehicles NOT excluded from CarSearchScreen
+
+### ISO Requests
+**Validation**: year_to >= year_from, price_to >= price_from, title max 100 chars, description max 500 chars
+
+**Visibility**: Own requests excluded from "All Requests" tab
+
+**Offers**: One per user per request, requester can accept multiple
+
+### Auctions
+**Monthly Limits**: Regular: 5, Gold: 10, VIP: 99
+
+**Bidding**: Min bid = current + increment, real-time updates, auto-close at end
+
+### Chat & Reveal
+**Two-stage**: Request → Approval → Reveal
+
+**Revealed Info**: Name, phone, email, business
+
+### Subscription Plans
+- **Regular (₪99/mo)**: 10 vehicles, 5 boosts, 5 auctions
+- **Gold (₪249/mo)**: 25 vehicles, 10 boosts, 10 auctions
+- **VIP (₪499/mo)**: 100 vehicles, 99 boosts, 99 auctions
+
+Limits reset monthly, enforced at action time
+
+---
+
+## Complete Route Table
+
+### Public Routes
+- `/mobile/welcome` - WelcomeScreen
+- `/mobile/login` - LoginScreen
+- `/mobile/register` - RegisterScreen
+- `/mobile/pending-approval` - PendingApprovalScreen
+
+### Protected Routes
+
+**Core**:
+- `/mobile` or `/mobile/` → Redirect to `/mobile/search`
+- `/mobile/dashboard` - DashboardScreen
+
+**Tabs**:
+- `/mobile/search` - CarSearchScreen (Tab 1)
+- `/mobile/required-cars` - RequiredCarsScreen (Tab 2)
+- `/mobile/hot-cars` - HotCarsScreen (Tab 3)
+- `/mobile/bids` - BidsScreen (Tab 4)
+- `/mobile/profile` - MyProfileScreen (Tab 5)
+
+**Vehicles**:
+- `/mobile/my-vehicles` - MyVehiclesScreen
+- `/mobile/add-vehicle` or `/add-car` - AddVehicleScreen
+- `/mobile/vehicle/:id` - VehicleDetailScreen
+- `/mobile/vehicle/:id/edit` - EditVehicleScreen
+- `/mobile/boost-management` - BoostManagementScreen
+
+**ISO**:
+- `/mobile/iso-requests/:id` - ISORequestDetailScreen
+- `/mobile/iso-requests/create` - CreateISORequestScreen
+
+**Auctions**:
+- `/mobile/auctions/:id` - AuctionDetailScreen
+
+**Chat**:
+- `/mobile/chats` - ChatListScreen
+- `/mobile/chat/:id` - ChatDetailScreen
+- `/mobile/chat-request/:id` - ChatRequestScreen (mock)
+
+**Profile**:
+- `/mobile/profile-edit` - ProfileEditScreen
+- `/mobile/notifications` - NotificationListScreen
+
+---
+
+## Obsolete Screens
+
+**Not routed or used**:
+1. **OTPVerificationScreen.tsx** - Obsolete (replaced by password auth)
+2. **SetPasswordScreen.tsx** - Obsolete (password set in registration)
+3. **OnboardingProfileScreen.tsx** - Obsolete (merged into RegisterScreen)
+4. **OnboardingLicenseScreen.tsx** - Obsolete (merged into RegisterScreen)
+5. **CreateBidSelectCarScreen.tsx** - Incomplete implementation
+6. **CreateBidDetailsScreen.tsx** - Incomplete implementation
+7. **AuctionListScreen.tsx** - Obsolete (replaced by BidsScreen tabs)
+8. **AllAuctionsScreen.tsx** - Empty file (never implemented)
+
+---
+
+**Document Version**: 2.0  
+**Last Updated**: 2025-01-29  
+**Status**: Reflects actual implementation
