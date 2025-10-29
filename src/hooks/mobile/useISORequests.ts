@@ -31,9 +31,9 @@ export const useISORequests = () => {
         .from("iso_requests")
         .select(`
           *,
-          vehicle_makes!iso_requests_make_id_fkey(name_hebrew, name_english),
-          vehicle_models!iso_requests_model_id_fkey(name_hebrew, name_english),
-          locations(name_hebrew)
+          vehicle_makes!make_id(name_hebrew, name_english),
+          vehicle_models!model_id(name_hebrew, name_english),
+          locations!location_id(name_hebrew)
         `)
         .eq("status", "active")
         .neq("requester_id", user.id)
@@ -57,9 +57,9 @@ export const useMyISORequests = () => {
         .from("iso_requests")
         .select(`
           *,
-          vehicle_makes!iso_requests_make_id_fkey(name_hebrew, name_english),
-          vehicle_models!iso_requests_model_id_fkey(name_hebrew, name_english),
-          locations(name_hebrew),
+          vehicle_makes!make_id(name_hebrew, name_english),
+          vehicle_models!model_id(name_hebrew, name_english),
+          locations!location_id(name_hebrew),
           iso_request_offers(count)
         `)
         .eq("requester_id", user.id)
@@ -87,10 +87,10 @@ export const useISORequestById = (id: string | undefined) => {
         .from("iso_requests")
         .select(`
           *,
-          vehicle_makes!iso_requests_make_id_fkey(name_hebrew, name_english),
-          vehicle_models!iso_requests_model_id_fkey(name_hebrew, name_english),
-          locations(name_hebrew),
-          user_profiles!iso_requests_requester_id_fkey(full_name, business_name)
+          vehicle_makes!make_id(name_hebrew, name_english),
+          vehicle_models!model_id(name_hebrew, name_english),
+          locations!location_id(name_hebrew),
+          user_profiles!requester_id(full_name, business_name)
         `)
         .eq("id", id)
         .single();
