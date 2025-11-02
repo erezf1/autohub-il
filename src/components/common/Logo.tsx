@@ -1,4 +1,4 @@
-import logo from "@/assets/auto-hub-logo.png";
+import logo from "@/assets/dealers-logo.jpeg";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {

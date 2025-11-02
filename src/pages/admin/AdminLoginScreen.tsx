@@ -9,7 +9,7 @@ import { Phone, Lock, Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatPhoneDisplay, cleanPhoneNumber } from '@/utils/phoneValidation';
 import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
-import logo from '/src/assets/logo.svg';
+import logo from '@/assets/dealers-logo.jpeg';
 
 export default function AdminLoginScreen() {
   const [phone, setPhone] = useState('');

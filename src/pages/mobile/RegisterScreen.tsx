@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import logo from '/src/assets/logo.svg';
+import logo from '@/assets/dealers-logo.jpeg';
 
 export const RegisterScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');

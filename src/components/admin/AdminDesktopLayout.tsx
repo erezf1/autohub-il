@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import AdminDesktopSidebar from "./AdminDesktopSidebar";
 import AdminUserProfile from "./AdminUserProfile";
-import logo from '/src/assets/logo.svg';
+import logo from '@/assets/dealers-logo.jpeg';
 
 interface AdminDesktopLayoutProps {
   children: ReactNode;

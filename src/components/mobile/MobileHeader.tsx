@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/mobile/useProfile";
 import { useConversations } from "@/hooks/mobile";
-import logo from "/src/assets/logo.svg";
+import logo from "@/assets/dealers-logo.jpeg";
 import {
   DropdownMenu,
   DropdownMenuContent,

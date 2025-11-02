@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Smartphone, Monitor, Car, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
-import logo from '/src/assets/logo.svg';
+import logo from '@/assets/dealers-logo.jpeg';
 
 const LandingPage = () => {
   const navigate = useNavigate();
