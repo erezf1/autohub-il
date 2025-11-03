@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, User, FileText, Car, Gavel, AlertTriangle, CheckCircle, Clock, Filter, Eye } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bell, User, FileText, Car, Gavel, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
-import { useAdminNotifications, useAdminNotificationActions } from "@/hooks/admin";
+import { useAdminNotifications, useAdminNotificationActions, useAdminUnreadCount } from "@/hooks/admin";
 import { LoadingSpinner } from "@/components/common";
 import { format } from "date-fns";
+import type { AdminNotification } from "@/hooks/admin/useAdminNotifications";
 
-const getNotificationRoute = (notification: any) => {
+const getNotificationRoute = (notification: AdminNotification) => {
   const { related_entity_type, related_entity_id } = notification;
   
   if (!related_entity_type || !related_entity_id) return null;
@@ -26,161 +25,52 @@ const getNotificationRoute = (notification: any) => {
   }
 };
 
-const mockNotifications_OLD = [
-  {
-    id: "n1",
-    type: "user",
-    icon: User,
-    title: "משתמש חדש הצטרף",
-    description: "אברהם כהן (כהן מוטורס) נרשם למערכת וממתין לאישור",
-    timestamp: "2024-01-10 15:30",
-    isRead: false,
-    priority: "medium",
-    relatedEntity: { type: "user", id: "u123" },
-    category: "users"
-  },
-  {
-    id: "n2",
-    type: "report",
-    icon: AlertTriangle,
-    title: "דיווח חדש התקבל",
-    description: "שרה לוי דיווחה על התנהגות לא הולמת של דני כהן",
-    timestamp: "2024-01-10 14:20",
-    isRead: false,
-    priority: "high",
-    relatedEntity: { type: "ticket", id: "t789" },
-    category: "reports"
-  },
-  {
-    id: "n3",
-    type: "auction",
-    icon: Gavel,
-    title: "מכירה פומבית הסתיימה",
-    description: "פורשה 911 2019 נמכרה תמורת ₪450,000 למשה לוי",
-    timestamp: "2024-01-10 12:00",
-    isRead: true,
-    priority: "low",
-    relatedEntity: { type: "auction", id: "a123" },
-    category: "auctions"
-  },
-  {
-    id: "n4",
-    type: "vehicle",
-    icon: Car,
-    title: "רכב חדש נוסף",
-    description: "BMW X5 2023 נוסף על ידי רונן אוטו",
-    timestamp: "2024-01-10 11:45",
-    isRead: true,
-    priority: "low",
-    relatedEntity: { type: "vehicle", id: "v456" },
-    category: "vehicles"
-  },
-  {
-    id: "n5",
-    type: "system",
-    icon: CheckCircle,
-    title: "עדכון מערכת הושלם",
-    description: "הגדרות האבטחה עודכנו בהצלחה",
-    timestamp: "2024-01-10 10:30",
-    isRead: true,
-    priority: "low",
-    relatedEntity: { type: "system", id: "sys1" },
-    category: "system"
-  },
-  {
-    id: "n6",
-    type: "user",
-    icon: User,
-    title: "בקשת שחזור סיסמה",
-    description: "יוסי גרין ביקש לשחזר את הסיסמה שלו",
-    timestamp: "2024-01-10 09:15",
-    isRead: false,
-    priority: "medium",
-    relatedEntity: { type: "user", id: "u789" },
-    category: "users"
-  },
-  {
-    id: "n7",
-    type: "payment",
-    icon: AlertTriangle,
-    title: "תשלום נכשל",
-    description: "תשלום עבור תוכנית פרימיום של משה מוטורס נכשל",
-    timestamp: "2024-01-10 08:45",
-    isRead: true,
-    priority: "high",
-    relatedEntity: { type: "payment", id: "p123" },
-    category: "reports"
-  },
-  {
-    id: "n8",
-    type: "vehicle",
-    icon: Car,
-    title: "רכב הוסר מהמערכת",
-    description: "טויוטה קמרי 2021 הוסר על ידי דוד לוי",
-    timestamp: "2024-01-09 16:20",
-    isRead: true,
-    priority: "low",
-    relatedEntity: { type: "vehicle", id: "v789" },
-    category: "vehicles"
-  },
-  {
-    id: "n9",
-    type: "auction",
-    icon: Gavel,
-    title: "מכירה פומבית חדשה",
-    description: "אאודי A4 2020 הוכנס למכירה פומבית על ידי רונן אוטו",
-    timestamp: "2024-01-09 14:10",
-    isRead: true,
-    priority: "medium",
-    relatedEntity: { type: "auction", id: "a456" },
-    category: "auctions"
-  },
-  {
-    id: "n10",
-    type: "user",
-    icon: User,
-    title: "משתמש אושר",
-    description: "חשבון של דני כהן (כהן אוטו) אושר בהצלחה",
-    timestamp: "2024-01-09 13:30",
-    isRead: true,
-    priority: "low",
-    relatedEntity: { type: "user", id: "u456" },
-    category: "users"
+const getTypeIcon = (notificationType: string) => {
+  if (notificationType.includes('user') || notificationType.includes('verification')) {
+    return <User className="h-5 w-5 text-blue-500" />;
   }
-];
+  if (notificationType.includes('vehicle')) {
+    return <Car className="h-5 w-5 text-green-500" />;
+  }
+  if (notificationType.includes('auction')) {
+    return <Gavel className="h-5 w-5 text-purple-500" />;
+  }
+  if (notificationType.includes('report') || notificationType.includes('ticket')) {
+    return <AlertTriangle className="h-5 w-5 text-red-500" />;
+  }
+  if (notificationType.includes('payment')) {
+    return <FileText className="h-5 w-5 text-orange-500" />;
+  }
+  return <Bell className="h-5 w-5 text-gray-500" />;
+};
 
 const AdminNotifications = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const navigate = useNavigate();
   const { data: notifications, isLoading } = useAdminNotifications();
+  const { data: unreadCount } = useAdminUnreadCount();
   const { markAsRead, markAllAsRead } = useAdminNotificationActions();
 
   if (isLoading) return <LoadingSpinner />;
 
-  const unreadCount = notifications?.filter(n => !n.is_read).length || 0;
-
   const getFilteredNotifications = () => {
     let filtered = notifications || [];
     
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(notification =>
-        notification.title.includes(searchTerm) ||
-        notification.description.includes(searchTerm)
-      );
-    }
-    
-    // Filter by tab
     switch (activeTab) {
       case "unread":
-        filtered = filtered.filter(n => !n.isRead);
+        filtered = filtered.filter(n => !n.is_read);
         break;
       case "users":
-        filtered = filtered.filter(n => n.category === "users");
+        filtered = filtered.filter(n => 
+          n.notification_type.includes('user') || 
+          n.notification_type.includes('verification')
+        );
         break;
       case "reports":
-        filtered = filtered.filter(n => n.category === "reports");
+        filtered = filtered.filter(n => 
+          n.notification_type.includes('report') || 
+          n.notification_type.includes('ticket')
+        );
         break;
       default:
         break;
@@ -202,46 +92,15 @@ const AdminNotifications = () => {
     }
   };
 
-  const getTypeIcon = (type: string, IconComponent: any) => {
-    const iconColors = {
-      user: "text-blue-500",
-      report: "text-red-500",
-      auction: "text-purple-500",
-      vehicle: "text-green-500",
-      system: "text-gray-500",
-      payment: "text-orange-500"
-    };
-    
-    return <IconComponent className={`h-5 w-5 ${iconColors[type as keyof typeof iconColors] || "text-gray-500"}`} />;
-  };
-
-  const handleNotificationClick = (notification: any) => {
-    // Mark as read (in real app, this would update the backend)
-    console.log("Marking as read:", notification.id);
-    
-    // Navigate to related entity
-    const { relatedEntity } = notification;
-    switch (relatedEntity.type) {
-      case 'user':
-        navigate(`/admin/users/${relatedEntity.id}`);
-        break;
-      case 'ticket':
-        navigate(`/admin/support/${relatedEntity.id}`);
-        break;
-      case 'auction':
-        navigate(`/admin/auctions/${relatedEntity.id}`);
-        break;
-      case 'vehicle':
-        navigate(`/admin/vehicles/${relatedEntity.id}`);
-        break;
-      default:
-        console.log("Unknown entity type:", relatedEntity.type);
+  const handleNotificationClick = (notification: AdminNotification) => {
+    if (!notification.is_read) {
+      markAsRead.mutate(notification.id);
     }
-  };
-
-  const markAllAsRead = () => {
-    console.log("Marking all notifications as read");
-    // In real app, this would update the backend
+    
+    const route = getNotificationRoute(notification);
+    if (route) {
+      navigate(route);
+    }
   };
 
   const formatTimeAgo = (timestamp: string) => {
@@ -261,7 +120,15 @@ const AdminNotifications = () => {
   };
 
   const filteredNotifications = getFilteredNotifications();
-  const unreadCount = notifications?.filter(n => !n.is_read).length || 0;
+  const userNotifications = notifications?.filter(n => 
+    n.notification_type.includes('user') || 
+    n.notification_type.includes('verification')
+  ).length || 0;
+  
+  const reportNotifications = notifications?.filter(n => 
+    n.notification_type.includes('report') || 
+    n.notification_type.includes('ticket')
+  ).length || 0;
 
   return (
     <div className="space-y-6">
@@ -276,37 +143,41 @@ const AdminNotifications = () => {
         <div className="flex items-center gap-3">
           <Badge variant="secondary" className="hebrew-text">
             <Bell className="h-4 w-4 ml-1" />
-            {unreadCount} לא נקראו
+            {unreadCount || 0} לא נקראו
           </Badge>
-          <Button onClick={handleMarkAllAsRead} variant="outline" className="hebrew-text btn-hover-cyan">
+          <Button 
+            onClick={() => markAllAsRead.mutate()} 
+            variant="outline" 
+            className="hebrew-text btn-hover-cyan"
+            disabled={!unreadCount}
+          >
             <CheckCircle className="h-4 w-4 ml-2" />
             סמן הכל כנקרא
           </Button>
         </div>
       </div>
 
-
       {/* Notifications Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4 bg-gray-900">
           <TabsTrigger value="all" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">
-            הכל ({mockNotifications.length})
+            הכל ({notifications?.length || 0})
           </TabsTrigger>
           <TabsTrigger value="unread" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">
-            לא נקראו ({unreadCount})
+            לא נקראו ({unreadCount || 0})
           </TabsTrigger>
           <TabsTrigger value="users" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">
-            משתמשים ({mockNotifications.filter(n => n.category === "users").length})
+            משתמשים ({userNotifications})
           </TabsTrigger>
           <TabsTrigger value="reports" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">
-            דיווחים ({mockNotifications.filter(n => n.category === "reports").length})
+            דיווחים ({reportNotifications})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab}>
           <GradientBorderContainer className="rounded-md">
-            <Card className="bg-black border-0 rounded-md">
-              <CardContent className="p-0">
+            <div className="bg-black border-0 rounded-md">
+              <div className="p-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -319,73 +190,75 @@ const AdminNotifications = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                  {filteredNotifications.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8">
-                        <div className="flex flex-col items-center gap-2">
-                          <Bell className="h-8 w-8 text-muted-foreground" />
-                          <p className="text-muted-foreground hebrew-text">אין עדכונים להצגה</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredNotifications.map((notification) => (
-                      <TableRow 
-                        key={notification.id}
-                        className={`cursor-pointer hover:bg-muted/50 ${!notification.isRead ? 'bg-cyan-950/50' : ''}`}
-                        onClick={() => handleNotificationClick(notification)}
-                      >
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {getTypeIcon(notification.type, notification.icon)}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <p className={`font-medium hebrew-text ${!notification.isRead ? 'text-white' : 'text-muted-foreground'}`}>
-                              {notification.title}
-                            </p>
-                            <p className={`text-sm text-muted-foreground hebrew-text mt-1 ${!notification.isRead ? 'font-semibold' : ''}`}>
-                              {notification.description}
-                            </p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {getPriorityBadge(notification.priority)}
-                        </TableCell>
-                        <TableCell className="hebrew-text text-white">
-                          <div className="flex flex-col">
-                            <span className="text-sm">{formatTimeAgo(notification.timestamp)}</span>
-                            <span className="text-xs text-muted-foreground">{notification.timestamp}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {notification.isRead ? (
-                            <Badge variant="outline" className="text-xs hebrew-text">
-                              <CheckCircle className="w-3 h-3 ml-1" />
-                              נקרא
-                            </Badge>
-                          ) : (
-                            <Badge variant="secondary" className="text-xs hebrew-text">
-                              <Clock className="w-3 h-3 ml-1" />
-                              חדש
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex justify-center">
-                            {!notification.isRead && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
+                    {filteredNotifications.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8">
+                          <div className="flex flex-col items-center gap-2">
+                            <Bell className="h-8 w-8 text-muted-foreground" />
+                            <p className="text-muted-foreground hebrew-text">אין עדכונים להצגה</p>
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                    ) : (
+                      filteredNotifications.map((notification) => (
+                        <TableRow 
+                          key={notification.id}
+                          className={`cursor-pointer hover:bg-muted/50 ${!notification.is_read ? 'bg-cyan-950/50' : ''}`}
+                          onClick={() => handleNotificationClick(notification)}
+                        >
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getTypeIcon(notification.notification_type)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className={`font-medium hebrew-text ${!notification.is_read ? 'text-white' : 'text-muted-foreground'}`}>
+                                {notification.title}
+                              </p>
+                              <p className={`text-sm text-muted-foreground hebrew-text mt-1 ${!notification.is_read ? 'font-semibold' : ''}`}>
+                                {notification.description}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {getPriorityBadge(notification.priority)}
+                          </TableCell>
+                          <TableCell className="hebrew-text text-white">
+                            <div className="flex flex-col">
+                              <span className="text-sm">{formatTimeAgo(notification.created_at)}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {format(new Date(notification.created_at), 'dd/MM/yyyy HH:mm')}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {notification.is_read ? (
+                              <Badge variant="outline" className="text-xs hebrew-text">
+                                <CheckCircle className="w-3 h-3 ml-1" />
+                                נקרא
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="text-xs hebrew-text">
+                                <Clock className="w-3 h-3 ml-1" />
+                                חדש
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex justify-center">
+                              {!notification.is_read && (
+                                <div className="w-2 h-2 bg-primary rounded-full"></div>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
           </GradientBorderContainer>
         </TabsContent>
       </Tabs>

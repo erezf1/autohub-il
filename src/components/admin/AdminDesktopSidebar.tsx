@@ -14,6 +14,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useAdminUnreadCount } from "@/hooks/admin";
 
 const adminNavItems = [
   { 
@@ -75,6 +77,7 @@ const adminNavItems = [
 const AdminDesktopSidebar = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const { data: unreadCount } = useAdminUnreadCount();
   
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -116,16 +119,26 @@ const AdminDesktopSidebar = () => {
                 end
                 className={({ isActive: navIsActive }) => cn(
                   "flex items-center gap-4 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200",
-                  "btn-hover-cyan group",
+                  "btn-hover-cyan group relative",
                   navIsActive
                     ? "bg-gradient-to-r from-[#2277ee] to-[#5be1fd] text-black shadow-sm" 
                     : "text-muted-foreground hover:text-white"
                 )}
               >
-                <item.icon className={cn(
-                  "h-5 w-5 flex-shrink-0 icon-hover-cyan",
-                  collapsed ? "mx-auto" : ""
-                )} />
+                <div className="relative">
+                  <item.icon className={cn(
+                    "h-5 w-5 flex-shrink-0 icon-hover-cyan",
+                    collapsed ? "mx-auto" : ""
+                  )} />
+                  {item.url === "/admin/notifications" && unreadCount && unreadCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-2 -left-2 h-4 min-w-4 text-[10px] rounded-full p-0 flex items-center justify-center bg-gradient-to-r from-[#5be1fd] to-[#2277ee] text-black border-0"
+                    >
+                      {unreadCount}
+                    </Badge>
+                  )}
+                </div>
                 {!collapsed && (
                   <div className="flex-1 text-right hebrew-text">
                     <div className="font-medium">{item.title}</div>
