@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, User, FileText, Car, Gavel, AlertTriangle, CheckCircle, Clock, Filter } from "lucide-react";
+import { Bell, User, FileText, Car, Gavel, AlertTriangle, CheckCircle, Clock, Filter, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,9 +8,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { useAdminNotifications, useAdminNotificationActions } from "@/hooks/admin";
+import { LoadingSpinner } from "@/components/common";
+import { format } from "date-fns";
 
-// Mock notifications data
-const mockNotifications = [
+const getNotificationRoute = (notification: any) => {
+  const { related_entity_type, related_entity_id } = notification;
+  
+  if (!related_entity_type || !related_entity_id) return null;
+  
+  switch (related_entity_type) {
+    case 'user': return `/admin/users/${related_entity_id}`;
+    case 'vehicle': return `/admin/vehicles/${related_entity_id}`;
+    case 'auction': return `/admin/auctions/${related_entity_id}`;
+    case 'ticket': return `/admin/support/${related_entity_id}`;
+    default: return null;
+  }
+};
+
+const mockNotifications_OLD = [
   {
     id: "n1",
     type: "user",
@@ -134,12 +150,18 @@ const mockNotifications = [
 ];
 
 const AdminNotifications = () => {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const navigate = useNavigate();
+  const { data: notifications, isLoading } = useAdminNotifications();
+  const { markAsRead, markAllAsRead } = useAdminNotificationActions();
+
+  if (isLoading) return <LoadingSpinner />;
+
+  const unreadCount = notifications?.filter(n => !n.is_read).length || 0;
 
   const getFilteredNotifications = () => {
-    let filtered = mockNotifications;
+    let filtered = notifications || [];
     
     // Filter by search term
     if (searchTerm) {
@@ -239,7 +261,7 @@ const AdminNotifications = () => {
   };
 
   const filteredNotifications = getFilteredNotifications();
-  const unreadCount = mockNotifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications?.filter(n => !n.is_read).length || 0;
 
   return (
     <div className="space-y-6">
@@ -256,7 +278,7 @@ const AdminNotifications = () => {
             <Bell className="h-4 w-4 ml-1" />
             {unreadCount} לא נקראו
           </Badge>
-          <Button onClick={markAllAsRead} variant="outline" className="hebrew-text btn-hover-cyan">
+          <Button onClick={handleMarkAllAsRead} variant="outline" className="hebrew-text btn-hover-cyan">
             <CheckCircle className="h-4 w-4 ml-2" />
             סמן הכל כנקרא
           </Button>

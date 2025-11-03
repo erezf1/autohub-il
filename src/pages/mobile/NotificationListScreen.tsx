@@ -1,118 +1,144 @@
-import { FileText, Gavel, MessageCircle, Car, TrendingUp } from "lucide-react";
+import { 
+  FileText, Gavel, MessageCircle, Car, TrendingUp, 
+  Bell, UserCheck, UserX, Ban, AlertCircle, Trash2, Eye
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { LoadingSpinner } from "@/components/common";
 import { useNavigate } from "react-router-dom";
+import { useNotifications, useNotificationActions } from "@/hooks/mobile";
+import { format, isToday, isYesterday, isThisWeek } from "date-fns";
+import { he } from "date-fns/locale";
 
-// Mock data for notifications
-const notificationsByDate = {
-  "היום": [
-    {
-      id: 1,
-      type: "iso_match",
-      icon: FileText,
-      title: "התאמה חדשה לבקשתך",
-      description: "טויוטה קורולה, 2020",
-      isUnread: true,
-      timestamp: "לפני 2 שעות"
-    },
-    {
-      id: 2,
-      type: "auction_bid",
-      icon: Gavel,
-      title: "הצעה חדשה במכירה פומבית",
-      description: "פורשה 911 - הצעה של 445,000 ₪",
-      isUnread: true,
-      timestamp: "לפני 4 שעות"
-    },
-    {
-      id: 3,
-      type: "message",
-      icon: MessageCircle,
-      title: "הודעה חדשה",
-      description: "סוחר #345 שלח לך הודעה",
-      isUnread: false,
-      timestamp: "לפני 6 שעות"
-    }
-  ],
-  "אתמול": [
-    {
-      id: 4,
-      type: "car_sold",
-      icon: TrendingUp,
-      title: "הרכב שלך נמכר!",
-      description: "מזדה CX-5 2019 נמכרה בהצלחה",
-      isUnread: false,
-      timestamp: "אתמול 15:30"
-    },
-    {
-      id: 5,
-      type: "auction_ending",
-      icon: Gavel,
-      title: "מכירה פומבית מסתיימת בקרוב",
-      description: "BMW X3 - נותרו 2 שעות",
-      isUnread: false,
-      timestamp: "אתמול 10:15"
-    }
-  ],
-  "השבוע": [
-    {
-      id: 6,
-      type: "iso_match",
-      icon: FileText,
-      title: "5 התאמות חדשות",
-      description: "לבקשת חיפוש: רכבי יוקרה",
-      isUnread: false,
-      timestamp: "02/01/2024"
-    }
-  ]
+const getNotificationIcon = (type: string) => {
+  switch (type) {
+    case "registration_approved": return UserCheck;
+    case "registration_rejected": return UserX;
+    case "account_suspended": return Ban;
+    case "subscription_expiring": return AlertCircle;
+    case "auction_outbid":
+    case "auction_won":
+    case "auction_ending_soon": return Gavel;
+    case "iso_offer_received": return FileText;
+    case "contact_details_requested":
+    case "contact_details_revealed": return MessageCircle;
+    case "vehicle_deleted": return Trash2;
+    default: return Bell;
+  }
 };
 
 const getIconColor = (type: string) => {
   switch (type) {
-    case "iso_match":
-      return "text-blue-400";
-    case "auction_bid":
-    case "auction_ending":
-      return "text-orange-400";
-    case "message":
-      return "text-green-400";
-    case "car_sold":
-      return "text-emerald-400";
-    default:
-      return "text-gray-400";
+    case "registration_approved": return "text-green-400";
+    case "registration_rejected":
+    case "account_suspended": return "text-red-400";
+    case "subscription_expiring":
+    case "auction_ending_soon": return "text-orange-400";
+    case "auction_won": return "text-emerald-400";
+    case "auction_outbid": return "text-yellow-400";
+    case "iso_offer_received": return "text-blue-400";
+    case "contact_details_requested":
+    case "contact_details_revealed": return "text-purple-400";
+    case "vehicle_deleted": return "text-red-400";
+    default: return "text-gray-400";
   }
+};
+
+const groupNotificationsByDate = (notifications: any[]) => {
+  const groups: { [key: string]: any[] } = {
+    "היום": [],
+    "אתמול": [],
+    "השבוע": [],
+    "קודם": []
+  };
+
+  notifications.forEach(notification => {
+    const date = new Date(notification.created_at);
+    if (isToday(date)) {
+      groups["היום"].push(notification);
+    } else if (isYesterday(date)) {
+      groups["אתמול"].push(notification);
+    } else if (isThisWeek(date)) {
+      groups["השבוע"].push(notification);
+    } else {
+      groups["קודם"].push(notification);
+    }
+  });
+
+  // Remove empty groups
+  Object.keys(groups).forEach(key => {
+    if (groups[key].length === 0) {
+      delete groups[key];
+    }
+  });
+
+  return groups;
 };
 
 const NotificationListScreen = () => {
   const navigate = useNavigate();
+  const { data: notifications, isLoading, error } = useNotifications();
+  const { markAsRead, markAllAsRead } = useNotificationActions();
 
   const handleNotificationClick = (notification: any) => {
-    // Navigate to relevant screen based on notification type
-    switch (notification.type) {
-      case "iso_match":
-        navigate("/iso-requests");
-        break;
-      case "auction_bid":
-      case "auction_ending":
-        navigate("/auctions");
-        break;
-      case "message":
-        navigate("/chats");
-        break;
-      case "car_sold":
-        navigate("/profile");
-        break;
+    // Mark as read
+    if (!notification.is_read) {
+      markAsRead.mutate(notification.id);
+    }
+
+    // Navigate based on action_url
+    if (notification.action_url) {
+      navigate(notification.action_url);
     }
   };
 
+  const handleMarkAllAsRead = () => {
+    markAllAsRead.mutate();
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-400 hebrew-text">שגיאה בטעינת ההתראות</p>
+      </div>
+    );
+  }
+
+  const groupedNotifications = groupNotificationsByDate(notifications || []);
+
   return (
     <div className="space-y-6">
-      {/* Screen Title */}
-      <h1 className="text-2xl font-bold text-foreground hebrew-text">התראות</h1>
+      {/* Screen Title and Actions */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground hebrew-text">התראות</h1>
+        {notifications && notifications.some(n => !n.is_read) && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleMarkAllAsRead}
+            className="hebrew-text"
+          >
+            <Eye className="h-4 w-4 ml-2" />
+            סמן הכל כנקרא
+          </Button>
+        )}
+      </div>
+
+      {/* Empty State */}
+      {(!notifications || notifications.length === 0) && (
+        <div className="text-center py-12">
+          <Bell className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground hebrew-text">אין התראות להציג</p>
+        </div>
+      )}
       
       {/* Notification Groups by Date */}
-      {Object.entries(notificationsByDate).map(([date, notifications]) => (
+      {Object.entries(groupedNotifications).map(([date, notificationGroup]) => (
         <div key={date} className="space-y-3">
           {/* Date Header */}
           <h2 className="text-lg font-semibold text-muted-foreground hebrew-text">
@@ -121,8 +147,8 @@ const NotificationListScreen = () => {
           
           {/* Notifications for this date */}
           <div className="space-y-2">
-            {notifications.map((notification) => {
-              const Icon = notification.icon;
+            {notificationGroup.map((notification) => {
+              const Icon = getNotificationIcon(notification.notification_type);
               return (
                 <GradientBorderContainer
                   key={notification.id}
@@ -136,7 +162,7 @@ const NotificationListScreen = () => {
                     <CardContent className="p-4">
                       <div className="flex items-start space-x-3 space-x-reverse">
                         {/* Icon */}
-                        <div className={`p-2 rounded-full bg-gray-800 ${getIconColor(notification.type)}`}>
+                        <div className={`p-2 rounded-full bg-gray-800 ${getIconColor(notification.notification_type)}`}>
                           <Icon className="h-5 w-5" />
                         </div>
 
@@ -149,7 +175,7 @@ const NotificationListScreen = () => {
                                 <h3 className="font-semibold text-white hebrew-text">
                                   {notification.title}
                                 </h3>
-                                {notification.isUnread && (
+                                {!notification.is_read && (
                                   <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0" />
                                 )}
                               </div>
@@ -162,7 +188,7 @@ const NotificationListScreen = () => {
 
                             {/* Timestamp */}
                             <span className="text-xs text-gray-400 flex-shrink-0 mr-2">
-                              {notification.timestamp}
+                              {format(new Date(notification.created_at), 'HH:mm', { locale: he })}
                             </span>
                           </div>
                         </div>
