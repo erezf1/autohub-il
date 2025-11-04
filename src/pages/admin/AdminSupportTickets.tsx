@@ -1,289 +1,143 @@
 import { useState } from "react";
-import { HelpCircle, Eye, MessageSquare, Clock, User, AlertTriangle } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
-
-// Mock data for support tickets
-const mockTickets = [
-  {
-    id: 1,
-    title: "דיווח על מוכר רכב מפוקפק",
-    reporter: "דני כהן",
-    reporterBusiness: "כהן מוטורס",
-    reportedUser: "אוטו גל",
-    category: "דיווח על משתמש",
-    priority: "גבוה",
-    status: "פתוח",
-    assignedTo: "לא משוייך",
-    dateCreated: "2024-01-20",
-    lastActivity: "לפני שעה",
-    description: "המוכר לא עונה להודעות ומפרסם רכבים עם פרטים לא נכונים"
-  },
-  {
-    id: 2,
-    title: "בעיה בתשלום עבור מנוי פרימיום",
-    reporter: "מירי לוי",
-    reporterBusiness: "לוי אוטו",
-    reportedUser: null,
-    category: "תמיכה טכנית",
-    priority: "בינוני",
-    status: "בטיפול",
-    assignedTo: "ישראל ישראלי",
-    dateCreated: "2024-01-18",
-    lastActivity: "לפני 3 שעות",
-    description: "הכרטיס לא עובר במערכת התשלומים"
-  },
-  {
-    id: 3,
-    title: "בקשה להחזר כספי",
-    reporter: "אבי רוזן",
-    reporterBusiness: "רוזן מוטורס",
-    reportedUser: null,
-    category: "כספים",
-    priority: "נמוך",
-    status: "ממתין תגובה",
-    assignedTo: "שרה כהן",
-    dateCreated: "2024-01-15",
-    lastActivity: "לפני יום",
-    description: "רוצה להחזיר כסף עבור מנוי שלא השתמש בו"
-  },
-  {
-    id: 4,
-    title: "רכב שנמכר עדיין מופיע במערכת",
-    reporter: "שרה ברק",
-    reporterBusiness: "ברק אוטו סנטר",
-    reportedUser: null,
-    category: "תמיכה טכנית",
-    priority: "בינוני",
-    status: "נפתר",
-    assignedTo: "ישראל ישראלי",
-    dateCreated: "2024-01-12",
-    lastActivity: "לפני שבוע",
-    description: "רכב שנמכר לפני שבוע עדיין מופיע כזמין"
-  }
-];
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, MessageSquare, User } from "lucide-react";
+import { useSupportTickets } from "@/hooks/admin/useSupportTickets";
+import { formatDistanceToNow } from "date-fns";
+import { ar } from "date-fns/locale";
 
 const AdminSupportTickets = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
+  const { data: tickets, isLoading } = useSupportTickets(searchTerm, activeTab);
+
   const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case "גבוה":
-        return <Badge variant="destructive" className="hebrew-text">{priority}</Badge>;
-      case "בינוני":
-        return <Badge variant="default" className="hebrew-text">{priority}</Badge>;
-      case "נמוך":
-        return <Badge variant="secondary" className="hebrew-text">{priority}</Badge>;
-      default:
-        return <Badge variant="secondary" className="hebrew-text">{priority}</Badge>;
-    }
+    const variants: { [key: string]: "default" | "destructive" | "outline" | "secondary" } = {
+      high: "destructive",
+      medium: "secondary",
+      low: "outline",
+    };
+    return <Badge variant={variants[priority] || "default"}>{priority === "high" ? "גבוהה" : priority === "medium" ? "בינונית" : "נמוכה"}</Badge>;
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "פתוח":
-        return <Badge variant="outline" className="hebrew-text">{status}</Badge>;
-      case "בטיפול":
-        return <Badge variant="default" className="hebrew-text">{status}</Badge>;
-      case "ממתין תגובה":
-        return <Badge className="bg-yellow-500 hover:bg-yellow-600 hebrew-text">{status}</Badge>;
-      case "נפתר":
-        return <Badge variant="secondary" className="hebrew-text">{status}</Badge>;
-      default:
-        return <Badge variant="secondary" className="hebrew-text">{status}</Badge>;
-    }
+    const variants: { [key: string]: "default" | "destructive" | "outline" | "secondary" } = {
+      open: "secondary",
+      in_progress: "default",
+      resolved: "outline",
+      closed: "outline",
+    };
+    const labels: { [key: string]: string } = {
+      open: "פתוח",
+      in_progress: "בטיפול",
+      resolved: "נפתר",
+      closed: "סגור",
+    };
+    return <Badge variant={variants[status] || "default"}>{labels[status] || status}</Badge>;
   };
 
-  const filteredTickets = mockTickets.filter(ticket => {
-    const matchesSearch = ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ticket.reporter.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ticket.reporterBusiness.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesTab = activeTab === "all" || 
-                      (activeTab === "open" && ["פתוח", "בטיפול"].includes(ticket.status)) ||
-                      (activeTab === "pending" && ticket.status === "ממתין תגובה") ||
-                      (activeTab === "resolved" && ticket.status === "נפתר");
-    
-    return matchesSearch && matchesTab;
-  });
-
   return (
-    <div className="space-y-6 min-h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white hebrew-text">פניות תמיכה</h1>
-          <p className="text-muted-foreground hebrew-text">
-            ניהול פניות תמיכה ודיווחים מהמשתמשים
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <GradientBorderContainer className="rounded-md">
-            <Select>
-              <SelectTrigger className="w-40 hebrew-text border-0 bg-black rounded-md">
-                <SelectValue placeholder="שיוך נציג" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="israel" className="hebrew-text">ישראל ישראלי</SelectItem>
-                <SelectItem value="sara" className="hebrew-text">שרה כהן</SelectItem>
-                <SelectItem value="unassigned" className="hebrew-text">לא משוייך</SelectItem>
-              </SelectContent>
-            </Select>
-          </GradientBorderContainer>
-        </div>
+    <div className="min-h-screen bg-background p-6" dir="rtl">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">פניות תמיכה</h1>
+        <p className="text-muted-foreground">ניהול פניות ותלונות</p>
       </div>
 
-      {/* Filters and Search */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="hebrew-text text-white">חיפוש וסינון</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              <div className="relative flex-1">
-                <HelpCircle className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="חפש לפי כותרת או שם מדווח..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-10 hebrew-text bg-muted text-white"
-                />
-              </div>
-              <Button variant="outline" className="hebrew-text btn-hover-cyan">
-                סינון מתקדם
-              </Button>
+      {/* Search and Filter Section */}
+      <GradientBorderContainer className="mb-6">
+        <Card className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="חפש לפי כותרת..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pr-10"
+              />
             </div>
-          </CardContent>
+          </div>
         </Card>
       </GradientBorderContainer>
 
-      {/* Support Tickets Tabs and Table */}
-      <GradientBorderContainer className="rounded-md">
-        <Card className="bg-black border-0 rounded-md">
-          <CardHeader>
-            <CardTitle className="hebrew-text text-white">פניות תמיכה ({filteredTickets.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 bg-gray-900">
-                <TabsTrigger value="all" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">כל הפניות</TabsTrigger>
-                <TabsTrigger value="open" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">פתוחות</TabsTrigger>
-                <TabsTrigger value="pending" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">ממתינות</TabsTrigger>
-                <TabsTrigger value="resolved" className="hebrew-text text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2277ee] data-[state=active]:to-[#5be1fd] data-[state=active]:text-black">נפתרו</TabsTrigger>
-              </TabsList>
+      {/* Tickets Table */}
+      <GradientBorderContainer>
+        <Card className="p-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-6">
+              <TabsTrigger value="all">הכל</TabsTrigger>
+              <TabsTrigger value="open">פתוחות</TabsTrigger>
+              <TabsTrigger value="in_progress">בטיפול</TabsTrigger>
+              <TabsTrigger value="resolved">נפתרו</TabsTrigger>
+              <TabsTrigger value="closed">סגורות</TabsTrigger>
+            </TabsList>
 
-              <TabsContent value={activeTab} className="mt-4">
-                <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-left hebrew-text text-white">פעולות</TableHead>
-                    <TableHead className="text-right hebrew-text text-white">פעילות אחרונה</TableHead>
-                    <TableHead className="text-right hebrew-text text-white">משוייך לנציג</TableHead>
-                    <TableHead className="text-right hebrew-text text-white">סטטוס</TableHead>
-                    <TableHead className="text-right hebrew-text text-white">עדיפות</TableHead>
-                    <TableHead className="text-right hebrew-text text-white">קטגוריה</TableHead>
-                    <TableHead className="text-right hebrew-text text-white">מדווח</TableHead>
-                    <TableHead className="text-right hebrew-text text-white">פנייה</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredTickets.map((ticket) => (
-                    <TableRow key={ticket.id}>
-                      <TableCell>
-                        <div className="flex justify-start gap-2">
-                          <Button variant="ghost" size="sm" className="hebrew-text" onClick={() => navigate(`/admin/support/${ticket.id}`)}>
-                            <Eye className="h-4 w-4 ml-1" />
-                            צפה
-                          </Button>
-                          <Button variant="ghost" size="sm" className="hebrew-text">
-                            <MessageSquare className="h-4 w-4 ml-1" />
-                            השב
-                          </Button>
-                          <Button variant="ghost" size="sm" className="hebrew-text">
-                            <User className="h-4 w-4 ml-1" />
-                            שייך
-                          </Button>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 justify-end">
-                          <span className="text-sm hebrew-text">{ticket.lastActivity}</span>
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 justify-end">
-                          <span className="text-sm hebrew-text">{ticket.assignedTo}</span>
-                          <User className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(ticket.status)}</TableCell>
-                      <TableCell>{getPriorityBadge(ticket.priority)}</TableCell>
-                      <TableCell className="hebrew-text text-right">{ticket.category}</TableCell>
-                      <TableCell>
-                        <div className="text-right">
-                          <div className="font-medium hebrew-text">{ticket.reporter}</div>
-                          <div className="text-sm text-muted-foreground hebrew-text">
-                            {ticket.reporterBusiness}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-3 space-x-reverse">
-                          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                            {ticket.reportedUser ? (
-                              <AlertTriangle className="h-5 w-5 text-destructive" />
-                            ) : (
-                              <HelpCircle className="h-5 w-5 text-muted-foreground" />
-                            )}
-                          </div>
-                          <div>
-                            <div className="font-medium hebrew-text">
-                              {ticket.title}
+            <TabsContent value={activeTab}>
+              {isLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                </div>
+              ) : tickets && tickets.length === 0 ? (
+                <div className="text-center py-12">
+                  <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">אין פניות תמיכה</h3>
+                  <p className="text-muted-foreground">לא נמצאו פניות תמיכה במערכת</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-right">כותרת</TableHead>
+                        <TableHead className="text-right">סטטוס</TableHead>
+                        <TableHead className="text-right">עדיפות</TableHead>
+                        <TableHead className="text-right">נוצר</TableHead>
+                        <TableHead className="text-right">פעולות</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {tickets?.map((ticket) => (
+                        <TableRow key={ticket.id}>
+                          <TableCell className="font-medium">{ticket.subject}</TableCell>
+                          <TableCell>{getStatusBadge(ticket.status)}</TableCell>
+                          <TableCell>{getPriorityBadge(ticket.priority)}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {formatDistanceToNow(new Date(ticket.created_at), {
+                              addSuffix: true,
+                              locale: ar,
+                            })}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => navigate(`/admin/support-tickets/${ticket.id}`)}
+                              >
+                                צפה
+                              </Button>
                             </div>
-                            <div className="text-sm text-muted-foreground hebrew-text">
-                              #{ticket.id} • נוצר {ticket.dateCreated}
-                            </div>
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+        </Card>
       </GradientBorderContainer>
     </div>
   );

@@ -1107,7 +1107,10 @@ export type Database = {
         Returns: string
       }
       get_admin_unread_notifications_count: { Args: never; Returns: number }
+      get_auctions_stats: { Args: never; Returns: Json }
+      get_boosted_vehicles_stats: { Args: never; Returns: Json }
       get_remaining_boosts: { Args: { user_id: string }; Returns: number }
+      get_support_tickets_stats: { Args: never; Returns: Json }
       get_user_unread_messages_count: {
         Args: { user_id: string }
         Returns: number
@@ -1116,6 +1119,8 @@ export type Database = {
         Args: { user_id: string }
         Returns: number
       }
+      get_users_stats: { Args: never; Returns: Json }
+      get_vehicles_stats: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
