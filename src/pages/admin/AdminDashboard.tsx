@@ -9,6 +9,7 @@ import { useDashboardStats } from "@/hooks/admin/useDashboardStats";
 import { useAdminNotifications } from "@/hooks/admin/useAdminNotifications";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
+import { PageHeader } from "@/components/common/PageHeader";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background p-6" dir="rtl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">לוח בקרה</h1>
+        <PageHeader title="לוח בקרה" />
         <p className="text-muted-foreground">סקירה כללית של פעילות המערכת</p>
       </div>
 
