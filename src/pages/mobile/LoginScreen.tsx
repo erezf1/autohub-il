@@ -83,7 +83,11 @@ export const LoginScreen: React.FC = () => {
               alt="AutoHub Logo" 
               className="h-16 w-auto mx-auto mb-4"
             />
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 mb-2 hebrew-text">Auto-Hub</h1>
+            <h1 className="text-3xl font-bold mb-2 hebrew-text">
+              <span className="text-blue-400">D</span>
+              <span className="text-white">ealer</span>
+              <span className="text-blue-400">s</span>
+            </h1>
             <p className="text-gray-300 hebrew-text">התחברות</p>
           </div>
           <div className="w-16"></div>
