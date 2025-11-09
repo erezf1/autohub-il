@@ -19,7 +19,11 @@ const LandingPage = () => {
               alt="Auto Hub" 
               className="w-22 h-20"
             />
-            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 hebrew-text">אוטו-האב</h1>
+            <h1 className="text-5xl font-bold hebrew-text">
+              <span className="text-blue-400">D</span>
+              <span className="text-white">ealer</span>
+              <span className="text-blue-400">s</span>
+            </h1>
           </div>
           <p className="text-lg text-gray-300 hebrew-text">פלטפורמת מסחר רכב מתקדמת</p>
         </div>
@@ -122,7 +126,7 @@ const LandingPage = () => {
       {/* Footer */}
       <footer className="py-4 text-center border-t border-gray-800 mt-16 bg-black/50">
         <p className="text-xs text-gray-400 hebrew-text">
-          © 2024 אוטו-האב. כל הזכויות שמורות.
+          © 2024 Dealers. כל הזכויות שמורות.
         </p>
         <div className="md:hidden" style={{ height: 'calc(4rem )' }} aria-hidden="true" />
       </footer>

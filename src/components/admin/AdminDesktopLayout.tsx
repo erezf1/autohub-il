@@ -29,7 +29,11 @@ const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
               className="h-8 w-auto"
             />
             <div className="hebrew-text">
-              <h1 className="font-bold text-lg text-primary">אוטו-האב</h1>
+              <h1 className="font-bold text-lg">
+                <span className="text-blue-400">D</span>
+                <span className="text-white">ealer</span>
+                <span className="text-blue-400">s</span>
+              </h1>
               <p className="text-xs text-muted-foreground">פאנל ניהול</p>
             </div>
           </div>
@@ -101,7 +105,7 @@ const AdminDesktopLayout = ({ children }: AdminDesktopLayoutProps) => {
       {/* Fixed Admin Footer */}
       <footer className="h-12 bg-black/70 backdrop-blur-md border-t border-border/20 shadow-lg px-6 flex items-center justify-center flex-shrink-0 z-50">
         <p className="text-sm text-muted-foreground hebrew-text">
-          © 2024 אוטו-האב - פאנל ניהול. כל הזכויות שמורות.
+          © 2024 Dealers - פאנל ניהול. כל הזכויות שמורות.
         </p>
       </footer>
     </div>
