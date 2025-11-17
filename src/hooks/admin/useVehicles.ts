@@ -15,7 +15,9 @@ export const useAdminVehicles = () => {
         .select(`
           *,
           make:vehicle_makes(name_hebrew, name_english),
-          model:vehicle_models(name_hebrew, name_english)
+          model:vehicle_models(name_hebrew, name_english),
+          owner:user_profiles!owner_id(business_name),
+          auction:auctions!vehicle_id(id, status)
         `)
         .order('created_at', { ascending: false });
 
@@ -31,11 +33,12 @@ export const useAdminVehicles = () => {
 
       if (profilesError) throw profilesError;
 
-      // Merge profiles with vehicles
+      // Merge profiles with vehicles and transform auction data
       const profilesById = new Map((profilesData || []).map(p => [p.id, p]));
       return vehiclesData.map(v => ({
         ...v,
         owner: profilesById.get(v.owner_id) || null,
+        auction: v.auction?.[0] || null
       }));
     },
   });
