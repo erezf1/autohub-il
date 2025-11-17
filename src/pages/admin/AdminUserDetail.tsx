@@ -330,13 +330,13 @@ const AdminUserDetail = () => {
                           <TableRow key={vehicle.id} className="border-gray-800">
                             <TableCell className="font-medium text-white hebrew-text">{vehicle.make?.name_hebrew || '-'}</TableCell>
                             <TableCell className="text-white hebrew-text">{vehicle.model?.name_hebrew || '-'}</TableCell>
-                            <TableCell className="font-medium text-white hebrew-text">{vehicle.make?.name_hebrew || '-'}</TableCell>
-                            <TableCell className="text-white hebrew-text">{vehicle.model?.name_hebrew || '-'}</TableCell>
                             <TableCell className="font-medium text-white">{vehicle.year}</TableCell>
                             <TableCell className="text-white">₪{vehicle.price?.toLocaleString()}</TableCell>
                             <TableCell>
                               <Badge variant={vehicle.status === 'available' ? 'default' : 'secondary'} className="text-xs">
-                                {vehicle.status === 'available' ? 'זמין' : vehicle.status === 'sold' ? 'נמכר' : 'לא זמין'}
+                                {vehicle.status === 'available' ? 'זמין' : 
+                                 vehicle.status === 'sold' ? 'נמכר' : 
+                                 vehicle.status === 'removed' ? 'הוסר' : 'לא זמין'}
                               </Badge>
                             </TableCell>
                             <TableCell className="text-sm text-white">{new Date(vehicle.created_at).toLocaleDateString('he-IL')}</TableCell>
