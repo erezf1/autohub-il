@@ -9,18 +9,18 @@ import { GradientBorderContainer } from "@/components/ui/gradient-border-contain
 import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { useUser } from "@/hooks/admin/useUsers";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { adminClient } from "@/integrations/supabase/adminClient";
 
 const AdminUserDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isLoading } = useUser(id!);
 
-  // Fetch user's vehicles
+  // Fetch user's vehicles (all statuses)
   const { data: vehicles } = useQuery({
     queryKey: ['admin-user-vehicles', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('vehicle_listings')
         .select(`
           *,
@@ -36,11 +36,11 @@ const AdminUserDetail = () => {
     enabled: !!id,
   });
 
-  // Fetch user's auctions
+  // Fetch user's auctions (all statuses)
   const { data: auctions } = useQuery({
     queryKey: ['admin-user-auctions', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('auctions')
         .select('*')
         .eq('creator_id', id)
@@ -56,11 +56,24 @@ const AdminUserDetail = () => {
   const { data: isoRequests } = useQuery({
     queryKey: ['admin-user-iso-requests', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('iso_requests')
         .select('*')
         .eq('requester_id', id)
         .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Fetch remaining boosts using RPC
+  const { data: remainingBoosts } = useQuery({
+    queryKey: ['admin-user-remaining-boosts', id],
+    queryFn: async () => {
+      const { data, error } = await adminClient
+        .rpc('get_remaining_boosts', { user_id: id });
       
       if (error) throw error;
       return data;
@@ -178,7 +191,7 @@ const AdminUserDetail = () => {
               <Car className="h-5 w-5 text-blue-500 flex-shrink-0" />
               <div className="text-right min-w-0">
                 <p className="text-[11px] text-white/70 hebrew-text">רכבים</p>
-                <p className="text-lg font-bold text-white">{vehicles?.filter(v => v.status === 'available').length || 0}</p>
+                <p className="text-lg font-bold text-white">{vehicles?.length || 0}</p>
               </div>
             </div>
           </Card>
@@ -190,7 +203,7 @@ const AdminUserDetail = () => {
               <Gavel className="h-5 w-5 text-green-500 flex-shrink-0" />
               <div className="text-right min-w-0">
                 <p className="text-[11px] text-white/70 hebrew-text">מכרזים</p>
-                <p className="text-lg font-bold text-white">{auctions?.filter(a => a.status === 'active').length || 0}</p>
+                <p className="text-lg font-bold text-white">{auctions?.length || 0}</p>
               </div>
             </div>
           </Card>
@@ -202,7 +215,7 @@ const AdminUserDetail = () => {
               <Activity className="h-5 w-5 text-orange-500 flex-shrink-0" />
               <div className="text-right min-w-0">
                 <p className="text-[11px] text-white/70 hebrew-text">בוסטים</p>
-                <p className="text-lg font-bold text-white">{user.profile?.available_boosts || 0}</p>
+                <p className="text-lg font-bold text-white">{remainingBoosts ?? 0}</p>
               </div>
             </div>
           </Card>
