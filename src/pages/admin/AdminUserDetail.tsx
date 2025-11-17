@@ -21,18 +21,26 @@ const AdminUserDetail = () => {
   const { data: vehicles } = useQuery({
     queryKey: ['admin-user-vehicles', id],
     queryFn: async () => {
-      const { data, error } = await adminClient
-        .from('vehicle_listings')
-        .select(`
-          *,
-          make:vehicle_makes(name_hebrew),
-          model:vehicle_models(name_hebrew)
-        `)
-        .eq('owner_id', id)
-        .order('created_at', { ascending: false });
+    const { data, error } = await adminClient
+      .from('vehicle_listings')
+      .select(`
+        *,
+        make:vehicle_makes(name_hebrew),
+        model:vehicle_models(name_hebrew),
+        auction:auctions!vehicle_id(id, status)
+      `)
+      .eq('owner_id', id)
+      .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      
+      // Transform the data to match the Vehicle interface
+      const transformedData = data?.map(vehicle => ({
+        ...vehicle,
+        auction: vehicle.auction?.[0] || null
+      }));
+      
+      return transformedData || [];
     },
     enabled: !!id,
   });

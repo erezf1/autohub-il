@@ -1,4 +1,4 @@
-import { Eye, Edit, Trash2, MoreVertical } from "lucide-react";
+import { Eye, Edit, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
@@ -9,12 +9,6 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 
 interface Vehicle {
@@ -24,9 +18,15 @@ interface Vehicle {
   status: string;
   created_at: string;
   owner_id: string;
+  is_boosted: boolean | null;
+  boosted_until: string | null;
   make: { name_hebrew: string } | null;
   model: { name_hebrew: string } | null;
   owner?: { business_name: string } | null;
+  auction?: {
+    id: string;
+    status: string;
+  } | null;
 }
 
 interface AdminVehiclesTableProps {
@@ -38,7 +38,35 @@ interface AdminVehiclesTableProps {
 export const AdminVehiclesTable = ({ vehicles, showOwner = true, onDelete }: AdminVehiclesTableProps) => {
   const navigate = useNavigate();
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (vehicle: Vehicle) => {
+    // Check if vehicle is boosted and boost is still active
+    const isBoosted = vehicle.is_boosted && 
+                      vehicle.boosted_until && 
+                      new Date(vehicle.boosted_until) > new Date();
+    
+    // Check if vehicle is in an active auction
+    const isInAuction = vehicle.auction && 
+                       (vehicle.auction.status === 'active' || 
+                        vehicle.auction.status === 'scheduled');
+
+    // Priority: Auction > Boost > Regular Status
+    if (isInAuction) {
+      return (
+        <Badge variant="default" className="bg-purple-500 text-white hebrew-text">
+          במכרז
+        </Badge>
+      );
+    }
+    
+    if (isBoosted) {
+      return (
+        <Badge variant="default" className="bg-amber-500 text-black hebrew-text">
+          בוסט
+        </Badge>
+      );
+    }
+
+    // Regular status handling
     const statusMap: Record<string, string> = {
       'available': 'זמין',
       'sold': 'נמכר',
@@ -46,9 +74,9 @@ export const AdminVehiclesTable = ({ vehicles, showOwner = true, onDelete }: Adm
       'pending': 'בהמתנה',
     };
     
-    const hebrewStatus = statusMap[status] || status;
+    const hebrewStatus = statusMap[vehicle.status] || vehicle.status;
     
-    switch (status) {
+    switch (vehicle.status) {
       case "available":
         return <Badge variant="default" className="hebrew-text">{hebrewStatus}</Badge>;
       case "sold":
@@ -106,44 +134,47 @@ export const AdminVehiclesTable = ({ vehicles, showOwner = true, onDelete }: Adm
               ₪{vehicle.price.toLocaleString()}
             </TableCell>
             <TableCell className="text-right">
-              {getStatusBadge(vehicle.status)}
+              {getStatusBadge(vehicle)}
             </TableCell>
             <TableCell className="text-right hebrew-text text-white">
               {formatDate(vehicle.created_at)}
             </TableCell>
             <TableCell className="text-center">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hover:bg-muted">
-                    <MoreVertical className="h-4 w-4" />
+              <div className="flex items-center justify-center gap-2" dir="ltr">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
+                  className="h-8 w-8 hover:bg-muted"
+                  title="צפייה"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate(`/admin/vehicles/${vehicle.id}/edit`)}
+                  className="h-8 w-8 hover:bg-muted"
+                  title="עריכה"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                {onDelete && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      if (window.confirm('האם אתה בטוח שברצונך למחוק את הרכב?')) {
+                        onDelete(vehicle.id);
+                      }
+                    }}
+                    className="h-8 w-8 hover:bg-destructive/10 text-destructive"
+                    title="מחיקה"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-card border-border">
-                  <DropdownMenuItem 
-                    onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
-                    className="cursor-pointer hebrew-text"
-                  >
-                    <Eye className="h-4 w-4 ml-2" />
-                    צפייה
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => navigate(`/admin/vehicles/${vehicle.id}/edit`)}
-                    className="cursor-pointer hebrew-text"
-                  >
-                    <Edit className="h-4 w-4 ml-2" />
-                    עריכה
-                  </DropdownMenuItem>
-                  {onDelete && (
-                    <DropdownMenuItem 
-                      onClick={() => onDelete(vehicle.id)}
-                      className="cursor-pointer hebrew-text text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4 ml-2" />
-                      מחיקה
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                )}
+              </div>
             </TableCell>
           </TableRow>
         ))}
