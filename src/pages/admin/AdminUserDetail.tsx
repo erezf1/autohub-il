@@ -10,6 +10,7 @@ import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { useUser } from "@/hooks/admin/useUsers";
 import { useQuery } from "@tanstack/react-query";
 import { adminClient } from "@/integrations/supabase/adminClient";
+import { AdminVehiclesTable } from "@/components/admin/AdminVehiclesTable";
 
 const AdminUserDetail = () => {
   const { id } = useParams();
@@ -32,6 +33,44 @@ const AdminUserDetail = () => {
       
       if (error) throw error;
       return data;
+    },
+    enabled: !!id,
+  });
+
+  // Fetch active boosted vehicles count
+  const { data: activeBoostedCount } = useQuery({
+    queryKey: ['admin-user-active-boosts', id],
+    queryFn: async () => {
+      const { count, error } = await adminClient
+        .from('vehicle_listings')
+        .select('id', { count: 'exact', head: true })
+        .eq('owner_id', id)
+        .eq('is_boosted', true)
+        .gt('boosted_until', new Date().toISOString());
+      
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!id,
+  });
+
+  // Fetch active bids count
+  const { data: activeBidsCount } = useQuery({
+    queryKey: ['admin-user-active-bids', id],
+    queryFn: async () => {
+      const { data, error } = await adminClient
+        .from('auction_bids')
+        .select('id, auction:auctions!inner(id, status)')
+        .eq('bidder_id', id);
+      
+      if (error) throw error;
+      
+      // Filter for active/scheduled auctions
+      const activeBids = data?.filter(bid => 
+        bid.auction && (bid.auction.status === 'active' || bid.auction.status === 'scheduled')
+      ) || [];
+      
+      return activeBids.length;
     },
     enabled: !!id,
   });
@@ -190,8 +229,8 @@ const AdminUserDetail = () => {
             <div className="flex items-center gap-2">
               <Car className="h-5 w-5 text-blue-500 flex-shrink-0" />
               <div className="text-right min-w-0">
-                <p className="text-[11px] text-white/70 hebrew-text">רכבים</p>
-                <p className="text-lg font-bold text-white">{vehicles?.length || 0}</p>
+                <p className="text-[11px] text-white/70 hebrew-text">רכבים פעילים</p>
+                <p className="text-lg font-bold text-white">{vehicles?.filter(v => v.status === 'available').length || 0}</p>
               </div>
             </div>
           </Card>
@@ -202,8 +241,8 @@ const AdminUserDetail = () => {
             <div className="flex items-center gap-2">
               <Gavel className="h-5 w-5 text-green-500 flex-shrink-0" />
               <div className="text-right min-w-0">
-                <p className="text-[11px] text-white/70 hebrew-text">מכרזים</p>
-                <p className="text-lg font-bold text-white">{auctions?.length || 0}</p>
+                <p className="text-[11px] text-white/70 hebrew-text">הצעות פעילות</p>
+                <p className="text-lg font-bold text-white">{activeBidsCount || 0}</p>
               </div>
             </div>
           </Card>
@@ -214,8 +253,8 @@ const AdminUserDetail = () => {
             <div className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-orange-500 flex-shrink-0" />
               <div className="text-right min-w-0">
-                <p className="text-[11px] text-white/70 hebrew-text">בוסטים</p>
-                <p className="text-lg font-bold text-white">{remainingBoosts ?? 0}</p>
+                <p className="text-[11px] text-white/70 hebrew-text">בוסטים פעילים</p>
+                <p className="text-lg font-bold text-white">{activeBoostedCount || 0}</p>
               </div>
             </div>
           </Card>
@@ -324,63 +363,10 @@ const AdminUserDetail = () => {
                 <CardTitle className="text-white hebrew-text text-lg">רכבים ({vehicles?.length || 0})</CardTitle>
               </CardHeader>
               <CardContent className="p-4 pt-0">
-                {vehicles && vehicles.length > 0 ? (
-                  <div className="rounded-md border border-gray-800">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-gray-800">
-                          <TableHead className="text-right text-white hebrew-text">יצרן</TableHead>
-                          <TableHead className="text-right text-white hebrew-text">דגם</TableHead>
-                          <TableHead className="text-right text-white hebrew-text">שנה</TableHead>
-                          <TableHead className="text-right text-white hebrew-text">מחיר</TableHead>
-                          <TableHead className="text-right text-white hebrew-text">סטטוס</TableHead>
-                          <TableHead className="text-right text-white hebrew-text">תאריך</TableHead>
-                          <TableHead className="text-right text-white hebrew-text">פעולות</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {vehicles.map((vehicle: any) => (
-                          <TableRow key={vehicle.id} className="border-gray-800">
-                            <TableCell className="font-medium text-white hebrew-text">{vehicle.make?.name_hebrew || '-'}</TableCell>
-                            <TableCell className="text-white hebrew-text">{vehicle.model?.name_hebrew || '-'}</TableCell>
-                            <TableCell className="font-medium text-white">{vehicle.year}</TableCell>
-                            <TableCell className="text-white">₪{vehicle.price?.toLocaleString()}</TableCell>
-                            <TableCell>
-                              <Badge variant={vehicle.status === 'available' ? 'default' : 'secondary'} className="text-xs">
-                                {vehicle.status === 'available' ? 'זמין' : 
-                                 vehicle.status === 'sold' ? 'נמכר' : 
-                                 vehicle.status === 'removed' ? 'הוסר' : 'לא זמין'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-sm text-white">{new Date(vehicle.created_at).toLocaleDateString('he-IL')}</TableCell>
-                            <TableCell>
-                              <div className="flex gap-2 justify-end">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}
-                                  className="btn-hover-cyan"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => navigate(`/admin/vehicles/${vehicle.id}/edit`)}
-                                  className="btn-hover-cyan"
-                                >
-                                  <Edit2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : (
-                  <p className="text-center text-white/70 hebrew-text py-6 text-sm">אין רכבים</p>
-                )}
+                <AdminVehiclesTable 
+                  vehicles={vehicles || []} 
+                  showOwner={false}
+                />
               </CardContent>
             </Card>
           </GradientBorderContainer>
