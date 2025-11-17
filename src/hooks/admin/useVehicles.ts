@@ -130,9 +130,25 @@ export const useAdminVehicles = () => {
 
   const updateVehicleMutation = useMutation({
     mutationFn: async ({ vehicleId, vehicleData }: { vehicleId: string; vehicleData: any }) => {
-      const { data, error } = await adminClient.functions.invoke('admin-update-vehicle', {
-        body: { vehicleId, vehicleData },
-      });
+      // Validate engine size
+      if (vehicleData.engine_size !== undefined && vehicleData.engine_size !== null) {
+        const engineSize = parseFloat(vehicleData.engine_size);
+        if (engineSize >= 100) {
+          throw new Error('נפח מנוע חייב להיות קטן מ-100 ליטר');
+        }
+      }
+
+      // Update vehicle directly using adminClient
+      const { data, error } = await adminClient
+        .from('vehicle_listings')
+        .update(vehicleData)
+        .eq('id', vehicleId)
+        .select(`
+          *,
+          make:vehicle_makes(id, name_hebrew, name_english),
+          model:vehicle_models(id, name_hebrew, name_english)
+        `)
+        .single();
 
       if (error) throw error;
       return data;

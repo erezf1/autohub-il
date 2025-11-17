@@ -89,7 +89,11 @@ const AdminEditVehicle = () => {
 
   // Pre-populate form when vehicle data loads
   useEffect(() => {
-    if (vehicle) {
+    if (vehicle && vehicle.make_id) {
+      // Set make ID first to trigger model loading
+      setSelectedMakeId(vehicle.make_id);
+      
+      // Then set all form data
       setFormData({
         make_id: vehicle.make_id?.toString() || "",
         model_id: vehicle.model_id?.toString() || "",
@@ -107,7 +111,6 @@ const AdminEditVehicle = () => {
         hadSevereCrash: vehicle.had_severe_crash || false,
         testResultFileUrl: vehicle.test_result_file_url || "",
       });
-      setSelectedMakeId(vehicle.make_id);
       setUploadedImages(vehicle.images || []);
       setSelectedTags(vehicle.tags?.map((t: any) => t.id) || []);
     }
