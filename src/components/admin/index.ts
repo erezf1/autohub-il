@@ -6,3 +6,4 @@ export * from './AdminVehicleFilterBar';
 export * from './AdminFilterButton';
 export * from './AdminResultsCount';
 export * from './AdminActiveFiltersDisplay';
+export * from './AdminVehiclesTable';
