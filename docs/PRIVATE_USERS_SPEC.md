@@ -22,7 +22,7 @@ Required fields in `private_users` table:
 - `phone_number` (TEXT, NOT NULL) - 10-digit Israeli phone
 - `full_name` (TEXT, NOT NULL) - User's full name
 - `location_id` (INTEGER) - References locations table
-- `status` (TEXT) - Values: `pending`, `active`, `suspended`, `rejected`
+- `status` (TEXT) - Values: `active`, `suspended`, `rejected` (NO `pending` - users are active immediately)
 - `created_at` (TIMESTAMP)
 - `updated_at` (TIMESTAMP)
 
@@ -35,18 +35,35 @@ Required fields in `private_users` table:
 - **Provider:** 019sms.co.il (future integration)
 - **Mock OTP:** `9876` (used until real SMS integration)
 - **No Password:** Private users authenticate ONLY via OTP
+- **No Admin Approval:** Users become `active` immediately after OTP verification
 
-### 2.2 Authentication Screens
+### 2.2 Registration Flow (New Users)
+1. User enters: Full Name, Phone Number, Location
+2. System sends OTP (mock: `9876`)
+3. User enters OTP on `/private/otp-verify`
+4. **AFTER OTP verification:** User account is created with `status = 'active'`
+5. User is automatically logged in and redirected to `/private/dashboard`
+
+### 2.3 Login Flow (Existing Users)
+1. User enters: Phone Number
+2. System sends OTP (mock: `9876`)
+3. User enters OTP on `/private/otp-verify`
+4. User is logged in and redirected to `/private/dashboard`
+
+### 2.4 Authentication Screens
 1. **Private Welcome Screen** (`/private`) - Entry point from landing page
-2. **Private Login Screen** (`/private/login`) - Phone input + OTP request
-3. **OTP Verification Screen** (`/private/otp-verify`) - REUSED from dealers, context-aware
-4. **Private Registration Screen** (`/private/register`) - Name + Phone + Location
+2. **Private Login Screen** (`/private/login`) - Phone input only
+3. **Private Registration Screen** (`/private/register`) - Name + Phone + Location
+4. **OTP Verification Screen** (`/private/otp-verify`) - Context-aware OTP entry
+   - Handles both registration (creates user) and login (signs in existing user)
+   - Uses location state to determine flow
 
-### 2.3 Authentication Context
+### 2.5 Authentication Context
 - **Separate Context:** `PrivateAuthContext` (independent from dealer auth)
 - **Separate Client:** `privateClient` with storage key `private-auth`
 - **Session Persistence:** localStorage with private-specific key
 - **Auto-redirect:** Logged-in users redirected to `/private/dashboard`
+- **signUp():** Called AFTER OTP verification with user data
 
 ---
 
@@ -163,7 +180,7 @@ CREATE TABLE public.private_users (
   phone_number TEXT NOT NULL UNIQUE,
   full_name TEXT NOT NULL,
   location_id INTEGER REFERENCES public.locations(id),
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'suspended', 'rejected')),
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'rejected')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -275,8 +292,7 @@ USING (
 
 ### 7.2 Admin Features
 - View all private users with status filter
-- Approve/reject pending private users
-- Suspend/activate private users
+- Suspend/activate private users (no approval needed - users are active immediately)
 - View user's vehicle listings
 - Delete user vehicles if needed
 - Access user contact information

@@ -22,9 +22,8 @@ export const PrivateRegisterScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [locationId, setLocationId] = useState<string>('');
   const [locations, setLocations] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, signUp } = usePrivateAuth();
+  const { user } = usePrivateAuth();
   const { toast } = useToast();
 
   // Redirect if already logged in
@@ -63,26 +62,19 @@ export const PrivateRegisterScreen: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
+    // Don't create user yet - just navigate to OTP verification
+    // User will be created AFTER OTP is verified
+    toast({
+      title: 'קוד אימות נשלח',
+      description: `נשלח קוד אימות ל-${formatPhoneDisplay(phoneNumber)}`,
+    });
 
-    const { error } = await signUp(phoneNumber, fullName, parseInt(locationId));
-
-    setIsLoading(false);
-
-    if (error) {
-      toast({
-        title: 'שגיאה',
-        description: error.message || 'אירעה שגיאה בהרשמה',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Navigate to OTP verification
     navigate('/private/otp-verify', { 
       state: { 
-        phoneNumber: formatPhoneDisplay(phoneNumber),
-        isRegister: true 
+        phone: phoneNumber,
+        fullName,
+        locationId: parseInt(locationId),
+        isRegistration: true
       } 
     });
   };
@@ -173,12 +165,11 @@ export const PrivateRegisterScreen: React.FC = () => {
 
             <Button
               type="submit"
-              disabled={isLoading}
               className="w-full gap-2"
               size="lg"
             >
               <UserPlus className="w-4 h-4" />
-              {isLoading ? 'נרשם...' : 'הרשמה'}
+              המשך
             </Button>
           </form>
 

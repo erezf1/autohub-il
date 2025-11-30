@@ -50,11 +50,16 @@ export const PrivateLoginScreen: React.FC = () => {
       return;
     }
 
+    toast({
+      title: 'קוד נשלח',
+      description: `נשלח קוד אימות ל-${formatPhoneDisplay(phoneNumber)}`,
+    });
+
     // Navigate to OTP verification
     navigate('/private/otp-verify', { 
       state: { 
-        phoneNumber: formatPhoneDisplay(phoneNumber),
-        isRegister: false 
+        phone: phoneNumber,
+        isRegistration: false 
       } 
     });
   };
