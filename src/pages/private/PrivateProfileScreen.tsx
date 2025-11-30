@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Phone, MapPin, Calendar } from 'lucide-react';
+import { Edit, Phone, MapPin, Calendar, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { PageContainer } from '@/components/common/PageContainer';
-import { PageHeader } from '@/components/common/PageHeader';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { privateClient } from '@/integrations/supabase/privateClient';
 import { usePrivateAuth } from '@/contexts/PrivateAuthContext';
@@ -47,23 +45,23 @@ export const PrivateProfileScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <PageContainer>
+      <div className="min-h-screen bg-background pb-20" dir="rtl">
         <div className="flex items-center justify-center min-h-[50vh]">
           <LoadingSpinner />
         </div>
-      </PageContainer>
+      </div>
     );
   }
 
   if (!profile) {
     return (
-      <PageContainer>
-        <div className="p-4">
+      <div className="min-h-screen bg-background pb-20" dir="rtl">
+        <div className="container max-w-md mx-auto p-4">
           <Card className="p-8 text-center">
             <p className="text-muted-foreground">לא נמצא פרופיל</p>
           </Card>
         </div>
-      </PageContainer>
+      </div>
     );
   }
 
@@ -77,27 +75,35 @@ export const PrivateProfileScreen: React.FC = () => {
   const statusInfo = statusMap[profile.status as keyof typeof statusMap] || statusMap.pending;
 
   return (
-    <PageContainer>
-      <PageHeader 
-        title={
-          <div className="space-y-1">
-            <div>הפרופיל שלי</div>
-            <div className="text-sm font-normal text-muted-foreground">פרטים אישיים</div>
+    <div className="min-h-screen bg-background pb-20" dir="rtl">
+      <div className="container max-w-md mx-auto p-4 space-y-6">
+        {/* Header with Back Button */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/private/dashboard')}
+            >
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">הפרופיל שלי</h1>
+              <p className="text-sm text-muted-foreground">פרטים אישיים</p>
+            </div>
           </div>
-        }
-        rightAction={
           <Button
             onClick={() => navigate('/private/profile/edit')}
             variant="outline"
+            size="sm"
             className="gap-2"
           >
             <Edit className="w-4 h-4" />
             ערוך
           </Button>
-        }
-      />
+        </div>
 
-      <div className="p-4 space-y-4">
+        <div className="space-y-4">
         {/* Status Card */}
         {profile.status !== 'active' && (
           <Card className="p-4 bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800">
@@ -163,7 +169,8 @@ export const PrivateProfileScreen: React.FC = () => {
             💡 משתמשים פרטיים יכולים להעלות עד 3 רכבים למכירה בו זמנית
           </p>
         </Card>
+        </div>
       </div>
-    </PageContainer>
+    </div>
   );
 };
