@@ -160,8 +160,8 @@ export default function PrivateOTPVerificationScreen() {
           </p>
         </div>
 
-        {/* OTP Input - Numbers typed left-to-right in Hebrew */}
-        <div className="flex justify-center py-6">
+        {/* OTP Input - Numbers typed left-to-right */}
+        <div className="flex justify-center py-6" dir="ltr">
           <InputOTP
             maxLength={4}
             value={otpValue}

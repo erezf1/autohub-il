@@ -80,6 +80,7 @@ import { PrivateDashboardScreen } from "./pages/private/PrivateDashboardScreen";
 import { PrivateMyVehiclesScreen } from "./pages/private/PrivateMyVehiclesScreen";
 import { PrivateProfileScreen } from "./pages/private/PrivateProfileScreen";
 import { PrivateProfileEditScreen } from "./pages/private/PrivateProfileEditScreen";
+import PrivateAddVehicleScreen from "./pages/private/PrivateAddVehicleScreen";
 
 const queryClient = new QueryClient();
 
@@ -141,7 +142,7 @@ const App = () => (
           }>
             <Route path="dashboard" element={<PrivateDashboardScreen />} />
             <Route path="my-vehicles" element={<PrivateMyVehiclesScreen />} />
-            <Route path="add-vehicle" element={<AddVehicleScreen />} />
+            <Route path="add-vehicle" element={<PrivateAddVehicleScreen />} />
             <Route path="edit-vehicle/:id" element={<EditVehicleScreen />} />
             <Route path="vehicle/:id" element={<VehicleDetailScreen />} />
             <Route path="profile" element={<PrivateProfileScreen />} />
