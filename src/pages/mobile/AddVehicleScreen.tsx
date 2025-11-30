@@ -116,9 +116,7 @@ const AddVehicleScreen = () => {
         if (!formData.condition) errors.condition = "מצב הרכב הוא שדה חובה";
         break;
       case 4:
-        if (!formData.description || formData.description.trim().length < 10) {
-          errors.description = "תיאור חייב להכיל לפחות 10 תווים";
-        }
+        // Description is optional
         break;
     }
     
