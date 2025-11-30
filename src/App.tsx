@@ -75,6 +75,7 @@ import { PrivateLayout } from "./components/private/PrivateLayout";
 import { PrivateWelcomeScreen } from "./pages/private/PrivateWelcomeScreen";
 import { PrivateLoginScreen } from "./pages/private/PrivateLoginScreen";
 import { PrivateRegisterScreen } from "./pages/private/PrivateRegisterScreen";
+import PrivateOTPVerificationScreen from "./pages/private/PrivateOTPVerificationScreen";
 import { PrivateDashboardScreen } from "./pages/private/PrivateDashboardScreen";
 import { PrivateMyVehiclesScreen } from "./pages/private/PrivateMyVehiclesScreen";
 import { PrivateProfileScreen } from "./pages/private/PrivateProfileScreen";
@@ -130,7 +131,7 @@ const App = () => (
           <Route path="/private" element={<PrivateWelcomeScreen />} />
           <Route path="/private/login" element={<PrivateLoginScreen />} />
           <Route path="/private/register" element={<PrivateRegisterScreen />} />
-          <Route path="/private/otp-verify" element={<OTPVerificationScreen />} />
+          <Route path="/private/otp-verify" element={<PrivateOTPVerificationScreen />} />
 
           {/* Private User Protected Routes */}
           <Route path="/private/*" element={
