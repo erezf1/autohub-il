@@ -17,6 +17,7 @@ interface VehicleCardProps {
   hotSalePrice?: number | string | null;
   isBoosted?: boolean;
   boostedUntil?: string | null;
+  isPrivateListing?: boolean;
   onClick: () => void;
 }
 
@@ -32,6 +33,7 @@ export const VehicleCard = ({
   hotSalePrice,
   isBoosted,
   boostedUntil,
+  isPrivateListing,
   onClick,
 }: VehicleCardProps) => {
   const transmissionLabel = transmission === 'automatic' ? 'אוטומט' : 
@@ -70,6 +72,11 @@ export const VehicleCard = ({
               {isHotSale && (
                 <Badge className="absolute top-2 left-2 bg-orange-500">
                   🔥 Hot Sale
+                </Badge>
+              )}
+              {isPrivateListing && (
+                <Badge className="absolute top-2 right-2 bg-purple-600 text-white">
+                  מפרטי
                 </Badge>
               )}
             </div>
