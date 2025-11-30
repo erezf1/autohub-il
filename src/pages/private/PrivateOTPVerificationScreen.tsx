@@ -162,18 +162,18 @@ export default function PrivateOTPVerificationScreen() {
           </p>
         </div>
 
-        {/* OTP Input - RTL layout but LTR input for numbers */}
-        <div className="flex justify-center py-6" dir="rtl">
+        {/* OTP Input - Numbers typed left-to-right in Hebrew */}
+        <div className="flex justify-center py-6">
           <InputOTP
             maxLength={4}
             value={otpValue}
             onChange={(value) => setOtpValue(value)}
           >
-            <InputOTPGroup className="flex-row-reverse">
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={1} />
+            <InputOTPGroup>
               <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+              <InputOTPSlot index={3} />
             </InputOTPGroup>
           </InputOTP>
         </div>
