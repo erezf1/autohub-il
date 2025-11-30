@@ -57,27 +57,25 @@ export const PrivateDashboardScreen: React.FC = () => {
   return (
     <div className="min-h-screen bg-background pb-20" dir="rtl">
       <div className="container max-w-md mx-auto p-4 space-y-6">
-        {/* User Profile Header */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h2 className="font-semibold text-lg">{userName || 'טוען...'}</h2>
-                <p className="text-sm text-muted-foreground">משתמש פרטי</p>
-              </div>
+        {/* Simple Top Bar with User Profile */}
+        <div className="flex items-center justify-between py-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <User className="w-5 h-5 text-primary" />
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/private/profile')}
-            >
-              עריכה
-            </Button>
+            <div>
+              <h2 className="font-semibold">{userName || 'טוען...'}</h2>
+              <p className="text-xs text-muted-foreground">משתמש פרטי</p>
+            </div>
           </div>
-        </Card>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/private/profile')}
+          >
+            עריכה
+          </Button>
+        </div>
 
         {/* My Cars Section */}
         <div className="space-y-4">
@@ -87,6 +85,18 @@ export const PrivateDashboardScreen: React.FC = () => {
               {vehicles.length} / 3
             </span>
           </div>
+
+          {/* Add Vehicle Button - Above list */}
+          {canAddVehicle && (
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={() => navigate('/private/add-vehicle')}
+            >
+              <Plus className="w-5 h-5 ml-2" />
+              הוסף רכב למכירה
+            </Button>
+          )}
 
           {/* Vehicle Cards */}
           {vehicles.length > 0 ? (
@@ -129,18 +139,6 @@ export const PrivateDashboardScreen: React.FC = () => {
               <Car className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
               <p className="text-muted-foreground mb-4">עדיין לא הוספת רכבים</p>
             </Card>
-          )}
-
-          {/* Add Vehicle Button */}
-          {canAddVehicle && (
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={() => navigate('/private/add-vehicle')}
-            >
-              <Plus className="w-5 h-5 ml-2" />
-              הוסף רכב למכירה
-            </Button>
           )}
 
           {/* Max Vehicles Warning */}

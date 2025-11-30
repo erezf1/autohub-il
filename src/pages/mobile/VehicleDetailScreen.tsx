@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { MessageCircle, Phone, Star, MapPin, Calendar, Gauge, ChevronLeft, ChevronRight, Loader2, Edit, Flame } from "lucide-react";
 import { SuperArrowsIcon } from "@/components/common/SuperArrowsIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,24 +10,32 @@ import { GradientBorderContainer } from "@/components/ui/gradient-border-contain
 import { GradientSeparator } from "@/components/ui/gradient-separator";
 import { useQuery } from '@tanstack/react-query';
 import { dealerClient } from '@/integrations/supabase/dealerClient';
+import { privateClient } from '@/integrations/supabase/privateClient';
 import darkCarImage from "@/assets/dark_car.png";
 import { useState } from "react";
 import { getVehicleTypeLabel } from "@/constants/vehicleTypes";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePrivateAuth } from "@/contexts/PrivateAuthContext";
 import { DealerCard, VehicleSpecsCard } from "@/components/common";
 import { useConversationForEntity } from "@/hooks/mobile";
 
 const VehicleDetailScreen = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  const { user: privateUser } = usePrivateAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Determine if user is private based on route
+  const isPrivateUser = location.pathname.startsWith('/private');
 
-  // Fetch vehicle data
+  // Fetch vehicle data - use appropriate client
   const { data: vehicle, isLoading } = useQuery({
-    queryKey: ['vehicle-detail', id],
+    queryKey: ['vehicle-detail', id, isPrivateUser],
     queryFn: async () => {
-      const { data, error } = await dealerClient
+      const client = isPrivateUser ? privateClient : dealerClient;
+      const { data, error } = await client
         .from('vehicle_listings')
         .select(`
           *,
@@ -133,8 +141,11 @@ const VehicleDetailScreen = () => {
   }
 
   const images = vehicle.images || [darkCarImage];
-  const isOwnVehicle = vehicle?.owner_id === user?.id;
-  const transmissionLabel = vehicle.transmission === 'automatic' ? 'אוטומט' : 
+  // Check ownership based on user type
+  const isOwnVehicle = isPrivateUser 
+    ? vehicle?.private_user_id === privateUser?.id 
+    : vehicle?.owner_id === user?.id;
+  const transmissionLabel = vehicle.transmission === 'automatic' ? 'אוטומט' :
                            vehicle.transmission === 'manual' ? 'ידנית' : 
                            vehicle.transmission === 'semi_automatic' ? 'טיפטרוניק' : '-';
   const fuelLabel = vehicle.fuel_type === 'gasoline' ? 'בנזין' :
@@ -145,8 +156,8 @@ const VehicleDetailScreen = () => {
                      vehicle.status === 'sold' ? 'נמכר' : 'לא פעיל';
 
   return (
-    <div className="w-full" dir="rtl">
-      <div className="container max-w-md mx-auto space-y-4">
+    <div className="w-full min-h-screen pb-24" dir="rtl">
+      <div className="container max-w-md mx-auto space-y-4 p-4">
           {/* Header with Back Button */}
           <div className="flex items-center space-x-3 space-x-reverse">
             <div 
@@ -389,9 +400,18 @@ const VehicleDetailScreen = () => {
 
       {/* Conditional Actions Based on Ownership */}
       {isOwnVehicle ? (
-        <GradientBorderContainer className="rounded-md flex-1">
-          <Card className="bg-black border-0">
-            <CardContent className="p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 z-10">
+          <div className="container max-w-md mx-auto">
+            {isPrivateUser ? (
+              <Button 
+                className="w-full"
+                size="lg"
+                onClick={() => navigate(`/private/edit-vehicle/${id}`)}
+              >
+                <Edit className="h-4 w-4 ml-2" />
+                ערוך רכב
+              </Button>
+            ) : (
               <div className="flex gap-2">
                 <GradientBorderContainer className="rounded-md flex-1">
                   <Button 
@@ -413,9 +433,9 @@ const VehicleDetailScreen = () => {
                   </Button>
                 </GradientBorderContainer>
               </div>
-            </CardContent>
-          </Card>
-        </GradientBorderContainer>
+            )}
+          </div>
+        </div>
       ) : (
         vehicle.owner_id && (
           <DealerCard
