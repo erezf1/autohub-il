@@ -69,6 +69,8 @@ import AdminAuctionDetail from "./pages/admin/AdminAuctionDetail";
 import AdminSupportTicketDetail from "./pages/admin/AdminSupportTicketDetail";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import EditVehicleScreen from "./pages/mobile/EditVehicleScreen";
+import AdminPrivateUsersList from "./pages/admin/AdminPrivateUsersList";
+import AdminPrivateUserDetail from "./pages/admin/AdminPrivateUserDetail";
 
 // Private User Layout and Pages
 import { PrivateLayout } from "./components/private/PrivateLayout";
@@ -111,6 +113,8 @@ const App = () => (
                     <Route path="users/create" element={<AdminCreateUser />} />
                     <Route path="users/:id" element={<AdminUserDetail />} />
                     <Route path="users/:id/edit" element={<AdminEditUser />} />
+                    <Route path="private-users" element={<AdminPrivateUsersList />} />
+                    <Route path="private-users/:id" element={<AdminPrivateUserDetail />} />
                     <Route path="vehicles" element={<AdminVehiclesList />} />
                     <Route path="vehicles/create" element={<AdminAddVehicle />} />
                     <Route path="vehicles/:id" element={<AdminVehicleDetail />} />

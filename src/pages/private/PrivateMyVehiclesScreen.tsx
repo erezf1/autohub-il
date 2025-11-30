@@ -118,6 +118,7 @@ export const PrivateMyVehiclesScreen: React.FC = () => {
                   hotSalePrice={vehicle.hot_sale_price}
                   isBoosted={vehicle.is_boosted}
                   boostedUntil={vehicle.boosted_until}
+                  isPrivateListing={vehicle.is_private_listing}
                   onClick={() => navigate(`/private/vehicle/${vehicle.id}`)}
                 />
               ))}

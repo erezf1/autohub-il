@@ -6,3 +6,4 @@ export * from './useAdminNotificationActions';
 export * from './useAdminUnreadCount';
 export * from './useDashboardStats';
 export * from './useSupportTickets';
+export * from './usePrivateUsers';

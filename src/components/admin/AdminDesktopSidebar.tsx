@@ -37,6 +37,12 @@ const adminNavItems = [
     description: "סוחרים ומשתמשים"
   },
   { 
+    title: "משתמשים פרטיים", 
+    url: "/admin/private-users", 
+    icon: Users,
+    description: "מוכרים פרטיים"
+  },
+  { 
     title: "ניהול רכבים", 
     url: "/admin/vehicles", 
     icon: Car,

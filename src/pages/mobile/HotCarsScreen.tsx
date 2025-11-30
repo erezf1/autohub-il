@@ -104,6 +104,7 @@ export const HotCarsScreen = () => {
                 hotSalePrice={car.hot_sale_price}
                 isBoosted={car.is_boosted}
                 boostedUntil={car.boosted_until}
+                isPrivateListing={car.is_private_listing}
                 onClick={() => navigate(`/mobile/vehicle/${car.id}`)}
               />
             );
