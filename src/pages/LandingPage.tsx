@@ -31,7 +31,7 @@ const LandingPage = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-16 flex-1">
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           
           {/* Mobile Interface Card */}
           <GradientBorderContainer
@@ -76,11 +76,54 @@ const LandingPage = () => {
             </Card>
           </GradientBorderContainer>
 
+          {/* Private User Interface Card */}
+          <GradientBorderContainer
+            className="rounded-md flex-1"
+          >
+            <Card className="border-0 bg-black hover:shadow-xl transition-shadow duration-300">
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-purple-400" />
+                </div>
+                <CardTitle className="text-2xl hebrew-text text-white">משתמש פרטי</CardTitle>
+                <CardDescription className="text-base hebrew-text text-gray-300">
+                  עבור מוכרי רכבים פרטיים
+                </CardDescription>
+              </CardHeader>
+              <div className="border-t border-gray-700/50 mx-4"></div>
+              <CardContent className="space-y-4 pt-4">
+                <div className="space-y-3 hebrew-text">
+                  <div className="flex items-center gap-3">
+                    <Car className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                    <span className="text-sm text-gray-300">העלה עד 3 רכבים למכירה</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Users className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                    <span className="text-sm text-gray-300">חשיפה לסוחרים רבים</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Smartphone className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                    <span className="text-sm text-gray-300">שירות חינמי לחלוטין</span>
+                  </div>
+                </div>
+                
+                <Button 
+                  className="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white" 
+                  size="lg"
+                  onClick={() => navigate('/private')}
+                >
+                  <Users className="w-5 h-5 ml-2" />
+                  <span className="hebrew-text">כניסה למשתמש פרטי</span>
+                </Button>
+              </CardContent>
+            </Card>
+          </GradientBorderContainer>
+
           {/* Admin Interface Card */}
           <GradientBorderContainer
             className="rounded-md flex-1"
           >
-            <Card className="border-0 bg-black hover:shadow-xl transition-shadow duration-300 ">
+            <Card className="border-0 bg-black hover:shadow-xl transition-shadow duration-300">
               <CardHeader className="text-center pb-4">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Monitor className="w-8 h-8 text-blue-400" />

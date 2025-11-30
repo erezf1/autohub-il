@@ -5,8 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import { PrivateAuthProvider } from "@/contexts/PrivateAuthContext";
 import { ProtectedRoute } from "@/components/mobile/ProtectedRoute";
 import ProtectedAdminRoute from "@/components/admin/ProtectedAdminRoute";
+import { ProtectedPrivateRoute } from "@/components/private/ProtectedPrivateRoute";
 
 // Landing Page
 import LandingPage from "./pages/LandingPage";
@@ -68,17 +70,28 @@ import AdminSupportTicketDetail from "./pages/admin/AdminSupportTicketDetail";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import EditVehicleScreen from "./pages/mobile/EditVehicleScreen";
 
+// Private User Layout and Pages
+import { PrivateLayout } from "./components/private/PrivateLayout";
+import { PrivateWelcomeScreen } from "./pages/private/PrivateWelcomeScreen";
+import { PrivateLoginScreen } from "./pages/private/PrivateLoginScreen";
+import { PrivateRegisterScreen } from "./pages/private/PrivateRegisterScreen";
+import { PrivateDashboardScreen } from "./pages/private/PrivateDashboardScreen";
+import { PrivateMyVehiclesScreen } from "./pages/private/PrivateMyVehiclesScreen";
+import { PrivateProfileScreen } from "./pages/private/PrivateProfileScreen";
+import { PrivateProfileEditScreen } from "./pages/private/PrivateProfileEditScreen";
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <AdminAuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
+        <PrivateAuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
             {/* Landing Page */}
             <Route path="/" element={<LandingPage />} />
 
@@ -113,7 +126,28 @@ const App = () => (
               </ProtectedAdminRoute>
             } />
 
-          {/* Auth routes without layout */}
+          {/* Private User Auth Routes - Not Protected */}
+          <Route path="/private" element={<PrivateWelcomeScreen />} />
+          <Route path="/private/login" element={<PrivateLoginScreen />} />
+          <Route path="/private/register" element={<PrivateRegisterScreen />} />
+          <Route path="/private/otp-verify" element={<OTPVerificationScreen />} />
+
+          {/* Private User Protected Routes */}
+          <Route path="/private/*" element={
+            <ProtectedPrivateRoute>
+              <PrivateLayout />
+            </ProtectedPrivateRoute>
+          }>
+            <Route path="dashboard" element={<PrivateDashboardScreen />} />
+            <Route path="my-vehicles" element={<PrivateMyVehiclesScreen />} />
+            <Route path="add-vehicle" element={<AddVehicleScreen />} />
+            <Route path="edit-vehicle/:id" element={<EditVehicleScreen />} />
+            <Route path="vehicle/:id" element={<VehicleDetailScreen />} />
+            <Route path="profile" element={<PrivateProfileScreen />} />
+            <Route path="profile/edit" element={<PrivateProfileEditScreen />} />
+          </Route>
+
+          {/* Dealer Auth routes without layout */}
           <Route path="/mobile" element={<WelcomeScreen />} />
           <Route path="/mobile/welcome" element={<WelcomeScreen />} />
           <Route path="/mobile/register" element={<RegisterScreen />} />
@@ -162,9 +196,10 @@ const App = () => (
               </MobileLayout>
             </ProtectedRoute>
           } />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+        </PrivateAuthProvider>
       </AdminAuthProvider>
     </AuthProvider>
   </QueryClientProvider>
