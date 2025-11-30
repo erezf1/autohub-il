@@ -63,11 +63,13 @@ export const PrivateAuthProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       const cleanedPhone = cleanPhoneNumber(phone);
       const email = phoneToEmail(cleanedPhone);
+      // Use consistent password based on phone number (not timestamp!)
+      const password = `private_user_${cleanedPhone}`;
 
-      // Sign up with mock password (OTP-based, no real password needed)
+      // Sign up with consistent password (OTP-based, no real password needed)
       const { data, error } = await privateClient.auth.signUp({
         email,
-        password: `temp_${cleanedPhone}_${Date.now()}`, // Temporary password
+        password,
         options: {
           data: {
             phone_number: cleanedPhone,
@@ -134,17 +136,16 @@ export const PrivateAuthProvider: React.FC<{ children: React.ReactNode }> = ({ c
         };
       }
 
-      // For existing users, sign in with the temporary password pattern
+      // For existing users, sign in with consistent password
+      // Use same password pattern as signup!
+      const password = `private_user_${cleanedPhone}`;
+      
       const { data, error } = await privateClient.auth.signInWithPassword({
         email,
-        password: `temp_${cleanedPhone}_${Date.now()}`, // This won't work for existing users
+        password,
       });
 
-      // If password doesn't match, try to get the user another way
-      // In production with real OTP, we'd use a custom token from edge function
       if (error) {
-        // For now, we'll need to handle this differently
-        // In production: exchange OTP for session token via edge function
         console.error('OTP verification error:', error);
         return { error };
       }
