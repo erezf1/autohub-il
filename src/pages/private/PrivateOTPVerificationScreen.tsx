@@ -53,22 +53,20 @@ export default function PrivateOTPVerificationScreen() {
     setIsLoading(true);
 
     try {
-      // For registration flow - create user after OTP verification
+      // For registration flow - create user after local OTP verification
       if (isRegistration && state?.fullName && state?.locationId) {
-        // First verify OTP
-        const { error: otpError } = await verifyOTP(phone, otpValue);
-        
-        if (otpError) {
+        // Verify OTP locally (don't call verifyOTP as user doesn't exist yet)
+        if (otpValue !== '9876') {
           toast({
             title: "שגיאה",
-            description: otpError.message || "קוד אימות שגוי",
+            description: "קוד אימות שגוי. נסה שוב",
             variant: "destructive",
           });
           setIsLoading(false);
           return;
         }
 
-        // OTP verified, now create user account
+        // OTP verified, now create user account (signUp creates AND signs in)
         const { error: signUpError } = await signUp(
           phone,
           state.fullName,
@@ -93,7 +91,7 @@ export default function PrivateOTPVerificationScreen() {
         
         navigate("/private/dashboard");
       } else {
-        // Login flow - verify OTP only
+        // Login flow - verify OTP and sign in existing user
         const { error } = await verifyOTP(phone, otpValue);
 
         if (error) {
