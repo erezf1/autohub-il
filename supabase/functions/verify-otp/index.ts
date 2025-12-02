@@ -27,7 +27,7 @@ serve(async (req) => {
     // Validate code format (6 digits)
     if (!/^\d{6}$/.test(code)) {
       return new Response(
-        JSON.stringify({ success: false, error: 'קוד אימות שגוי', errorCode: 1 }),
+        JSON.stringify({ success: false, error: 'קוד אימות לא תקין' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -42,28 +42,32 @@ serve(async (req) => {
       );
     }
 
-    // Build the verification API URL
-    const apiUrl = new URL('https://019sms.co.il/api');
-    apiUrl.searchParams.set('check', 'otp');
-    apiUrl.searchParams.set('user', username);
-    apiUrl.searchParams.set('destination', cleanPhone);
-    apiUrl.searchParams.set('code', code);
+    // 019sms API requires POST with JSON body
+    const requestBody = {
+      validate_otp: {
+        user: {
+          username: username
+        },
+        phone: cleanPhone,
+        code: parseInt(code)
+      }
+    };
 
     console.log(`Verifying OTP for ${cleanPhone}...`);
     
-    const response = await fetch(apiUrl.toString());
-    const responseText = await response.text();
+    const response = await fetch('https://019sms.co.il/api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
     
-    console.log(`019sms verify response: ${responseText}`);
+    const responseData = await response.json();
+    console.log('019sms verify response:', JSON.stringify(responseData));
 
-    // Parse the response code
-    // 0 = Success
-    // 1 = Invalid code
-    // 2 = Expired
-    // 3 = Max tries exceeded
-    const responseCode = parseInt(responseText.trim(), 10);
-
-    if (responseCode === 0) {
+    // Status codes: 0=success, 1=invalid code, 2=expired, 3=max tries exceeded
+    if (responseData.status === 0 || responseData.status === '0') {
       return new Response(
         JSON.stringify({ success: true, message: 'קוד אומת בהצלחה' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -71,20 +75,19 @@ serve(async (req) => {
     }
 
     // Map error codes to Hebrew messages
-    const errorMessages: Record<number, string> = {
-      1: 'קוד אימות שגוי',
-      2: 'פג תוקף הקוד',
-      3: 'נוצלו כל הניסיונות. נסה לשלוח קוד חדש',
-    };
-
-    const errorMessage = errorMessages[responseCode] || 'שגיאה באימות הקוד';
+    let errorMessage = 'קוד אימות שגוי';
+    const status = parseInt(responseData.status);
+    
+    if (status === 1) {
+      errorMessage = 'קוד אימות שגוי';
+    } else if (status === 2) {
+      errorMessage = 'הקוד פג תוקף. בקש קוד חדש';
+    } else if (status === 3) {
+      errorMessage = 'חרגת ממספר הניסיונות. בקש קוד חדש';
+    }
 
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: errorMessage,
-        errorCode: responseCode 
-      }),
+      JSON.stringify({ success: false, error: errorMessage }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
