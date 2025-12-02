@@ -32,9 +32,10 @@ serve(async (req) => {
       );
     }
 
-    const token = Deno.env.get('SMS_019_TOKEN');
+    const username = Deno.env.get('SMS_019_USERNAME');
+    const password = Deno.env.get('SMS_019_PASS');
     
-    if (!token) {
+    if (!username || !password) {
       console.error('SMS credentials not configured');
       return new Response(
         JSON.stringify({ success: false, error: 'שירות SMS לא מוגדר' }),
@@ -46,7 +47,8 @@ serve(async (req) => {
     const requestBody = {
       validate_otp: {
         user: {
-          token: token
+          username: username,
+          password: password
         },
         phone: cleanPhone,
         code: parseInt(code)
