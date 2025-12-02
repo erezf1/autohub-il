@@ -9,6 +9,7 @@ import { PrivateAuthProvider } from "@/contexts/PrivateAuthContext";
 import { ProtectedRoute } from "@/components/mobile/ProtectedRoute";
 import ProtectedAdminRoute from "@/components/admin/ProtectedAdminRoute";
 import { ProtectedPrivateRoute } from "@/components/private/ProtectedPrivateRoute";
+import { useSubdomainRedirect } from "@/hooks/useSubdomainRedirect";
 
 // Landing Page
 import LandingPage from "./pages/LandingPage";
@@ -86,6 +87,12 @@ import PrivateAddVehicleScreen from "./pages/private/PrivateAddVehicleScreen";
 
 const queryClient = new QueryClient();
 
+// Component to handle subdomain redirect (must be inside BrowserRouter)
+const SubdomainRedirectHandler = ({ children }: { children: React.ReactNode }) => {
+  useSubdomainRedirect();
+  return <>{children}</>;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -95,6 +102,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <SubdomainRedirectHandler>
               <Routes>
             {/* Landing Page */}
             <Route path="/" element={<LandingPage />} />
@@ -203,6 +211,7 @@ const App = () => (
             </ProtectedRoute>
           } />
             </Routes>
+              </SubdomainRedirectHandler>
           </BrowserRouter>
         </TooltipProvider>
         </PrivateAuthProvider>
