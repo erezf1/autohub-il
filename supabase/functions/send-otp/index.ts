@@ -42,50 +42,50 @@ serve(async (req) => {
       );
     }
 
-    // 019sms API configuration
-    const source = '0555502266';
-    const message = 'קוד הכניסה שלך למערכת DEALERS הוא [code]';
-    const validTime = 5; // minutes
-    const maxTries = 3;
-    const codeLength = 6;
-
-    // Build the API URL
-    const apiUrl = new URL('https://019sms.co.il/api');
-    apiUrl.searchParams.set('send', 'otp');
-    apiUrl.searchParams.set('user', username);
-    apiUrl.searchParams.set('source', source);
-    apiUrl.searchParams.set('destination', cleanPhone);
-    apiUrl.searchParams.set('message', message);
-    apiUrl.searchParams.set('valid', validTime.toString());
-    apiUrl.searchParams.set('tries', maxTries.toString());
-    apiUrl.searchParams.set('length', codeLength.toString());
+    // 019sms API requires POST with JSON body
+    const requestBody = {
+      send_otp: {
+        user: {
+          username: username
+        },
+        phone: cleanPhone,
+        source: '0555502266',
+        text: 'קוד הכניסה שלך למערכת DEALERS הוא [code]',
+        valid_time: 5,
+        max_tries: 3
+      }
+    };
 
     console.log(`Sending OTP to ${cleanPhone}...`);
     
-    const response = await fetch(apiUrl.toString());
-    const responseText = await response.text();
+    const response = await fetch('https://019sms.co.il/api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
     
-    console.log(`019sms response: ${responseText}`);
+    const responseData = await response.json();
+    console.log('019sms response:', JSON.stringify(responseData));
 
-    // Parse response - 019sms returns status codes
-    // Success response format varies, check for success indicators
-    const isSuccess = responseText.includes('0') || responseText.toLowerCase().includes('success');
-    
-    if (!response.ok || !isSuccess) {
-      console.error(`019sms error: ${responseText}`);
+    // Check response status (0 = success)
+    if (responseData.status === 0 || responseData.status === '0') {
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'שליחת הקוד נכשלה. נסה שוב',
-          details: responseText 
-        }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: true, message: 'קוד נשלח בהצלחה' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // Error handling based on status codes
+    let errorMessage = 'שליחת הקוד נכשלה. נסה שוב';
+    if (responseData.message) {
+      console.error(`019sms error: ${responseData.status} - ${responseData.message}`);
+    }
+
     return new Response(
-      JSON.stringify({ success: true, message: 'קוד נשלח בהצלחה' }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ success: false, error: errorMessage }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
