@@ -33,9 +33,10 @@ serve(async (req) => {
     }
 
     const username = Deno.env.get('SMS_019_USERNAME');
+    const password = Deno.env.get('SMS_019_PASS');
     
-    if (!username) {
-      console.error('SMS_019_USERNAME not configured');
+    if (!username || !password) {
+      console.error('SMS credentials not configured');
       return new Response(
         JSON.stringify({ success: false, error: 'שירות SMS לא מוגדר' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -46,7 +47,8 @@ serve(async (req) => {
     const requestBody = {
       validate_otp: {
         user: {
-          username: username
+          username: username,
+          password: password
         },
         phone: cleanPhone,
         code: parseInt(code)
