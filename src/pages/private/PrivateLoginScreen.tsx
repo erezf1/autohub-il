@@ -8,6 +8,7 @@ import { Logo } from '@/components/common/Logo';
 import { usePrivateAuth } from '@/contexts/PrivateAuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { formatPhoneDisplay } from '@/utils/phoneValidation';
+import { supabase } from '@/integrations/supabase/client';
 
 export const PrivateLoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -37,9 +38,8 @@ export const PrivateLoginScreen: React.FC = () => {
 
     setIsLoading(true);
 
+    // Validate phone format
     const { error } = await signIn(phoneNumber);
-
-    setIsLoading(false);
 
     if (error) {
       toast({
@@ -47,21 +47,48 @@ export const PrivateLoginScreen: React.FC = () => {
         description: error.message || 'אירעה שגיאה בהתחברות',
         variant: 'destructive',
       });
+      setIsLoading(false);
       return;
     }
 
-    toast({
-      title: 'קוד נשלח',
-      description: `נשלח קוד אימות ל-${formatPhoneDisplay(phoneNumber)}`,
-    });
+    // Send OTP via 019sms
+    try {
+      const { data, error: sendError } = await supabase.functions.invoke('send-otp', {
+        body: { phone: phoneNumber }
+      });
 
-    // Navigate to OTP verification
-    navigate('/private/otp-verify', { 
-      state: { 
-        phone: phoneNumber,
-        isRegistration: false 
-      } 
-    });
+      if (sendError || !data?.success) {
+        toast({
+          title: 'שגיאה',
+          description: data?.error || 'שליחת הקוד נכשלה',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: 'קוד נשלח',
+        description: `נשלח קוד אימות ל-${formatPhoneDisplay(phoneNumber)}`,
+      });
+
+      // Navigate to OTP verification
+      navigate('/private/otp-verify', { 
+        state: { 
+          phone: phoneNumber,
+          isRegistration: false 
+        } 
+      });
+    } catch (error) {
+      console.error('Send OTP error:', error);
+      toast({
+        title: 'שגיאה',
+        description: 'שליחת הקוד נכשלה',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
