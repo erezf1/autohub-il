@@ -51,7 +51,7 @@ serve(async (req) => {
           password: password
         },
         phone: cleanPhone,
-        code: parseInt(code)
+        code: code
       }
     };
 
