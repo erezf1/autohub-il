@@ -7,6 +7,7 @@ import { ArrowRight, RefreshCw } from "lucide-react";
 import { usePrivateAuth } from "@/contexts/PrivateAuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/common/Logo";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LocationState {
   phone: string;
@@ -27,6 +28,7 @@ export default function PrivateOTPVerificationScreen() {
 
   const [otpValue, setOtpValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
@@ -40,11 +42,29 @@ export default function PrivateOTPVerificationScreen() {
     }
   }, [timeLeft]);
 
+  const verifyOTPWithService = async (code: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-otp', {
+        body: { phone, code }
+      });
+
+      if (error) {
+        console.error('Verify OTP error:', error);
+        return { success: false, error: 'שגיאה באימות הקוד' };
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Verify OTP exception:', error);
+      return { success: false, error: 'שגיאה באימות הקוד' };
+    }
+  };
+
   const handleVerify = async () => {
-    if (otpValue.length !== 4) {
+    if (otpValue.length !== 6) {
       toast({
         title: "שגיאה",
-        description: "יש להזין 4 ספרות",
+        description: "יש להזין 6 ספרות",
         variant: "destructive",
       });
       return;
@@ -53,20 +73,22 @@ export default function PrivateOTPVerificationScreen() {
     setIsLoading(true);
 
     try {
-      // For registration flow - create user after local OTP verification
-      if (isRegistration && state?.fullName && state?.locationId) {
-        // Verify OTP locally (don't call verifyOTP as user doesn't exist yet)
-        if (otpValue !== '9876') {
-          toast({
-            title: "שגיאה",
-            description: "קוד אימות שגוי. נסה שוב",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
+      // First verify OTP with 019sms service
+      const verifyResult = await verifyOTPWithService(otpValue);
 
-        // OTP verified, now create user account (signUp creates AND signs in)
+      if (!verifyResult.success) {
+        toast({
+          title: "שגיאה",
+          description: verifyResult.error || "קוד אימות שגוי",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // OTP verified successfully - now handle auth
+      if (isRegistration && state?.fullName && state?.locationId) {
+        // Registration flow - create user account
         const { error: signUpError } = await signUp(
           phone,
           state.fullName,
@@ -83,7 +105,6 @@ export default function PrivateOTPVerificationScreen() {
           return;
         }
 
-        // Success - user created and logged in
         toast({
           title: "הרשמה הושלמה!",
           description: "החשבון שלך נוצר בהצלחה",
@@ -91,13 +112,13 @@ export default function PrivateOTPVerificationScreen() {
         
         navigate("/private/dashboard");
       } else {
-        // Login flow - verify OTP and sign in existing user
+        // Login flow - sign in existing user
         const { error } = await verifyOTP(phone, otpValue);
 
         if (error) {
           toast({
             title: "שגיאה",
-            description: error.message || "קוד אימות שגוי",
+            description: error.message || "אירעה שגיאה בהתחברות",
             variant: "destructive",
           });
           setIsLoading(false);
@@ -123,15 +144,42 @@ export default function PrivateOTPVerificationScreen() {
     }
   };
 
-  const handleResendOTP = () => {
-    setTimeLeft(60);
-    setCanResend(false);
-    setOtpValue("");
+  const handleResendOTP = async () => {
+    setIsResending(true);
     
-    toast({
-      title: "קוד נשלח מחדש",
-      description: `קוד אימות חדש נשלח ל-${phone}`,
-    });
+    try {
+      const { data, error } = await supabase.functions.invoke('send-otp', {
+        body: { phone }
+      });
+
+      if (error || !data?.success) {
+        toast({
+          title: "שגיאה",
+          description: data?.error || "שליחת הקוד נכשלה",
+          variant: "destructive",
+        });
+        setIsResending(false);
+        return;
+      }
+
+      setTimeLeft(60);
+      setCanResend(false);
+      setOtpValue("");
+      
+      toast({
+        title: "קוד נשלח מחדש",
+        description: `קוד אימות חדש נשלח ל-${phone}`,
+      });
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      toast({
+        title: "שגיאה",
+        description: "שליחת הקוד נכשלה",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -154,16 +202,16 @@ export default function PrivateOTPVerificationScreen() {
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold">אימות קוד</h1>
           <p className="text-muted-foreground">
-            הזן את הקוד בן 4 הספרות שנשלח ל-
+            הזן את הקוד בן 6 הספרות שנשלח ל-
             <br />
             <span className="font-semibold text-foreground">{phone}</span>
           </p>
         </div>
 
-        {/* OTP Input - Numbers typed left-to-right */}
+        {/* OTP Input - 6 digits, Numbers typed left-to-right */}
         <div className="flex justify-center py-6" dir="ltr">
           <InputOTP
-            maxLength={4}
+            maxLength={6}
             value={otpValue}
             onChange={(value) => setOtpValue(value)}
           >
@@ -172,6 +220,8 @@ export default function PrivateOTPVerificationScreen() {
               <InputOTPSlot index={1} />
               <InputOTPSlot index={2} />
               <InputOTPSlot index={3} />
+              <InputOTPSlot index={4} />
+              <InputOTPSlot index={5} />
             </InputOTPGroup>
           </InputOTP>
         </div>
@@ -179,7 +229,7 @@ export default function PrivateOTPVerificationScreen() {
         {/* Verify Button */}
         <Button
           onClick={handleVerify}
-          disabled={isLoading || otpValue.length !== 4}
+          disabled={isLoading || otpValue.length !== 6}
           className="w-full"
           size="lg"
         >
@@ -196,19 +246,13 @@ export default function PrivateOTPVerificationScreen() {
             <Button
               variant="ghost"
               onClick={handleResendOTP}
+              disabled={isResending}
               className="text-primary"
             >
-              <RefreshCw className="h-4 w-4 ml-2" />
-              שלח קוד מחדש
+              <RefreshCw className={`h-4 w-4 ml-2 ${isResending ? 'animate-spin' : ''}`} />
+              {isResending ? 'שולח...' : 'שלח קוד מחדש'}
             </Button>
           )}
-        </div>
-
-        {/* Development Note */}
-        <div className="pt-4 border-t">
-          <p className="text-xs text-center text-muted-foreground">
-            לצורכי פיתוח: השתמש בקוד <span className="font-mono font-bold">9876</span>
-          </p>
         </div>
       </Card>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserPlus, Phone, User, MapPin, ArrowLeft, ArrowRight } from 'lucide-react';
+import { UserPlus, Phone, User, MapPin, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -22,6 +22,7 @@ export const PrivateRegisterScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [locationId, setLocationId] = useState<string>('');
   const [locations, setLocations] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = usePrivateAuth();
   const { toast } = useToast();
@@ -62,21 +63,47 @@ export const PrivateRegisterScreen: React.FC = () => {
       return;
     }
 
-    // Don't create user yet - just navigate to OTP verification
-    // User will be created AFTER OTP is verified
-    toast({
-      title: 'קוד אימות נשלח',
-      description: `נשלח קוד אימות ל-${formatPhoneDisplay(phoneNumber)}`,
-    });
+    setIsLoading(true);
 
-    navigate('/private/otp-verify', { 
-      state: { 
-        phone: phoneNumber,
-        fullName,
-        locationId: parseInt(locationId),
-        isRegistration: true
-      } 
-    });
+    // Send OTP via 019sms before navigating
+    try {
+      const { data, error } = await supabase.functions.invoke('send-otp', {
+        body: { phone: phoneNumber }
+      });
+
+      if (error || !data?.success) {
+        toast({
+          title: 'שגיאה',
+          description: data?.error || 'שליחת הקוד נכשלה',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: 'קוד אימות נשלח',
+        description: `נשלח קוד אימות ל-${formatPhoneDisplay(phoneNumber)}`,
+      });
+
+      navigate('/private/otp-verify', { 
+        state: { 
+          phone: phoneNumber,
+          fullName,
+          locationId: parseInt(locationId),
+          isRegistration: true
+        } 
+      });
+    } catch (error) {
+      console.error('Send OTP error:', error);
+      toast({
+        title: 'שגיאה',
+        description: 'שליחת הקוד נכשלה',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -165,11 +192,12 @@ export const PrivateRegisterScreen: React.FC = () => {
 
             <Button
               type="submit"
+              disabled={isLoading}
               className="w-full gap-2"
               size="lg"
             >
               <UserPlus className="w-4 h-4" />
-              המשך
+              {isLoading ? 'שולח קוד...' : 'המשך'}
             </Button>
           </form>
 

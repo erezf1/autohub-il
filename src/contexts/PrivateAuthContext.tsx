@@ -63,7 +63,7 @@ export const PrivateAuthProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       const cleanedPhone = cleanPhoneNumber(phone);
       const email = phoneToEmail(cleanedPhone);
-      // Use consistent password based on phone number (not timestamp!)
+      // Use consistent password based on phone number
       const password = `private_user_${cleanedPhone}`;
 
       // Sign up with consistent password (OTP-based, no real password needed)
@@ -111,10 +111,8 @@ export const PrivateAuthProvider: React.FC<{ children: React.ReactNode }> = ({ c
         };
       }
 
-      const cleanedPhone = cleanPhoneNumber(phone);
-      
-      // For now, we just validate the phone format
-      // OTP verification happens in verifyOTP
+      // Just validate the phone format
+      // OTP is sent by the calling component and verified in verifyOTP
       return { error: null };
     } catch (error: any) {
       console.error('Sign in error:', error);
@@ -127,17 +125,8 @@ export const PrivateAuthProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const cleanedPhone = cleanPhoneNumber(phone);
       const email = phoneToEmail(cleanedPhone);
 
-      // Mock OTP verification (until 019sms.co.il integration)
-      if (otp !== '9876') {
-        return {
-          error: {
-            message: 'קוד אימות שגוי. נסה שוב',
-          },
-        };
-      }
-
-      // For existing users, sign in with consistent password
-      // Use same password pattern as signup!
+      // OTP is already verified by 019sms service before this is called
+      // Now just sign in the user with their password
       const password = `private_user_${cleanedPhone}`;
       
       const { data, error } = await privateClient.auth.signInWithPassword({
@@ -146,7 +135,7 @@ export const PrivateAuthProvider: React.FC<{ children: React.ReactNode }> = ({ c
       });
 
       if (error) {
-        console.error('OTP verification error:', error);
+        console.error('Sign in error:', error);
         return { error };
       }
 
