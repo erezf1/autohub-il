@@ -41,9 +41,9 @@ export const useVehicles = () => {
         .eq('status', 'available')
         .order('created_at', { ascending: false });
 
-      // Exclude own vehicles if user is authenticated
+      // Exclude own vehicles if user is authenticated, but include private listings (owner_id is null)
       if (userId) {
-        query.neq('owner_id', userId);
+        query.or(`owner_id.neq.${userId},owner_id.is.null`);
       }
 
       const { data, error } = await query;

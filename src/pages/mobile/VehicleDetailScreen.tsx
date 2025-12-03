@@ -16,7 +16,7 @@ import { useState } from "react";
 import { getVehicleTypeLabel } from "@/constants/vehicleTypes";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePrivateAuth } from "@/contexts/PrivateAuthContext";
-import { DealerCard, VehicleSpecsCard } from "@/components/common";
+import { DealerCard, VehicleSpecsCard, PrivateSellerCard } from "@/components/common";
 import { useConversationForEntity } from "@/hooks/mobile";
 
 const VehicleDetailScreen = () => {
@@ -55,7 +55,7 @@ const VehicleDetailScreen = () => {
     enabled: !!id,
   });
 
-  // Fetch owner profile separately
+  // Fetch owner profile separately (for dealer vehicles)
   const { data: ownerProfile } = useQuery({
     queryKey: ['vehicle-owner', vehicle?.owner_id],
     queryFn: async () => {
@@ -71,6 +71,25 @@ const VehicleDetailScreen = () => {
       return data;
     },
     enabled: !!vehicle?.owner_id,
+  });
+
+  // Fetch private seller info (for private listings)
+  const { data: privateSeller } = useQuery({
+    queryKey: ['private-seller', vehicle?.private_user_id],
+    queryFn: async () => {
+      if (!vehicle?.private_user_id) return null;
+      
+      const client = isPrivateUser ? privateClient : dealerClient;
+      const { data, error } = await client
+        .from('private_users')
+        .select('id, full_name, phone_number')
+        .eq('id', vehicle.private_user_id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!vehicle?.private_user_id && vehicle?.is_private_listing,
   });
 
   // Check if conversation exists for this vehicle
@@ -437,7 +456,13 @@ const VehicleDetailScreen = () => {
           </div>
         </div>
       ) : (
-        vehicle.owner_id && (
+        // Show PrivateSellerCard for private listings, DealerCard for dealer listings
+        vehicle.is_private_listing && vehicle.private_user_id && privateSeller ? (
+          <PrivateSellerCard
+            name={privateSeller.full_name}
+            phone={privateSeller.phone_number}
+          />
+        ) : vehicle.owner_id ? (
           <DealerCard
             dealerId={vehicle.owner_id}
             isRevealed={true}
@@ -446,7 +471,7 @@ const VehicleDetailScreen = () => {
             onChatClick={handleContactSeller}
             chatButtonLabel={existingConversationId ? 'חזרה לצ׳אט' : 'שלח הודעה'}
           />
-        )
+        ) : null
       )}
       </div>
     </div>
