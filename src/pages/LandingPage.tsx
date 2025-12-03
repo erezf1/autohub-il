@@ -8,7 +8,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 flex flex-col" dir="rtl">
+    <div className="min-h-screen h-screen overflow-y-auto bg-gradient-to-b from-black to-gray-900 flex flex-col" dir="rtl">
       {/* Header */}
       <header className="py-8 text-center border-b border-gray-800">
         <div className="container mx-auto px-4">
