@@ -27,46 +27,42 @@ export const PrivateSellerCard = ({ name, phone, className }: PrivateSellerCardP
   };
 
   return (
-    <div className={`fixed bottom-0 left-0 right-0 bg-background border-t p-4 z-10 ${className || ''}`}>
-      <div className="container max-w-md mx-auto">
-        <GradientBorderContainer className="rounded-xl">
-          <Card className="bg-black border-0 rounded-xl">
-            <CardContent className="p-4" dir="rtl">
-              <div className="flex items-center gap-4">
-                {/* Avatar */}
-                <Avatar className="h-14 w-14 border-2 border-primary/30">
-                  <AvatarFallback className="bg-primary/20 text-primary text-lg font-bold">
-                    {name?.charAt(0) || <User className="h-6 w-6" />}
-                  </AvatarFallback>
-                </Avatar>
+    <GradientBorderContainer className={`rounded-xl ${className || ''}`}>
+      <Card className="bg-black border-0 rounded-xl">
+        <CardContent className="p-4" dir="rtl">
+          <div className="flex items-center gap-4">
+            {/* Avatar */}
+            <Avatar className="h-14 w-14 border-2 border-primary/30">
+              <AvatarFallback className="bg-primary/20 text-primary text-lg font-bold">
+                {name?.charAt(0) || <User className="h-6 w-6" />}
+              </AvatarFallback>
+            </Avatar>
 
-                {/* Info */}
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-white hebrew-text text-lg">{name}</h3>
-                    <Badge className="bg-purple-600 text-white hebrew-text text-xs">
-                      מפרטי
-                    </Badge>
-                  </div>
-                  <p className="text-muted-foreground hebrew-text text-sm">
-                    {formatPhone(phone)}
-                  </p>
-                </div>
-
-                {/* Call Button */}
-                <Button 
-                  onClick={handleCall}
-                  className="bg-green-600 hover:bg-green-700 text-white gap-2"
-                >
-                  <Phone className="h-4 w-4" />
-                  <span className="hebrew-text">התקשר</span>
-                </Button>
+            {/* Info */}
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-white hebrew-text text-lg">{name}</h3>
+                <Badge className="bg-purple-600 text-white hebrew-text text-xs">
+                  מפרטי
+                </Badge>
               </div>
-            </CardContent>
-          </Card>
-        </GradientBorderContainer>
-      </div>
-    </div>
+              <p className="text-muted-foreground hebrew-text text-sm">
+                {formatPhone(phone)}
+              </p>
+            </div>
+
+            {/* Call Button */}
+            <Button 
+              onClick={handleCall}
+              className="bg-green-600 hover:bg-green-700 text-white gap-2"
+            >
+              <Phone className="h-4 w-4" />
+              <span className="hebrew-text">התקשר</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </GradientBorderContainer>
   );
 };
 

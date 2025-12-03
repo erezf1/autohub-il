@@ -259,9 +259,14 @@ const VehicleDetailScreen = () => {
           <CardContent className="p-4">
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-white hebrew-text">
-                {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-white hebrew-text">
+                  {vehicle.make?.name_hebrew} {vehicle.model?.name_hebrew} {vehicle.year}
+                </h2>
+                {vehicle.is_private_listing && (
+                  <Badge className="bg-purple-600 text-white hebrew-text text-xs">מפרטי</Badge>
+                )}
+              </div>
               {vehicle.is_boosted && vehicle.boosted_until && (
                 <p className="text-sm text-orange-500 hebrew-text mt-1">
                   מבוסט עד: {new Date(vehicle.boosted_until).toLocaleDateString('he-IL')}
