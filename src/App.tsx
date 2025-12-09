@@ -27,6 +27,12 @@ import PrivateLogin from "./pages/private/PrivateLogin";
 import { PrivateWelcomeScreen } from "./pages/private/PrivateWelcomeScreen";
 import { PrivateRegisterScreen } from "./pages/private/PrivateRegisterScreen";
 import PrivateOTPVerificationScreen from "./pages/private/PrivateOTPVerificationScreen";
+import { PrivateProfileScreen } from "./pages/private/PrivateProfileScreen";
+import { PrivateProfileEditScreen } from "./pages/private/PrivateProfileEditScreen";
+import PrivateAddVehicleScreen from "./pages/private/PrivateAddVehicleScreen";
+import { PrivateMyVehiclesScreen } from "./pages/private/PrivateMyVehiclesScreen";
+import { PrivateVehicleDetailScreen } from "./pages/private/PrivateVehicleDetailScreen";
+import { PrivateEditVehicleScreen } from "./pages/private/PrivateEditVehicleScreen";
 
 const queryClient = new QueryClient();
 
@@ -79,8 +85,13 @@ const App = () => (
 
                   {/* All Private routes are nested under a single protected element */}
                   <Route element={<PrivateRoutes />}>
-                    {/* Add your private routes here. The path is relative to the root. */}
                     <Route path="/private/dashboard" element={<PrivateDashboardScreen />} />
+                    <Route path="/private/profile" element={<PrivateProfileScreen />} />
+                    <Route path="/private/profile/edit" element={<PrivateProfileEditScreen />} />
+                    <Route path="/private/add-vehicle" element={<PrivateAddVehicleScreen />} />
+                    <Route path="/private/my-vehicles" element={<PrivateMyVehiclesScreen />} />
+                    <Route path="/private/vehicle/:id" element={<PrivateVehicleDetailScreen />} />
+                    <Route path="/private/vehicle/:id/edit" element={<PrivateEditVehicleScreen />} />
                   </Route>
 
                   {/* All Mobile routes are nested under the /mobile path */}
