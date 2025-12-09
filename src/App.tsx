@@ -21,9 +21,12 @@ import { useSubdomainRedirect } from "@/hooks/useSubdomainRedirect";
 // Landing Page
 import LandingPage from "./pages/LandingPage";
 
-// Example Private Page (create this component if it doesn't exist)
-import PrivateDashboard from "./pages/private/PrivateDashboard"; // Assuming this is one of your private pages
+// Private User Pages
+import PrivateDashboard from "./pages/private/PrivateDashboard";
 import PrivateLogin from "./pages/private/PrivateLogin";
+import { PrivateWelcomeScreen } from "./pages/private/PrivateWelcomeScreen";
+import { PrivateRegisterScreen } from "./pages/private/PrivateRegisterScreen";
+import PrivateOTPVerificationScreen from "./pages/private/PrivateOTPVerificationScreen";
 
 const queryClient = new QueryClient();
 
@@ -68,9 +71,10 @@ const App = () => (
                   <Route path="/" element={<LandingPage />} />
 
                   {/* Public route for private user login */}
+                  <Route path="/private" element={<PrivateWelcomeScreen />} />
                   <Route path="/private/login" element={<PrivateLogin />} />
-
-                  {/* All Admin routes are nested under the /admin path */}
+                  <Route path="/private/register" element={<PrivateRegisterScreen />} />
+                  <Route path="/private/otp" element={<PrivateOTPVerificationScreen />} />
                   <Route path="/admin/*" element={<AdminRoutes />} />
 
                   {/* All Private routes are nested under a single protected element */}
