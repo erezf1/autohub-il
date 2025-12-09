@@ -116,6 +116,7 @@ const AdminPrivateUsersList = () => {
                   <TableHead className="text-right hebrew-text text-base text-white">טלפון</TableHead>
                   <TableHead className="text-right hebrew-text text-base text-white">מיקום</TableHead>
                   <TableHead className="text-right hebrew-text text-base text-white">תאריך הצטרפות</TableHead>
+                  <TableHead className="text-right hebrew-text text-base text-white">עדכון אחרון</TableHead>
                   <TableHead className="text-right hebrew-text text-base text-white">סטטוס</TableHead>
                   <TableHead className="text-right hebrew-text text-base text-white">פעולות</TableHead>
                 </TableRow>
@@ -135,6 +136,9 @@ const AdminPrivateUsersList = () => {
                     </TableCell>
                     <TableCell className="hebrew-text text-base text-white">
                       {new Date(user.created_at).toLocaleDateString('he-IL')}
+                    </TableCell>
+                    <TableCell className="hebrew-text text-base text-white">
+                      {user.updated_at ? new Date(user.updated_at).toLocaleDateString('he-IL') : '-'}
                     </TableCell>
                     <TableCell>
                       <Badge 

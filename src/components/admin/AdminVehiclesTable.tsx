@@ -17,12 +17,15 @@ interface Vehicle {
   price: number;
   status: string;
   created_at: string;
-  owner_id: string;
+  owner_id: string | null;
+  private_user_id?: string | null;
+  is_private_listing?: boolean | null;
   is_boosted: boolean | null;
   boosted_until: string | null;
   make: { name_hebrew: string } | null;
   model: { name_hebrew: string } | null;
   owner?: { business_name: string } | null;
+  private_user?: { full_name: string } | null;
   auction?: {
     id: string;
     status: string;
@@ -127,7 +130,9 @@ export const AdminVehiclesTable = ({ vehicles, showOwner = true, onDelete }: Adm
             </TableCell>
             {showOwner && (
               <TableCell className="text-right hebrew-text text-white">
-                {vehicle.owner?.business_name || 'לא ידוע'}
+                {vehicle.is_private_listing 
+                  ? (vehicle.private_user?.full_name || 'מפרטי') 
+                  : (vehicle.owner?.business_name || 'לא ידוע')}
               </TableCell>
             )}
             <TableCell className="text-right hebrew-text text-white">
