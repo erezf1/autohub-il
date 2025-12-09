@@ -82,24 +82,40 @@ export const PrivateAuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   /**
+   * Generate deterministic password from phone number
+   * Used for both signup and login to maintain consistency
+   */
+  const generatePassword = (phone: string): string => {
+    const cleanPhone = phone.replace(/\D/g, '');
+    return `${cleanPhone}_private_autohub_2024`;
+  };
+
+  /**
+   * Generate fake email from phone number
+   */
+  const generateEmail = (phone: string): string => {
+    const cleanPhone = phone.replace(/\D/g, '');
+    return `${cleanPhone}@autohub.private`;
+  };
+
+  /**
    * Verify OTP and sign in existing user
    * Called after OTP is verified via 019sms service
    */
   const verifyOTP = async (phone: string, code: string): Promise<{ error?: { message: string } }> => {
     try {
-      // Clean phone number
-      const cleanPhone = phone.replace(/\D/g, '');
+      const fakeEmail = generateEmail(phone);
+      const password = generatePassword(phone);
       
-      // Sign in with OTP (phone auth)
-      const { data, error } = await privateClient.auth.signInWithOtp({
-        phone: `+972${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}`,
-        options: {
-          shouldCreateUser: false,
-        }
+      // Sign in with email/password
+      const { data, error } = await privateClient.auth.signInWithPassword({
+        email: fakeEmail,
+        password: password,
       });
 
       if (error) {
-        return { error: { message: error.message } };
+        console.error('Login error:', error);
+        return { error: { message: 'משתמש לא נמצא. אנא הירשם תחילה' } };
       }
 
       return {};
@@ -118,15 +134,16 @@ export const PrivateAuthProvider = ({ children }: { children: ReactNode }) => {
     locationId: number
   ): Promise<{ error?: { message: string } }> => {
     try {
-      // Clean phone number
       const cleanPhone = phone.replace(/\D/g, '');
-      const formattedPhone = `+972${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}`;
+      const fakeEmail = generateEmail(phone);
+      const password = generatePassword(phone);
 
-      // Create user with phone auth
+      // Create user with email auth
       const { data, error } = await privateClient.auth.signUp({
-        phone: formattedPhone,
-        password: crypto.randomUUID(), // Random password for phone auth
+        email: fakeEmail,
+        password: password,
         options: {
+          emailRedirectTo: `${window.location.origin}/private/dashboard`,
           data: {
             user_type: 'private',
             phone_number: cleanPhone,
@@ -137,7 +154,21 @@ export const PrivateAuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
+        console.error('SignUp error:', error);
         return { error: { message: error.message } };
+      }
+
+      // Auto sign-in after signup
+      if (data.user) {
+        const { error: signInError } = await privateClient.auth.signInWithPassword({
+          email: fakeEmail,
+          password: password,
+        });
+        
+        if (signInError) {
+          console.error('Auto sign-in error:', signInError);
+          return { error: { message: signInError.message } };
+        }
       }
 
       return {};
