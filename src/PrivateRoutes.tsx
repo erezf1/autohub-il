@@ -1,39 +1,31 @@
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { usePrivateAuth } from "@/contexts/PrivateAuthContext";
 
-// Layouts and Protected Routes
-import { ProtectedPrivateRoute } from "@/components/private/ProtectedPrivateRoute";
-import { PrivateLayout } from "@/components/private/PrivateLayout";
+/**
+ * A component to protect routes that require private user authentication.
+ *
+ * This component acts as a "layout route" in React Router v6.
+ * - If the user is authenticated, it renders the nested child routes via <Outlet />.
+ * - If the user is not authenticated, it redirects them to the private login page.
+ */
+export const PrivateRoutes = () => {
+  const { isPrivateAuthenticated, isLoading } = usePrivateAuth();
+  const location = useLocation();
 
-// Page Imports
-import { PrivateWelcomeScreen } from "@/pages/private/PrivateWelcomeScreen";
-import { PrivateLoginScreen } from "@/pages/private/PrivateLoginScreen";
-import { PrivateRegisterScreen } from "@/pages/private/PrivateRegisterScreen";
-import PrivateOTPVerificationScreen from "@/pages/private/PrivateOTPVerificationScreen";
-import { PrivateDashboardScreen } from "@/pages/private/PrivateDashboardScreen";
-import { PrivateMyVehiclesScreen } from "@/pages/private/PrivateMyVehiclesScreen";
-import PrivateAddVehicleScreen from "@/pages/private/PrivateAddVehicleScreen";
-import EditVehicleScreen from "@/pages/mobile/EditVehicleScreen"; // Assuming this is shared
-import VehicleDetailScreen from "@/pages/mobile/VehicleDetailScreen"; // Assuming this is shared
-import { PrivateProfileScreen } from "@/pages/private/PrivateProfileScreen";
-import { PrivateProfileEditScreen } from "@/pages/private/PrivateProfileEditScreen";
+  // 1. Handle the loading state while authentication is being checked.
+  // This prevents a brief flash of the protected content or login page.
+  if (isLoading) {
+    return <div>Loading session...</div>; // Or a spinner component
+  }
 
-export const PrivateRoutes = () => (
-  <>
-    {/* Private User Auth Routes - Not Protected */}
-    <Route path="/private" element={<PrivateWelcomeScreen />} />
-    <Route path="/private/login" element={<PrivateLoginScreen />} />
-    <Route path="/private/register" element={<PrivateRegisterScreen />} />
-    <Route path="/private/otp-verify" element={<PrivateOTPVerificationScreen />} />
+  // 2. If the user is authenticated, render the child route.
+  // <Outlet /> is a placeholder where React Router will render the matched
+  // nested route from App.tsx (e.g., <PrivateDashboard />).
+  if (isPrivateAuthenticated) {
+    return <Outlet />;
+  }
 
-    {/* Private User Protected Routes */}
-    <Route path="/private/*" element={<ProtectedPrivateRoute><PrivateLayout /></ProtectedPrivateRoute>}>
-      <Route path="dashboard" element={<PrivateDashboardScreen />} />
-      <Route path="my-vehicles" element={<PrivateMyVehiclesScreen />} />
-      <Route path="add-vehicle" element={<PrivateAddVehicleScreen />} />
-      <Route path="edit-vehicle/:id" element={<EditVehicleScreen />} />
-      <Route path="vehicle/:id" element={<VehicleDetailScreen />} />
-      <Route path="profile" element={<PrivateProfileScreen />} />
-      <Route path="profile/edit" element={<PrivateProfileEditScreen />} />
-    </Route>
-  </>
-);
+  // 3. If not authenticated, redirect to the login page.
+  // We pass the `location` they were trying to access in the `state` prop.
+  return <Navigate to="/private/login" state={{ from: location }} replace />;
+};
