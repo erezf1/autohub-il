@@ -514,6 +514,44 @@ export type Database = {
         }
         Relationships: []
       }
+      private_users: {
+        Row: {
+          created_at: string | null
+          full_name: string
+          id: string
+          location_id: number | null
+          phone_number: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name: string
+          id: string
+          location_id?: number | null
+          phone_number: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          location_id?: number | null
+          phone_number?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "private_users_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           created_at: string | null
@@ -897,12 +935,14 @@ export type Database = {
           id: string
           images: string[] | null
           is_boosted: boolean | null
+          is_private_listing: boolean | null
           kilometers: number | null
           make_id: number | null
           model_id: number | null
           owner_id: string | null
           previous_owners: number | null
           price: number
+          private_user_id: string | null
           status: string | null
           sub_model: string | null
           test_result_file_url: string | null
@@ -922,12 +962,14 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_boosted?: boolean | null
+          is_private_listing?: boolean | null
           kilometers?: number | null
           make_id?: number | null
           model_id?: number | null
           owner_id?: string | null
           previous_owners?: number | null
           price: number
+          private_user_id?: string | null
           status?: string | null
           sub_model?: string | null
           test_result_file_url?: string | null
@@ -947,12 +989,14 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_boosted?: boolean | null
+          is_private_listing?: boolean | null
           kilometers?: number | null
           make_id?: number | null
           model_id?: number | null
           owner_id?: string | null
           previous_owners?: number | null
           price?: number
+          private_user_id?: string | null
           status?: string | null
           sub_model?: string | null
           test_result_file_url?: string | null
@@ -980,6 +1024,13 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_listings_private_user_id_fkey"
+            columns: ["private_user_id"]
+            isOneToOne: false
+            referencedRelation: "private_users"
             referencedColumns: ["id"]
           },
         ]
@@ -1131,7 +1182,7 @@ export type Database = {
       is_admin: { Args: { user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "dealer" | "admin" | "support"
+      app_role: "dealer" | "admin" | "support" | "private"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1259,7 +1310,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["dealer", "admin", "support"],
+      app_role: ["dealer", "admin", "support", "private"],
     },
   },
 } as const

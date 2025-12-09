@@ -1,134 +1,114 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Smartphone, Monitor, Car, Users } from "lucide-react";
+import { Car, Users, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { GradientBorderContainer } from "@/components/ui/gradient-border-container";
+import { Badge } from "@/components/ui/badge";
 import logo from '@/assets/dealers-logo.jpeg';
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen h-screen overflow-y-auto overflow-x-hidden bg-gradient-to-b from-black to-gray-900 flex flex-col fixed inset-0" dir="rtl">
+    <div className="min-h-screen h-screen overflow-y-auto bg-gradient-to-b from-black to-gray-900 flex flex-col" dir="rtl">
       {/* Header */}
-      <header className="py-12 text-center border-b border-gray-800 flex-shrink-0">
+      <header className="py-8 text-center border-b border-gray-800">
         <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center gap-3 mb-4">
+          <div className="flex justify-center items-center gap-3 mb-3">
             <img 
               src={logo}
               alt="Auto Hub" 
-              className="w-22 h-20"
+              className="w-16 h-14"
             />
-            <h1 className="text-5xl font-bold hebrew-text">
+            <h1 className="text-4xl font-bold hebrew-text">
               <span className="text-blue-400">D</span>
               <span className="text-white">ealer</span>
               <span className="text-blue-400">s</span>
             </h1>
           </div>
-          <p className="text-lg text-gray-300 hebrew-text">פלטפורמת מסחר רכב מתקדמת</p>
+          <p className="text-base text-gray-300 hebrew-text">פלטפורמת מסחר רכב מתקדמת</p>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-16 flex-1">
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <main className="container mx-auto px-4 py-8 flex-1">
+        <div className="max-w-md mx-auto space-y-6">
           
-          {/* Mobile Interface Card */}
-          <GradientBorderContainer
-            className="rounded-md flex-1"
-          >
-            <Card className="border-0 bg-black hover:shadow-xl transition-shadow duration-300">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Smartphone className="w-8 h-8 text-blue-400" />
-                </div>
-                <CardTitle className="text-2xl hebrew-text text-white">ממשק סוחרים</CardTitle>
-                <CardDescription className="text-base hebrew-text text-gray-300">
-                  עבור סוחרי רכב ולקוחות פרטיים
-                </CardDescription>
-              </CardHeader>
-              <div className="border-t border-gray-700/50 mx-4"></div>
-              <CardContent className="space-y-4 pt-4">
-                <div className="space-y-3 hebrew-text">
-                  <div className="flex items-center gap-3">
-                    <Car className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300">חיפוש וקנייה של רכבים</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Car className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300">השתתפות במכירות פומביות</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Users className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300">ניהול פרופיל אישי</span>
-                  </div>
-                </div>
-                
-                <Button 
-                  className="w-full mt-6 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white" 
-                  size="lg"
-                  onClick={() => navigate('/mobile')}
-                >
-                  <Smartphone className="w-5 h-5 ml-2" />
-                  <span className="hebrew-text">כניסה לממשק הסוחרים</span>
-                </Button>
-              </CardContent>
-            </Card>
-          </GradientBorderContainer>
+          {/* About Service */}
+          <div className="text-center space-y-3 mb-8">
+            <h2 className="text-2xl font-bold text-white hebrew-text">
+              מסחר רכבים חכם ומהיר
+            </h2>
+            <p className="text-gray-300 hebrew-text text-sm leading-relaxed">
+              פלטפורמה מתקדמת לסוחרים ומוכרים פרטיים. מכירות, קניות, מכרזים ומידע רלוונטי במקום אחד.
+            </p>
+          </div>
 
-          {/* Admin Interface Card */}
-          <GradientBorderContainer
-            className="rounded-md flex-1"
-          >
-            <Card className="border-0 bg-black hover:shadow-xl transition-shadow duration-300 ">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Monitor className="w-8 h-8 text-blue-400" />
-                </div>
-                <CardTitle className="text-2xl hebrew-text text-white">פאנל ניהול</CardTitle>
-                <CardDescription className="text-base hebrew-text text-gray-300">
-                  עבור מנהלי המערכת
-                </CardDescription>
-              </CardHeader>
-              <div className="border-t border-gray-700/50 mx-4"></div>
-              <CardContent className="space-y-4 pt-4">
-                <div className="space-y-3 hebrew-text">
-                  <div className="flex items-center gap-3">
-                    <Users className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300">ניהול משתמשים וסוחרים</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Car className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300">ניהול רכבים ומכירות</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Monitor className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300">דוחות וניתוחים</span>
-                  </div>
-                </div>
-                
-                <Button 
-                  className="w-full mt-6 bg-gray-700 hover:bg-gray-600 text-white" 
-                  size="lg"
-                  onClick={() => navigate('/admin/login')}
-                >
-                  <Monitor className="w-5 h-5 ml-2" />
-                  <span className="hebrew-text">כניסה לפאנל הניהול</span>
-                </Button>
-              </CardContent>
-            </Card>
-          </GradientBorderContainer>
+          {/* Dealers Section */}
+          <div className="space-y-4">
+            <div className="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-lg p-6 border border-blue-500/30">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Car className="w-6 h-6 text-blue-400" />
+                <h3 className="text-xl font-bold text-white hebrew-text">סוחרים</h3>
+              </div>
+              
+              <div className="space-y-2 mb-6 text-center">
+                <p className="text-sm text-gray-300 hebrew-text">
+                  חיפוש רכבים, השתתפות במכרזים, ניהול מלאי ועוד
+                </p>
+              </div>
+              
+              <Button 
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white" 
+                size="lg"
+                onClick={() => navigate('/mobile')}
+              >
+                <span className="hebrew-text font-semibold">כניסה לממשק הסוחרים</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Private Users Section - NEW */}
+          <div className="space-y-4">
+            <div className="relative bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-lg p-6 border border-purple-500/30">
+              {/* New Badge */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 px-4 py-1">
+                  <Sparkles className="w-3 h-3 ml-1" />
+                  <span className="hebrew-text font-semibold">חדש</span>
+                </Badge>
+              </div>
+              
+              <div className="flex items-center justify-center gap-2 mb-4 mt-2">
+                <Users className="w-6 h-6 text-purple-400" />
+                <h3 className="text-xl font-bold text-white hebrew-text">משתמשים פרטיים</h3>
+              </div>
+              
+              <div className="space-y-2 mb-6 text-center">
+                <p className="text-sm text-gray-300 hebrew-text">
+                  מוכרים פרטיים - העלו את הרכב שלכם וקבלו הצעות מסוחרים
+                </p>
+                <p className="text-xs text-purple-300 hebrew-text font-semibold">
+                  שירות חינמי לחלוטין • עד 3 רכבים
+                </p>
+              </div>
+              
+              <Button 
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white" 
+                size="lg"
+                onClick={() => navigate('/private')}
+              >
+                <span className="hebrew-text font-semibold">כניסה למשתמשים פרטיים</span>
+              </Button>
+            </div>
+          </div>
+
         </div>
-        {/* Bottom Spacer - Height of footer + 20px breathing room */}
- 
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center border-t border-gray-800 mt-16 bg-black/50">
+      <footer className="py-6 text-center border-t border-gray-800 mt-8 bg-black/50">
         <p className="text-xs text-gray-400 hebrew-text">
           © 2024 Dealers. כל הזכויות שמורות.
         </p>
-        <div className="md:hidden" style={{ height: 'calc(4rem )' }} aria-hidden="true" />
       </footer>
     </div>
   );
