@@ -22,7 +22,7 @@ import { useSubdomainRedirect } from "@/hooks/useSubdomainRedirect";
 import LandingPage from "./pages/LandingPage";
 
 // Private User Pages
-import PrivateDashboard from "./pages/private/PrivateDashboard";
+import { PrivateDashboardScreen } from "./pages/private/PrivateDashboardScreen";
 import PrivateLogin from "./pages/private/PrivateLogin";
 import { PrivateWelcomeScreen } from "./pages/private/PrivateWelcomeScreen";
 import { PrivateRegisterScreen } from "./pages/private/PrivateRegisterScreen";
@@ -80,7 +80,7 @@ const App = () => (
                   {/* All Private routes are nested under a single protected element */}
                   <Route element={<PrivateRoutes />}>
                     {/* Add your private routes here. The path is relative to the root. */}
-                    <Route path="/private/dashboard" element={<PrivateDashboard />} />
+                    <Route path="/private/dashboard" element={<PrivateDashboardScreen />} />
                   </Route>
 
                   {/* All Mobile routes are nested under the /mobile path */}
