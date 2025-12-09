@@ -74,7 +74,7 @@ const App = () => (
                   <Route path="/private" element={<PrivateWelcomeScreen />} />
                   <Route path="/private/login" element={<PrivateLogin />} />
                   <Route path="/private/register" element={<PrivateRegisterScreen />} />
-                  <Route path="/private/otp" element={<PrivateOTPVerificationScreen />} />
+                  <Route path="/private/otp-verify" element={<PrivateOTPVerificationScreen />} />
                   <Route path="/admin/*" element={<AdminRoutes />} />
 
                   {/* All Private routes are nested under a single protected element */}
