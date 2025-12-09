@@ -4,56 +4,124 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 /**
- * A login page for private users with a form to collect credentials.
+ * A login page for private users with OTP-based authentication.
  */
 const PrivateLogin = () => {
-  const { signIn, isLoading, isPrivateAuthenticated } = usePrivateAuth();
+  const { loading, isPrivateAuthenticated } = usePrivateAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  const [phone, setPhone] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     // If the user is already authenticated, redirect them away from the login page.
-    // This prevents a logged-in user from being stuck on the login screen.
     if (isPrivateAuthenticated) {
       navigate("/private/dashboard", { replace: true });
     }
   }, [isPrivateAuthenticated, navigate]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    
+    // Validate phone format
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone.length !== 10 || !cleanPhone.startsWith('05')) {
+      toast({
+        title: 'שגיאה',
+        description: 'מספר טלפון לא תקין. נא להזין 10 ספרות המתחילות ב-05',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
     try {
-      await signIn(email, password);
-      // After signing in, redirect to the private dashboard, replacing the login page in history.
-      navigate("/private/dashboard", { replace: true });
+      // Send OTP via 019sms
+      const { data, error } = await supabase.functions.invoke('send-otp', {
+        body: { phone: cleanPhone }
+      });
+
+      if (error || !data?.success) {
+        toast({
+          title: 'שגיאה',
+          description: data?.error || 'שליחת הקוד נכשלה',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      toast({
+        title: 'קוד נשלח',
+        description: `נשלח קוד אימות ל-${cleanPhone}`,
+      });
+
+      // Navigate to OTP verification
+      navigate('/private/otp-verify', { 
+        state: { 
+          phone: cleanPhone,
+          isRegistration: false 
+        } 
+      });
     } catch (err) {
-      setError("Invalid email or password. Please try again.");
-      console.error("Sign-in failed:", err);
+      console.error("Send OTP failed:", err);
+      toast({
+        title: 'שגיאה',
+        description: 'שליחת הקוד נכשלה',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100" dir="rtl">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-center">Private Login</h1>
-        <form onSubmit={handleSignIn} className="space-y-6">
+        <h1 className="text-2xl font-bold text-center">התחברות למשתמש פרטי</h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Label htmlFor="phone">מספר טלפון</Label>
+            <Input 
+              id="phone" 
+              type="tel" 
+              placeholder="050-123-4567" 
+              required 
+              value={phone} 
+              onChange={(e) => setPhone(e.target.value)}
+              dir="ltr"
+              maxLength={12}
+            />
+            <p className="text-xs text-muted-foreground">
+              פורמט: 10 ספרות, מתחיל ב-05
+            </p>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing In..." : "Sign In"}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "שולח קוד..." : "שלח קוד אימות"}
           </Button>
         </form>
+        <div className="text-center text-sm">
+          <span className="text-muted-foreground">עדיין אין לך חשבון? </span>
+          <Button
+            variant="link"
+            className="p-0 h-auto font-semibold"
+            onClick={() => navigate('/private/register')}
+          >
+            הירשם עכשיו
+          </Button>
+        </div>
       </div>
     </div>
   );

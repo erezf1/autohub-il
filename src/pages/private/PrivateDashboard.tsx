@@ -1,4 +1,4 @@
-import { usePrivateAuth } from "@/contexts/PrivateAuthContext"; // Assuming '@' is aliased to 'src' - this might not need changing. If it fails, try "../../contexts/PrivateAuthContext"
+import { usePrivateAuth } from "@/contexts/PrivateAuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -27,7 +27,8 @@ const PrivateDashboard = () => {
       </div>
       <p>Welcome, you are successfully logged in!</p>
       {user && <p>Your user ID is: {user.id}</p>}
-      {user?.email && <p>Your registered email (from phone) is: {user.email}</p>}
+      {user?.full_name && <p>Your name: {user.full_name}</p>}
+      {user?.phone_number && <p>Your phone: {user.phone_number}</p>}
     </div>
   );
 };
