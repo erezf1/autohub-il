@@ -9,12 +9,12 @@ import { usePrivateAuth } from "@/contexts/PrivateAuthContext";
  * - If the user is not authenticated, it redirects them to the private login page.
  */
 export const PrivateRoutes = () => {
-  const { isPrivateAuthenticated, isLoading } = usePrivateAuth();
+  const { isPrivateAuthenticated, loading } = usePrivateAuth();
   const location = useLocation();
 
   // 1. Handle the loading state while authentication is being checked.
   // This prevents a brief flash of the protected content or login page.
-  if (isLoading) {
+  if (loading) {
     return <div>Loading session...</div>; // Or a spinner component
   }
 

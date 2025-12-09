@@ -14,7 +14,7 @@ export const PrivateLoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, signIn } = usePrivateAuth();
+  const { user } = usePrivateAuth();
   const { toast } = useToast();
 
   // Redirect if already logged in
@@ -36,25 +36,23 @@ export const PrivateLoginScreen: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    // Validate phone format
-    const { error } = await signIn(phoneNumber);
-
-    if (error) {
+    // Validate phone format (Israeli mobile: 10 digits starting with 05)
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    if (cleanPhone.length !== 10 || !cleanPhone.startsWith('05')) {
       toast({
         title: 'שגיאה',
-        description: error.message || 'אירעה שגיאה בהתחברות',
+        description: 'מספר טלפון לא תקין. נא להזין 10 ספרות המתחילות ב-05',
         variant: 'destructive',
       });
-      setIsLoading(false);
       return;
     }
+
+    setIsLoading(true);
 
     // Send OTP via 019sms
     try {
       const { data, error: sendError } = await supabase.functions.invoke('send-otp', {
-        body: { phone: phoneNumber }
+        body: { phone: cleanPhone }
       });
 
       if (sendError || !data?.success) {
@@ -69,13 +67,13 @@ export const PrivateLoginScreen: React.FC = () => {
 
       toast({
         title: 'קוד נשלח',
-        description: `נשלח קוד אימות ל-${formatPhoneDisplay(phoneNumber)}`,
+        description: `נשלח קוד אימות ל-${formatPhoneDisplay(cleanPhone)}`,
       });
 
       // Navigate to OTP verification
       navigate('/private/otp-verify', { 
         state: { 
-          phone: phoneNumber,
+          phone: cleanPhone,
           isRegistration: false 
         } 
       });
