@@ -33,6 +33,7 @@ import PrivateAddVehicleScreen from "./pages/private/PrivateAddVehicleScreen";
 import { PrivateMyVehiclesScreen } from "./pages/private/PrivateMyVehiclesScreen";
 import { PrivateVehicleDetailScreen } from "./pages/private/PrivateVehicleDetailScreen";
 import { PrivateEditVehicleScreen } from "./pages/private/PrivateEditVehicleScreen";
+import { PrivateContactScreen } from "./pages/private/PrivateContactScreen";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,7 @@ const App = () => (
                     <Route path="/private/my-vehicles" element={<PrivateMyVehiclesScreen />} />
                     <Route path="/private/vehicle/:id" element={<PrivateVehicleDetailScreen />} />
                     <Route path="/private/vehicle/:id/edit" element={<PrivateEditVehicleScreen />} />
+                    <Route path="/private/contact" element={<PrivateContactScreen />} />
                   </Route>
 
                   {/* All Mobile routes are nested under the /mobile path */}
