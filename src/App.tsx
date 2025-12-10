@@ -23,7 +23,7 @@ import LandingPage from "./pages/LandingPage";
 
 // Private User Pages
 import { PrivateDashboardScreen } from "./pages/private/PrivateDashboardScreen";
-import PrivateLogin from "./pages/private/PrivateLogin";
+import { PrivateLoginScreen } from "./pages/private/PrivateLoginScreen";
 import { PrivateWelcomeScreen } from "./pages/private/PrivateWelcomeScreen";
 import { PrivateRegisterScreen } from "./pages/private/PrivateRegisterScreen";
 import PrivateOTPVerificationScreen from "./pages/private/PrivateOTPVerificationScreen";
@@ -79,7 +79,7 @@ const App = () => (
 
                   {/* Public route for private user login */}
                   <Route path="/private" element={<PrivateWelcomeScreen />} />
-                  <Route path="/private/login" element={<PrivateLogin />} />
+                  <Route path="/private/login" element={<PrivateLoginScreen />} />
                   <Route path="/private/register" element={<PrivateRegisterScreen />} />
                   <Route path="/private/otp-verify" element={<PrivateOTPVerificationScreen />} />
                   <Route path="/admin/*" element={<AdminRoutes />} />

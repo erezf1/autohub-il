@@ -50,35 +50,35 @@ export const PrivateHeader: React.FC = () => {
   };
 
   return (
-    <header className="bg-card border-b border-border sticky top-0 z-50 shadow-sm" dir="rtl">
+    <header className="sticky top-0 z-50 w-full bg-black border-b border-border shadow-sm" dir="rtl">
       <div className="container max-w-md mx-auto px-4 py-3 flex items-center justify-between">
         {/* Left side (RTL: start) - User Name with Dropdown */}
         {user && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-1 text-sm font-medium">
+              <Button variant="ghost" size="sm" className="gap-1 text-sm font-medium text-white hover:bg-gray-800">
                 <span>{userName || 'טוען...'}</span>
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuContent align="start" className="w-48 bg-gray-900 border-gray-700">
               <DropdownMenuItem
                 onClick={() => navigate('/private/profile')}
-                className="cursor-pointer gap-2"
+                className="cursor-pointer gap-2 text-white hover:bg-gray-800 focus:bg-gray-800"
               >
                 <User className="w-4 h-4" />
                 פרופיל
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate('/private/contact')}
-                className="cursor-pointer gap-2"
+                className="cursor-pointer gap-2 text-white hover:bg-gray-800 focus:bg-gray-800"
               >
                 <MessageSquare className="w-4 h-4" />
                 צור קשר
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleSignOut}
-                className="cursor-pointer text-destructive gap-2"
+                className="cursor-pointer text-red-400 gap-2 hover:bg-gray-800 focus:bg-gray-800"
               >
                 <LogOut className="w-4 h-4" />
                 התנתק
