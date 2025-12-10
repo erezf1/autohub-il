@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Phone, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Logo } from '@/components/common/Logo';
+import { Label } from '@/components/ui/label';
+import { GradientBorderContainer } from '@/components/ui/gradient-border-container';
 import { usePrivateAuth } from '@/contexts/PrivateAuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { formatPhoneDisplay } from '@/utils/phoneValidation';
 import { supabase } from '@/integrations/supabase/client';
+import logo from '@/assets/dealers-logo.jpeg';
 
 export const PrivateLoginScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -90,76 +92,100 @@ export const PrivateLoginScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col" dir="rtl">
-      {/* Header */}
-      <div className="bg-white shadow-sm px-4 py-4 flex items-center">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => navigate('/private')}
-          className="gap-2"
-        >
-          <ArrowRight className="w-4 h-4" />
-          חזור
-        </Button>
-        <div className="flex-1 text-center">
-          <Logo />
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 space-y-6">
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold">התחברות</h1>
-            <p className="text-muted-foreground text-sm">
-              הזן את מספר הטלפון שלך לקבלת קוד אימות
-            </p>
+    <div className="min-h-screen h-screen overflow-y-auto overflow-x-hidden bg-gradient-to-b from-black to-gray-900 flex items-center justify-center p-4 fixed inset-0" dir="rtl">
+      <div className="w-full max-w-md my-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/private')}
+            className="gap-2 text-gray-300 hover:text-white"
+          >
+            <ArrowRight className="w-4 h-4" />
+            חזור
+          </Button>
+          <div className="text-center">
+            <img 
+              src={logo}
+              alt="AutoHub Logo" 
+              className="h-16 w-auto mx-auto mb-4"
+            />
+            <p className="text-gray-300 hebrew-text">התחברות</p>
           </div>
+          <div className="w-16"></div>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">מספר טלפון</label>
-              <div className="relative">
-                <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  type="tel"
-                  placeholder="050-123-4567"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="pr-10"
-                  dir="ltr"
-                  maxLength={12}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                פורמט: 10 ספרות, מתחיל ב-05
+        <GradientBorderContainer className="rounded-md">
+          <Card className="w-full p-6 space-y-6 border-0 bg-black">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white hebrew-text">התחברות למערכת</h2>
+              <p className="text-gray-300 text-sm hebrew-text">
+                הזן את מספר הטלפון שלך לקבלת קוד אימות
               </p>
             </div>
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full gap-2"
-              size="lg"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {isLoading ? 'שולח קוד...' : 'המשך'}
-            </Button>
-          </form>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-white hebrew-text">מספר טלפון</Label>
+                <div className="relative">
+                  <Phone className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="050-123-4567"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="pr-10 text-right bg-gray-800 border-gray-700 text-white placeholder-gray-500"
+                    dir="ltr"
+                    maxLength={12}
+                  />
+                </div>
+                <p className="text-xs text-gray-400 hebrew-text">
+                  פורמט: 10 ספרות, מתחיל ב-05
+                </p>
+              </div>
 
-          {/* Register Link */}
-          <div className="text-center text-sm">
-            <span className="text-muted-foreground">עדיין אין לך חשבון? </span>
-            <Button
-              variant="link"
-              className="p-0 h-auto font-semibold"
-              onClick={() => navigate('/private/register')}
-            >
-              הירשם עכשיו
-            </Button>
-          </div>
-        </Card>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white hebrew-text"
+                size="lg"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <ArrowLeft className="w-4 h-4" />
+                )}
+                {isLoading ? 'שולח קוד...' : 'המשך'}
+              </Button>
+            </form>
+
+            <div className="border-t border-gray-700/50"></div>
+
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-300 hebrew-text">
+                עדיין אין לך חשבון?
+              </p>
+              <Button 
+                size="sm" 
+                onClick={() => navigate('/private/register')}
+                className="gap-2 bg-gray-800 text-white hover:bg-gray-700 hebrew-text"
+              >
+                הרשמה חדשה
+              </Button>
+            </div>
+
+            <div className="text-center">
+              <Button variant="ghost" size="sm" className="text-xs text-gray-400 hover:text-white hebrew-text">
+                תנאי שימוש ומדיניות פרטיות
+              </Button>
+            </div>
+          </Card>
+        </GradientBorderContainer>
+        
+        {/* Bottom Spacer */}
+        <div style={{ height: 'calc(4rem + 20px)' }} aria-hidden="true" />
       </div>
     </div>
   );
