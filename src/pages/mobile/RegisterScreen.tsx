@@ -263,11 +263,6 @@ export const RegisterScreen: React.FC = () => {
               alt="AutoHub Logo" 
               className="h-16 w-auto mx-auto mb-4"
             />
-            <h1 className="text-3xl font-bold mb-2 hebrew-text">
-              <span className="text-blue-400">D</span>
-              <span className="text-white">ealer</span>
-              <span className="text-blue-400">s</span>
-            </h1>
             <p className="text-gray-300 hebrew-text">הרשמה חדשה</p>
           </div>
           <div className="w-16"></div>
